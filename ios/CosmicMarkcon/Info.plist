@@ -9,7 +9,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>CosmicMarkcon</string>
+	<string>Cosmic</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -40,7 +40,7 @@
 	<key>FacebookClientToken</key>
 	<string>c7d8bbed65dacedc0c8c43563010ded1</string>
 	<key>FacebookDisplayName</key>
-	<string>CosmicMarkcon</string>
+	<string>Cosmic</string>
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-2129001407304490~6945256957</string>
 	<key>LSApplicationQueriesSchemes</key>
@@ -62,15 +62,15 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Manga Verse needs access to your camera to take photos.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Manga Verse needs access to your location to provide location-based features.</string>
+	<string>Cosmic needs access to your location to provide location-based features.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Manga Verse needs permission to save images to your photo library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Manga Verse needs access to your photo library to let you select and upload images.</string>
 	<key>NSUserNotificationsUsageDescription</key>
-	<string>Manga Verse would like to send you notifications about important updates and messages.</string>
+	<string>Cosmic would like to send you notifications about important updates and messages.</string>
 	<key>NSUserTrackingUsageDescription</key>
-	<string>Manga Verse would like to track your activity across apps and websites owned by other companies for personalized advertising and analytics purposes.</string>
+	<string>Cosmic would like to track your activity across apps and websites owned by other companies for personalized advertising and analytics purposes.</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>SKAdNetworkItems</key>
