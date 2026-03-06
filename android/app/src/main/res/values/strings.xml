@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Manga Verse</string>
+    
+    <!-- Facebook SDK Configuration -->
+    <string name="facebook_app_id">734401465854955</string>
+    <string name="facebook_client_token">c7d8bbed65dacedc0c8c43563010ded1</string>
+    <string name="fb_login_protocol_scheme">fb734401465854955</string>
+    
+    <!-- Widget Configuration -->
+    <string name="widget_description">Display your todo list on the home screen</string>
+</resources>

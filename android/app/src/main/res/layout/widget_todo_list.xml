@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/widget_background">
+
+    <!-- Header Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="12dp">
+
+        <TextView
+            android:id="@+id/widget_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="My Todo List"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:ellipsize="end"
+            android:maxLines="1" />
+
+        <ImageButton
+            android:id="@+id/widget_refresh_button"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_popup_sync"
+            android:contentDescription="Refresh"
+            android:tint="#FFFFFF" />
+    </LinearLayout>
+
+    <!-- Todo Items -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/widget_item_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• Item 1"
+            android:textSize="14sp"
+            android:textColor="#E0E0E0"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:ellipsize="end"
+            android:maxLines="1" />
+
+        <TextView
+            android:id="@+id/widget_item_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• Item 2"
+            android:textSize="14sp"
+            android:textColor="#E0E0E0"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:ellipsize="end"
+            android:maxLines="1" />
+
+        <TextView
+            android:id="@+id/widget_item_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• Item 3"
+            android:textSize="14sp"
+            android:textColor="#E0E0E0"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:ellipsize="end"
+            android:maxLines="1" />
+
+        <TextView
+            android:id="@+id/widget_item_4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• Item 4"
+            android:textSize="14sp"
+            android:textColor="#E0E0E0"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:ellipsize="end"
+            android:maxLines="1" />
+
+        <TextView
+            android:id="@+id/widget_item_5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• Item 5"
+            android:textSize="14sp"
+            android:textColor="#E0E0E0"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:ellipsize="end"
+            android:maxLines="1" />
+    </LinearLayout>
+
+    <!-- Footer hint -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tap to open app"
+        android:textSize="11sp"
+        android:textColor="#80FFFFFF"
+        android:gravity="center"
+        android:paddingTop="12dp" />
+</LinearLayout>

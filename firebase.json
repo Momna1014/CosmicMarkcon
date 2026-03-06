@@ -1,0 +1,17 @@
+{
+  "react-native": {
+    "analytics_auto_collection_enabled": false,
+    "crashlytics_auto_collection_enabled": false,
+    "crashlytics_debug_enabled": false,
+    "crashlytics_ndk_enabled": true,
+    "crashlytics_is_error_generation_on_js_crash_enabled": true,
+    "crashlytics_javascript_exception_handler_chaining_enabled": true,
+    "messaging_auto_init_enabled": true,
+    "in_app_messaging_auto_collection_enabled": true,
+    "perf_auto_collection_enabled": false,
+    "perf_collection_enabled": false,
+    "remote_config_auto_fetch_enabled": true,
+    "remote_config_fetch_interval": 3600,
+    "remote_config_throttle_interval_millis": 60000
+  }
+}

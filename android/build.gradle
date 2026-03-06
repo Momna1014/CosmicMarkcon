@@ -1,0 +1,29 @@
+buildscript {
+    ext {
+        buildToolsVersion = "36.0.0"
+        minSdkVersion = 24
+        compileSdkVersion = 36
+        targetSdkVersion = 36
+        ndkVersion = "27.1.12297006"
+        kotlinVersion = "2.1.20"
+    }
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://artifacts.applovin.com/android' }  // Add this line
+
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle")
+        classpath("com.facebook.react:react-native-gradle-plugin")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
+        // Google Services plugin for Firebase (required to process google-services.json)
+        classpath("com.google.gms:google-services:4.4.4")
+        // Firebase Crashlytics plugin for crash reporting
+        classpath("com.google.firebase:firebase-crashlytics-gradle:3.0.2")
+        // Sentry plugin for error tracking and source maps (temporarily disabled to test build)
+        // classpath("io.sentry:sentry-android-gradle-plugin:4.3.1")
+    }
+}
+
+apply plugin: "com.facebook.react.rootproject"
