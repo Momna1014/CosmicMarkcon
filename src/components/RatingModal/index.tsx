@@ -141,7 +141,7 @@ const StarIcon: React.FC<StarIconProps> = memo(({ filled, size = 40, onPress, an
             <Path
               d={starPath}
               fill="transparent"
-              stroke={Colors.inactive}
+              // stroke={Colors.inactive}
               strokeWidth={1.5}
             />
           )}
@@ -541,7 +541,7 @@ const styles = StyleSheet.create({
   ratingBadgeText: {
     fontFamily: FontFamilies.interSemiBold,
     fontSize: moderateScale(13),
-    color: Colors.primary,
+    // color: Colors.primary,
     fontWeight: '600',
   },
   tapHint: {

@@ -17,63 +17,59 @@ import {
   fontScale,
 } from '../../theme';
 
-// Import SVG icons
-import HomeSvg from '../../assets/icons/svgicons/BottomTabIcons/Home.svg';
-import DiscoverSvg from '../../assets/icons/svgicons/BottomTabIcons/Discover.svg';
-import LibrarySvg from '../../assets/icons/svgicons/BottomTabIcons/Library.svg';
-import MeSvg from '../../assets/icons/svgicons/BottomTabIcons/Me.svg';
+// import HomeSvg from '../../assets/icons/svgicons/BottomTabIcons/Home.svg';
+// import DiscoverSvg from '../../assets/icons/svgicons/BottomTabIcons/Discover.svg';
+// import LibrarySvg from '../../assets/icons/svgicons/BottomTabIcons/Library.svg';
+// import MeSvg from '../../assets/icons/svgicons/BottomTabIcons/Me.svg';
 
-// Import active SVG icons
-import ActiveHomeSvg from '../../assets/icons/svgicons/BottomTabIcons/active_home.svg';
-import ActiveDiscoverSvg from '../../assets/icons/svgicons/BottomTabIcons/active_discover.svg';
-import ActiveLibrarySvg from '../../assets/icons/svgicons/BottomTabIcons/active_library.svg';
-import ActiveMeSvg from '../../assets/icons/svgicons/BottomTabIcons/active_me.svg';
+// import ActiveHomeSvg from '../../assets/icons/svgicons/BottomTabIcons/active_home.svg';
+// import ActiveDiscoverSvg from '../../assets/icons/svgicons/BottomTabIcons/active_discover.svg';
+// import ActiveLibrarySvg from '../../assets/icons/svgicons/BottomTabIcons/active_library.svg';
+// import ActiveMeSvg from '../../assets/icons/svgicons/BottomTabIcons/active_me.svg';
 
-interface TabIconProps extends SvgProps {
-  focused: boolean;
-  size?: number;
-}
+// interface TabIconProps extends SvgProps {
+//   focused: boolean;
+//   size?: number;
+// }
 
-// Icon components with focus state
-const HomeIcon: React.FC<TabIconProps> = ({ focused, size = moderateScale(32), ...props }) => (
-  focused ? (
-    <ActiveHomeSvg width={size} height={size} {...props} />
-  ) : (
-    <HomeSvg width={size} height={size} stroke={Colors.dark.textSecondary} {...props} />
-  )
-);
+// const HomeIcon: React.FC<TabIconProps> = ({ focused, size = moderateScale(32), ...props }) => (
+//   focused ? (
+//     <ActiveHomeSvg width={size} height={size} {...props} />
+//   ) : (
+//     <HomeSvg width={size} height={size} stroke={Colors.dark.textSecondary} {...props} />
+//   )
+// );
 
-const DiscoverIcon: React.FC<TabIconProps> = ({ focused, size = moderateScale(32), ...props }) => (
-  focused ? (
-    <ActiveDiscoverSvg width={size} height={size} {...props} />
-  ) : (
-    <DiscoverSvg width={size} height={size} stroke={Colors.dark.textSecondary} {...props} />
-  )
-);
+// const DiscoverIcon: React.FC<TabIconProps> = ({ focused, size = moderateScale(32), ...props }) => (
+//   focused ? (
+//     <ActiveDiscoverSvg width={size} height={size} {...props} />
+//   ) : (
+//     <DiscoverSvg width={size} height={size} stroke={Colors.dark.textSecondary} {...props} />
+//   )
+// );
 
-const LibraryIcon: React.FC<TabIconProps> = ({ focused, size = moderateScale(32), ...props }) => (
-  focused ? (
-    <ActiveLibrarySvg width={size} height={size} {...props} />
-  ) : (
-    <LibrarySvg width={size} height={size} stroke={Colors.dark.textSecondary} {...props} />
-  )
-);
+// const LibraryIcon: React.FC<TabIconProps> = ({ focused, size = moderateScale(32), ...props }) => (
+//   focused ? (
+//     <ActiveLibrarySvg width={size} height={size} {...props} />
+//   ) : (
+//     <LibrarySvg width={size} height={size} stroke={Colors.dark.textSecondary} {...props} />
+//   )
+// );
 
-const MeIcon: React.FC<TabIconProps> = ({ focused, size = moderateScale(32), ...props }) => (
-  focused ? (
-    <ActiveMeSvg width={size} height={size} {...props} />
-  ) : (
-    <MeSvg width={size} height={size} stroke={Colors.dark.textSecondary} {...props} />
-  )
-);
+// const MeIcon: React.FC<TabIconProps> = ({ focused, size = moderateScale(32), ...props }) => (
+//   focused ? (
+//     <ActiveMeSvg width={size} height={size} {...props} />
+//   ) : (
+//     <MeSvg width={size} height={size} stroke={Colors.dark.textSecondary} {...props} />
+//   )
+// );
 
-// Icon mapping
-const iconMap: Record<string, React.FC<TabIconProps>> = {
-  Home: HomeIcon,
-  Discover: DiscoverIcon,
-  Library: LibraryIcon,
-  Me: MeIcon,
-};
+// const iconMap: Record<string, React.FC<TabIconProps>> = {
+//   Home: HomeIcon,
+//   Discover: DiscoverIcon,
+//   Library: LibraryIcon,
+//   Me: MeIcon,
+// };
 
 interface CustomBottomTabBarProps extends BottomTabBarProps {}
 
@@ -95,7 +91,7 @@ const BottomTabBar: React.FC<CustomBottomTabBarProps> = ({
               : route.name;
 
           const isFocused = state.index === index;
-          const IconComponent = iconMap[route.name];
+          // const IconComponent = iconMap[route.name];
 
           const onPress = () => {
             const event = navigation.emit({
@@ -129,9 +125,9 @@ const BottomTabBar: React.FC<CustomBottomTabBarProps> = ({
               activeOpacity={0.7}
             >
               <View style={styles.iconContainer}>
-                {IconComponent && (
+                {/* {IconComponent && (
                   <IconComponent focused={isFocused} size={moderateScale(32)} />
-                )}
+                )} */}
               </View>
               <Text
                 style={[

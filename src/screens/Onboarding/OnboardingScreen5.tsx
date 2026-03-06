@@ -38,7 +38,8 @@ import {
 import SunIcon from '../../assets/icons/onboarding_icons/sun.svg';
 import MoonIcon from '../../assets/icons/onboarding_icons/moon.svg';
 import RisingIcon from '../../assets/icons/onboarding_icons/rising.svg';
-
+import {showPaywall} from '../../utils/showPaywall';
+import { useNavigation } from '@react-navigation/native';
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
 // Background image - same as other onboarding screens
@@ -171,7 +172,7 @@ export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
   const progressAnimatedStyle = useAnimatedStyle(() => ({
     width: `${progressWidth.value}%`,
   }));
-
+ const navigation = useNavigation();
   const handleNext = () => {
     // Button pulse animation
     buttonScale.value = withSequence(
@@ -181,6 +182,8 @@ export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
     setTimeout(() => {
       onNext?.();
     }, 150);
+
+        showPaywall('onboarding_start_reading', navigation);
   };
 
   const buttonAnimatedStyle = useAnimatedStyle(() => ({

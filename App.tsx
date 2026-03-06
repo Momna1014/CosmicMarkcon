@@ -272,8 +272,7 @@
  * @see src/initialization/README.md for full architecture details
  */
 import React, { JSX, useEffect, useState, useRef } from 'react';
-import { StatusBar } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar, View } from 'react-native';
 import { Provider, useDispatch } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import Toast from 'react-native-toast-message';
@@ -434,7 +433,7 @@ const AppContent = (): JSX.Element => {
   }, [appStartTime, initState]);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
+    <View style={{ flex: 1,}}>
       <StatusBar
         barStyle={isDark ? 'light-content' : 'dark-content'}
         backgroundColor={theme.colors.background}
@@ -470,7 +469,7 @@ const AppContent = (): JSX.Element => {
           onClose={() => setShowForceUpdate(false)} // DEV ONLY: Allow closing the modal in test mode
         />
       )} */}
-    </SafeAreaView>
+    </View>
   );
 };
 

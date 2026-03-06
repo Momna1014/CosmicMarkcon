@@ -347,6 +347,8 @@ const styles = StyleSheet.create({
   backgroundFallback: {
     flex: 1,
     backgroundColor: Colors.cosmicBackground,
+    // backgroundColor:'pink'
+    
   },
   container: {
     flex: 1,
