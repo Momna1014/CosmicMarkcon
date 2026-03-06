@@ -1,0 +1,58 @@
+
+Using of scripts:
+
+In project structure, run yarn and build is project successfully on both android and ios
+
+After successful building,
+
+Follow the below mentioned steps:
+
+
+NOTE: name of ios Bundle Identifier and android package name should not have underscore
+
+STEP 1: clean-cache.sh
+STEP 2: rename-android-project.sh (A new folder structure will be created)
+STEP 3: rename-ios-project.sh (Run this command in newly created folder sturcture)
+STEP 4: clean-cache.sh
+STEP 5: cleanup-backups.sh
+fix-bundle-identifier.sh (not need)
+
+
+---------------------Splash Icon------------------------------------------------------------
+Run this command: yarn generate-bootsplash 
+To replace only the icon: npx react-native-bootsplash 
+To replace background and the icon: "npx react-native-bootsplash generate src/assets/SplashLogo/logo.png --platforms=android,ios --background=#FFFFFF --logo-width=100",
+Note:
+Place the required icon to be at this place: src/assets/SplashLogo/logo.png
+---------------------------------------------------------------------------------------------
+
+---------------------Create new screen in Stack, Bottom or Drawer----------------------
+Run Script: create-screen.sh (Follow Permissions.txt for running this)
+---------------------------------------------------------------------------------------
+
+---------------------App Icon------------------------------
+TO RUN THIS SCRIPT: node src/scripts/app-icon-generator.js
+-----------------------------------------------------------
+
+-------------------Android WIDGET--------------------------------------
+To Enable Widget: yarn widget:enable ✅
+To Disable Widget: yarn widget:disable ❌
+
+Or Run this : yarn widget:toggle 🔄
+
+Must Run after enabling or disabling : bash check-widget-status.sh 📊
+------------------------------------------------------------------------
+
+---------------------Rename App display name for Android and iOS------------------------
+Run Script: rename-app-display.sh (Follow Permissions.txt for running this)
+
+# Script to rename app display name for Android and iOS
+# This script updates:
+# 1. App display name shown on mobile devices
+# 2. Permission descriptions that reference the app name
+# 3. Facebook display name
+# 4. app.json configuration
+
+----------------------------------------------------------------------------------------
+
+

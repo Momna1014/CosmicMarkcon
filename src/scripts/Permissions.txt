@@ -1,0 +1,24 @@
+======> PERMISSIONS:
+If you face permission issues for SCRIPTS, then run the below command:
+
+chmod +x /Users/macmini/Desktop/Project_name/rename-ios-project.sh
+
+Example:
+
+chmod +x Documents/GitHub/DemoApp/rename-ios-project.sh
+chmod +x /Users/macmini/Desktop/DemoApp/rename-ios-project.sh
+chmod +x /Users/macmini/Desktop/CrytoGram/src/scripts/rename-ios-project.sh
+
+chmod +x src/scripts/cleanup-backups.sh
+----------------------------------------------------------
+
+======> Execution of SCRIPTS:
+
+To Run the SCRIPTS, run the below command accordingly:
+
+./src/scripts/setup-applovin.sh
+./src/scripts/rename-app-display.sh "My Awesome App"
+
+node src/scripts/app-icon-generator.js
+
+-----------------------------------------------------------
