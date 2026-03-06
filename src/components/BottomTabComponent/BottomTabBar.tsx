@@ -4,20 +4,16 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  Dimensions,
 } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import Svg, { SvgProps } from 'react-native-svg';
+import { SvgProps } from 'react-native-svg';
 
 // Import theme and scaling functions
 import {
   Colors,
   FontFamilies,
   verticalScale,
-  horizontalScale,
   moderateScale,
-  BorderRadius,
-  Spacing,
   fontScale,
 } from '../../theme';
 
@@ -43,7 +39,7 @@ const HomeIcon: React.FC<TabIconProps> = ({ focused, size = moderateScale(32), .
   focused ? (
     <ActiveHomeSvg width={size} height={size} {...props} />
   ) : (
-    <HomeSvg width={size} height={size} stroke={Colors.inactive} {...props} />
+    <HomeSvg width={size} height={size} stroke={Colors.dark.textSecondary} {...props} />
   )
 );
 
@@ -51,7 +47,7 @@ const DiscoverIcon: React.FC<TabIconProps> = ({ focused, size = moderateScale(32
   focused ? (
     <ActiveDiscoverSvg width={size} height={size} {...props} />
   ) : (
-    <DiscoverSvg width={size} height={size} stroke={Colors.inactive} {...props} />
+    <DiscoverSvg width={size} height={size} stroke={Colors.dark.textSecondary} {...props} />
   )
 );
 
@@ -59,7 +55,7 @@ const LibraryIcon: React.FC<TabIconProps> = ({ focused, size = moderateScale(32)
   focused ? (
     <ActiveLibrarySvg width={size} height={size} {...props} />
   ) : (
-    <LibrarySvg width={size} height={size} stroke={Colors.inactive} {...props} />
+    <LibrarySvg width={size} height={size} stroke={Colors.dark.textSecondary} {...props} />
   )
 );
 
@@ -67,7 +63,7 @@ const MeIcon: React.FC<TabIconProps> = ({ focused, size = moderateScale(32), ...
   focused ? (
     <ActiveMeSvg width={size} height={size} {...props} />
   ) : (
-    <MeSvg width={size} height={size} stroke={Colors.inactive} {...props} />
+    <MeSvg width={size} height={size} stroke={Colors.dark.textSecondary} {...props} />
   )
 );
 
@@ -141,7 +137,7 @@ const BottomTabBar: React.FC<CustomBottomTabBarProps> = ({
                 style={[
                   styles.tabLabel,
                   {
-                    color: isFocused ? Colors.white : Colors.inactive,
+                    color: isFocused ? Colors.white : Colors.dark.textSecondary,
                   },
                 ]}
               >
@@ -157,11 +153,11 @@ const BottomTabBar: React.FC<CustomBottomTabBarProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.dark.background,
   },
   tabBar: {
     flexDirection: 'row',
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.dark.background,
     paddingTop: verticalScale(12),
     // paddingBottom: verticalScale(20), // Extra padding for safe area
     // paddingHorizontal: horizontalScale(16),
@@ -181,7 +177,7 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(8),
   },
   tabLabel: {
-    fontFamily: FontFamilies.jetBrainsMonoRegular,
+    fontFamily: FontFamilies.interRegular,
     fontSize: fontScale(14),
     fontWeight: '400',
     lineHeight: fontScale(18), // Increased for iPad compatibility

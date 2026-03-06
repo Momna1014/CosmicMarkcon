@@ -22,12 +22,7 @@ import NavigationConfig from './NavigationConfig';
 import TabNavigator from './TabNavigator';
 import {OnboardingContainer} from '../screens/Onboarding';
 import PaywallScreen from '../screens/Paywall';
-import HomeDetailScreen from '../screens/HomeDetail';
-import DiscoveryDetailScreen from '../screens/DiscoveryDetail';
-import ChaptersScreen from '../screens/Chapters';
-import ReviewsDetailScreen from '../screens/ReviewsDetail';
-import PDFReaderScreen from '../screens/PDFReader';
-import NotificationTestScreen from '../screens/NotificationTest';
+
 
 
 // Conditionally import DrawerNavigator
@@ -120,53 +115,6 @@ export const StackNavigator: React.FC = () => {
         }}
       />
 
-      <Stack.Screen
-        name="HomeDetail"
-        component={HomeDetailScreen}
-        options={{
-          title: 'HomeDetail',
-        }}
-      />
-      <Stack.Screen
-        name="DiscoveryDetail"
-        component={DiscoveryDetailScreen}
-        options={{
-          title: 'DiscoveryDetail',
-        }}
-      />
-      <Stack.Screen
-        name="Chapters"
-        component={ChaptersScreen}
-        options={{
-          title: 'Chapters',
-        }}
-      />
-      <Stack.Screen
-        name="ReviewsDetail"
-        component={ReviewsDetailScreen}
-        options={{
-          title: 'ReviewsDetail',
-        }}
-      />
-      <Stack.Screen
-        name="PDFReader"
-        component={PDFReaderScreen}
-        options={{
-          headerShown: false,
-          animation: 'slide_from_right',
-        }}
-      />
-
-      {/* Notification Test Screen */}
-      <Stack.Screen
-        name="NotificationTest"
-        component={NotificationTestScreen}
-        options={{
-          headerShown: false,
-          animation: 'slide_from_right',
-        }}
-      />
-      
       {/* Paywall Screen - Full screen, not modal */}
       {/* Can be used as initial route or navigated to from anywhere */}
       {NavigationConfig.enablePaywall && (

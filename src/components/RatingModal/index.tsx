@@ -504,7 +504,7 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(42),
   },
   title: {
-    fontFamily: FontFamilies.poppinsBold,
+    fontFamily: FontFamilies.interBold,
     fontSize: moderateScale(22),
     fontWeight: '700',
     color: '#FFFFFF',
@@ -512,7 +512,7 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(6),
   },
   subtitle: {
-    fontFamily: FontFamilies.poppinsRegular,
+    fontFamily: FontFamilies.interRegular,
     fontSize: moderateScale(14),
     color: 'rgba(255, 255, 255, 0.6)',
     textAlign: 'center',
@@ -539,13 +539,13 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 62, 87, 0.3)',
   },
   ratingBadgeText: {
-    fontFamily: FontFamilies.poppinsSemiBold,
+    fontFamily: FontFamilies.interSemiBold,
     fontSize: moderateScale(13),
     color: Colors.primary,
     fontWeight: '600',
   },
   tapHint: {
-    fontFamily: FontFamilies.poppinsRegular,
+    fontFamily: FontFamilies.interRegular,
     fontSize: moderateScale(13),
     color: 'rgba(255, 255, 255, 0.4)',
   },
@@ -574,7 +574,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   submitButtonText: {
-    fontFamily: FontFamilies.poppinsSemiBold,
+    fontFamily: FontFamilies.interSemiBold,
     fontSize: moderateScale(16),
     fontWeight: '600',
     color: '#FFFFFF',
@@ -583,7 +583,7 @@ const styles = StyleSheet.create({
     paddingVertical: verticalScale(6),
   },
   skipText: {
-    fontFamily: FontFamilies.poppinsRegular,
+    fontFamily: FontFamilies.interRegular,
     fontSize: moderateScale(14),
     color: 'rgba(255, 255, 255, 0.4)',
   },
