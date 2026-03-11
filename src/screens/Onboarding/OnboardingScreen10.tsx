@@ -41,6 +41,11 @@ import {OnboardingData} from './OnboardingContainer';
 // SVG Icons
 import LeafIcon from '../../assets/icons/onboarding_icons/leaf.svg';
 import {hapticLight} from '../../utils/haptics';
+import {
+  trackOnboarding10View,
+  trackOnboarding10LoadingComplete,
+  trackOnboarding10Continue,
+} from '../../utils/onboardingAnalytics';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -80,6 +85,8 @@ export const OnboardingScreen10: React.FC<OnboardingScreen10Props> = ({
   // Mark loading as complete
   const onLoadingComplete = useCallback(() => {
     setIsLoadingComplete(true);
+    // Track loading complete
+    trackOnboarding10LoadingComplete();
     // Animate top progress bar to 91% when result shows - Screen 10 of 11
     topProgressWidth.value = withTiming(91, {
       duration: 800,
@@ -88,6 +95,9 @@ export const OnboardingScreen10: React.FC<OnboardingScreen10Props> = ({
   }, [topProgressWidth]);
 
   useEffect(() => {
+    // Track screen view (loading started)
+    trackOnboarding10View();
+    
     // Animate leaf with subtle pulse
     leafScale.value = withRepeat(
       withSequence(
@@ -152,6 +162,8 @@ export const OnboardingScreen10: React.FC<OnboardingScreen10Props> = ({
 
   const handleContinue = useCallback(() => {
     hapticLight();
+    // Track continue button click
+    trackOnboarding10Continue();
     buttonScale.value = withSequence(
       withTiming(1.02, {duration: 100}),
       withTiming(1, {duration: 100}),

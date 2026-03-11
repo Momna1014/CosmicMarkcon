@@ -43,6 +43,10 @@ import {OnboardingData} from './OnboardingContainer';
 import StartCommaIcon from '../../assets/icons/onboarding_icons/start_comma.svg';
 import EndCommaIcon from '../../assets/icons/onboarding_icons/end_comma.svg';
 import {hapticLight} from '../../utils/haptics';
+import {
+  trackOnboarding11View,
+  trackOnboarding11Complete,
+} from '../../utils/onboardingAnalytics';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -194,6 +198,9 @@ export const OnboardingScreen11: React.FC<OnboardingScreen11Props> = ({
   const buttonScale = useSharedValue(1);
 
   useEffect(() => {
+    // Track final screen view
+    trackOnboarding11View();
+    
     // Animate progress bar to 100%
     progressWidth.value = withDelay(
       300,
@@ -212,6 +219,8 @@ export const OnboardingScreen11: React.FC<OnboardingScreen11Props> = ({
 
   const handleNext = useCallback(() => {
     hapticLight();
+    // Track onboarding completion
+    trackOnboarding11Complete();
     buttonScale.value = withSequence(
       withTiming(1.02, {duration: 100}),
       withTiming(1, {duration: 100}),

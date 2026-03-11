@@ -35,6 +35,11 @@ import {
   radiusScale,
 } from '../../theme';
 import {hapticLight} from '../../utils/haptics';
+import {
+  trackOnboarding1View,
+  trackOnboarding1AlignmentSelected,
+  trackOnboardingStarted,
+} from '../../utils/onboardingAnalytics';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 const BackgroundImageSource = require('../../assets/icons/onboarding_icons/background_image.png');
@@ -153,6 +158,10 @@ export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
   const buttonScale = useSharedValue(1);
 
   useEffect(() => {
+    // Track screen view and onboarding start
+    trackOnboardingStarted();
+    trackOnboarding1View();
+    
     // Animate progress bar on mount - Screen 1 of 11 (9%)
     progressWidth.value = withDelay(
       300,
@@ -181,6 +190,10 @@ export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
 
   const handleOptionSelect = (optionId: AlignmentOption) => {
     setSelectedOption(optionId);
+    // Track alignment selection
+    if (optionId) {
+      trackOnboarding1AlignmentSelected(optionId);
+    }
     // Subtle pulse animation on button when option selected
     buttonScale.value = withSequence(
       withTiming(1.02, {duration: 100}),

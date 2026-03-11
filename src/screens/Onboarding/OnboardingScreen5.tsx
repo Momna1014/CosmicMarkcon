@@ -40,6 +40,10 @@ import SunIcon from '../../assets/icons/onboarding_icons/sun.svg';
 import MoonIcon from '../../assets/icons/onboarding_icons/moon.svg';
 import RisingIcon from '../../assets/icons/onboarding_icons/rising.svg';
 import {hapticLight} from '../../utils/haptics';
+import {
+  trackOnboarding5View,
+  trackOnboarding5DiscoverMapClicked,
+} from '../../utils/onboardingAnalytics';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -164,6 +168,9 @@ export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
   const buttonScale = useSharedValue(1);
 
   useEffect(() => {
+    // Track screen view
+    trackOnboarding5View();
+    
     // Animate progress bar on mount - Screen 5 of 11 (45%)
     progressWidth.value = withDelay(
       300,
@@ -177,6 +184,8 @@ export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
   }));
   const handleNext = () => {
     hapticLight();
+    // Track discover map clicked
+    trackOnboarding5DiscoverMapClicked();
     // Button pulse animation
     buttonScale.value = withSequence(
       withTiming(1.02, {duration: 100}),

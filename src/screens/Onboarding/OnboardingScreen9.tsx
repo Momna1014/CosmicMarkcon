@@ -51,6 +51,13 @@ import {
 import WatchIcon from '../../assets/icons/onboarding_icons/watch.svg';
 import PolicyIcon from '../../assets/icons/onboarding_icons/policy.svg';
 import {hapticLight} from '../../utils/haptics';
+import {
+  trackOnboarding9View,
+  trackOnboarding9TimeSelected,
+  trackOnboarding9CountrySelected,
+  trackOnboarding9CitySelected,
+  trackOnboarding9Continue,
+} from '../../utils/onboardingAnalytics';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -396,6 +403,9 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
 
   // Defer heavy operations to after mount using requestAnimationFrame
   useEffect(() => {
+    // Track screen view
+    trackOnboarding9View();
+    
     // Use requestAnimationFrame as a lightweight alternative to InteractionManager
     const frameId = requestAnimationFrame(() => {
       setIsReady(true);
@@ -431,6 +441,13 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
       ? `${timeValue.hour}:${String(timeValue.minute).padStart(2, '0')} ${timeValue.ampm}`
       : '';
 
+    // Track completion with location data
+    trackOnboarding9Continue(
+      Boolean(timeString),
+      Boolean(selectedCountry?.name),
+      Boolean(selectedCity?.name),
+    );
+
     setTimeout(() => {
       onNext?.(
         timeString,
@@ -451,6 +468,8 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
   const handleTimeConfirm = useCallback((value: TimePickerValue) => {
     setTimeValue(value);
     setShowTimePicker(false);
+    // Track time selection with AM/PM
+    trackOnboarding9TimeSelected(value.ampm);
   }, []);
 
   const handleOpenCountryPicker = useCallback(() => {
@@ -464,6 +483,9 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
   const handleCountrySelect = useCallback((country: ICountry) => {
     setSelectedCountry(country);
     setSelectedCity(null); // Reset city when country changes
+    
+    // Track country selection
+    trackOnboarding9CountrySelected(country.name);
     
     // Check if country has cities
     const cities = City.getCitiesOfCountry(country.isoCode) || [];
@@ -482,6 +504,8 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
 
   const handleCitySelect = useCallback((city: ICity) => {
     setSelectedCity(city);
+    // Track city selection
+    trackOnboarding9CitySelected(city.name);
   }, []);
 
   // Check if all fields are filled

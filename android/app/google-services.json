@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "148381319580",
-    "project_id": "mangamania-c4668",
-    "storage_bucket": "mangamania-c4668.firebasestorage.app"
+    "project_number": "524130079468",
+    "project_id": "horoscope-love",
+    "storage_bucket": "horoscope-love.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:148381319580:android:a03af2e611e6fcd5540859",
+        "mobilesdk_app_id": "1:524130079468:android:e230e1f8b7f3a768e60bc9",
         "android_client_info": {
           "package_name": "com.cosmic.markcon"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyD2mlSqz54Aqw7SGlTVDBLo4laq5gQmgGI"
+          "current_key": "AIzaSyCTSYqILNKabW7MYRueG_IEJzEBhF1AdtQ"
         }
       ],
       "services": {

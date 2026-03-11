@@ -35,6 +35,11 @@ import {
   radiusScale,
 } from '../../theme';
 import {getZodiacSign} from '../../components/mock/zodiacMockData';
+import {
+  trackOnboarding4View,
+  trackOnboarding4TypewriterComplete,
+  trackOnboarding4AutoNavigate,
+} from '../../utils/onboardingAnalytics';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -190,6 +195,9 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
 
   // Animate progress bar on mount - Screen 4 of 11 (36%)
   useEffect(() => {
+    // Track screen view with zodiac name and insight number
+    trackOnboarding4View(zodiac.name, insightNumber);
+    
     progressWidth.value = withDelay(
       300,
       withTiming(36, {duration: 800, easing: Easing.out(Easing.cubic)}),
@@ -258,13 +266,18 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
   // Auto-navigate after both texts complete
   useEffect(() => {
     if (isSubTextComplete && onNext) {
+      // Track typewriter completion
+      trackOnboarding4TypewriterComplete(zodiac.name);
+      
       const navigateTimeout = setTimeout(() => {
+        // Track auto-navigation
+        trackOnboarding4AutoNavigate();
         onNext();
       }, 2000); // 2 seconds after completion
 
       return () => clearTimeout(navigateTimeout);
     }
-  }, [isSubTextComplete, onNext]);
+  }, [isSubTextComplete, onNext, zodiac]);
 
   const cursorAnimatedStyle = useAnimatedStyle(() => ({
     opacity: cursorOpacity.value,

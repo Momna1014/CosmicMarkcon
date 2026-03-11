@@ -42,6 +42,11 @@ import {
 import {AlignmentOption} from './OnboardingScreen1';
 import ArrowIcon from '../../assets/icons/onboarding_icons/arrow.svg';
 import {hapticLight} from '../../utils/haptics';
+import {
+  trackOnboarding2View,
+  trackOnboarding2NameStarted,
+  trackOnboarding2NameSubmitted,
+} from '../../utils/onboardingAnalytics';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 const BackgroundImageSource = require('../../assets/icons/onboarding_icons/background_image.png');
@@ -152,6 +157,7 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
 }) => {
   const {t} = useTranslation();
   const [name, setName] = useState('');
+  const [hasStartedTyping, setHasStartedTyping] = useState(false);
 
   // Progress bar animation - start from previous screen's value (9%)
   const progressWidth = useSharedValue(9);
@@ -160,6 +166,9 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
   const buttonScale = useSharedValue(1);
 
   useEffect(() => {
+    // Track screen view
+    trackOnboarding2View();
+    
     // Animate progress bar on mount - Screen 2 of 11 (18%)
     progressWidth.value = withDelay(
       300,
@@ -175,6 +184,8 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
   const handleNext = () => {
     if (name.trim()) {
       hapticLight();
+      // Track name submission
+      trackOnboarding2NameSubmitted(name.trim().length);
       // Subtle pulse animation on button
       buttonScale.value = withSequence(
         withTiming(1.02, {duration: 100}),
@@ -184,6 +195,15 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
       setTimeout(() => {
         onNext?.(name.trim());
       }, 150);
+    }
+  };
+
+  const handleNameChange = (text: string) => {
+    setName(text);
+    // Track when user starts typing (first character)
+    if (!hasStartedTyping && text.length > 0) {
+      setHasStartedTyping(true);
+      trackOnboarding2NameStarted();
     }
   };
 
@@ -298,7 +318,7 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
                       placeholder={t('onboarding.screen2.placeholder')}
                       placeholderTextColor={Colors.subHeading}
                       value={name}
-                      onChangeText={setName}
+                      onChangeText={handleNameChange}
                       autoCapitalize="words"
                       autoCorrect={false}
                       returnKeyType="done"

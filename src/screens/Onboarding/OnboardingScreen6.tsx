@@ -38,6 +38,10 @@ import {
 } from '../../theme';
 import UnlockAnalysisIcon from '../../assets/icons/onboarding_icons/unlock_analysis.svg';
 import {hapticLight} from '../../utils/haptics';
+import {
+  trackOnboarding6View,
+  trackOnboarding6DeepenAnalysisClicked,
+} from '../../utils/onboardingAnalytics';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -167,6 +171,9 @@ export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
   const buttonScale = useSharedValue(1);
 
   useEffect(() => {
+    // Track screen view
+    trackOnboarding6View();
+    
     // Animate progress bar on mount - Screen 6 of 11 (55%)
     progressWidth.value = withDelay(
       300,
@@ -181,6 +188,8 @@ export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
 
   const handleNext = () => {
     hapticLight();
+    // Track deepen analysis clicked
+    trackOnboarding6DeepenAnalysisClicked();
     // Button pulse animation
     buttonScale.value = withSequence(
       withTiming(1.02, {duration: 100}),

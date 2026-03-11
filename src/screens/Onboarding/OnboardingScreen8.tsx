@@ -56,6 +56,10 @@ import {OnboardingData} from './OnboardingContainer';
 import RoundCircles from '../../assets/icons/onboarding_icons/round_circles.svg';
 import GreenDot from '../../assets/icons/onboarding_icons/green_dot.svg';
 import {hapticLight} from '../../utils/haptics';
+import {
+  trackOnboarding8View,
+  trackOnboarding8Continue,
+} from '../../utils/onboardingAnalytics';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -221,6 +225,11 @@ export const OnboardingScreen8: React.FC<OnboardingScreen8Props> = ({
   const greenDotScale = useSharedValue(1);
 
   useEffect(() => {
+    // Track screen view with element
+    if (westernZodiac) {
+      trackOnboarding8View(westernZodiac.element);
+    }
+    
     // Animate progress bar on mount - Screen 8 of 11 (73%)
     progressWidth.value = withDelay(
       300,
@@ -260,6 +269,10 @@ export const OnboardingScreen8: React.FC<OnboardingScreen8Props> = ({
 
   const handleNext = () => {
     hapticLight();
+    // Track continue with element
+    if (westernZodiac) {
+      trackOnboarding8Continue(westernZodiac.element);
+    }
     // Button pulse animation
     buttonScale.value = withSequence(
       withTiming(1.02, {duration: 100}),

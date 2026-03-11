@@ -37,6 +37,12 @@ import {
 import {DatePicker} from '../../components/DatePicker';
 import {ZodiacCard} from '../../components/ZodiacCard';
 import {hapticLight} from '../../utils/haptics';
+import {getZodiacSign} from '../../components/mock/zodiacMockData';
+import {
+  trackOnboarding3View,
+  trackOnboarding3BirthdaySelected,
+  trackOnboarding3Continue,
+} from '../../utils/onboardingAnalytics';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 const BackgroundImageSource = require('../../assets/icons/onboarding_icons/background_image.png');
@@ -147,6 +153,7 @@ export const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
 }) => {
   const {t} = useTranslation();
   const [birthday, setBirthday] = useState<Date | null>(null);
+  const [hasTrackedBirthday, setHasTrackedBirthday] = useState(false);
 
   // Progress bar animation - start from previous screen's value (18%)
   const progressWidth = useSharedValue(18);
@@ -155,6 +162,9 @@ export const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
   const buttonScale = useSharedValue(1);
 
   useEffect(() => {
+    // Track screen view
+    trackOnboarding3View();
+    
     // Animate progress bar on mount - Screen 3 of 11 (27%)
     progressWidth.value = withDelay(
       300,
@@ -170,6 +180,9 @@ export const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
   const handleNext = () => {
     if (birthday) {
       hapticLight();
+      const zodiacSign = getZodiacSign(birthday);
+      // Track continue with zodiac sign name
+      trackOnboarding3Continue(zodiacSign.name);
       // Subtle pulse animation on button
       buttonScale.value = withSequence(
         withTiming(1.02, {duration: 100}),
@@ -179,6 +192,16 @@ export const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
       setTimeout(() => {
         onNext?.(birthday);
       }, 150);
+    }
+  };
+
+  const handleBirthdayChange = (date: Date | null) => {
+    setBirthday(date);
+    // Track birthday selection (only once)
+    if (date && !hasTrackedBirthday) {
+      setHasTrackedBirthday(true);
+      const zodiacSign = getZodiacSign(date);
+      trackOnboarding3BirthdaySelected(zodiacSign.name);
     }
   };
 
@@ -288,7 +311,7 @@ export const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
               style={styles.inputSection}>
               <DatePicker
                 value={birthday}
-                onChange={setBirthday}
+                onChange={handleBirthdayChange}
                 minimumDate={minDate}
                 maximumDate={maxDate}
               />

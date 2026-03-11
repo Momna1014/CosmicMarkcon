@@ -43,6 +43,10 @@ import {
 } from '../../components/mock/zodiacMockData';
 import {OnboardingData} from './OnboardingContainer';
 import {hapticLight} from '../../utils/haptics';
+import {
+  trackOnboarding7View,
+  trackOnboarding7Continue,
+} from '../../utils/onboardingAnalytics';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -207,6 +211,15 @@ export const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({
   const buttonScale = useSharedValue(1);
 
   useEffect(() => {
+    // Track screen view with zodiac data
+    if (westernZodiac && easternZodiac) {
+      trackOnboarding7View(
+        westernZodiac.name,
+        easternZodiac.name,
+        combinationPercentage
+      );
+    }
+    
     // Animate progress bar on mount - Screen 7 of 11 (64%)
     progressWidth.value = withDelay(
       300,
@@ -221,6 +234,10 @@ export const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({
 
   const handleNext = () => {
     hapticLight();
+    // Track continue with zodiac data
+    if (westernZodiac && easternZodiac) {
+      trackOnboarding7Continue(westernZodiac.name, easternZodiac.name);
+    }
     // Button pulse animation
     buttonScale.value = withSequence(
       withTiming(1.02, {duration: 100}),
