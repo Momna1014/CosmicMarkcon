@@ -296,7 +296,7 @@ import { RatingProvider } from './src/contexts/RatingContext';
 
 
 // Import i18n configuration
-// import './src/i18n';
+import './src/i18n';
 import * as Sentry from '@sentry/react-native';
 
 // Sentry.init({

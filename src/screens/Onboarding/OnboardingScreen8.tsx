@@ -15,6 +15,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {useTranslation} from 'react-i18next';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -40,8 +41,15 @@ import {
   getZodiacSign,
   getEasternZodiacSign,
   getCombinationPercentage,
-  getCombinationEnergyText,
 } from '../../components/mock/zodiacMockData';
+
+// Highlight words for each element
+const ELEMENT_HIGHLIGHT_WORDS: {[key: string]: string[]} = {
+  fire: ['alignment', 'fire', 'intensity', 'bravery', 'radiance'],
+  earth: ['grounding', 'roots', 'endurance', 'determination', 'mastery'],
+  air: ['innovation', 'freedom', 'insight', 'perspective', 'connection'],
+  water: ['depth', 'wisdom', 'perception', 'understanding', 'transcendence'],
+};
 import {OnboardingData} from './OnboardingContainer';
 
 // SVG Icons
@@ -165,6 +173,8 @@ export const OnboardingScreen8: React.FC<OnboardingScreen8Props> = ({
   onNext,
   onboardingData,
 }) => {
+  const {t} = useTranslation();
+
   // Get Western zodiac sign based on date and month
   const westernZodiac = useMemo(() => {
     if (!onboardingData.birthday) return null;
@@ -184,13 +194,19 @@ export const OnboardingScreen8: React.FC<OnboardingScreen8Props> = ({
     return getCombinationPercentage(westernZodiac.name, easternZodiac.name);
   }, [westernZodiac, easternZodiac]);
 
-  // Get combination energy text
+  // Get combination energy text with translations
   const energyText = useMemo(() => {
-    if (!westernZodiac || !easternZodiac) {
-      return {mainText: "Your energy doesn't come from the crowd.", highlightWord: "alignment"};
-    }
-    return getCombinationEnergyText(westernZodiac.element, easternZodiac.name);
-  }, [westernZodiac, easternZodiac]);
+    const element = (westernZodiac?.element || 'Fire').toLowerCase();
+    const easternName = easternZodiac?.name || 'Dragon';
+    const textIndex = (easternName.length % 5) + 1; // 1-5 index for text1-text5
+    const highlightWords = ELEMENT_HIGHLIGHT_WORDS[element] || ELEMENT_HIGHLIGHT_WORDS.fire;
+    const highlightKey = highlightWords[textIndex - 1];
+    
+    return {
+      mainText: t(`zodiac.energy.${element}.text${textIndex}`),
+      highlightWord: t(`zodiac.energy.${element}.${highlightKey}`),
+    };
+  }, [westernZodiac, easternZodiac, t]);
 
   // Progress bar animation - start from previous screen's value (64%)
   const progressWidth = useSharedValue(64);
@@ -333,7 +349,7 @@ export const OnboardingScreen8: React.FC<OnboardingScreen8Props> = ({
                 <Animated.Text
                   entering={FadeInDown.delay(550).duration(600).springify()}
                   style={styles.subHeading}>
-                  It comes from <Text style={styles.highlightText}>{energyText.highlightWord}</Text>.
+                  {t('onboarding.screen8.energySource', {alignment: energyText.highlightWord})}
                 </Animated.Text>
 
                 {/* Pattern Badge */}
@@ -344,7 +360,7 @@ export const OnboardingScreen8: React.FC<OnboardingScreen8Props> = ({
                     <GreenDot width={moderateScale(20)} height={moderateScale(20)} />
                   </Animated.View>
                   <Text style={styles.patternText}>
-                    Only {combinationPercentage}% of people experience this pattern
+                    {t('onboarding.screen8.rarityText', {percentage: combinationPercentage})}
                   </Text>
                 </Animated.View>
               </View>
@@ -358,7 +374,7 @@ export const OnboardingScreen8: React.FC<OnboardingScreen8Props> = ({
                 style={[styles.nextButton, buttonAnimatedStyle]}
                 onPress={handleNext}
                 activeOpacity={0.8}>
-                <Text style={styles.nextButtonText}>Final step</Text>
+                <Text style={styles.nextButtonText}>{t('onboarding.screen8.button')}</Text>
               </AnimatedTouchable>
             </Animated.View>
           </View>

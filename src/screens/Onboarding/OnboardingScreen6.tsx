@@ -15,6 +15,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {useTranslation} from 'react-i18next';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -157,6 +158,8 @@ interface OnboardingScreen6Props {
 export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
   onNext,
 }) => {
+  const {t} = useTranslation();
+
   // Progress bar animation - start from previous screen's value (45%)
   const progressWidth = useSharedValue(45);
 
@@ -260,14 +263,14 @@ export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
             <Animated.Text
               entering={FadeInDown.delay(200).duration(600).springify()}
               style={styles.mainHeading}>
-              Three deeper{'\n'}cosmic layers are{'\n'}influencing you{'\n'}right now.
+              {t('onboarding.screen6.heading')}
             </Animated.Text>
 
             {/* Sub Heading - just below heading like OnboardingScreen1 */}
             <Animated.Text
               entering={FadeInDown.delay(350).duration(600).springify()}
               style={styles.subHeading}>
-              Most people live their lives ignoring these.
+              {t('onboarding.screen6.subheading')}
             </Animated.Text>
 
             {/* Spacer */}
@@ -288,7 +291,7 @@ export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
                     {/* Centered Content */}
                     <View style={styles.cardContent}>
                       <UnlockAnalysisIcon width={52} height={52} />
-                      <Text style={styles.unlockCardText}>Unlock with analysis</Text>
+                      <Text style={styles.unlockCardText}>{t('onboarding.screen6.buttonUnlock')}</Text>
                     </View>
                   </ImageBackground>
                 </Animated.View>
@@ -303,7 +306,7 @@ export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
                 style={[styles.nextButton, buttonAnimatedStyle]}
                 onPress={handleNext}
                 activeOpacity={0.8}>
-                <Text style={styles.nextButtonText}>Deepen my analysis</Text>
+                <Text style={styles.nextButtonText}>{t('onboarding.screen6.buttonDeepen')}</Text>
               </AnimatedTouchable>
             </Animated.View>
           </View>

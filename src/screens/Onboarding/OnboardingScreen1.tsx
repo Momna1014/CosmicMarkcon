@@ -13,6 +13,7 @@ import {
   Dimensions,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {useTranslation} from 'react-i18next';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -142,6 +143,7 @@ const TwinklingStar: React.FC<{
 export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
   onContinue,
 }) => {
+  const {t} = useTranslation();
   const [selectedOption, setSelectedOption] = useState<AlignmentOption>(null);
 
   // Progress bar animation
@@ -191,9 +193,9 @@ export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
   }));
 
   const options = [
-    {id: 'in-my-flow' as AlignmentOption, label: 'In my flow'},
-    {id: 'figuring-it-out' as AlignmentOption, label: 'Figuring it out'},
-    {id: 'totally-lost' as AlignmentOption, label: 'Totally Lost'},
+    {id: 'in-my-flow' as AlignmentOption, label: t('onboarding.screen1.options.inMyFlow')},
+    {id: 'figuring-it-out' as AlignmentOption, label: t('onboarding.screen1.options.figuringItOut')},
+    {id: 'totally-lost' as AlignmentOption, label: t('onboarding.screen1.options.totallyLost')},
   ];
 
   // Twinkling stars configuration - more stars, various sizes and intensities
@@ -272,14 +274,14 @@ export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
             <Animated.Text
               entering={FadeInDown.delay(200).duration(600).springify()}
               style={styles.mainHeading}>
-              How aligned do you feel with your life right now?
+              {t('onboarding.screen1.heading')}
             </Animated.Text>
 
             {/* Sub Heading */}
             <Animated.Text
               entering={FadeInDown.delay(350).duration(600).springify()}
               style={styles.subHeading}>
-              Be honest - this helps us tune your cosmic reading.
+              {t('onboarding.screen1.subheading')}
             </Animated.Text>
 
             {/* Spacer */}
@@ -324,18 +326,12 @@ export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
                 disabled={!selectedOption}
                 onPress={handleContinue}
                 activeOpacity={0.8}>
-                <Text style={styles.continueButtonText}>Continue</Text>
+                <Text style={styles.continueButtonText}>{t('onboarding.screen1.button')}</Text>
               </AnimatedTouchable>
 
               {/* Footer Text */}
               <Text style={styles.footerText}>
-                Your answers will shape a{' '}
-                <Text style={styles.footerTextHighlight}>
-                  unique cosmic snapshot {''}
-                </Text>
-                   <Text style={styles.footerText}>
-                   only for you.
-                   </Text>
+                {t('onboarding.screen1.footer')}
               </Text>
             </Animated.View>
           </View>

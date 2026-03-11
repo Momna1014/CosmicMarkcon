@@ -15,6 +15,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {useTranslation} from 'react-i18next';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -154,6 +155,8 @@ interface OnboardingScreen5Props {
 export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
   onNext,
 }) => {
+  const {t} = useTranslation();
+
   // Progress bar animation - start from previous screen's value (36%)
   const progressWidth = useSharedValue(36);
 
@@ -258,21 +261,21 @@ export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
               <Animated.Text
                 entering={FadeInDown.delay(300).duration(600).springify()}
                 style={styles.subHeading}>
-                Most horoscope only read{'\n'}your Sun.
+                {t('onboarding.screen5.heading')}
               </Animated.Text>
 
               {/* Main Heading */}
               <Animated.Text
                 entering={FadeInDown.delay(400).duration(600).springify()}
                 style={styles.mainHeading}>
-                But your reactions are shaped elsewhere.
+                {t('onboarding.screen5.subheading')}
               </Animated.Text>
 
               {/* Description */}
               <Animated.Text
                 entering={FadeInDown.delay(500).duration(600).springify()}
                 style={styles.description}>
-                Not everyone is weird to pick up subtle{'\n'}shifts.
+                {t('onboarding.screen5.description')}
               </Animated.Text>
 
               {/* Icons Row */}
@@ -282,13 +285,13 @@ export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
                 {/* Moon / Hidden */}
                 <View style={styles.iconItem}>
                   <MoonIcon width={40} height={40} />
-                  <Text style={styles.iconLabel}>HIDDEN</Text>
+                  <Text style={styles.iconLabel}>{t('onboarding.screen5.hidden')}</Text>
                 </View>
 
                 {/* Rising */}
                 <View style={styles.iconItem}>
                   <RisingIcon width={40} height={40} />
-                  <Text style={styles.iconLabel}>RISING</Text>
+                  <Text style={styles.iconLabel}>{t('onboarding.screen5.rising')}</Text>
                 </View>
               </Animated.View>
             </View>
@@ -299,7 +302,7 @@ export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
                 style={[styles.nextButton, buttonAnimatedStyle]}
                 onPress={handleNext}
                 activeOpacity={0.8}>
-                <Text style={styles.nextButtonText}>Discover my map</Text>
+                <Text style={styles.nextButtonText}>{t('onboarding.screen5.button')}</Text>
               </AnimatedTouchable>
             </View>
           </View>

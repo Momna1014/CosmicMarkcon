@@ -13,6 +13,7 @@ import {
   Dimensions,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {useTranslation} from 'react-i18next';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -144,6 +145,7 @@ export const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
   onNext,
   name: _name,
 }) => {
+  const {t} = useTranslation();
   const [birthday, setBirthday] = useState<Date | null>(null);
 
   // Progress bar animation - start from previous screen's value (18%)
@@ -261,14 +263,14 @@ export const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
             <Animated.Text
               entering={FadeInDown.delay(200).duration(600).springify()}
               style={styles.mainHeading}>
-              When were you born?
+              {t('onboarding.screen3.heading')}
             </Animated.Text>
 
             {/* Sub Heading */}
             <Animated.Text
               entering={FadeInDown.delay(350).duration(600).springify()}
               style={styles.subHeading}>
-              Your birth date reveals your cosmic blueprint.
+              {t('onboarding.screen3.subheading')}
             </Animated.Text>
 
             {/* Center Section - Zodiac Card (when date selected) */}
@@ -307,17 +309,17 @@ export const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
                 onPress={handleNext}
                 activeOpacity={0.8}>
                 <Text style={styles.nextButtonText}>
-                  {birthday ? 'Analyze my pattern' : 'Continue'}
+                  {birthday ? t('onboarding.screen3.buttonAnalyze') : t('onboarding.screen3.button')}
                 </Text>
               </AnimatedTouchable>
 
               {/* Footer Text */}
               <Text style={styles.footerText}>
-                Your answers will shape a{' '}
+                {t('onboarding.screen3.footerPart1')}
                 <Text style={styles.footerTextHighlight}>
-                  unique cosmic snapshot{' '}
+                  {t('onboarding.screen3.footerHighlight')}
                 </Text>
-                <Text style={styles.footerText}>only for you.</Text>
+                <Text style={styles.footerText}>{t('onboarding.screen3.footerPart2')}</Text>
               </Text>
             </Animated.View>
           </View>

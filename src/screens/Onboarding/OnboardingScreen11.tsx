@@ -15,6 +15,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {useTranslation} from 'react-i18next';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -184,6 +185,8 @@ export const OnboardingScreen11: React.FC<OnboardingScreen11Props> = ({
   onNext,
   onboardingData: _onboardingData,
 }) => {
+  const {t} = useTranslation();
+
   // Progress bar animation - start from previous screen's value (91%)
   const progressWidth = useSharedValue(91);
 
@@ -256,7 +259,7 @@ export const OnboardingScreen11: React.FC<OnboardingScreen11Props> = ({
               <Animated.Text
                 entering={FadeInDown.delay(200).duration(600).springify()}
                 style={styles.mainHeading}>
-                We've locked onto your{'\n'}unique energetic{'\n'}signature,
+                {t('onboarding.screen11.signature')}
               </Animated.Text>
 
               {/* Quote Section */}
@@ -267,14 +270,14 @@ export const OnboardingScreen11: React.FC<OnboardingScreen11Props> = ({
                 <View style={styles.quoteFirstLine}>
                   <StartCommaIcon width={moderateScale(55)} height={moderateScale(55)} />
                   <Text style={styles.quoteTextFirstLine}>
-                    A rare combination of intuition and
+                    {t('onboarding.screen11.quoteLine1')}
                   </Text>
                   <EndCommaIcon width={moderateScale(55)} height={moderateScale(55)} />
                 </View>
 
                 {/* Remaining text below */}
                 <Text style={styles.quoteTextRemaining}>
-                  logic that often feels like a{'\n'}contradiction...
+                  {t('onboarding.screen11.quoteLine2')}
                 </Text>
               </Animated.View>
             </View>
@@ -287,7 +290,7 @@ export const OnboardingScreen11: React.FC<OnboardingScreen11Props> = ({
                 style={[styles.nextButton, buttonAnimatedStyle]}
                 onPress={handleNext}
                 activeOpacity={0.8}>
-                <Text style={styles.nextButtonText}>Reveal final insight</Text>
+                <Text style={styles.nextButtonText}>{t('onboarding.screen11.button')}</Text>
               </AnimatedTouchable>
             </Animated.View>
           </View>

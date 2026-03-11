@@ -15,6 +15,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {useTranslation} from 'react-i18next';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -58,6 +59,8 @@ export const OnboardingScreen10: React.FC<OnboardingScreen10Props> = ({
   onComplete,
   onboardingData: _onboardingData,
 }) => {
+  const {t} = useTranslation();
+
   // State
   const [isLoadingComplete, setIsLoadingComplete] = useState(false);
   const [progressPercent, setProgressPercent] = useState(0);
@@ -173,7 +176,7 @@ export const OnboardingScreen10: React.FC<OnboardingScreen10Props> = ({
       <Animated.Text
         entering={FadeIn.delay(400).duration(500)}
         style={styles.loadingText}>
-        Aligning planetary ephemeris...
+        {t('onboarding.screen10.loading')}
       </Animated.Text>
 
       {/* Progress Bar */}
@@ -221,8 +224,7 @@ export const OnboardingScreen10: React.FC<OnboardingScreen10Props> = ({
           entering={FadeInUp.delay(200).duration(600).springify()}
           style={styles.resultTextContainer}>
           <Text style={styles.resultMainText}>
-            Today, your alignment{'\n'}is 
-            <Text style={styles.resultHighlight}> usually strong.</Text>
+            {t('onboarding.screen10.resultHeading')}
           </Text>
         </Animated.View>
 
@@ -230,7 +232,7 @@ export const OnboardingScreen10: React.FC<OnboardingScreen10Props> = ({
         <Animated.Text
           entering={FadeInUp.delay(400).duration(600).springify()}
           style={styles.resultSubtitle}>
-          This doesn't happen often.
+          {t('onboarding.screen10.resultSubheading')}
         </Animated.Text>
       </View>
 
@@ -242,7 +244,7 @@ export const OnboardingScreen10: React.FC<OnboardingScreen10Props> = ({
           style={[styles.ctaButton, buttonAnimatedStyle]}
           onPress={handleContinue}
           activeOpacity={0.8}>
-          <Text style={styles.ctaButtonText}>See what's influencing me</Text>
+          <Text style={styles.ctaButtonText}>{t('onboarding.screen10.button')}</Text>
         </AnimatedTouchable>
       </Animated.View>
     </Animated.View>

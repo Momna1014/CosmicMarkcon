@@ -25,6 +25,7 @@ import Animated, {
   withDelay,
   FadeInDown,
 } from 'react-native-reanimated';
+import {useTranslation} from 'react-i18next';
 import {
   Colors,
   FontFamilies,
@@ -33,15 +34,28 @@ import {
   verticalScale,
   radiusScale,
 } from '../../theme';
-import {getZodiacSign, getRandomInsight} from '../../components/mock/zodiacMockData';
+import {getZodiacSign} from '../../components/mock/zodiacMockData';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
 // Background image - same as other onboarding screens
 const BackgroundImageSource = require('../../assets/icons/onboarding_icons/background_image.png');
 
-// Static subtext
-const STATIC_SUBTEXT = 'Not everyone is weird to pick up subtle shifts.';
+// Map zodiac signs to translation keys
+const ZODIAC_KEYS: Record<string, string> = {
+  'Capricorn': 'capricorn',
+  'Aquarius': 'aquarius',
+  'Pisces': 'pisces',
+  'Aries': 'aries',
+  'Taurus': 'taurus',
+  'Gemini': 'gemini',
+  'Cancer': 'cancer',
+  'Leo': 'leo',
+  'Virgo': 'virgo',
+  'Libra': 'libra',
+  'Scorpio': 'scorpio',
+  'Sagittarius': 'sagittarius',
+};
 
 interface TwinklingStarProps {
   size: number;
@@ -151,9 +165,16 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
   onNext,
   birthday,
 }) => {
-  // Get zodiac sign and random insight based on birthday
+  const {t} = useTranslation();
+
+  // Get zodiac sign based on birthday
   const zodiac = useMemo(() => getZodiacSign(birthday), [birthday]);
-  const insight = useMemo(() => getRandomInsight(zodiac), [zodiac]);
+  
+  // Get random insight number (1-5) and translated insight text
+  const insightNumber = useMemo(() => Math.floor(Math.random() * 5) + 1, []);
+  const zodiacKey = ZODIAC_KEYS[zodiac] || 'aries';
+  const insightText = t(`zodiac.insights.${zodiacKey}.insight${insightNumber}`);
+  const subtextText = t('onboarding.screen4.subtext');
 
   // Typewriter state
   const [displayedMainText, setDisplayedMainText] = useState('');
@@ -195,12 +216,12 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
 
   // Main text typewriter effect
   useEffect(() => {
-    if (!insight.mainText) return;
+    if (!insightText) return;
 
     let currentIndex = 0;
     const typingInterval = setInterval(() => {
-      if (currentIndex < insight.mainText.length) {
-        setDisplayedMainText(insight.mainText.slice(0, currentIndex + 1));
+      if (currentIndex < insightText.length) {
+        setDisplayedMainText(insightText.slice(0, currentIndex + 1));
         currentIndex++;
       } else {
         clearInterval(typingInterval);
@@ -209,7 +230,7 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
     }, 50); // 50ms per character for smooth typing
 
     return () => clearInterval(typingInterval);
-  }, [insight.mainText]);
+  }, [insightText]);
 
   // Subtext typewriter effect (starts after main text completes)
   useEffect(() => {
@@ -219,8 +240,8 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
     const startDelay = setTimeout(() => {
       let currentIndex = 0;
       const typingInterval = setInterval(() => {
-        if (currentIndex < STATIC_SUBTEXT.length) {
-          setDisplayedSubText(STATIC_SUBTEXT.slice(0, currentIndex + 1));
+        if (currentIndex < subtextText.length) {
+          setDisplayedSubText(subtextText.slice(0, currentIndex + 1));
           currentIndex++;
         } else {
           clearInterval(typingInterval);
@@ -232,7 +253,7 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
     }, 500); // 500ms delay after main text
 
     return () => clearTimeout(startDelay);
-  }, [isMainTextComplete]);
+  }, [isMainTextComplete, subtextText]);
 
   // Auto-navigate after both texts complete
   useEffect(() => {

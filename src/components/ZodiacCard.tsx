@@ -14,6 +14,7 @@ import Animated, {
   FadeIn,
   FadeInUp,
 } from 'react-native-reanimated';
+import {useTranslation} from 'react-i18next';
 import {
   Colors,
   FontFamilies,
@@ -22,7 +23,7 @@ import {
   verticalScale,
   radiusScale,
 } from '../theme';
-import {getZodiacSign, getRandomTrait, type ZodiacSign} from './mock/zodiacMockData';
+import {getZodiacSign} from './mock/zodiacMockData';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -34,11 +35,19 @@ interface ZodiacCardProps {
 }
 
 export const ZodiacCard: React.FC<ZodiacCardProps> = ({birthday}) => {
+  const {t} = useTranslation();
   const zodiac = getZodiacSign(birthday);
+  const signKey = zodiac.name.toLowerCase();
   
-  // Get random trait - memoized so it stays consistent during component lifecycle
+  // Get random trait index - memoized so it stays consistent during component lifecycle
   // but changes when user returns to the screen (component remounts)
-  const randomTrait = useMemo(() => getRandomTrait(zodiac), [zodiac]);
+  const traitIndex = useMemo(() => Math.floor(Math.random() * 5) + 1, []);
+
+  // Get translated values
+  const translatedSign = t(`zodiac.western.${signKey}`);
+  const prefix = t(`zodiac.traits.${signKey}.trait${traitIndex}.prefix`);
+  const highlight = t(`zodiac.traits.${signKey}.trait${traitIndex}.highlight`);
+  const description = t(`zodiac.traits.${signKey}.trait${traitIndex}.description`);
 
   return (
     <Animated.View
@@ -54,23 +63,23 @@ export const ZodiacCard: React.FC<ZodiacCardProps> = ({birthday}) => {
           <Animated.Text
             entering={FadeIn.delay(300).duration(400)}
             style={styles.labelText}>
-            YOUR SUN SIGN
+            {t('onboarding.zodiacCard.sunSignLabel')}
           </Animated.Text>
           
           {/* You're a {Sign} */}
           <Animated.Text
             entering={FadeIn.delay(400).duration(400)}
             style={styles.titleText}>
-            You're a {zodiac.name}
+            {t('onboarding.zodiacCard.youreA', {sign: translatedSign})}
           </Animated.Text>
           
           {/* Three words trait with prefix and highlight */}
           <Animated.Text
             entering={FadeIn.delay(500).duration(400)}
             style={styles.threeWordsText}>
-            <Animated.Text style={styles.threeWordsNormal}>{randomTrait.prefix} </Animated.Text>
+            <Animated.Text style={styles.threeWordsNormal}>{prefix} </Animated.Text>
             <Animated.Text style={styles.threeWordsHighlight}>
-              {randomTrait.highlight.replace('.', '')}
+              {highlight.replace('.', '')}
             </Animated.Text>
             <Animated.Text style={styles.threeWordsNormal}>.</Animated.Text>
           </Animated.Text>
@@ -79,7 +88,7 @@ export const ZodiacCard: React.FC<ZodiacCardProps> = ({birthday}) => {
           <Animated.Text
             entering={FadeIn.delay(600).duration(400)}
             style={styles.descriptionText}>
-            {randomTrait.description}
+            {description}
           </Animated.Text>
         </View>
       </ImageBackground>

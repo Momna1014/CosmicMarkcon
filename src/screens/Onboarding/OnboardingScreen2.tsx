@@ -18,6 +18,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {useTranslation} from 'react-i18next';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -149,6 +150,7 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
   onNext,
   alignment: _alignment,
 }) => {
+  const {t} = useTranslation();
   const [name, setName] = useState('');
 
   // Progress bar animation - start from previous screen's value (9%)
@@ -264,14 +266,14 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
                 <Animated.Text
                   entering={FadeInDown.delay(200).duration(600).springify()}
                   style={styles.mainHeading}>
-                  Names carry{'\n'}power.
+                  {t('onboarding.screen2.heading')}
                 </Animated.Text>
 
                 {/* Sub Heading */}
                 <Animated.Text
                   entering={FadeInDown.delay(350).duration(600).springify()}
                   style={styles.subHeading}>
-                  It defines your energetic signature.
+                  {t('onboarding.screen2.subheading')}
                 </Animated.Text>
 
                 {/* Spacer */}
@@ -285,11 +287,7 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
                   <View style={styles.vibrationContainer}>
                     <Text style={styles.vibrationEmoji}>✨</Text>
                     <Text style={styles.vibrationText}>
-                      The vibration{''}
-                      <Text style={styles.vibrationName}>
-                        {name || ''}
-                      </Text>{' '}
-                      strong.
+                      {t('onboarding.screen2.vibration', {name: name || ''})}
                     </Text>
                   </View>
 
@@ -297,7 +295,7 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
                   <View style={styles.inputContainer}>
                     <TextInput
                       style={styles.textInput}
-                      placeholder="Enter your name"
+                      placeholder={t('onboarding.screen2.placeholder')}
                       placeholderTextColor={Colors.subHeading}
                       value={name}
                       onChangeText={setName}
@@ -324,7 +322,7 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
                     onPress={handleNext}
                     activeOpacity={0.8}>
                     <View style={styles.nextButtonContent}>
-                      <Text style={styles.nextButtonText}>Next</Text>
+                      <Text style={styles.nextButtonText}>{t('onboarding.screen2.button')}</Text>
                       <ArrowIcon
                         width={horizontalScale(24)}
                         height={verticalScale(24)}

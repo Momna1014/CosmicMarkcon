@@ -1,0 +1,426 @@
+{
+  "onboarding": {
+    "screen1": {
+      "heading": "How aligned do you feel with your life right now?",
+      "subheading": "Be honest — this helps us tune your cosmic reading.",
+      "options": {
+        "inMyFlow": "In my flow",
+        "figuringItOut": "Figuring it out",
+        "totallyLost": "Totally Lost"
+      },
+      "button": "Continue",
+      "footer": "Your answers are private and encrypted."
+    },
+    "screen2": {
+      "heading": "Names carry power.",
+      "subheading": "It defines your energetic signature.",
+      "vibration": "The vibration {{name}} strong.",
+      "placeholder": "Enter your name",
+      "button": "Next"
+    },
+    "screen3": {
+      "heading": "When were you born?",
+      "subheading": "Your birth date reveals your cosmic blueprint.",
+      "button": "Continue",
+      "buttonAnalyze": "Analyze my pattern",
+      "footerPart1": "Your answers will shape a ",
+      "footerHighlight": "unique cosmic snapshot ",
+      "footerPart2": "only for you."
+    },
+    "screen4": {
+      "subtext": "Not everyone is wired to pick up subtle shifts."
+    },
+    "screen5": {
+      "heading": "Most horoscope only read your Sun.",
+      "subheading": "But your reactions are shaped elsewhere.",
+      "description": "Not everyone is wired to pick up subtle shifts.",
+      "hidden": "HIDDEN",
+      "rising": "RISING",
+      "button": "Discover my map"
+    },
+    "screen6": {
+      "heading": "Three deeper cosmic layers are influencing you right now.",
+      "subheading": "Most people live their lives ignoring these.",
+      "card1": {
+        "title": "Your Rising Sign",
+        "description": "How others see you"
+      },
+      "card2": {
+        "title": "Moon Phase Impact",
+        "description": "Your emotional patterns"
+      },
+      "card3": {
+        "title": "Planetary Transits",
+        "description": "Current cosmic influences"
+      },
+      "buttonUnlock": "Unlock with analysis",
+      "buttonDeepen": "Deepen my analysis"
+    },
+    "screen7": {
+      "heading": "In Eastern astrology, you're a...",
+      "knownFor": "Known for {{trait}}.",
+      "combinationPrefix": "When we combine your {{western}} sun and {{eastern}} energy, we get a rare pattern.",
+      "combinationSuffix": "is rare — blending {{trait1}} with {{trait2}}.",
+      "rarityText": "Only {{percentage}}% of people share this exact combination.",
+      "button": "Continue"
+    },
+    "screen8": {
+      "energySource": "It comes from {{alignment}}.",
+      "rarityText": "Only {{percentage}}% of people experience this pattern",
+      "button": "Final step"
+    },
+    "screen9": {
+      "heading": "Let's get specific.",
+      "emphasis": "Minute-specific.",
+      "subheading": "Your birth time helps us calculate your Rising sign and exact sky map.",
+      "birthTime": "BIRTH TIME",
+      "birthPlace": "BIRTH PLACE",
+      "selectCountry": "Select country",
+      "selectCity": "Select city",
+      "cardHintWithCity": "City & Country are enough",
+      "cardHintNoCity": "Country is enough",
+      "timeHint": "If you don't know the exact time. Choose your\nbest guess.",
+      "completionPart1": "Perfect. We can now calculate a ",
+      "completionHighlight": "uniquely precise snapshot",
+      "completionPart2": " for AI.",
+      "privacy": "Your details are encrypted. We never share them.",
+      "button": "Complete my reading",
+      "validation": "Please fill in all fields"
+    },
+    "screen10": {
+      "loading": "Aligning planetary ephemeris...",
+      "resultHeading": "Today, your alignment is unusually strong.",
+      "resultSubheading": "This doesn't happen often.",
+      "button": "See what's influencing me"
+    },
+    "screen11": {
+      "signature": "We've locked onto your unique energetic signature,",
+      "quoteStart": "\"",
+      "quoteLine1": "A rare combination of intuition and",
+      "quoteLine2": "logic that often feels like a\ncontradiction...",
+      "button": "Reveal final insight"
+    },
+    "zodiacCard": {
+      "sunSignLabel": "YOUR SUN SIGN",
+      "youreA": "You're a {{sign}}"
+    }
+  },
+  "zodiac": {
+    "eastern": {
+      "rat": {
+        "name": "Rat",
+        "trait": "clever resourcefulness",
+        "description": "Known for clever resourcefulness."
+      },
+      "ox": {
+        "name": "Ox",
+        "trait": "patient dependability",
+        "description": "Known for patient dependability."
+      },
+      "tiger": {
+        "name": "Tiger",
+        "trait": "bold bravery",
+        "description": "Known for bold bravery."
+      },
+      "rabbit": {
+        "name": "Rabbit",
+        "trait": "gentle elegance",
+        "description": "Known for gentle elegance."
+      },
+      "dragon": {
+        "name": "Dragon",
+        "trait": "charismatic confidence",
+        "description": "Known for charismatic confidence."
+      },
+      "snake": {
+        "name": "Snake",
+        "trait": "wise intuition",
+        "description": "Known for wise intuition."
+      },
+      "horse": {
+        "name": "Horse",
+        "trait": "energetic independence",
+        "description": "Known for energetic independence."
+      },
+      "goat": {
+        "name": "Goat",
+        "trait": "artistic compassion",
+        "description": "Known for artistic compassion."
+      },
+      "monkey": {
+        "name": "Monkey",
+        "trait": "playful cleverness",
+        "description": "Known for playful cleverness."
+      },
+      "rooster": {
+        "name": "Rooster",
+        "trait": "confident precision",
+        "description": "Known for confident precision."
+      },
+      "dog": {
+        "name": "Dog",
+        "trait": "loyal protectiveness",
+        "description": "Known for loyal protectiveness."
+      },
+      "pig": {
+        "name": "Pig",
+        "trait": "generous warmth",
+        "description": "Known for generous warmth."
+      }
+    },
+    "energy": {
+      "fire": {
+        "text1": "Your energy doesn't come from the crowd.",
+        "text2": "Your passion ignites from within.",
+        "text3": "Your spirit burns brighter than most.",
+        "text4": "Your courage flows from your core.",
+        "text5": "Your light shines from deep inside.",
+        "alignment": "alignment",
+        "fire": "fire",
+        "intensity": "intensity",
+        "bravery": "bravery",
+        "radiance": "radiance"
+      },
+      "earth": {
+        "text1": "Your strength doesn't come from the crowd.",
+        "text2": "Your stability builds from foundation.",
+        "text3": "Your power grows from patience.",
+        "text4": "Your success comes from persistence.",
+        "text5": "Your wisdom emerges from experience.",
+        "grounding": "grounding",
+        "roots": "roots",
+        "endurance": "endurance",
+        "determination": "determination",
+        "mastery": "mastery"
+      },
+      "air": {
+        "text1": "Your ideas don't come from the crowd.",
+        "text2": "Your thoughts transcend boundaries.",
+        "text3": "Your mind connects unseen patterns.",
+        "text4": "Your vision extends beyond horizons.",
+        "text5": "Your intellect bridges distant worlds.",
+        "innovation": "innovation",
+        "freedom": "freedom",
+        "insight": "insight",
+        "perspective": "perspective",
+        "connection": "connection"
+      },
+      "water": {
+        "text1": "Your intuition doesn't come from the crowd.",
+        "text2": "Your emotions flow from ancient sources.",
+        "text3": "Your sensitivity reveals hidden truths.",
+        "text4": "Your empathy connects souls together.",
+        "text5": "Your dreams reach beyond this realm.",
+        "depth": "depth",
+        "wisdom": "wisdom",
+        "perception": "perception",
+        "understanding": "understanding",
+        "transcendence": "transcendence"
+      }
+    },
+    "western": {
+      "capricorn": "Capricorn",
+      "aquarius": "Aquarius",
+      "pisces": "Pisces",
+      "aries": "Aries",
+      "taurus": "Taurus",
+      "gemini": "Gemini",
+      "cancer": "Cancer",
+      "leo": "Leo",
+      "virgo": "Virgo",
+      "libra": "Libra",
+      "scorpio": "Scorpio",
+      "sagittarius": "Sagittarius"
+    },
+    "traits": {
+      "capricorn": {
+        "trait1": {"prefix": "Naturally", "highlight": "disciplined and wise.", "description": "Your relentless determination builds empires where others see only obstacles."},
+        "trait2": {"prefix": "Born", "highlight": "patient and strategic.", "description": "Your steady climb to success inspires everyone watching your journey."},
+        "trait3": {"prefix": "Inherently", "highlight": "resilient and focused.", "description": "Your unwavering focus transforms distant dreams into concrete reality."},
+        "trait4": {"prefix": "Truly", "highlight": "hardworking and masterful.", "description": "Your natural leadership earns respect through actions, not just words."},
+        "trait5": {"prefix": "Deeply", "highlight": "ambitious and grounded.", "description": "Your commitment to excellence sets standards others aspire to reach."}
+      },
+      "aquarius": {
+        "trait1": {"prefix": "Naturally", "highlight": "progressive and visionary.", "description": "Your innovative mind sees possibilities invisible to conventional thinkers."},
+        "trait2": {"prefix": "Born", "highlight": "humanitarian and inventive.", "description": "Your unique perspective brings revolutionary ideas that change the world."},
+        "trait3": {"prefix": "Inherently", "highlight": "independent and brilliant.", "description": "Your refusal to conform opens doors nobody knew existed."},
+        "trait4": {"prefix": "Truly", "highlight": "innovative and analytical.", "description": "Your forward-thinking nature positions you decades ahead of your time."},
+        "trait5": {"prefix": "Deeply", "highlight": "authentic and revolutionary.", "description": "Your genuine care for humanity drives you to make meaningful change."}
+      },
+      "pisces": {
+        "trait1": {"prefix": "Naturally", "highlight": "intuitive and artistic.", "description": "Your emotional depth creates connections that transcend ordinary bonds."},
+        "trait2": {"prefix": "Born", "highlight": "empathetic and imaginative.", "description": "Your boundless creativity flows from a wellspring of infinite possibilities."},
+        "trait3": {"prefix": "Inherently", "highlight": "wise and spiritual.", "description": "Your intuition guides you through waters others fear to navigate."},
+        "trait4": {"prefix": "Truly", "highlight": "gentle and mystical.", "description": "Your artistic soul transforms everyday moments into magical experiences."},
+        "trait5": {"prefix": "Deeply", "highlight": "romantic and selfless.", "description": "Your capacity for love and understanding heals everyone you touch."}
+      },
+      "aries": {
+        "trait1": {"prefix": "Naturally", "highlight": "bold and fearless.", "description": "Your pioneering spirit blazes trails where others hesitate to step."},
+        "trait2": {"prefix": "Born", "highlight": "courageous and confident.", "description": "Your natural leadership ignites passion in everyone around you."},
+        "trait3": {"prefix": "Inherently", "highlight": "passionate and dynamic.", "description": "Your unstoppable drive turns impossible challenges into conquered victories."},
+        "trait4": {"prefix": "Truly", "highlight": "direct and independent.", "description": "Your fierce authenticity inspires others to embrace their true selves."},
+        "trait5": {"prefix": "Deeply", "highlight": "enthusiastic and pioneering.", "description": "Your courage in the face of adversity makes you a natural champion."}
+      },
+      "taurus": {
+        "trait1": {"prefix": "Naturally", "highlight": "reliable and devoted.", "description": "Your steadfast nature creates a foundation others can always depend on."},
+        "trait2": {"prefix": "Born", "highlight": "sensual and determined.", "description": "Your appreciation for life's pleasures brings richness to every experience."},
+        "trait3": {"prefix": "Inherently", "highlight": "practical and loyal.", "description": "Your unwavering loyalty makes you the anchor in any storm."},
+        "trait4": {"prefix": "Truly", "highlight": "persistent and nurturing.", "description": "Your patient perseverance achieves what others abandon as impossible."},
+        "trait5": {"prefix": "Deeply", "highlight": "stable and serene.", "description": "Your calm presence brings peace to chaos and clarity to confusion."}
+      },
+      "gemini": {
+        "trait1": {"prefix": "Naturally", "highlight": "brilliantly curious.", "description": "Your adaptability allows you to thrive where others freeze."},
+        "trait2": {"prefix": "Born", "highlight": "witty and versatile.", "description": "Your quick mind dances through conversations with effortless charm."},
+        "trait3": {"prefix": "Inherently", "highlight": "expressive and clever.", "description": "Your dual nature sees both sides, finding truth others miss."},
+        "trait4": {"prefix": "Truly", "highlight": "playful and quick-minded.", "description": "Your gift for connection transforms strangers into friends instantly."},
+        "trait5": {"prefix": "Deeply", "highlight": "social and fascinating.", "description": "Your restless intellect keeps life an exciting adventure."}
+      },
+      "cancer": {
+        "trait1": {"prefix": "Naturally", "highlight": "intuitive and protective.", "description": "Your nurturing heart creates safe havens for those you love."},
+        "trait2": {"prefix": "Born", "highlight": "nurturing and loyal.", "description": "Your fierce devotion to family builds unbreakable bonds of love."},
+        "trait3": {"prefix": "Inherently", "highlight": "compassionate and caring.", "description": "Your emotional intelligence reads hearts before words are spoken."},
+        "trait4": {"prefix": "Truly", "highlight": "devoted and empathetic.", "description": "Your protective instincts shield loved ones from life's harsh storms."},
+        "trait5": {"prefix": "Deeply", "highlight": "warm and tenacious.", "description": "Your memory for love and loyalty knows no bounds or limits."}
+      },
+      "leo": {
+        "trait1": {"prefix": "Naturally", "highlight": "bold and magnificent.", "description": "Your radiant presence lights up every room you enter."},
+        "trait2": {"prefix": "Born", "highlight": "generous and loyal.", "description": "Your warm heart shares its light freely with everyone around."},
+        "trait3": {"prefix": "Inherently", "highlight": "charismatic and confident.", "description": "Your natural royalty commands attention without demanding it."},
+        "trait4": {"prefix": "Truly", "highlight": "courageous and magnetic.", "description": "Your theatrical spirit transforms ordinary moments into memorable events."},
+        "trait5": {"prefix": "Deeply", "highlight": "passionate and regal.", "description": "Your nobility of spirit inspires loyalty in all who know you."}
+      },
+      "virgo": {
+        "trait1": {"prefix": "Naturally", "highlight": "analytical and brilliant.", "description": "Your attention to detail perfects what others leave half-finished."},
+        "trait2": {"prefix": "Born", "highlight": "meticulous and reliable.", "description": "Your dedication to improvement elevates everything you touch."},
+        "trait3": {"prefix": "Inherently", "highlight": "intelligent and precise.", "description": "Your problem-solving mind untangles knots others can't even see."},
+        "trait4": {"prefix": "Truly", "highlight": "diligent and organized.", "description": "Your systematic approach brings order to chaos effortlessly."},
+        "trait5": {"prefix": "Deeply", "highlight": "caring and perfectionist.", "description": "Your quiet service makes the world work better for everyone."}
+      },
+      "libra": {
+        "trait1": {"prefix": "Naturally", "highlight": "harmonious and fair.", "description": "Your natural grace brings balance to every relationship you enter."},
+        "trait2": {"prefix": "Born", "highlight": "graceful and charming.", "description": "Your aesthetic eye creates beauty wherever you make your mark."},
+        "trait3": {"prefix": "Inherently", "highlight": "idealistic and romantic.", "description": "Your pursuit of justice and fairness inspires others to be better."},
+        "trait4": {"prefix": "Truly", "highlight": "peaceful and artistic.", "description": "Your partnership skills build bridges where others see walls."},
+        "trait5": {"prefix": "Deeply", "highlight": "refined and diplomatic.", "description": "Your ability to see all sides makes you a natural peacemaker."}
+      },
+      "scorpio": {
+        "trait1": {"prefix": "Naturally", "highlight": "passionate and resourceful.", "description": "Your intensity transforms ordinary experiences into profound revelations."},
+        "trait2": {"prefix": "Born", "highlight": "determined and magnetic.", "description": "Your unwavering focus penetrates mysteries others can't comprehend."},
+        "trait3": {"prefix": "Inherently", "highlight": "powerful and transformative.", "description": "Your ability to rise from ashes makes you eternally unstoppable."},
+        "trait4": {"prefix": "Truly", "highlight": "strategic and perceptive.", "description": "Your emotional depth creates bonds that transcend time itself."},
+        "trait5": {"prefix": "Deeply", "highlight": "brave and investigative.", "description": "Your fearless pursuit of truth uncovers what others desperately hide."}
+      },
+      "sagittarius": {
+        "trait1": {"prefix": "Naturally", "highlight": "adventurous and free.", "description": "Your boundless enthusiasm turns every journey into an epic adventure."},
+        "trait2": {"prefix": "Born", "highlight": "philosophical and generous.", "description": "Your quest for meaning inspires others to look beyond the horizon."},
+        "trait3": {"prefix": "Inherently", "highlight": "optimistic and lucky.", "description": "Your positive energy attracts fortune wherever you wander."},
+        "trait4": {"prefix": "Truly", "highlight": "curious and fun-loving.", "description": "Your infectious joy for life makes every moment worth celebrating."},
+        "trait5": {"prefix": "Deeply", "highlight": "bold and truth-seeking.", "description": "Your honest wisdom cuts through illusion to find what's real."}
+      }
+    },
+    "insights": {
+      "capricorn": {
+        "insight1": "You carry the weight of the world and make it look effortless.",
+        "insight2": "Success comes to you because you never stop climbing.",
+        "insight3": "Your patience is a superpower others can only dream of.",
+        "insight4": "You see the long game when others are stuck in the moment.",
+        "insight5": "Structure gives you freedom that chaos never could."
+      },
+      "aquarius": {
+        "insight1": "You think in ways that won't make sense for another decade.",
+        "insight2": "Your uniqueness isn't a flaw — it's your gift to the world.",
+        "insight3": "You care about humanity even when it doesn't understand you.",
+        "insight4": "Rules feel optional because you see better possibilities.",
+        "insight5": "You connect dots that others don't even know exist."
+      },
+      "pisces": {
+        "insight1": "You feel things before others notice them.",
+        "insight2": "Your dreams hold truths your waking mind hasn't caught yet.",
+        "insight3": "You absorb emotions like a sponge — and that's your power.",
+        "insight4": "Boundaries blur for you because you live between worlds.",
+        "insight5": "Your compassion is endless, even when it exhausts you."
+      },
+      "aries": {
+        "insight1": "You dive in headfirst while others are still thinking.",
+        "insight2": "Fear doesn't stop you — it fuels you.",
+        "insight3": "You start things others are afraid to even imagine.",
+        "insight4": "Waiting feels like torture because action is your language.",
+        "insight5": "You light fires in people without even trying."
+      },
+      "taurus": {
+        "insight1": "You build things meant to last when others build to impress.",
+        "insight2": "Comfort isn't laziness for you — it's wisdom.",
+        "insight3": "Your stubbornness is actually unshakeable self-trust.",
+        "insight4": "You notice details others rush right past.",
+        "insight5": "Loyalty runs so deep, it becomes your identity."
+      },
+      "gemini": {
+        "insight1": "Your mind runs at a speed most people can't keep up with.",
+        "insight2": "Boredom is your enemy — and you always find a way out.",
+        "insight3": "You contain multitudes and that confuses simple minds.",
+        "insight4": "Words are your superpower — you wield them effortlessly.",
+        "insight5": "You adapt so fast, change feels like your comfort zone."
+      },
+      "cancer": {
+        "insight1": "You remember feelings long after others have forgotten them.",
+        "insight2": "Home isn't a place for you — it's a feeling you create.",
+        "insight3": "Your shell protects a heart that feels everything.",
+        "insight4": "You nurture people into becoming their best selves.",
+        "insight5": "Emotions are your compass — and they never lie."
+      },
+      "leo": {
+        "insight1": "You shine brightest when others try to dim your light.",
+        "insight2": "Attention finds you even when you're not looking for it.",
+        "insight3": "Your heart is generous even when the world isn't kind.",
+        "insight4": "You lead naturally — people just follow.",
+        "insight5": "Your confidence inspires those who doubt themselves."
+      },
+      "virgo": {
+        "insight1": "You see flaws others miss — and fix them silently.",
+        "insight2": "Perfection isn't obsession for you — it's just the standard.",
+        "insight3": "You care so much it sometimes looks like criticism.",
+        "insight4": "Order calms your mind when the world feels chaotic.",
+        "insight5": "You improve everything you touch without asking for credit."
+      },
+      "libra": {
+        "insight1": "You feel tension before anyone says a word.",
+        "insight2": "Balance isn't something you seek — it's who you are.",
+        "insight3": "You make peace look effortless even when it isn't.",
+        "insight4": "Beauty matters to you because ugliness feels unbearable.",
+        "insight5": "You see both sides even when others only see their own."
+      },
+      "scorpio": {
+        "insight1": "You sense betrayal before it ever happens.",
+        "insight2": "Surface-level anything feels like a waste of your time.",
+        "insight3": "You transform pain into power like no one else.",
+        "insight4": "Secrets reveal themselves to you without trying.",
+        "insight5": "Your intensity is misunderstood by those who fear depth."
+      },
+      "sagittarius": {
+        "insight1": "Freedom isn't a desire for you — it's survival.",
+        "insight2": "You'd rather be honest than comfortable.",
+        "insight3": "Adventure calls you even when logic says stay still.",
+        "insight4": "You find meaning in the journey, not just the destination.",
+        "insight5": "Your optimism saves people even when you don't realize it."
+      }
+    }
+  },
+  "timePicker": {
+    "title": "Select Time",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  },
+  "locationPicker": {
+    "countryTitle": "Select Country",
+    "cityTitle": "Select City",
+    "searchCountry": "Search country...",
+    "searchCity": "Search city...",
+    "cancel": "Cancel",
+    "noResults": "No results found"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry"
+  }
+}

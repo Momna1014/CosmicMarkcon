@@ -17,6 +17,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {useTranslation} from 'react-i18next';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -173,6 +174,8 @@ interface BirthTimeCardProps {
 }
 
 const BirthTimeCard = memo<BirthTimeCardProps>(({timeValue, onPress}) => {
+  const {t} = useTranslation();
+
   const formatTimeDisplay = useCallback(() => {
     if (!timeValue) {
       return null;
@@ -193,7 +196,7 @@ const BirthTimeCard = memo<BirthTimeCardProps>(({timeValue, onPress}) => {
         onPress={onPress}
         activeOpacity={0.8}>
         <View style={styles.cardHeader}>
-          <Text style={styles.cardLabel}>BIRTH TIME</Text>
+          <Text style={styles.cardLabel}>{t('onboarding.screen9.birthTime')}</Text>
           <WatchIcon width={24} height={24} />
         </View>
         <View style={styles.timeDisplayContainer}>
@@ -204,7 +207,7 @@ const BirthTimeCard = memo<BirthTimeCardProps>(({timeValue, onPress}) => {
           )}
         </View>
         <Text style={styles.cardHint}>
-          If you don't know the exact time. Choose your{'\n'}best guess.
+          {t('onboarding.screen9.timeHint')}
         </Text>
       </TouchableOpacity>
     </Animated.View>
@@ -222,11 +225,13 @@ interface BirthPlaceCardProps {
 
 const BirthPlaceCard = memo<BirthPlaceCardProps>(
   ({selectedCountry, selectedCity, countryHasCities, onCountryPress, onCityPress}) => {
+    const {t} = useTranslation();
+
     return (
       <Animated.View
         entering={FadeInUp.delay(600).duration(500).springify()}
         style={styles.card}>
-        <Text style={styles.cardLabelPurple}>BIRTH PLACE</Text>
+        <Text style={styles.cardLabelPurple}>{t('onboarding.screen9.birthPlace')}</Text>
 
         {/* Country Picker Button - Always show first */}
         <TouchableOpacity
@@ -238,7 +243,7 @@ const BirthPlaceCard = memo<BirthPlaceCardProps>(
               styles.locationPickerText,
               !selectedCountry && styles.locationPickerPlaceholder,
             ]}>
-            {selectedCountry?.name || 'Country'}
+            {selectedCountry?.name || t('onboarding.screen9.selectCountry')}
           </Text>
         </TouchableOpacity>
 
@@ -253,13 +258,13 @@ const BirthPlaceCard = memo<BirthPlaceCardProps>(
                 styles.locationPickerText,
                 !selectedCity && styles.locationPickerPlaceholder,
               ]}>
-              {selectedCity?.name || 'City'}
+              {selectedCity?.name || t('onboarding.screen9.selectCity')}
             </Text>
           </TouchableOpacity>
         )}
 
         <Text style={styles.cardHintSmall}>
-          {countryHasCities ? 'City & Country are enough' : 'Country is enough'}
+          {countryHasCities ? t('onboarding.screen9.cardHintWithCity') : t('onboarding.screen9.cardHintNoCity')}
         </Text>
       </Animated.View>
     );
@@ -370,6 +375,8 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
   onNext,
   onboardingData: _onboardingData,
 }) => {
+  const {t} = useTranslation();
+
   // State - Deferred loading for modals
   const [isReady, setIsReady] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -521,20 +528,19 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
             <Animated.Text
               entering={FadeInDown.delay(200).duration(600).springify()}
               style={styles.mainHeading}>
-              Let's get specific.
+              {t('onboarding.screen9.heading')}
             </Animated.Text>
 
             <Animated.Text
               entering={FadeInDown.delay(300).duration(600).springify()}
               style={styles.subHeadingYellow}>
-              Minute-specific.
+              {t('onboarding.screen9.emphasis')}
             </Animated.Text>
 
             <Animated.Text
               entering={FadeInDown.delay(400).duration(600).springify()}
               style={styles.description}>
-              Your birth time helps us calculate your Rising{'\n'}sign and exact
-              sky map.
+              {t('onboarding.screen9.subheading')}
             </Animated.Text>
 
             {/* Birth Time Card */}
@@ -558,7 +564,7 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
               style={styles.privacyContainer}>
               <PolicyIcon width={16} height={16} />
               <Text style={styles.privacyText}>
-                Your details are encrypted. We never share them.
+                {t('onboarding.screen9.privacy')}
               </Text>
             </Animated.View>
 
@@ -568,11 +574,11 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
                 entering={FadeIn.duration(400)}
                 style={styles.completionContainer}>
                 <Text style={styles.completionText}>
-                  Perfect. We can now calculate a{' '}
+                  {t('onboarding.screen9.completionPart1')}
                   <Text style={styles.completionTextHighlight}>
-                    uniquely precise snapshot
-                  </Text>{' '}
-                  for AI.
+                    {t('onboarding.screen9.completionHighlight')}
+                  </Text>
+                  {t('onboarding.screen9.completionPart2')}
                 </Text>
               </Animated.View>
             )}
@@ -598,7 +604,7 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
                     styles.nextButtonText,
                     !isFormComplete && styles.nextButtonTextDisabled,
                   ]}>
-                  Final step
+                  {t('onboarding.screen9.button')}
                 </Text>
               </AnimatedTouchable>
             </Animated.View>

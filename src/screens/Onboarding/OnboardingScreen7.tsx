@@ -15,6 +15,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {useTranslation} from 'react-i18next';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -159,6 +160,8 @@ export const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({
   onNext,
   onboardingData,
 }) => {
+  const {t} = useTranslation();
+
   // Get Western zodiac sign based on date and month
   const westernZodiac = useMemo(() => {
     if (!onboardingData.birthday) return null;
@@ -293,7 +296,7 @@ export const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({
             <Animated.Text
               entering={FadeInDown.delay(200).duration(600).springify()}
               style={styles.mainHeading}>
-              In Eastern{'\n'}astrology, you're{'\n'}a...
+              {t('onboarding.screen7.heading')}
             </Animated.Text>
 
             {/* Spacer */}
@@ -306,10 +309,10 @@ export const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({
               <View style={styles.easternCardContent}>
                 <View style={styles.easternTextContainer}>
                   <Text style={styles.easternAnimalName}>
-                    {easternZodiac?.name || 'Dragon'}
+                    {t(`zodiac.eastern.${(easternZodiac?.name || 'Dragon').toLowerCase()}.name`)}
                   </Text>
                   <Text style={styles.easternCardTrait}>
-                    Know for {easternZodiac?.trait || 'charismatic confidence'}.
+                    {t('onboarding.screen7.knownFor', {trait: t(`zodiac.eastern.${(easternZodiac?.name || 'Dragon').toLowerCase()}.trait`)})}
                   </Text>
                 </View>
                 <View style={styles.symbolCircle}>
@@ -325,18 +328,15 @@ export const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({
               entering={FadeInUp.delay(500).duration(600).springify()}
               style={styles.combinationCard}>
               <Text style={styles.combinationText}>
-                When we combine your{' '}
-                <Text style={styles.highlightText}>{westernZodiac?.name || 'Gemini'}</Text>
-                {' '}sun and{' '}
-                <Text style={styles.highlightText}>{easternZodiac?.name || 'Dragon'}</Text>
-                {' '}energy, we get a rare pattern.
+                {t('onboarding.screen7.combinationPrefix', {
+                  western: t(`zodiac.western.${(westernZodiac?.name || 'Gemini').toLowerCase()}`),
+                  eastern: t(`zodiac.eastern.${(easternZodiac?.name || 'Dragon').toLowerCase()}.name`)
+                })}
               </Text>
               <View style={styles.rarityContainer}>
                 <Text style={styles.sparkleEmoji}>✨</Text>
                 <Text style={styles.rarityText}>
-                  This combination appears in less than{' '}
-                  <Text style={styles.rarityHighlight}>{combinationPercentage}%</Text>
-                  {' '}of birth pattern.
+                  {t('onboarding.screen7.rarityText', {percentage: combinationPercentage})}
                 </Text>
               </View>
             </Animated.View>
@@ -349,7 +349,7 @@ export const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({
                 style={[styles.nextButton, buttonAnimatedStyle]}
                 onPress={handleNext}
                 activeOpacity={0.8}>
-                <Text style={styles.nextButtonText}>Continue</Text>
+                <Text style={styles.nextButtonText}>{t('onboarding.screen7.button')}</Text>
               </AnimatedTouchable>
             </Animated.View>
           </View>
