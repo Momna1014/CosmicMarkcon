@@ -35,6 +35,7 @@ import {
 } from '../../theme';
 import {DatePicker} from '../../components/DatePicker';
 import {ZodiacCard} from '../../components/ZodiacCard';
+import {hapticLight} from '../../utils/haptics';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 const BackgroundImageSource = require('../../assets/icons/onboarding_icons/background_image.png');
@@ -166,6 +167,7 @@ export const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
 
   const handleNext = () => {
     if (birthday) {
+      hapticLight();
       // Subtle pulse animation on button
       buttonScale.value = withSequence(
         withTiming(1.02, {duration: 100}),

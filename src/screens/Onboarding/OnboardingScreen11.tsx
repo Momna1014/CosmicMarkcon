@@ -41,6 +41,7 @@ import {OnboardingData} from './OnboardingContainer';
 // SVG Icons
 import StartCommaIcon from '../../assets/icons/onboarding_icons/start_comma.svg';
 import EndCommaIcon from '../../assets/icons/onboarding_icons/end_comma.svg';
+import {hapticLight} from '../../utils/haptics';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -207,6 +208,7 @@ export const OnboardingScreen11: React.FC<OnboardingScreen11Props> = ({
   }));
 
   const handleNext = useCallback(() => {
+    hapticLight();
     buttonScale.value = withSequence(
       withTiming(1.02, {duration: 100}),
       withTiming(1, {duration: 100}),

@@ -47,6 +47,7 @@ import {OnboardingData} from './OnboardingContainer';
 // SVG Icons
 import RoundCircles from '../../assets/icons/onboarding_icons/round_circles.svg';
 import GreenDot from '../../assets/icons/onboarding_icons/green_dot.svg';
+import {hapticLight} from '../../utils/haptics';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -242,6 +243,7 @@ export const OnboardingScreen8: React.FC<OnboardingScreen8Props> = ({
   }));
 
   const handleNext = () => {
+    hapticLight();
     // Button pulse animation
     buttonScale.value = withSequence(
       withTiming(1.02, {duration: 100}),

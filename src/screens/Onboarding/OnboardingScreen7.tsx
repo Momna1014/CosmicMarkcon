@@ -41,6 +41,7 @@ import {
   getCombinationPercentage,
 } from '../../components/mock/zodiacMockData';
 import {OnboardingData} from './OnboardingContainer';
+import {hapticLight} from '../../utils/haptics';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -216,6 +217,7 @@ export const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({
   }));
 
   const handleNext = () => {
+    hapticLight();
     // Button pulse animation
     buttonScale.value = withSequence(
       withTiming(1.02, {duration: 100}),

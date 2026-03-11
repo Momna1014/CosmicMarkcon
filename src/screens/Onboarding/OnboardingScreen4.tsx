@@ -12,8 +12,6 @@ import {
   StyleSheet,
   ImageBackground,
   Dimensions,
-  Vibration,
-  Platform,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Animated, {
@@ -182,17 +180,6 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
     width: `${progressWidth.value}%`,
   }));
 
-  // Trigger haptic feedback
-  const triggerHaptic = useCallback(() => {
-    if (Platform.OS === 'ios') {
-      // Light haptic on iOS
-      Vibration.vibrate(1);
-    } else {
-      // Short vibration on Android
-      Vibration.vibrate(10);
-    }
-  }, []);
-
   // Cursor blink animation
   useEffect(() => {
     cursorOpacity.value = withRepeat(
@@ -214,7 +201,6 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
     const typingInterval = setInterval(() => {
       if (currentIndex < insight.mainText.length) {
         setDisplayedMainText(insight.mainText.slice(0, currentIndex + 1));
-        triggerHaptic();
         currentIndex++;
       } else {
         clearInterval(typingInterval);
@@ -223,7 +209,7 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
     }, 50); // 50ms per character for smooth typing
 
     return () => clearInterval(typingInterval);
-  }, [insight.mainText, triggerHaptic]);
+  }, [insight.mainText]);
 
   // Subtext typewriter effect (starts after main text completes)
   useEffect(() => {
@@ -235,7 +221,6 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
       const typingInterval = setInterval(() => {
         if (currentIndex < STATIC_SUBTEXT.length) {
           setDisplayedSubText(STATIC_SUBTEXT.slice(0, currentIndex + 1));
-          triggerHaptic();
           currentIndex++;
         } else {
           clearInterval(typingInterval);
@@ -247,7 +232,7 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
     }, 500); // 500ms delay after main text
 
     return () => clearTimeout(startDelay);
-  }, [isMainTextComplete, triggerHaptic]);
+  }, [isMainTextComplete]);
 
   // Auto-navigate after both texts complete
   useEffect(() => {

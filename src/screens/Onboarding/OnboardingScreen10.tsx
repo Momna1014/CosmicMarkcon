@@ -39,6 +39,7 @@ import {OnboardingData} from './OnboardingContainer';
 
 // SVG Icons
 import LeafIcon from '../../assets/icons/onboarding_icons/leaf.svg';
+import {hapticLight} from '../../utils/haptics';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -147,6 +148,7 @@ export const OnboardingScreen10: React.FC<OnboardingScreen10Props> = ({
   }));
 
   const handleContinue = useCallback(() => {
+    hapticLight();
     buttonScale.value = withSequence(
       withTiming(1.02, {duration: 100}),
       withTiming(1, {duration: 100}),

@@ -38,6 +38,7 @@ import {
 import SunIcon from '../../assets/icons/onboarding_icons/sun.svg';
 import MoonIcon from '../../assets/icons/onboarding_icons/moon.svg';
 import RisingIcon from '../../assets/icons/onboarding_icons/rising.svg';
+import {hapticLight} from '../../utils/haptics';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -172,6 +173,7 @@ export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
     width: `${progressWidth.value}%`,
   }));
   const handleNext = () => {
+    hapticLight();
     // Button pulse animation
     buttonScale.value = withSequence(
       withTiming(1.02, {duration: 100}),

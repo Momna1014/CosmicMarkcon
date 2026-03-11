@@ -33,6 +33,7 @@ import {
   verticalScale,
   radiusScale,
 } from '../../theme';
+import {hapticLight} from '../../utils/haptics';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 const BackgroundImageSource = require('../../assets/icons/onboarding_icons/background_image.png');
@@ -164,6 +165,7 @@ export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
 
   const handleContinue = () => {
     if (selectedOption) {
+      hapticLight();
       buttonScale.value = withSequence(
         withTiming(1.02, {duration: 100}),
         withTiming(1, {duration: 100}),

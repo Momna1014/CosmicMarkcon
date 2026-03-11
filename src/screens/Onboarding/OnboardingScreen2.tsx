@@ -40,6 +40,7 @@ import {
 } from '../../theme';
 import {AlignmentOption} from './OnboardingScreen1';
 import ArrowIcon from '../../assets/icons/onboarding_icons/arrow.svg';
+import {hapticLight} from '../../utils/haptics';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 const BackgroundImageSource = require('../../assets/icons/onboarding_icons/background_image.png');
@@ -171,6 +172,7 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
 
   const handleNext = () => {
     if (name.trim()) {
+      hapticLight();
       // Subtle pulse animation on button
       buttonScale.value = withSequence(
         withTiming(1.02, {duration: 100}),

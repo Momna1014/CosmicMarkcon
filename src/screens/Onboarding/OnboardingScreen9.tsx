@@ -37,7 +37,7 @@ import {
   verticalScale,
   radiusScale,
 } from '../../theme';
-import {ICountry, ICity} from 'country-state-city';
+import {ICountry, ICity, City} from 'country-state-city';
 import {OnboardingData} from './OnboardingContainer';
 import {
   TimePickerModal,
@@ -49,6 +49,7 @@ import {
 // SVG Icons
 import WatchIcon from '../../assets/icons/onboarding_icons/watch.svg';
 import PolicyIcon from '../../assets/icons/onboarding_icons/policy.svg';
+import {hapticLight} from '../../utils/haptics';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -214,12 +215,13 @@ const BirthTimeCard = memo<BirthTimeCardProps>(({timeValue, onPress}) => {
 interface BirthPlaceCardProps {
   selectedCountry: ICountry | null;
   selectedCity: ICity | null;
+  countryHasCities: boolean;
   onCountryPress: () => void;
   onCityPress: () => void;
 }
 
 const BirthPlaceCard = memo<BirthPlaceCardProps>(
-  ({selectedCountry, selectedCity, onCountryPress, onCityPress}) => {
+  ({selectedCountry, selectedCity, countryHasCities, onCountryPress, onCityPress}) => {
     return (
       <Animated.View
         entering={FadeInUp.delay(600).duration(500).springify()}
@@ -240,8 +242,8 @@ const BirthPlaceCard = memo<BirthPlaceCardProps>(
           </Text>
         </TouchableOpacity>
 
-        {/* City Picker Button - Only show after country is selected */}
-        {selectedCountry && (
+        {/* City Picker Button - Only show when country is selected AND has cities */}
+        {selectedCountry && countryHasCities && (
           <TouchableOpacity
             style={styles.locationPickerButton}
             onPress={onCityPress}
@@ -256,7 +258,9 @@ const BirthPlaceCard = memo<BirthPlaceCardProps>(
           </TouchableOpacity>
         )}
 
-        <Text style={styles.cardHintSmall}>City & Country are enough</Text>
+        <Text style={styles.cardHintSmall}>
+          {countryHasCities ? 'City & Country are enough' : 'Country is enough'}
+        </Text>
       </Animated.View>
     );
   },
@@ -373,6 +377,7 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
 
   const [selectedCountry, setSelectedCountry] = useState<ICountry | null>(null);
   const [selectedCity, setSelectedCity] = useState<ICity | null>(null);
+  const [countryHasCities, setCountryHasCities] = useState(true);
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [showCityPicker, setShowCityPicker] = useState(false);
 
@@ -409,6 +414,7 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
 
   // Handlers - memoized to prevent re-renders
   const handleNext = useCallback(() => {
+    hapticLight();
     buttonScale.value = withSequence(
       withTiming(1.02, {duration: 100}),
       withTiming(1, {duration: 100}),
@@ -451,6 +457,10 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
   const handleCountrySelect = useCallback((country: ICountry) => {
     setSelectedCountry(country);
     setSelectedCity(null); // Reset city when country changes
+    
+    // Check if country has cities
+    const cities = City.getCitiesOfCountry(country.isoCode) || [];
+    setCountryHasCities(cities.length > 0);
   }, []);
 
   const handleOpenCityPicker = useCallback(() => {
@@ -468,9 +478,12 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
   }, []);
 
   // Check if all fields are filled
+  // City is only required if the country has cities
   const isFormComplete = useMemo(() => {
-    return Boolean(timeValue && selectedCountry && selectedCity);
-  }, [timeValue, selectedCountry, selectedCity]);
+    if (!timeValue || !selectedCountry) return false;
+    // If country has cities, require city selection; otherwise just country is enough
+    return countryHasCities ? Boolean(selectedCity) : true;
+  }, [timeValue, selectedCountry, selectedCity, countryHasCities]);
 
   return (
     <View style={styles.backgroundFallback}>
@@ -534,6 +547,7 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
             <BirthPlaceCard
               selectedCountry={selectedCountry}
               selectedCity={selectedCity}
+              countryHasCities={countryHasCities}
               onCountryPress={handleOpenCountryPicker}
               onCityPress={handleOpenCityPicker}
             />

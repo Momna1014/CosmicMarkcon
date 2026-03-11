@@ -36,6 +36,7 @@ import {
   radiusScale,
 } from '../../theme';
 import UnlockAnalysisIcon from '../../assets/icons/onboarding_icons/unlock_analysis.svg';
+import {hapticLight} from '../../utils/haptics';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -176,6 +177,7 @@ export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
   }));
 
   const handleNext = () => {
+    hapticLight();
     // Button pulse animation
     buttonScale.value = withSequence(
       withTiming(1.02, {duration: 100}),
