@@ -116,25 +116,49 @@ export const getResponsiveValue = <T>(small: T, medium?: T, large?: T): T => {
 // Colors
 export const Colors = {
   // Basic colors
-  black: '#000000',
   white: '#FFFFFF',
-  background: '#0B0B0C',
-  // Theme colors
-  primary: '#FF3E57',
-  card: '#FF3E57',
-  text: '#FFFFFF',
-  border: '#FF823E',
-  notification: '#4CE3B2',
-  // Additional colors
-  rating: '#FF8E3C',
-  inactive: '#7B7B80',
-  cardBackground: '#1E1E21',
-  // Gradient colors
-  gradientStart: '#E60076',
-  gradientEnd: '#C27AFF',
-  ratingText:"#737373",
-  light_blue:"#49A3FF",
-  light_gray:"#B5B5BA"
+  black: '#000000',
+  transparent: 'transparent',
+
+  // Semantic colors
+  success: '#03AA82',
+  warning: '#665600',
+  error: '#FF0000',
+  info: '#354764',
+
+  // Onboarding colors
+  progressBarBackground: '#0E0E0E57',
+  progressBarFilled: '#FFEF00',
+  subHeading: '#C2D1F3',
+  cosmicBackground: '#08142A', // Deep cosmic blue for fallback backgrounds
+
+  // Light theme colors
+  light: {
+    primary: '#03AA82',
+    background: '#FFFFFF',
+    card: '#F5F5F5',
+    text: '#000000',
+    textSecondary: '#666666',
+    textTertiary: '#999999',
+    border: '#E0E0E0',
+    notification: '#03AA82',
+    shadow: '#000000',
+    overlay: 'rgba(0, 0, 0, 0.5)',
+  },
+
+  // Dark theme colors
+  dark: {
+ primary: '#03AA82',
+    background: '#FFFFFF',
+    card: '#F5F5F5',
+    text: '#000000',
+    textSecondary: '#666666',
+    textTertiary: '#999999',
+    border: '#E0E0E0',
+    notification: '#03AA82',
+    shadow: '#000000',
+    overlay: 'rgba(0, 0, 0, 0.5)',
+  },
 } as const;
 
 // Typography
@@ -163,85 +187,18 @@ export const FontWeights = {
 } as const;
 
 export const FontFamilies = {
-  // Poppins
-  poppinsThin: 'Poppins-Thin',
-  poppinsThinItalic: 'Poppins-ThinItalic',
-  poppinsExtraLight: 'Poppins-ExtraLight',
-  poppinsExtraLightItalic: 'Poppins-ExtraLightItalic',
-  poppinsLight: 'Poppins-Light',
-  poppinsLightItalic: 'Poppins-LightItalic',
-  poppinsRegular: 'Poppins-Regular',
-  poppinsItalic: 'Poppins-Italic',
-  poppinsMedium: 'Poppins-Medium',
-  poppinsMediumItalic: 'Poppins-MediumItalic',
-  poppinsSemiBold: 'Poppins-SemiBold',
-  poppinsSemiBoldItalic: 'Poppins-SemiBoldItalic',
-  poppinsBold: 'Poppins-Bold',
-  poppinsBoldItalic: 'Poppins-BoldItalic',
-  poppinsExtraBold: 'Poppins-ExtraBold',
-  poppinsExtraBoldItalic: 'Poppins-ExtraBoldItalic',
-  poppinsBlack: 'Poppins-Black',
-  poppinsBlackItalic: 'Poppins-BlackItalic',
+  // Sunlight Dreams font
+  sunlightDreams: 'Sunlight Dreams',
 
-  // Montserrat
-  montserratThin: 'Montserrat-Thin',
-  montserratThinItalic: 'Montserrat-ThinItalic',
-  montserratExtraLight: 'Montserrat-ExtraLight',
-  montserratExtraLightItalic: 'Montserrat-ExtraLightItalic',
-  montserratLight: 'Montserrat-Light',
-  montserratLightItalic: 'Montserrat-LightItalic',
-  montserratRegular: 'Montserrat-Regular',
-  montserratItalic: 'Montserrat-Italic',
-  montserratMedium: 'Montserrat-Medium',
-  montserratMediumItalic: 'Montserrat-MediumItalic',
-  montserratSemiBold: 'Montserrat-SemiBold',
-  montserratSemiBoldItalic: 'Montserrat-SemiBoldItalic',
-  montserratBold: 'Montserrat-Bold',
-  montserratBoldItalic: 'Montserrat-BoldItalic',
-  montserratExtraBold: 'Montserrat-ExtraBold',
-  montserratExtraBoldItalic: 'Montserrat-ExtraBoldItalic',
-  montserratBlack: 'Montserrat-Black',
-  montserratBlackItalic: 'Montserrat-BlackItalic',
-
-  // JetBrainsMono
-  jetBrainsMonoThin: 'JetBrainsMono-Thin',
-  jetBrainsMonoThinItalic: 'JetBrainsMono-ThinItalic',
-  jetBrainsMonoExtraLight: 'JetBrainsMono-ExtraLight',
-  jetBrainsMonoExtraLightItalic: 'JetBrainsMono-ExtraLightItalic',
-  jetBrainsMonoLight: 'JetBrainsMono-Light',
-  jetBrainsMonoLightItalic: 'JetBrainsMono-LightItalic',
-  jetBrainsMonoRegular: 'JetBrainsMono-Regular',
-  jetBrainsMonoItalic: 'JetBrainsMono-Italic',
-  jetBrainsMonoMedium: 'JetBrainsMono-Medium',
-  jetBrainsMonoMediumItalic: 'JetBrainsMono-MediumItalic',
-  jetBrainsMonoSemiBold: 'JetBrainsMono-SemiBold',
-  jetBrainsMonoSemiBoldItalic: 'JetBrainsMono-SemiBoldItalic',
-  jetBrainsMonoBold: 'JetBrainsMono-Bold',
-  jetBrainsMonoBoldItalic: 'JetBrainsMono-BoldItalic',
-  jetBrainsMonoExtraBold: 'JetBrainsMono-ExtraBold',
-  jetBrainsMonoExtraBoldItalic: 'JetBrainsMono-ExtraBoldItalic',
-
-  // Outfit
-  outfitThin: 'Outfit-Thin',
-  outfitExtraLight: 'Outfit-ExtraLight',
-  outfitLight: 'Outfit-Light',
-  outfitRegular: 'Outfit-Regular',
-  outfitMedium: 'Outfit-Medium',
-  outfitSemiBold: 'Outfit-SemiBold',
-  outfitBold: 'Outfit-Bold',
-  outfitExtraBold: 'Outfit-ExtraBold',
-  outfitBlack: 'Outfit-Black',
-
-  // SF Pro Display
-  sfProDisplayRegular: 'SFProDisplay-Regular',
-  sfProDisplayMedium: 'SFProDisplay-Medium',
-  sfProDisplayBold: 'SFProDisplay-Bold',
-  sfProDisplayThinItalic: 'SFProDisplay-ThinItalic',
-  sfProDisplayUltralightItalic: 'SFProDisplay-UltralightItalic',
-  sfProDisplayLightItalic: 'SFProDisplay-LightItalic',
-  sfProDisplaySemiboldItalic: 'SFProDisplay-SemiboldItalic',
-  sfProDisplayHeavyItalic: 'SFProDisplay-HeavyItalic',
-  sfProDisplayBlackItalic: 'SFProDisplay-BlackItalic',
+  // Inter font family
+  interRegular: 'Inter_18pt-Regular',
+  interMedium: 'Inter_18pt-Medium',
+  interSemiBold: 'Inter_18pt-SemiBold',
+  interBold: 'Inter_18pt-Bold',
+  interExtraBold: 'Inter_18pt-ExtraBold',
+  interBlack: 'Inter_18pt-Black',
+  interLight: 'Inter_18pt-Light',
+  interThin: 'Inter_18pt-Thin',
 } as const;
 
 // Spacing (base values)
@@ -318,12 +275,26 @@ export const Shadows = {
 
 export interface AppTheme extends Omit<NavigationTheme, 'fonts'> {
   colors: NavigationTheme['colors'] & {
+    // Custom semantic colors
+    secondary: string;
+    textPrimary: string;
+    textSecondary: string;
+    textTertiary: string;
+    backgroundPrimary: string;
+    backgroundSecondary: string;
+    overlay: string;
+    shadow: string;
+    
+    // Status colors
+    success: string;
+    warning: string;
+    error: string;
+    info: string;
+    
     // Basic colors
     white: string;
     black: string;
-    // Additional colors
-    rating: string;
-    inactive: string;
+    transparent: string;
   };
   spacing: typeof Spacing;
   borderRadius: typeof BorderRadius;
@@ -339,18 +310,33 @@ export const lightTheme: AppTheme = {
   dark: false,
   colors: {
     // Navigation theme colors (required by React Navigation)
-    primary: Colors.primary,
-    background: Colors.background,
-    card: Colors.card,
-    text: Colors.text,
-    border: Colors.border,
-    notification: Colors.notification,
+    primary: Colors.light.primary,
+    background: Colors.light.background,
+    card: Colors.light.card,
+    text: Colors.light.text,
+    border: Colors.light.border,
+    notification: Colors.light.notification,
+    
+    // Custom semantic colors
+    secondary: Colors.info,
+    textPrimary: Colors.light.text,
+    textSecondary: Colors.light.textSecondary,
+    textTertiary: Colors.light.textTertiary,
+    backgroundPrimary: Colors.light.background,
+    backgroundSecondary: Colors.light.card,
+    overlay: Colors.light.overlay,
+    shadow: Colors.light.shadow,
+    
+    // Status colors
+    success: Colors.success,
+    warning: Colors.warning,
+    error: Colors.error,
+    info: Colors.info,
+    
     // Basic colors
     white: Colors.white,
     black: Colors.black,
-    // Additional colors
-    rating: Colors.rating,
-    inactive: Colors.inactive,
+    transparent: Colors.transparent,
   },
   spacing: Spacing,
   borderRadius: BorderRadius,
@@ -366,18 +352,33 @@ export const darkTheme: AppTheme = {
   dark: true,
   colors: {
     // Navigation theme colors (required by React Navigation)
-    primary: Colors.primary,
-    background: Colors.background,
-    card: Colors.card,
-    text: Colors.text,
-    border: Colors.border,
-    notification: Colors.notification,
+    primary: Colors.dark.primary,
+    background: Colors.dark.background,
+    card: Colors.dark.card,
+    text: Colors.dark.text,
+    border: Colors.dark.border,
+    notification: Colors.dark.notification,
+    
+    // Custom semantic colors
+    secondary: Colors.info,
+    textPrimary: Colors.dark.text,
+    textSecondary: Colors.dark.textSecondary,
+    textTertiary: Colors.dark.textTertiary,
+    backgroundPrimary: Colors.dark.background,
+    backgroundSecondary: Colors.dark.card,
+    overlay: Colors.dark.overlay,
+    shadow: Colors.dark.shadow,
+    
+    // Status colors
+    success: Colors.success,
+    warning: Colors.warning,
+    error: Colors.error,
+    info: Colors.info,
+    
     // Basic colors
     white: Colors.white,
     black: Colors.black,
-    // Additional colors
-    rating: Colors.rating,
-    inactive: Colors.inactive,
+    transparent: Colors.transparent,
   },
   spacing: Spacing,
   borderRadius: BorderRadius,

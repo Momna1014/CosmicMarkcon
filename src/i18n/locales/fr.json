@@ -1,0 +1,426 @@
+{
+  "onboarding": {
+    "screen1": {
+      "heading": "À quel point vous sentez-vous aligné avec votre vie en ce moment ?",
+      "subheading": "Soyez honnête — cela nous aide à affiner votre lecture cosmique.",
+      "options": {
+        "inMyFlow": "Dans mon flux",
+        "figuringItOut": "Je cherche encore",
+        "totallyLost": "Totalement perdu"
+      },
+      "button": "Continuer",
+      "footer": "Vos réponses sont privées et cryptées."
+    },
+    "screen2": {
+      "heading": "Les noms portent un pouvoir.",
+      "subheading": "Il définit votre signature énergétique.",
+      "vibration": "La vibration de {{name}} est forte.",
+      "placeholder": "Entrez votre nom",
+      "button": "Suivant"
+    },
+    "screen3": {
+      "heading": "Quand êtes-vous né ?",
+      "subheading": "Votre date de naissance révèle votre plan cosmique.",
+      "button": "Continuer",
+      "buttonAnalyze": "Analyser mon schéma",
+      "footerPart1": "Vos réponses façonneront un ",
+      "footerHighlight": "instantané cosmique unique ",
+      "footerPart2": "rien que pour vous."
+    },
+    "screen4": {
+      "subtext": "Tout le monde n'est pas prédisposé à percevoir les changements subtils."
+    },
+    "screen5": {
+      "heading": "La plupart des horoscopes ne lisent que votre Soleil.",
+      "subheading": "Mais vos réactions sont façonnées ailleurs.",
+      "description": "Tout le monde n'est pas prédisposé à capter les changements subtils.",
+      "hidden": "CACHÉ",
+      "rising": "ASCENDANT",
+      "button": "Découvrir ma carte"
+    },
+    "screen6": {
+      "heading": "Trois couches cosmiques profondes vous influencent en ce moment.",
+      "subheading": "La plupart des gens vivent leur vie en ignorant celles-ci.",
+      "card1": {
+        "title": "Votre Signe Ascendant",
+        "description": "Comment les autres vous voient"
+      },
+      "card2": {
+        "title": "Impact des Phases Lunaires",
+        "description": "Vos schémas émotionnels"
+      },
+      "card3": {
+        "title": "Transits Planétaires",
+        "description": "Influences cosmiques actuelles"
+      },
+      "buttonUnlock": "Débloquer avec analyse",
+      "buttonDeepen": "Approfondir mon analyse"
+    },
+    "screen7": {
+      "heading": "En astrologie orientale, vous êtes un...",
+      "knownFor": "Connu pour {{trait}}.",
+      "combinationPrefix": "Lorsque nous combinons votre soleil {{western}} et votre énergie {{eastern}}, nous obtenons un schéma rare.",
+      "combinationSuffix": "est rare — mêlant {{trait1}} et {{trait2}}.",
+      "rarityText": "Seulement {{percentage}}% des personnes partagent cette combinaison exacte.",
+      "button": "Continuer"
+    },
+    "screen8": {
+      "energySource": "Elle vient de {{alignment}}.",
+      "rarityText": "Seulement {{percentage}}% des personnes vivent ce schéma",
+      "button": "Dernière étape"
+    },
+    "screen9": {
+      "heading": "Soyons précis.",
+      "emphasis": "À la minute près.",
+      "subheading": "Votre heure de naissance nous aide à calculer votre signe ascendant et votre carte du ciel exacte.",
+      "birthTime": "HEURE DE NAISSANCE",
+      "birthPlace": "LIEU DE NAISSANCE",
+      "selectCountry": "Sélectionner le pays",
+      "selectCity": "Sélectionner la ville",
+      "cardHintWithCity": "Ville et pays suffisent",
+      "cardHintNoCity": "Le pays suffit",
+      "timeHint": "Si vous ne connaissez pas l'heure exacte. Choisissez\nvotre meilleure estimation.",
+      "completionPart1": "Parfait. Nous pouvons maintenant calculer un ",
+      "completionHighlight": "instantané unique et précis",
+      "completionPart2": " pour l'IA.",
+      "privacy": "Vos données sont cryptées. Nous ne les partageons jamais.",
+      "button": "Compléter ma lecture",
+      "validation": "Veuillez remplir tous les champs"
+    },
+    "screen10": {
+      "loading": "Alignement des éphémérides planétaires...",
+      "resultHeading": "Aujourd'hui, votre alignement est inhabituellement fort.",
+      "resultSubheading": "Cela n'arrive pas souvent.",
+      "button": "Voir ce qui m'influence"
+    },
+    "screen11": {
+      "signature": "Nous avons capté votre signature énergétique unique,",
+      "quoteStart": "\"",
+      "quoteLine1": "Une rare combinaison d'intuition et de",
+      "quoteLine2": "logique qui ressemble souvent à une\ncontradiction...",
+      "button": "Révéler l'aperçu final"
+    },
+    "zodiacCard": {
+      "sunSignLabel": "VOTRE SIGNE SOLAIRE",
+      "youreA": "Vous êtes {{sign}}"
+    }
+  },
+  "zodiac": {
+    "eastern": {
+      "rat": {
+        "name": "Rat",
+        "trait": "ingéniosité astucieuse",
+        "description": "Connu pour son ingéniosité astucieuse."
+      },
+      "ox": {
+        "name": "Bœuf",
+        "trait": "fiabilité patiente",
+        "description": "Connu pour sa fiabilité patiente."
+      },
+      "tiger": {
+        "name": "Tigre",
+        "trait": "bravoure audacieuse",
+        "description": "Connu pour sa bravoure audacieuse."
+      },
+      "rabbit": {
+        "name": "Lapin",
+        "trait": "élégance douce",
+        "description": "Connu pour son élégance douce."
+      },
+      "dragon": {
+        "name": "Dragon",
+        "trait": "confiance charismatique",
+        "description": "Connu pour sa confiance charismatique."
+      },
+      "snake": {
+        "name": "Serpent",
+        "trait": "intuition sage",
+        "description": "Connu pour son intuition sage."
+      },
+      "horse": {
+        "name": "Cheval",
+        "trait": "indépendance énergique",
+        "description": "Connu pour son indépendance énergique."
+      },
+      "goat": {
+        "name": "Chèvre",
+        "trait": "compassion artistique",
+        "description": "Connu pour sa compassion artistique."
+      },
+      "monkey": {
+        "name": "Singe",
+        "trait": "intelligence espiègle",
+        "description": "Connu pour son intelligence espiègle."
+      },
+      "rooster": {
+        "name": "Coq",
+        "trait": "précision confiante",
+        "description": "Connu pour sa précision confiante."
+      },
+      "dog": {
+        "name": "Chien",
+        "trait": "protection loyale",
+        "description": "Connu pour sa protection loyale."
+      },
+      "pig": {
+        "name": "Cochon",
+        "trait": "chaleur généreuse",
+        "description": "Connu pour sa chaleur généreuse."
+      }
+    },
+    "energy": {
+      "fire": {
+        "text1": "Votre énergie ne vient pas de la foule.",
+        "text2": "Votre passion s'enflamme de l'intérieur.",
+        "text3": "Votre esprit brûle plus fort que la plupart.",
+        "text4": "Votre courage coule de votre cœur.",
+        "text5": "Votre lumière brille de l'intérieur.",
+        "alignment": "l'alignement",
+        "fire": "le feu",
+        "intensity": "l'intensité",
+        "bravery": "la bravoure",
+        "radiance": "l'éclat"
+      },
+      "earth": {
+        "text1": "Votre force ne vient pas de la foule.",
+        "text2": "Votre stabilité se construit sur des fondations.",
+        "text3": "Votre pouvoir grandit de la patience.",
+        "text4": "Votre succès vient de la persévérance.",
+        "text5": "Votre sagesse émerge de l'expérience.",
+        "grounding": "l'ancrage",
+        "roots": "les racines",
+        "endurance": "l'endurance",
+        "determination": "la détermination",
+        "mastery": "la maîtrise"
+      },
+      "air": {
+        "text1": "Vos idées ne viennent pas de la foule.",
+        "text2": "Vos pensées transcendent les frontières.",
+        "text3": "Votre esprit connecte des schémas invisibles.",
+        "text4": "Votre vision s'étend au-delà des horizons.",
+        "text5": "Votre intellect relie des mondes lointains.",
+        "innovation": "l'innovation",
+        "freedom": "la liberté",
+        "insight": "la perspicacité",
+        "perspective": "la perspective",
+        "connection": "la connexion"
+      },
+      "water": {
+        "text1": "Votre intuition ne vient pas de la foule.",
+        "text2": "Vos émotions coulent de sources anciennes.",
+        "text3": "Votre sensibilité révèle des vérités cachées.",
+        "text4": "Votre empathie connecte les âmes ensemble.",
+        "text5": "Vos rêves atteignent au-delà de ce monde.",
+        "depth": "la profondeur",
+        "wisdom": "la sagesse",
+        "perception": "la perception",
+        "understanding": "la compréhension",
+        "transcendence": "la transcendance"
+      }
+    },
+    "western": {
+      "capricorn": "Capricorne",
+      "aquarius": "Verseau",
+      "pisces": "Poissons",
+      "aries": "Bélier",
+      "taurus": "Taureau",
+      "gemini": "Gémeaux",
+      "cancer": "Cancer",
+      "leo": "Lion",
+      "virgo": "Vierge",
+      "libra": "Balance",
+      "scorpio": "Scorpion",
+      "sagittarius": "Sagittaire"
+    },
+    "traits": {
+      "capricorn": {
+        "trait1": {"prefix": "Naturellement", "highlight": "discipliné et sage.", "description": "Votre détermination inébranlable construit des empires là où d'autres ne voient que des obstacles."},
+        "trait2": {"prefix": "Né", "highlight": "patient et stratégique.", "description": "Votre ascension régulière vers le succès inspire tous ceux qui observent votre parcours."},
+        "trait3": {"prefix": "Intrinsèquement", "highlight": "résilient et concentré.", "description": "Votre concentration inébranlable transforme les rêves lointains en réalité concrète."},
+        "trait4": {"prefix": "Vraiment", "highlight": "travailleur et maître.", "description": "Votre leadership naturel gagne le respect par les actes, pas seulement les mots."},
+        "trait5": {"prefix": "Profondément", "highlight": "ambitieux et ancré.", "description": "Votre engagement envers l'excellence établit des normes que d'autres aspirent à atteindre."}
+      },
+      "aquarius": {
+        "trait1": {"prefix": "Naturellement", "highlight": "progressiste et visionnaire.", "description": "Votre esprit innovant voit des possibilités invisibles aux penseurs conventionnels."},
+        "trait2": {"prefix": "Né", "highlight": "humanitaire et inventif.", "description": "Votre perspective unique apporte des idées révolutionnaires qui changent le monde."},
+        "trait3": {"prefix": "Intrinsèquement", "highlight": "indépendant et brillant.", "description": "Votre refus de vous conformer ouvre des portes que personne ne savait exister."},
+        "trait4": {"prefix": "Vraiment", "highlight": "innovant et analytique.", "description": "Votre nature avant-gardiste vous positionne des décennies en avance sur votre temps."},
+        "trait5": {"prefix": "Profondément", "highlight": "authentique et révolutionnaire.", "description": "Votre souci sincère pour l'humanité vous pousse à créer un changement significatif."}
+      },
+      "pisces": {
+        "trait1": {"prefix": "Naturellement", "highlight": "intuitif et artistique.", "description": "Votre profondeur émotionnelle crée des connexions qui transcendent les liens ordinaires."},
+        "trait2": {"prefix": "Né", "highlight": "empathique et imaginatif.", "description": "Votre créativité sans limites coule d'une source de possibilités infinies."},
+        "trait3": {"prefix": "Intrinsèquement", "highlight": "sage et spirituel.", "description": "Votre intuition vous guide à travers des eaux que d'autres craignent de naviguer."},
+        "trait4": {"prefix": "Vraiment", "highlight": "doux et mystique.", "description": "Votre âme artistique transforme les moments quotidiens en expériences magiques."},
+        "trait5": {"prefix": "Profondément", "highlight": "romantique et désintéressé.", "description": "Votre capacité d'amour et de compréhension guérit tous ceux que vous touchez."}
+      },
+      "aries": {
+        "trait1": {"prefix": "Naturellement", "highlight": "audacieux et intrépide.", "description": "Votre esprit pionnier trace des chemins là où d'autres hésitent à s'aventurer."},
+        "trait2": {"prefix": "Né", "highlight": "courageux et confiant.", "description": "Votre leadership naturel allume la passion chez tous ceux qui vous entourent."},
+        "trait3": {"prefix": "Intrinsèquement", "highlight": "passionné et dynamique.", "description": "Votre élan imparable transforme les défis impossibles en victoires conquises."},
+        "trait4": {"prefix": "Vraiment", "highlight": "direct et indépendant.", "description": "Votre authenticité féroce inspire les autres à embrasser leur vrai moi."},
+        "trait5": {"prefix": "Profondément", "highlight": "enthousiaste et pionnier.", "description": "Votre courage face à l'adversité fait de vous un champion naturel."}
+      },
+      "taurus": {
+        "trait1": {"prefix": "Naturellement", "highlight": "fiable et dévoué.", "description": "Votre nature inébranlable crée une fondation sur laquelle les autres peuvent toujours compter."},
+        "trait2": {"prefix": "Né", "highlight": "sensuel et déterminé.", "description": "Votre appréciation des plaisirs de la vie apporte de la richesse à chaque expérience."},
+        "trait3": {"prefix": "Intrinsèquement", "highlight": "pratique et loyal.", "description": "Votre loyauté inébranlable fait de vous l'ancre dans toute tempête."},
+        "trait4": {"prefix": "Vraiment", "highlight": "persévérant et nourricier.", "description": "Votre persévérance patiente accomplit ce que d'autres abandonnent comme impossible."},
+        "trait5": {"prefix": "Profondément", "highlight": "stable et serein.", "description": "Votre présence calme apporte la paix au chaos et la clarté à la confusion."}
+      },
+      "gemini": {
+        "trait1": {"prefix": "Naturellement", "highlight": "brillamment curieux.", "description": "Votre adaptabilité vous permet de prospérer là où d'autres se figent."},
+        "trait2": {"prefix": "Né", "highlight": "spirituel et polyvalent.", "description": "Votre esprit vif danse à travers les conversations avec un charme sans effort."},
+        "trait3": {"prefix": "Intrinsèquement", "highlight": "expressif et intelligent.", "description": "Votre double nature voit les deux côtés, trouvant la vérité que d'autres manquent."},
+        "trait4": {"prefix": "Vraiment", "highlight": "joueur et vif d'esprit.", "description": "Votre don pour la connexion transforme instantanément les étrangers en amis."},
+        "trait5": {"prefix": "Profondément", "highlight": "social et fascinant.", "description": "Votre intellect agité garde la vie comme une aventure passionnante."}
+      },
+      "cancer": {
+        "trait1": {"prefix": "Naturellement", "highlight": "intuitif et protecteur.", "description": "Votre cœur nourricier crée des havres sûrs pour ceux que vous aimez."},
+        "trait2": {"prefix": "Né", "highlight": "nourricier et loyal.", "description": "Votre dévotion féroce à la famille construit des liens d'amour incassables."},
+        "trait3": {"prefix": "Intrinsèquement", "highlight": "compatissant et attentionné.", "description": "Votre intelligence émotionnelle lit les cœurs avant que les mots ne soient prononcés."},
+        "trait4": {"prefix": "Vraiment", "highlight": "dévoué et empathique.", "description": "Vos instincts protecteurs protègent vos proches des tempêtes dures de la vie."},
+        "trait5": {"prefix": "Profondément", "highlight": "chaleureux et tenace.", "description": "Votre mémoire de l'amour et de la loyauté ne connaît ni limites ni bornes."}
+      },
+      "leo": {
+        "trait1": {"prefix": "Naturellement", "highlight": "audacieux et magnifique.", "description": "Votre présence rayonnante illumine chaque pièce où vous entrez."},
+        "trait2": {"prefix": "Né", "highlight": "généreux et loyal.", "description": "Votre cœur chaleureux partage librement sa lumière avec tous autour de vous."},
+        "trait3": {"prefix": "Intrinsèquement", "highlight": "charismatique et confiant.", "description": "Votre royauté naturelle commande l'attention sans la demander."},
+        "trait4": {"prefix": "Vraiment", "highlight": "courageux et magnétique.", "description": "Votre esprit théâtral transforme les moments ordinaires en événements mémorables."},
+        "trait5": {"prefix": "Profondément", "highlight": "passionné et royal.", "description": "Votre noblesse d'esprit inspire la loyauté chez tous ceux qui vous connaissent."}
+      },
+      "virgo": {
+        "trait1": {"prefix": "Naturellement", "highlight": "analytique et brillant.", "description": "Votre attention aux détails perfectionne ce que d'autres laissent à moitié fini."},
+        "trait2": {"prefix": "Né", "highlight": "méticuleux et fiable.", "description": "Votre dévouement à l'amélioration élève tout ce que vous touchez."},
+        "trait3": {"prefix": "Intrinsèquement", "highlight": "intelligent et précis.", "description": "Votre esprit de résolution de problèmes démêle des nœuds que d'autres ne peuvent même pas voir."},
+        "trait4": {"prefix": "Vraiment", "highlight": "diligent et organisé.", "description": "Votre approche systématique apporte l'ordre au chaos sans effort."},
+        "trait5": {"prefix": "Profondément", "highlight": "attentionné et perfectionniste.", "description": "Votre service discret fait fonctionner le monde mieux pour tout le monde."}
+      },
+      "libra": {
+        "trait1": {"prefix": "Naturellement", "highlight": "harmonieux et équitable.", "description": "Votre grâce naturelle apporte l'équilibre à chaque relation que vous entrez."},
+        "trait2": {"prefix": "Né", "highlight": "gracieux et charmant.", "description": "Votre œil esthétique crée la beauté partout où vous laissez votre marque."},
+        "trait3": {"prefix": "Intrinsèquement", "highlight": "idéaliste et romantique.", "description": "Votre poursuite de la justice et de l'équité inspire les autres à être meilleurs."},
+        "trait4": {"prefix": "Vraiment", "highlight": "pacifique et artistique.", "description": "Vos compétences en partenariat construisent des ponts là où d'autres voient des murs."},
+        "trait5": {"prefix": "Profondément", "highlight": "raffiné et diplomatique.", "description": "Votre capacité à voir tous les côtés fait de vous un artisan de paix naturel."}
+      },
+      "scorpio": {
+        "trait1": {"prefix": "Naturellement", "highlight": "passionné et débrouillard.", "description": "Votre intensité transforme les expériences ordinaires en révélations profondes."},
+        "trait2": {"prefix": "Né", "highlight": "déterminé et magnétique.", "description": "Votre concentration inébranlable pénètre des mystères que d'autres ne peuvent comprendre."},
+        "trait3": {"prefix": "Intrinsèquement", "highlight": "puissant et transformateur.", "description": "Votre capacité à renaître des cendres vous rend éternellement inarrêtable."},
+        "trait4": {"prefix": "Vraiment", "highlight": "stratégique et perspicace.", "description": "Votre profondeur émotionnelle crée des liens qui transcendent le temps lui-même."},
+        "trait5": {"prefix": "Profondément", "highlight": "courageux et investigateur.", "description": "Votre poursuite intrépide de la vérité découvre ce que d'autres cachent désespérément."}
+      },
+      "sagittarius": {
+        "trait1": {"prefix": "Naturellement", "highlight": "aventurier et libre.", "description": "Votre enthousiasme sans limites transforme chaque voyage en une aventure épique."},
+        "trait2": {"prefix": "Né", "highlight": "philosophique et généreux.", "description": "Votre quête de sens inspire les autres à regarder au-delà de l'horizon."},
+        "trait3": {"prefix": "Intrinsèquement", "highlight": "optimiste et chanceux.", "description": "Votre énergie positive attire la fortune partout où vous errez."},
+        "trait4": {"prefix": "Vraiment", "highlight": "curieux et amusant.", "description": "Votre joie contagieuse pour la vie rend chaque moment digne d'être célébré."},
+        "trait5": {"prefix": "Profondément", "highlight": "audacieux et chercheur de vérité.", "description": "Votre sagesse honnête coupe à travers l'illusion pour trouver ce qui est réel."}
+      }
+    },
+    "insights": {
+      "capricorn": {
+        "insight1": "Vous portez le poids du monde et le faites paraître facile.",
+        "insight2": "Le succès vient à vous parce que vous ne cessez jamais de grimper.",
+        "insight3": "Votre patience est un super-pouvoir dont les autres ne peuvent que rêver.",
+        "insight4": "Vous voyez le jeu à long terme quand les autres sont coincés dans le moment.",
+        "insight5": "La structure vous donne une liberté que le chaos ne pourra jamais offrir."
+      },
+      "aquarius": {
+        "insight1": "Vous pensez d'une manière qui ne sera pas logique avant une autre décennie.",
+        "insight2": "Votre bizarrerie n'est pas un défaut — c'est votre don au monde.",
+        "insight3": "Vous vous souciez de l'humanité même quand elle ne vous comprend pas.",
+        "insight4": "Les règles semblent optionnelles parce que vous voyez de meilleures possibilités.",
+        "insight5": "Vous connectez des points que les autres ne savent même pas qu'ils existent."
+      },
+      "pisces": {
+        "insight1": "Vous ressentez les choses avant que les autres ne les remarquent.",
+        "insight2": "Vos rêves portent des vérités que votre esprit éveillé n'a pas encore rattrapées.",
+        "insight3": "Vous absorbez les émotions comme une éponge — et c'est votre force.",
+        "insight4": "Les frontières sont floues pour vous parce que vous vivez entre les mondes.",
+        "insight5": "Votre compassion est illimitée, même quand elle vous épuise."
+      },
+      "aries": {
+        "insight1": "Vous plongez tête première pendant que les autres réfléchissent encore.",
+        "insight2": "La peur ne vous arrête pas — elle vous alimente.",
+        "insight3": "Vous commencez des choses que les autres ont peur même d'imaginer.",
+        "insight4": "Attendre ressemble à de la torture parce que l'action est votre langage.",
+        "insight5": "Vous allumez le feu chez les gens sans même essayer."
+      },
+      "taurus": {
+        "insight1": "Vous construisez des choses qui durent pendant que les autres construisent pour impressionner.",
+        "insight2": "Le repos n'est pas de la paresse pour vous — c'est de la sagesse.",
+        "insight3": "Votre entêtement est en réalité une confiance en soi inébranlable.",
+        "insight4": "Vous remarquez les détails que les autres survolent.",
+        "insight5": "La loyauté est si profonde en vous qu'elle devient qui vous êtes."
+      },
+      "gemini": {
+        "insight1": "Votre esprit travaille à une vitesse que la plupart des gens ne peuvent pas suivre.",
+        "insight2": "L'ennui est votre ennemi — et vous trouvez toujours une issue.",
+        "insight3": "Vous contenez des multitudes et cela déroute les esprits simples.",
+        "insight4": "Les mots sont votre super-pouvoir — vous les maniez sans effort.",
+        "insight5": "Vous vous adaptez si vite que le changement ressemble à une zone de confort."
+      },
+      "cancer": {
+        "insight1": "Vous vous souvenez des sentiments longtemps après que les autres les ont oubliés.",
+        "insight2": "La maison n'est pas un lieu pour vous — c'est un sentiment que vous créez.",
+        "insight3": "Votre coquille protège un cœur qui ressent tout.",
+        "insight4": "Vous nourrissez les gens pour qu'ils deviennent leur meilleure version.",
+        "insight5": "Les émotions sont votre boussole — et elles ne mentent jamais."
+      },
+      "leo": {
+        "insight1": "Vous brillez plus fort quand les autres essaient de vous éteindre.",
+        "insight2": "L'attention vous trouve même quand vous ne la cherchez pas.",
+        "insight3": "Votre cœur est généreux même quand le monde n'est pas gentil.",
+        "insight4": "Vous dirigez naturellement — les gens suivent simplement.",
+        "insight5": "Votre confiance inspire ceux qui doutent d'eux-mêmes."
+      },
+      "virgo": {
+        "insight1": "Vous voyez des défauts que les autres manquent — et vous les corrigez silencieusement.",
+        "insight2": "La perfection n'est pas une obsession pour vous — c'est juste le standard.",
+        "insight3": "Vous vous souciez si profondément que cela ressemble parfois à de la critique.",
+        "insight4": "L'ordre calme votre esprit quand le monde est chaotique.",
+        "insight5": "Vous améliorez tout ce que vous touchez sans chercher la reconnaissance."
+      },
+      "libra": {
+        "insight1": "Vous ressentez la tension avant que quiconque ne dise un mot.",
+        "insight2": "L'équilibre n'est pas quelque chose que vous cherchez — c'est qui vous êtes.",
+        "insight3": "Vous faites paraître la paix facile même quand elle ne l'est pas.",
+        "insight4": "La beauté vous importe parce que la laideur est insupportable.",
+        "insight5": "Vous voyez les deux côtés même quand les autres ne voient que le leur."
+      },
+      "scorpio": {
+        "insight1": "Vous pressentez la trahison avant qu'elle n'arrive.",
+        "insight2": "La superficialité vous semble être une perte de temps.",
+        "insight3": "Vous transformez la douleur en pouvoir comme personne d'autre.",
+        "insight4": "Les secrets se révèlent à vous sans que vous essayiez.",
+        "insight5": "Votre intensité est incomprise par ceux qui craignent la profondeur."
+      },
+      "sagittarius": {
+        "insight1": "La liberté n'est pas un désir pour vous — c'est la survie.",
+        "insight2": "Vous préférez l'honnêteté au confort.",
+        "insight3": "L'aventure vous appelle même quand la logique dit de rester immobile.",
+        "insight4": "Vous trouvez du sens dans le voyage, pas seulement dans la destination.",
+        "insight5": "Votre optimisme sauve les gens même quand vous ne le réalisez pas."
+      }
+    }
+  },
+  "timePicker": {
+    "title": "Sélectionner l'heure",
+    "cancel": "Annuler",
+    "confirm": "Confirmer"
+  },
+  "locationPicker": {
+    "countryTitle": "Sélectionner le pays",
+    "cityTitle": "Sélectionner la ville",
+    "searchCountry": "Rechercher un pays...",
+    "searchCity": "Rechercher une ville...",
+    "cancel": "Annuler",
+    "noResults": "Aucun résultat trouvé"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "retry": "Réessayer"
+  }
+}

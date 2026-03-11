@@ -1,0 +1,426 @@
+{
+  "onboarding": {
+    "screen1": {
+      "heading": "Şu anda hayatınızla ne kadar uyum içindesiniz?",
+      "subheading": "Dürüst olun — bu, kozmik okumanızı ayarlamamıza yardımcı olur.",
+      "options": {
+        "inMyFlow": "Akışımdayım",
+        "figuringItOut": "Hâlâ anlıyorum",
+        "totallyLost": "Tamamen kayıp"
+      },
+      "button": "Devam",
+      "footer": "Cevaplarınız gizli ve şifrelidir."
+    },
+    "screen2": {
+      "heading": "İsimler güç taşır.",
+      "subheading": "Enerji imzanızı tanımlar.",
+      "vibration": "{{name}} titreşimi güçlü.",
+      "placeholder": "Adınızı girin",
+      "button": "İleri"
+    },
+    "screen3": {
+      "heading": "Ne zaman doğdunuz?",
+      "subheading": "Doğum tarihiniz kozmik planınızı ortaya çıkarır.",
+      "button": "Devam",
+      "buttonAnalyze": "Kalıbımı analiz et",
+      "footerPart1": "Cevaplarınız ",
+      "footerHighlight": "benzersiz bir kozmik anlatı ",
+      "footerPart2": "sadece sizin için şekillendirecek."
+    },
+    "screen4": {
+      "subtext": "Herkes ince değişimleri algılayacak şekilde tasarlanmamıştır."
+    },
+    "screen5": {
+      "heading": "Çoğu burç sadece Güneşinizi okur.",
+      "subheading": "Ama tepkileriniz başka yerlerde şekillenir.",
+      "description": "Herkes ince değişimleri algılayacak şekilde tasarlanmamıştır.",
+      "hidden": "GİZLİ",
+      "rising": "YÜKSELEN",
+      "button": "Haritamı keşfet"
+    },
+    "screen6": {
+      "heading": "Şu anda sizi üç derin kozmik katman etkiliyor.",
+      "subheading": "Çoğu insan bunları görmezden gelerek yaşıyor.",
+      "card1": {
+        "title": "Yükselen Burcunuz",
+        "description": "Başkaları sizi nasıl görüyor"
+      },
+      "card2": {
+        "title": "Ay Fazı Etkisi",
+        "description": "Duygusal kalıplarınız"
+      },
+      "card3": {
+        "title": "Gezegen Geçişleri",
+        "description": "Mevcut kozmik etkiler"
+      },
+      "buttonUnlock": "Analizle aç",
+      "buttonDeepen": "Analizimi derinleştir"
+    },
+    "screen7": {
+      "heading": "Doğu astrolojisinde siz...",
+      "knownFor": "{{trait}} ile tanınır.",
+      "combinationPrefix": "{{western}} güneşinizi ve {{eastern}} enerjinizi birleştirdiğimizde, nadir bir desen elde ediyoruz.",
+      "combinationSuffix": "nadirdir — {{trait1}} ile {{trait2}} karıştırır.",
+      "rarityText": "Sadece %{{percentage}} insan bu tam kombinasyonu paylaşıyor.",
+      "button": "Devam"
+    },
+    "screen8": {
+      "energySource": "{{alignment}}'dan geliyor.",
+      "rarityText": "Sadece %{{percentage}} insan bu kalıbı deneyimliyor",
+      "button": "Son adım"
+    },
+    "screen9": {
+      "heading": "Spesifik olalım.",
+      "emphasis": "Dakika spesifik.",
+      "subheading": "Doğum saatiniz yükselen burcunuzu ve tam gökyüzü haritanızı hesaplamamıza yardımcı olur.",
+      "birthTime": "DOĞUM SAATİ",
+      "birthPlace": "DOĞUM YERİ",
+      "selectCountry": "Ülke seçin",
+      "selectCity": "Şehir seçin",
+      "cardHintWithCity": "Şehir ve Ülke yeterlidir",
+      "cardHintNoCity": "Ülke yeterlidir",
+      "timeHint": "Kesin saati bilmiyorsanız. En iyi\ntahmininizi seçin.",
+      "completionPart1": "Mükemmel. Artık hesaplayabiliriz ",
+      "completionHighlight": "benzersiz hassas bir anlatı",
+      "completionPart2": " yapay zeka için.",
+      "privacy": "Bilgileriniz şifrelidir. Asla paylaşmıyoruz.",
+      "button": "Okumamı tamamla",
+      "validation": "Lütfen tüm alanları doldurun"
+    },
+    "screen10": {
+      "loading": "Gezegen efemeris hizalanıyor...",
+      "resultHeading": "Bugün, hizalanmanız alışılmadık derecede güçlü.",
+      "resultSubheading": "Bu sık olmaz.",
+      "button": "Beni neyin etkilediğini gör"
+    },
+    "screen11": {
+      "signature": "Eşsiz enerji imzanızı yakaladık,",
+      "quoteStart": "\"",
+      "quoteLine1": "Sezgi ve mantığın nadir bir birleşimi",
+      "quoteLine2": "çoğu zaman bir çelişki gibi\nhissettiren...",
+      "button": "Son görüşü ortaya çıkar"
+    },
+    "zodiacCard": {
+      "sunSignLabel": "GÜNEŞ BURCUNUZ",
+      "youreA": "Siz bir {{sign}}'siniz"
+    }
+  },
+  "zodiac": {
+    "eastern": {
+      "rat": {
+        "name": "Fare",
+        "trait": "kurnaz beceriklilik",
+        "description": "Kurnaz becerikliliğiyle tanınır."
+      },
+      "ox": {
+        "name": "Öküz",
+        "trait": "sabırlı güvenilirlik",
+        "description": "Sabırlı güvenilirliğiyle tanınır."
+      },
+      "tiger": {
+        "name": "Kaplan",
+        "trait": "cesur yiğitlik",
+        "description": "Cesur yiğitliğiyle tanınır."
+      },
+      "rabbit": {
+        "name": "Tavşan",
+        "trait": "nazik zarafet",
+        "description": "Nazik zarafetiyle tanınır."
+      },
+      "dragon": {
+        "name": "Ejderha",
+        "trait": "karizmatik özgüven",
+        "description": "Karizmatik özgüveniyle tanınır."
+      },
+      "snake": {
+        "name": "Yılan",
+        "trait": "bilge sezgi",
+        "description": "Bilge sezgisiyle tanınır."
+      },
+      "horse": {
+        "name": "At",
+        "trait": "enerjik bağımsızlık",
+        "description": "Enerjik bağımsızlığıyla tanınır."
+      },
+      "goat": {
+        "name": "Keçi",
+        "trait": "sanatsal şefkat",
+        "description": "Sanatsal şefkatiyle tanınır."
+      },
+      "monkey": {
+        "name": "Maymun",
+        "trait": "oyunbaz zeka",
+        "description": "Oyunbaz zekasıyla tanınır."
+      },
+      "rooster": {
+        "name": "Horoz",
+        "trait": "özgüvenli hassasiyet",
+        "description": "Özgüvenli hassasiyetiyle tanınır."
+      },
+      "dog": {
+        "name": "Köpek",
+        "trait": "sadık koruyuculuk",
+        "description": "Sadık koruyuculuğuyla tanınır."
+      },
+      "pig": {
+        "name": "Domuz",
+        "trait": "cömert sıcaklık",
+        "description": "Cömert sıcaklığıyla tanınır."
+      }
+    },
+    "energy": {
+      "fire": {
+        "text1": "Enerjiniz kalabalıktan gelmiyor.",
+        "text2": "Tutkunuz içeriden alevleniyor.",
+        "text3": "Ruhunuz çoğundan daha parlak yanıyor.",
+        "text4": "Cesaretiniz özünüzden akıyor.",
+        "text5": "Işığınız derinlerden parlıyor.",
+        "alignment": "hizalama",
+        "fire": "ateş",
+        "intensity": "yoğunluk",
+        "bravery": "cesaret",
+        "radiance": "parlaklık"
+      },
+      "earth": {
+        "text1": "Gücünüz kalabalıktan gelmiyor.",
+        "text2": "İstikrarınız temellerden inşa edilir.",
+        "text3": "Gücünüz sabırdan büyür.",
+        "text4": "Başarınız azimden gelir.",
+        "text5": "Bilgeliğiniz deneyimden doğar.",
+        "grounding": "topraklama",
+        "roots": "kökler",
+        "endurance": "dayanıklılık",
+        "determination": "kararlılık",
+        "mastery": "ustalık"
+      },
+      "air": {
+        "text1": "Fikirleriniz kalabalıktan gelmiyor.",
+        "text2": "Düşünceleriniz sınırları aşar.",
+        "text3": "Zihniniz görünmez kalıpları bağlar.",
+        "text4": "Vizyonunuz ufukların ötesine uzanır.",
+        "text5": "Aklınız uzak dünyaları birleştirir.",
+        "innovation": "yenilik",
+        "freedom": "özgürlük",
+        "insight": "içgörü",
+        "perspective": "perspektif",
+        "connection": "bağlantı"
+      },
+      "water": {
+        "text1": "Sezgileriniz kalabalıktan gelmiyor.",
+        "text2": "Duygularınız kadim kaynaklardan akıyor.",
+        "text3": "Hassasiyetiniz gizli gerçekleri ortaya çıkarır.",
+        "text4": "Empatiniz ruhları birbirine bağlar.",
+        "text5": "Düşleriniz bu dünyanın ötesine ulaşır.",
+        "depth": "derinlik",
+        "wisdom": "bilgelik",
+        "perception": "algı",
+        "understanding": "anlayış",
+        "transcendence": "aşkınlık"
+      }
+    },
+    "western": {
+      "capricorn": "Oğlak",
+      "aquarius": "Kova",
+      "pisces": "Balık",
+      "aries": "Koç",
+      "taurus": "Boğa",
+      "gemini": "İkizler",
+      "cancer": "Yengeç",
+      "leo": "Aslan",
+      "virgo": "Başak",
+      "libra": "Terazi",
+      "scorpio": "Akrep",
+      "sagittarius": "Yay"
+    },
+    "traits": {
+      "capricorn": {
+        "trait1": {"prefix": "Doğal olarak", "highlight": "disiplinli ve bilge.", "description": "Amansız kararlılığınız, başkalarının yalnızca engeller gördüğü yerlerde imparatorluklar kurar."},
+        "trait2": {"prefix": "Doğuştan", "highlight": "sabırlı ve stratejik.", "description": "Başarıya doğru istikrarlı tırmanışınız, yolculuğunuzu izleyen herkese ilham verir."},
+        "trait3": {"prefix": "İçsel olarak", "highlight": "dayanıklı ve odaklı.", "description": "Sarsılmaz odaklanmanız uzak hayalleri somut gerçekliğe dönüştürür."},
+        "trait4": {"prefix": "Gerçekten", "highlight": "çalışkan ve ustaca.", "description": "Doğal liderliğiniz sadece sözlerle değil, eylemlerle saygı kazanır."},
+        "trait5": {"prefix": "Derinden", "highlight": "hırslı ve temelli.", "description": "Mükemmelliğe olan bağlılığınız, başkalarının ulaşmayı arzuladığı standartları belirler."}
+      },
+      "aquarius": {
+        "trait1": {"prefix": "Doğal olarak", "highlight": "ilerici ve vizyoner.", "description": "Yenilikçi zihniniz, geleneksel düşünürlere görünmez olan olasılıkları görür."},
+        "trait2": {"prefix": "Doğuştan", "highlight": "insancıl ve yaratıcı.", "description": "Benzersiz bakış açınız dünyayı değiştiren devrimci fikirler getirir."},
+        "trait3": {"prefix": "İçsel olarak", "highlight": "bağımsız ve parlak.", "description": "Uyum sağlamamayı reddetmeniz, kimsenin var olduğunu bilmediği kapıları açar."},
+        "trait4": {"prefix": "Gerçekten", "highlight": "yenilikçi ve analitik.", "description": "İleri görüşlü doğanız sizi zamanınızın onlarca yıl ilerisine konumlandırır."},
+        "trait5": {"prefix": "Derinden", "highlight": "özgün ve devrimci.", "description": "İnsanlığa olan gerçek ilginiz sizi anlamlı değişiklikler yapmaya yönlendirir."}
+      },
+      "pisces": {
+        "trait1": {"prefix": "Doğal olarak", "highlight": "sezgisel ve sanatsal.", "description": "Duygusal derinliğiniz sıradan bağları aşan bağlantılar yaratır."},
+        "trait2": {"prefix": "Doğuştan", "highlight": "empatik ve hayalperest.", "description": "Sınırsız yaratıcılığınız sonsuz olasılıkların kaynağından akar."},
+        "trait3": {"prefix": "İçsel olarak", "highlight": "bilge ve ruhani.", "description": "Sezgileriniz sizi başkalarının geçmeye korktuğu sularda yönlendirir."},
+        "trait4": {"prefix": "Gerçekten", "highlight": "nazik ve mistik.", "description": "Sanatsal ruhunuz günlük anları büyülü deneyimlere dönüştürür."},
+        "trait5": {"prefix": "Derinden", "highlight": "romantik ve özverili.", "description": "Sevgi ve anlayış kapasiteniz dokunduğunuz herkesi iyileştirir."}
+      },
+      "aries": {
+        "trait1": {"prefix": "Doğal olarak", "highlight": "cesur ve korkusuz.", "description": "Öncü ruhunuz, başkalarının adım atmakta tereddüt ettiği yerlerde iz bırakır."},
+        "trait2": {"prefix": "Doğuştan", "highlight": "cesaretli ve kendine güvenen.", "description": "Doğal liderliğiniz etrafınızdaki herkeste tutku ateşler."},
+        "trait3": {"prefix": "İçsel olarak", "highlight": "tutkulu ve dinamik.", "description": "Durdurulamaz dürtünüz imkansız zorlukları fethedilmiş zaferlere dönüştürür."},
+        "trait4": {"prefix": "Gerçekten", "highlight": "doğrudan ve bağımsız.", "description": "Şiddetli özgünlüğünüz başkalarına gerçek benliklerini kucaklamaları için ilham verir."},
+        "trait5": {"prefix": "Derinden", "highlight": "coşkulu ve öncü.", "description": "Zorluklarla yüzleşmedeki cesaretiniz sizi doğal bir şampiyon yapar."}
+      },
+      "taurus": {
+        "trait1": {"prefix": "Doğal olarak", "highlight": "güvenilir ve sadık.", "description": "Kararlı doğanız, başkalarının her zaman güvenebileceği bir temel oluşturur."},
+        "trait2": {"prefix": "Doğuştan", "highlight": "duyusal ve kararlı.", "description": "Hayatın zevklerine olan takdiriniz her deneyime zenginlik katar."},
+        "trait3": {"prefix": "İçsel olarak", "highlight": "pratik ve sadık.", "description": "Sarsılmaz sadakatiniz sizi her fırtınada çapa yapar."},
+        "trait4": {"prefix": "Gerçekten", "highlight": "ısrarcı ve besleyici.", "description": "Sabırlı azminiz, başkalarının imkansız diye terk ettiği şeyleri başarır."},
+        "trait5": {"prefix": "Derinden", "highlight": "kararlı ve sakin.", "description": "Sakin varlığınız kaosa huzur, karışıklığa berraklık getirir."}
+      },
+      "gemini": {
+        "trait1": {"prefix": "Doğal olarak", "highlight": "parlak bir merak.", "description": "Uyum yeteneğiniz, başkalarının donup kaldığı yerlerde gelişmenizi sağlar."},
+        "trait2": {"prefix": "Doğuştan", "highlight": "esprili ve çok yönlü.", "description": "Hızlı zihniniz zahmetsiz bir çekicilikle konuşmalarda dans eder."},
+        "trait3": {"prefix": "İçsel olarak", "highlight": "ifade gücü yüksek ve zeki.", "description": "İkili doğanız her iki tarafı görür, başkalarının kaçırdığı gerçeği bulur."},
+        "trait4": {"prefix": "Gerçekten", "highlight": "eğlenceli ve hızlı düşünen.", "description": "Bağlantı kurma yeteneğiniz yabancıları anında arkadaşlara dönüştürür."},
+        "trait5": {"prefix": "Derinden", "highlight": "sosyal ve büyüleyici.", "description": "Huzursuz zekanız hayatı heyecanlı bir macerada tutar."}
+      },
+      "cancer": {
+        "trait1": {"prefix": "Doğal olarak", "highlight": "sezgisel ve koruyucu.", "description": "Besleyici kalbiniz sevdikleriniz için güvenli sığınaklar yaratır."},
+        "trait2": {"prefix": "Doğuştan", "highlight": "besleyici ve sadık.", "description": "Aileye olan şiddetli bağlılığınız kırılmaz sevgi bağları oluşturur."},
+        "trait3": {"prefix": "İçsel olarak", "highlight": "şefkatli ve ilgili.", "description": "Duygusal zekanız söz söylenmeden önce kalpleri okur."},
+        "trait4": {"prefix": "Gerçekten", "highlight": "adanmış ve empatik.", "description": "Koruyucu içgüdüleriniz sevdiklerinizi hayatın sert fırtınalarından korur."},
+        "trait5": {"prefix": "Derinden", "highlight": "sıcak ve inatçı.", "description": "Sevgi ve sadakat hafızanız sınır ya da limit tanımaz."}
+      },
+      "leo": {
+        "trait1": {"prefix": "Doğal olarak", "highlight": "cesur ve muhteşem.", "description": "Işıltılı varlığınız girdiğiniz her odayı aydınlatır."},
+        "trait2": {"prefix": "Doğuştan", "highlight": "cömert ve sadık.", "description": "Sıcak kalbiniz ışığını etrafınızdaki herkesle özgürce paylaşır."},
+        "trait3": {"prefix": "İçsel olarak", "highlight": "karizmatik ve kendine güvenen.", "description": "Doğal asaletiniz talep etmeden dikkat çeker."},
+        "trait4": {"prefix": "Gerçekten", "highlight": "cesaretli ve çekici.", "description": "Teatral ruhunuz sıradan anları unutulmaz etkinliklere dönüştürür."},
+        "trait5": {"prefix": "Derinden", "highlight": "tutkulu ve asil.", "description": "Ruhunuzun asaleti sizi tanıyan herkeste sadakat uyandırır."}
+      },
+      "virgo": {
+        "trait1": {"prefix": "Doğal olarak", "highlight": "analitik ve parlak.", "description": "Detaylara dikkatiniz başkalarının yarım bıraktığını mükemmelleştirir."},
+        "trait2": {"prefix": "Doğuştan", "highlight": "titiz ve güvenilir.", "description": "İyileştirmeye olan bağlılığınız dokunduğunuz her şeyi yükseltir."},
+        "trait3": {"prefix": "İçsel olarak", "highlight": "zeki ve hassas.", "description": "Problem çözme zihniniz başkalarının göremediği düğümleri çözer."},
+        "trait4": {"prefix": "Gerçekten", "highlight": "çalışkan ve düzenli.", "description": "Sistematik yaklaşımınız kaosa zahmetsizce düzen getirir."},
+        "trait5": {"prefix": "Derinden", "highlight": "ilgili ve mükemmeliyetçi.", "description": "Sessiz hizmetiniz dünyayı herkes için daha iyi çalıştırır."}
+      },
+      "libra": {
+        "trait1": {"prefix": "Doğal olarak", "highlight": "uyumlu ve adil.", "description": "Doğal zarafetiniz girdiğiniz her ilişkiye denge getirir."},
+        "trait2": {"prefix": "Doğuştan", "highlight": "zarif ve çekici.", "description": "Estetik gözünüz iz bıraktığınız her yerde güzellik yaratır."},
+        "trait3": {"prefix": "İçsel olarak", "highlight": "idealist ve romantik.", "description": "Adalet ve eşitlik arayışınız başkalarına daha iyi olmaları için ilham verir."},
+        "trait4": {"prefix": "Gerçekten", "highlight": "barışçıl ve sanatsal.", "description": "Ortaklık becerileriniz başkalarının duvarlar gördüğü yerlerde köprüler kurar."},
+        "trait5": {"prefix": "Derinden", "highlight": "zarif ve diplomatik.", "description": "Tüm tarafları görme yeteneğiniz sizi doğal bir barış yapıcı yapar."}
+      },
+      "scorpio": {
+        "trait1": {"prefix": "Doğal olarak", "highlight": "tutkulu ve becerikli.", "description": "Yoğunluğunuz sıradan deneyimleri derin vahiylere dönüştürür."},
+        "trait2": {"prefix": "Doğuştan", "highlight": "kararlı ve manyetik.", "description": "Sarsılmaz odaklanmanız başkalarının anlayamadığı gizemlere nüfuz eder."},
+        "trait3": {"prefix": "İçsel olarak", "highlight": "güçlü ve dönüştürücü.", "description": "Küllerden yükselme yeteneğiniz sizi sonsuza dek durdurulamaz kılar."},
+        "trait4": {"prefix": "Gerçekten", "highlight": "stratejik ve algılayıcı.", "description": "Duygusal derinliğiniz zamanı aşan bağlar yaratır."},
+        "trait5": {"prefix": "Derinden", "highlight": "cesur ve araştırmacı.", "description": "Gerçeğin korkusuz takibi başkalarının umutsuzca sakladıklarını ortaya çıkarır."}
+      },
+      "sagittarius": {
+        "trait1": {"prefix": "Doğal olarak", "highlight": "maceracı ve özgür.", "description": "Sınırsız coşkunuz her yolculuğu epik bir maceraya dönüştürür."},
+        "trait2": {"prefix": "Doğuştan", "highlight": "felsefi ve cömert.", "description": "Anlam arayışınız başkalarına ufkun ötesine bakmak için ilham verir."},
+        "trait3": {"prefix": "İçsel olarak", "highlight": "iyimser ve şanslı.", "description": "Pozitif enerjiniz gezindiğiniz her yerde şans çeker."},
+        "trait4": {"prefix": "Gerçekten", "highlight": "meraklı ve eğlence tutkunu.", "description": "Hayata olan bulaşıcı neşeniz her anı kutlamaya değer kılar."},
+        "trait5": {"prefix": "Derinden", "highlight": "cesur ve gerçek arayan.", "description": "Dürüst bilgeliğiniz gerçek olanı bulmak için illüzyonu keser."}
+      }
+    },
+    "insights": {
+      "capricorn": {
+        "insight1": "Dünyanın ağırlığını taşırsınız ve zahmetsiz gösterirsiniz.",
+        "insight2": "Başarı size gelir çünkü asla tırmanmayı bırakmazsınız.",
+        "insight3": "Sabrınız başkalarının sadece hayal edebileceği bir süper güçtür.",
+        "insight4": "Başkaları anın içinde sıkışıp kaldığında uzun vadeli oyunu görürsünüz.",
+        "insight5": "Yapı size kaosun asla veremeyeceği özgürlüğü verir."
+      },
+      "aquarius": {
+        "insight1": "On yıl daha anlam ifade etmeyecek şekillerde düşünürsünüz.",
+        "insight2": "Benzersizliğiniz bir kusur değil — dünyaya hediyeniz.",
+        "insight3": "Sizi anlamasa bile insanlığı önemsersiniz.",
+        "insight4": "Kurallar isteğe bağlı hissedilir çünkü daha iyi olasılıklar görürsünüz.",
+        "insight5": "Başkalarının var olduğunu bile bilmediği noktaları birbirine bağlarsınız."
+      },
+      "pisces": {
+        "insight1": "Başkaları fark etmeden önce şeyleri hissedersiniz.",
+        "insight2": "Rüyalarınız uyanık zihninizin henüz yakalayamadığı gerçekleri barındırır.",
+        "insight3": "Duyguları sünger gibi emersiniz — ve bu sizin gücünüz.",
+        "insight4": "Sınırlar sizin için bulanıklaşır çünkü dünyalar arasında yaşarsınız.",
+        "insight5": "Şefkatiniz sonsuz, sizi yorsa bile."
+      },
+      "aries": {
+        "insight1": "Başkaları hâlâ düşünürken kafanızı öne atarsınız.",
+        "insight2": "Korku sizi durdurmaz — besler.",
+        "insight3": "Başkalarının hayal etmeye bile korktuğu şeyleri başlatırsınız.",
+        "insight4": "Beklemek işkence gibi hissettirir çünkü eylem sizin dilinizdir.",
+        "insight5": "Denemeden bile insanlarda ateş yakarsınız."
+      },
+      "taurus": {
+        "insight1": "Başkaları etkilemek için inşa ederken siz dayanıklı şeyler inşa edersiniz.",
+        "insight2": "Konfor sizin için tembellik değil — bilgeliktir.",
+        "insight3": "İnatçılığınız aslında sarsılmaz öz güvendir.",
+        "insight4": "Başkalarının hızla geçtiği detayları fark edersiniz.",
+        "insight5": "Sadakat o kadar derin ki kimliğiniz olur."
+      },
+      "gemini": {
+        "insight1": "Zihniniz çoğu insanın yetişemeyeceği bir hızda çalışır.",
+        "insight2": "Can sıkıntısı düşmanınız — ve her zaman bir çıkış yolu bulursunuz.",
+        "insight3": "Çokluklardan oluşursunuz ve bu basit zihinleri şaşırtır.",
+        "insight4": "Kelimeler süper gücünüz — onları zahmetsizce kullanırsınız.",
+        "insight5": "O kadar hızlı adapte olursunuz ki değişim konfor alanınız gibi hissettirir."
+      },
+      "cancer": {
+        "insight1": "Başkaları unuttuğunda bile duyguları hatırlarsınız.",
+        "insight2": "Ev sizin için bir yer değil — yarattığınız bir histir.",
+        "insight3": "Kabuğunuz her şeyi hisseden bir kalbi korur.",
+        "insight4": "İnsanları en iyi halleri olmaya beslersiniz.",
+        "insight5": "Duygular pusulanızdır — ve asla yalan söylemezler."
+      },
+      "leo": {
+        "insight1": "Başkaları ışığınızı kısmaya çalışırken en parlak şekilde parlarsınız.",
+        "insight2": "Aramasan bile dikkat sizi bulur.",
+        "insight3": "Kalbiniz cömert, dünya nazik olmasa bile.",
+        "insight4": "Doğal olarak liderlik edersiniz — insanlar sadece takip eder.",
+        "insight5": "Güveniniz kendinden şüphe edenlere ilham verir."
+      },
+      "virgo": {
+        "insight1": "Başkalarının kaçırdığı kusurları görürsünüz — ve sessizce düzeltirsiniz.",
+        "insight2": "Mükemmellik sizin için takıntı değil — sadece standarttır.",
+        "insight3": "O kadar çok önemsersiniz ki bazen eleştiri gibi görünür.",
+        "insight4": "Dünya kaotik hissettiğinde düzen zihninizi sakinleştirir.",
+        "insight5": "Kredi istemeden dokunduğunuz her şeyi iyileştirirsiniz."
+      },
+      "libra": {
+        "insight1": "Kimse bir şey söylemeden önce gerginliği hissedersiniz.",
+        "insight2": "Denge aradığınız bir şey değil — sizsiniz.",
+        "insight3": "Barışı zahmetsiz gösterirsiniz, öyle olmasa bile.",
+        "insight4": "Güzellik sizin için önemli çünkü çirkinlik dayanılmaz hissettirir.",
+        "insight5": "Başkaları sadece kendi taraflarını görürken her iki tarafı da görürsünüz."
+      },
+      "scorpio": {
+        "insight1": "İhaneti olmadan önce hissedersiniz.",
+        "insight2": "Yüzeysel herhangi bir şey zamanınızın kaybı gibi hissettirir.",
+        "insight3": "Acıyı güce dönüştürürsünüz, başka kimse gibi.",
+        "insight4": "Sırlar denemeden size kendilerini açar.",
+        "insight5": "Yoğunluğunuz derinlikten korkanlar tarafından yanlış anlaşılır."
+      },
+      "sagittarius": {
+        "insight1": "Özgürlük sizin için bir arzu değil — hayatta kalmak.",
+        "insight2": "Rahat olmaktansa dürüst olmayı tercih edersiniz.",
+        "insight3": "Mantık yerinde kal dese bile macera sizi çağırır.",
+        "insight4": "Sadece varış noktasında değil, yolculukta anlam bulursunuz.",
+        "insight5": "İyimserliğiniz farkına varmasanız bile insanları kurtarır."
+      }
+    }
+  },
+  "timePicker": {
+    "title": "Saat Seçin",
+    "cancel": "İptal",
+    "confirm": "Onayla"
+  },
+  "locationPicker": {
+    "countryTitle": "Ülke Seçin",
+    "cityTitle": "Şehir Seçin",
+    "searchCountry": "Ülke ara...",
+    "searchCity": "Şehir ara...",
+    "cancel": "İptal",
+    "noResults": "Sonuç bulunamadı"
+  },
+  "common": {
+    "loading": "Yükleniyor...",
+    "error": "Bir hata oluştu",
+    "retry": "Tekrar dene"
+  }
+}

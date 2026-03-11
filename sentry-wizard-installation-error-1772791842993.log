@@ -1,0 +1,18 @@
+warning bare-fs@4.5.4: The engine "bare" appears to be invalid.
+warning bare-os@3.6.2: The engine "bare" appears to be invalid.
+warning " > react-native-fast-image@8.6.3" has incorrect peer dependency "react@^17 || ^18".
+warning " > react-native-skeleton-placeholder@5.2.4" has incorrect peer dependency "@react-native-masked-view/masked-view@^0.2.8".
+warning " > redux-persist@6.0.0" has unmet peer dependency "redux@>4.0.0".
+warning Workspaces can only be enabled in private projects.
+warning Workspaces can only be enabled in private projects.
+warning Workspaces can only be enabled in private projects.
+warning Workspaces can only be enabled in private projects.
+warning Workspaces can only be enabled in private projects.
+warning Workspaces can only be enabled in private projects.
+warning Workspaces can only be enabled in private projects.
+warning Workspaces can only be enabled in private projects.
+/Users/macmini/Desktop/CosmicMarkcon/node_modules/react-native-fbsdk-next/react-native-fbsdk-next.podspec:4: warning: already initialized constant Pod::FBSDKVersion
+/Users/macmini/Desktop/CosmicMarkcon/node_modules/react-native-fbsdk-next/react-native-fbsdk-next.podspec:4: warning: previous definition of FBSDKVersion was here
+/Users/macmini/Desktop/CosmicMarkcon/node_modules/react-native-fbsdk-next/react-native-fbsdk-next.podspec:4: warning: already initialized constant Pod::FBSDKVersion
+/Users/macmini/Desktop/CosmicMarkcon/node_modules/react-native-fbsdk-next/react-native-fbsdk-next.podspec:4: warning: previous definition of FBSDKVersion was here
+error Command failed with exit code 1.

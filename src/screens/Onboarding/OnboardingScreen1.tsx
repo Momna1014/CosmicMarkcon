@@ -1,521 +1,471 @@
 /**
  * Onboarding Screen 1
- * Main onboarding screen with category carousel
+ * Life alignment question screen with cosmic animations
  */
 
-import React, {useRef, useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  FlatList,
+  ImageBackground,
   Dimensions,
-  ScrollView,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import LinearGradient from 'react-native-linear-gradient';
-import {useNavigation} from '@react-navigation/native';
-import {useApp} from '../../contexts/AppContext';
+import {useTranslation} from 'react-i18next';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withDelay,
+  withRepeat,
+  withSequence,
+  Easing,
+  FadeIn,
+  FadeInDown,
+  FadeInUp,
+} from 'react-native-reanimated';
 import {
   Colors,
   FontFamilies,
-  verticalScale,
+  fontScale,
   horizontalScale,
-  moderateScale,
-  BorderRadius,
+  verticalScale,
+  radiusScale,
 } from '../../theme';
-import {showPaywall} from '../../utils/showPaywall';
+import {hapticLight} from '../../utils/haptics';
+import {
+  trackOnboarding1View,
+  trackOnboarding1AlignmentSelected,
+  trackOnboardingStarted,
+} from '../../utils/onboardingAnalytics';
 
-// Analytics imports
-import { useScreenView } from '../../hooks/useFacebookAnalytics';
-import { trackOnboardingStep, trackOnboardingCompleted } from '../../utils/facebookEvents';
-import firebaseService from '../../services/firebase/FirebaseService';
+const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
+const BackgroundImageSource = require('../../assets/icons/onboarding_icons/background_image.png');
 
-// Import SVG images for carousel
-import ActionImage from '../../assets/icons/svgicons/onboardingIcons/action.svg';
-import ThrillerImage from '../../assets/icons/svgicons/onboardingIcons/thriller.svg';
-import ComedyImage from '../../assets/icons/svgicons/onboardingIcons/comedy.svg';
-import HorrorImage from '../../assets/icons/svgicons/onboardingIcons/horror.svg';
-import RomanceImage from '../../assets/icons/svgicons/onboardingIcons/romance.svg';
-
-const {width: SCREEN_WIDTH} = Dimensions.get('window');
-
-// Category data with images
-const CATEGORIES = [
-  {
-    id: 'action',
-    title: 'Action',
-    description: 'Fast reads, high stakes',
-    Image: ActionImage,
-  },
-  {
-    id: 'thriller',
-    title: 'Thriller',
-    description: 'Twists around every corner',
-    Image: ThrillerImage,
-  },
-  {
-    id: 'comedy',
-    title: 'Comedy',
-    description: 'Laughs on every page',
-    Image: ComedyImage,
-  },
-  {
-    id: 'horror',
-    title: 'Horror',
-    description: 'Dark tales, endless chills',
-    Image: HorrorImage,
-  },
-  {
-    id: 'romance',
-    title: 'Romance',
-    description: 'Hearts meet, stories bloom',
-    Image: RomanceImage,
-  },
-];
-
-// Card dimensions
-const CARD_WIDTH = moderateScale(278);
-const CARD_HEIGHT = moderateScale(418);
-const CARD_MARGIN = horizontalScale(8);
-const SIDE_CARD_SCALE = 0.85;
-
-// Auto-scroll configuration
-const AUTO_SCROLL_INITIAL_DELAY = 1000; // Start auto-scroll after 1 second
-const AUTO_SCROLL_INTERVAL = 1700; // Scroll every 1.5 seconds
-const USER_INTERACTION_PAUSE = 2000; // Resume auto-scroll 2 seconds after user stops
-
-// Infinite loop configuration
-const LOOP_MULTIPLIER = 100; // Create 100 copies for "infinite" illusion
-const EXTENDED_CATEGORIES = Array(LOOP_MULTIPLIER)
-  .fill(CATEGORIES)
-  .flat()
-  .map((cat, index) => ({...cat, uniqueId: `${cat.id}_${index}`}));
-const INITIAL_INDEX = Math.floor(EXTENDED_CATEGORIES.length / 2) - (Math.floor(EXTENDED_CATEGORIES.length / 2) % CATEGORIES.length);
+// Animated TouchableOpacity
+const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 interface OnboardingScreen1Props {
-  // Props can be added as needed
+  onContinue?: (alignment: AlignmentOption) => void;
 }
 
-export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = () => {
-  const {setOnboardingCompleted} = useApp();
-  const navigation = useNavigation();
-  const flatListRef = useRef<FlatList>(null);
-  const [activeIndex, setActiveIndex] = useState(INITIAL_INDEX);
-  const [isUserInteracting, setIsUserInteracting] = useState(false);
-  
-  // Refs for auto-scroll
-  const autoScrollTimer = useRef<ReturnType<typeof setInterval> | null>(null);
-  const userInteractionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const currentIndexRef = useRef(INITIAL_INDEX);
+export type AlignmentOption = 'in-my-flow' | 'figuring-it-out' | 'totally-lost' | null;
 
-  // ===== Analytics: Track screen view =====
-  useScreenView('OnboardingScreen1', {
-    screen_category: 'onboarding',
-    step: '1',
-  });
+// Twinkling Star Component with sharp sparkle animation
+const TwinklingStar: React.FC<{
+  size: number;
+  top: number;
+  left: number;
+  delay: number;
+  intensity?: 'low' | 'medium' | 'high';
+}> = ({size, top, left, delay, intensity = 'medium'}) => {
+  const opacity = useSharedValue(0.3);
+  const scale = useSharedValue(0.8);
 
-  /**
-   * Log Firebase event helper
-   */
-  const logFirebaseEvent = useCallback((eventName: string, params?: Record<string, any>) => {
-    console.log(`📊 [OnboardingScreen1] Firebase Event: ${eventName}`, params);
-    firebaseService.logEvent(eventName, params);
-  }, []);
-
-  // Log screen view to Firebase on mount
-  useEffect(() => {
-    console.log('📱 [OnboardingScreen1] Screen mounted - logging Firebase screen view');
-    firebaseService.logScreenView('OnboardingScreen1', 'OnboardingScreen1');
-    logFirebaseEvent('onboarding_screen_viewed', {
-      step: 1,
-      screen: 'OnboardingScreen1',
-      timestamp: Date.now(),
-    });
-    // Track Facebook onboarding step
-    trackOnboardingStep(1, 'categories_carousel');
-  }, [logFirebaseEvent]);
-
-  // Calculate the real category index (0-4) from extended index
-  const realCategoryIndex = activeIndex % CATEGORIES.length;
-
-  // Keep currentIndexRef in sync with activeIndex
-  useEffect(() => {
-    currentIndexRef.current = activeIndex;
-  }, [activeIndex]);
-
-  // Auto-scroll function - simply increment to next item
-  const scrollToNextItem = useCallback(() => {
-    if (flatListRef.current) {
-      const nextIndex = currentIndexRef.current + 1;
-      // Safety check - reset to middle if we somehow get too far
-      if (nextIndex >= EXTENDED_CATEGORIES.length - CATEGORIES.length) {
-        flatListRef.current.scrollToIndex({
-          index: INITIAL_INDEX,
-          animated: false,
-        });
-        currentIndexRef.current = INITIAL_INDEX;
-        setActiveIndex(INITIAL_INDEX);
-        return;
-      }
-      flatListRef.current.scrollToIndex({
-        index: nextIndex,
-        animated: true,
-      });
-    }
-  }, []);
-
-  // Start auto-scroll timer
-  const startAutoScroll = useCallback(() => {
-    if (autoScrollTimer.current) {
-      clearInterval(autoScrollTimer.current);
-    }
-    autoScrollTimer.current = setInterval(scrollToNextItem, AUTO_SCROLL_INTERVAL);
-  }, [scrollToNextItem]);
-
-  // Stop auto-scroll timer
-  const stopAutoScroll = useCallback(() => {
-    if (autoScrollTimer.current) {
-      clearInterval(autoScrollTimer.current);
-      autoScrollTimer.current = null;
-    }
-  }, []);
-
-  // Handle user interaction start (touch/drag)
-  const handleScrollBeginDrag = useCallback(() => {
-    setIsUserInteracting(true);
-    stopAutoScroll();
-    
-    // Clear any pending resume timer
-    if (userInteractionTimer.current) {
-      clearTimeout(userInteractionTimer.current);
-    }
-  }, [stopAutoScroll]);
-
-  // Handle user interaction end
-  const handleScrollEndDrag = useCallback(() => {
-    // Resume auto-scroll after user stops interacting
-    if (userInteractionTimer.current) {
-      clearTimeout(userInteractionTimer.current);
-    }
-    
-    userInteractionTimer.current = setTimeout(() => {
-      setIsUserInteracting(false);
-      startAutoScroll();
-    }, USER_INTERACTION_PAUSE);
-  }, [startAutoScroll]);
-
-  // Handle momentum scroll end
-  const handleMomentumScrollEnd = useCallback(() => {
-    // Additional check to resume auto-scroll after momentum ends
-    if (!isUserInteracting) return;
-    
-    if (userInteractionTimer.current) {
-      clearTimeout(userInteractionTimer.current);
-    }
-    
-    userInteractionTimer.current = setTimeout(() => {
-      setIsUserInteracting(false);
-      startAutoScroll();
-    }, USER_INTERACTION_PAUSE);
-  }, [isUserInteracting, startAutoScroll]);
-
-  // Initialize auto-scroll on mount
-  useEffect(() => {
-    // Start auto-scroll after initial delay
-    const initialTimer = setTimeout(() => {
-      startAutoScroll();
-    }, AUTO_SCROLL_INITIAL_DELAY);
-
-    return () => {
-      clearTimeout(initialTimer);
-      stopAutoScroll();
-      if (userInteractionTimer.current) {
-        clearTimeout(userInteractionTimer.current);
-      }
-    };
-  }, [startAutoScroll, stopAutoScroll]);
-
-  const handleStartReading = async () => {
-    // Log analytics event
-    console.log('🟢 [OnboardingScreen1] Start Reading button pressed');
-    logFirebaseEvent('onboarding_start_reading_pressed', {
-      step: 1,
-      selected_category: CATEGORIES[realCategoryIndex].title,
-      screen: 'OnboardingScreen1',
-    });
-    // Track Facebook onboarding completed
-    trackOnboardingCompleted(1);
-    
-    // Mark onboarding as completed first
-    await setOnboardingCompleted(true);
-    // Then navigate to paywall
-    showPaywall('onboarding_start_reading', navigation);
+  const opacityRange = {
+    low: {min: 0.2, max: 0.5},
+    medium: {min: 0.3, max: 0.7},
+    high: {min: 0.4, max: 1.0},
   };
 
-  const handleSkip = async () => {
-    // Log analytics event
-    console.log('⏭️ [OnboardingScreen1] Skip button pressed');
-    logFirebaseEvent('onboarding_skipped', {
-      step: 1,
-      screen: 'OnboardingScreen1',
-    });
-    // Track Facebook onboarding completed
-    trackOnboardingCompleted(1);
-    
-    // Mark onboarding as completed first
-    await setOnboardingCompleted(true);
-    // Then navigate to paywall
-    showPaywall('onboarding_skip', navigation);
+  const scaleRange = {
+    low: {min: 0.8, max: 1.0},
+    medium: {min: 0.7, max: 1.1},
+    high: {min: 0.6, max: 1.2},
   };
 
-  const onViewableItemsChanged = useRef(({viewableItems}: any) => {
-    if (viewableItems.length > 0) {
-      const centerItem = viewableItems.find(
-        (item: any) => item.isViewable && item.index !== undefined,
+  const durationRange = {
+    low: 3000,
+    medium: 2500,
+    high: 2000,
+  };
+
+  useEffect(() => {
+    const range = opacityRange[intensity];
+    const scaleR = scaleRange[intensity];
+    const duration = durationRange[intensity];
+
+    opacity.value = withDelay(
+      delay,
+      withRepeat(
+        withSequence(
+          withTiming(range.max, {duration, easing: Easing.inOut(Easing.ease)}),
+          withTiming(range.min, {duration, easing: Easing.inOut(Easing.ease)}),
+        ),
+        -1,
+        true,
+      ),
+    );
+
+    scale.value = withDelay(
+      delay,
+      withRepeat(
+        withSequence(
+          withTiming(scaleR.max, {
+            duration: duration * 0.8,
+            easing: Easing.inOut(Easing.ease),
+          }),
+          withTiming(scaleR.min, {
+            duration: duration * 0.8,
+            easing: Easing.inOut(Easing.ease),
+          }),
+        ),
+        -1,
+        true,
+      ),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{scale: scale.value}],
+  }));
+
+  return (
+    <Animated.View
+      style={[
+        styles.star,
+        {
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          top,
+          left,
+          shadowColor: Colors.white,
+          shadowOffset: {width: 0, height: 0},
+          shadowOpacity: 0.8,
+          shadowRadius: size,
+        },
+        animatedStyle,
+      ]}
+    />
+  );
+};
+
+export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
+  onContinue,
+}) => {
+  const {t} = useTranslation();
+  const [selectedOption, setSelectedOption] = useState<AlignmentOption>(null);
+
+  // Progress bar animation
+  const progressWidth = useSharedValue(0);
+
+  // Button scale animation
+  const buttonScale = useSharedValue(1);
+
+  useEffect(() => {
+    // Track screen view and onboarding start
+    trackOnboardingStarted();
+    trackOnboarding1View();
+    
+    // Animate progress bar on mount - Screen 1 of 11 (9%)
+    progressWidth.value = withDelay(
+      300,
+      withTiming(9, {duration: 800, easing: Easing.out(Easing.cubic)}),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const progressAnimatedStyle = useAnimatedStyle(() => ({
+    width: `${progressWidth.value}%`,
+  }));
+
+  const handleContinue = () => {
+    if (selectedOption) {
+      hapticLight();
+      buttonScale.value = withSequence(
+        withTiming(1.02, {duration: 100}),
+        withTiming(1, {duration: 100}),
       );
-      if (centerItem) {
-        setActiveIndex(centerItem.index);
-      }
+      // Small delay to let animation play before navigating
+      setTimeout(() => {
+        onContinue?.(selectedOption);
+      }, 150);
     }
-  }).current;
+  };
 
-  const viewabilityConfig = useRef({
-    itemVisiblePercentThreshold: 50,
-  }).current;
-
-  const getItemLayout = (_data: any, index: number) => ({
-    length: CARD_WIDTH + CARD_MARGIN * 2,
-    offset: (CARD_WIDTH + CARD_MARGIN * 2) * index,
-    index,
-  });
-
-  const renderCarouselItem = ({item, index}: {item: typeof EXTENDED_CATEGORIES[0]; index: number}) => {
-    const isActive = index === activeIndex;
-    const ImageComponent = item.Image;
-
-    return (
-      <View
-        style={[
-          styles.carouselItem,
-          {
-            transform: [{scale: isActive ? 1 : SIDE_CARD_SCALE}],
-            opacity: isActive ? 1 : 0.6,
-          },
-        ]}>
-        <View style={styles.cardContainer}>
-          <ImageComponent
-            width={CARD_WIDTH}
-            height={CARD_HEIGHT}
-            style={styles.cardImage}
-          />
-        </View>
-      </View>
+  const handleOptionSelect = (optionId: AlignmentOption) => {
+    setSelectedOption(optionId);
+    // Track alignment selection
+    if (optionId) {
+      trackOnboarding1AlignmentSelected(optionId);
+    }
+    // Subtle pulse animation on button when option selected
+    buttonScale.value = withSequence(
+      withTiming(1.02, {duration: 100}),
+      withTiming(1, {duration: 100}),
     );
   };
 
-  const currentCategory = CATEGORIES[realCategoryIndex];
+  const buttonAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{scale: buttonScale.value}],
+  }));
+
+  const options = [
+    {id: 'in-my-flow' as AlignmentOption, label: t('onboarding.screen1.options.inMyFlow')},
+    {id: 'figuring-it-out' as AlignmentOption, label: t('onboarding.screen1.options.figuringItOut')},
+    {id: 'totally-lost' as AlignmentOption, label: t('onboarding.screen1.options.totallyLost')},
+  ];
+
+  // Twinkling stars configuration - more stars, various sizes and intensities
+  const stars = [
+    // Top region - scattered bright stars
+    {size: 6, top: SCREEN_HEIGHT * 0.08, left: SCREEN_WIDTH * 0.15, delay: 0, intensity: 'high' as const},
+    {size: 4, top: SCREEN_HEIGHT * 0.12, left: SCREEN_WIDTH * 0.75, delay: 300, intensity: 'medium' as const},
+    {size: 8, top: SCREEN_HEIGHT * 0.05, left: SCREEN_WIDTH * 0.5, delay: 600, intensity: 'high' as const},
+    {size: 3, top: SCREEN_HEIGHT * 0.1, left: SCREEN_WIDTH * 0.9, delay: 150, intensity: 'low' as const},
+    {size: 5, top: SCREEN_HEIGHT * 0.15, left: SCREEN_WIDTH * 0.3, delay: 450, intensity: 'medium' as const},
+    
+    // Upper-middle region
+    {size: 7, top: SCREEN_HEIGHT * 0.2, left: SCREEN_WIDTH * 0.85, delay: 200, intensity: 'high' as const},
+    {size: 4, top: SCREEN_HEIGHT * 0.22, left: SCREEN_WIDTH * 0.1, delay: 800, intensity: 'medium' as const},
+    {size: 6, top: SCREEN_HEIGHT * 0.25, left: SCREEN_WIDTH * 0.6, delay: 100, intensity: 'high' as const},
+    {size: 3, top: SCREEN_HEIGHT * 0.18, left: SCREEN_WIDTH * 0.45, delay: 550, intensity: 'low' as const},
+    
+    // Middle region
+    {size: 5, top: SCREEN_HEIGHT * 0.32, left: SCREEN_WIDTH * 0.08, delay: 700, intensity: 'medium' as const},
+    {size: 8, top: SCREEN_HEIGHT * 0.35, left: SCREEN_WIDTH * 0.92, delay: 50, intensity: 'high' as const},
+    {size: 4, top: SCREEN_HEIGHT * 0.38, left: SCREEN_WIDTH * 0.25, delay: 400, intensity: 'medium' as const},
+    {size: 6, top: SCREEN_HEIGHT * 0.33, left: SCREEN_WIDTH * 0.7, delay: 250, intensity: 'high' as const},
+    
+    // Lower-middle region
+    {size: 5, top: SCREEN_HEIGHT * 0.45, left: SCREEN_WIDTH * 0.12, delay: 350, intensity: 'medium' as const},
+    {size: 7, top: SCREEN_HEIGHT * 0.48, left: SCREEN_WIDTH * 0.88, delay: 100, intensity: 'high' as const},
+    {size: 3, top: SCREEN_HEIGHT * 0.42, left: SCREEN_WIDTH * 0.55, delay: 650, intensity: 'low' as const},
+    {size: 4, top: SCREEN_HEIGHT * 0.5, left: SCREEN_WIDTH * 0.35, delay: 500, intensity: 'medium' as const},
+    
+    // Lower region  
+    // {size: 6, top: SCREEN_HEIGHT * 0.58, left: SCREEN_WIDTH * 0.05, delay: 200, intensity: 'high' as const},
+    // {size: 5, top: SCREEN_HEIGHT * 0.62, left: SCREEN_WIDTH * 0.78, delay: 450, intensity: 'medium' as const},
+    // {size: 8, top: SCREEN_HEIGHT * 0.55, left: SCREEN_WIDTH * 0.42, delay: 0, intensity: 'high' as const},
+    // {size: 3, top: SCREEN_HEIGHT * 0.6, left: SCREEN_WIDTH * 0.95, delay: 750, intensity: 'low' as const},
+    
+    // Bottom region
+    {size: 4, top: SCREEN_HEIGHT * 0.7, left: SCREEN_WIDTH * 0.2, delay: 300, intensity: 'medium' as const},
+    {size: 6, top: SCREEN_HEIGHT * 0.72, left: SCREEN_WIDTH * 0.65, delay: 100, intensity: 'high' as const},
+    {size: 5, top: SCREEN_HEIGHT * 0.75, left: SCREEN_WIDTH * 0.9, delay: 550, intensity: 'medium' as const},
+    {size: 7, top: SCREEN_HEIGHT * 0.68, left: SCREEN_WIDTH * 0.4, delay: 200, intensity: 'high' as const},
+  ];
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollViewContent}
-        showsVerticalScrollIndicator={false}
-        bounces={false}>
-        <View style={styles.container}>
-          {/* App Title */}
-          <Text style={styles.appTitle}>MangaVerse</Text>
-
-        {/* Carousel */}
-        <View style={styles.carouselContainer}>
-          <FlatList
-            ref={flatListRef}
-            data={EXTENDED_CATEGORIES}
-            renderItem={renderCarouselItem}
-            initialScrollIndex={INITIAL_INDEX}
-            keyExtractor={item => item.uniqueId}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            snapToInterval={CARD_WIDTH + CARD_MARGIN * 2}
-            decelerationRate="fast"
-            contentContainerStyle={styles.carouselContent}
-            onViewableItemsChanged={onViewableItemsChanged}
-            viewabilityConfig={viewabilityConfig}
-            getItemLayout={getItemLayout}
-            onScrollBeginDrag={handleScrollBeginDrag}
-            onScrollEndDrag={handleScrollEndDrag}
-            onMomentumScrollEnd={handleMomentumScrollEnd}
-          />
-        </View>
-
-        {/* Category Dots */}
-        <View style={styles.dotsContainer}>
-          {CATEGORIES.map((_, index) => (
-            <View
+    <View style={styles.backgroundFallback}>
+      <ImageBackground
+        source={BackgroundImageSource}
+        style={styles.container}
+        resizeMode="cover">
+        <SafeAreaView style={styles.safeArea}>
+          {/* Twinkling Stars Overlay */}
+          {stars.map((star, index) => (
+            <TwinklingStar
               key={index}
-              style={[
-                styles.dot,
-                index === realCategoryIndex ? styles.activeDot : styles.inactiveDot,
-              ]}
+              size={star.size}
+              top={star.top}
+              left={star.left}
+              delay={star.delay}
+              intensity={star.intensity}
             />
           ))}
-        </View>
 
-        {/* Category Info */}
-        <View style={styles.categoryInfo}>
-          <Text style={styles.categoryTitle}>{currentCategory.title}</Text>
-          <Text style={styles.categoryDescription}>
-            {currentCategory.description}
-          </Text>
-        </View>
+          {/* Content */}
+          <View style={styles.contentContainer}>
+            {/* Progress Bar */}
+            <Animated.View
+              entering={FadeIn.delay(100).duration(400)}
+              style={styles.progressBarContainer}>
+              <View style={styles.progressBarBackground}>
+                <Animated.View
+                  style={[styles.progressBarFilled, progressAnimatedStyle]}
+                />
+              </View>
+            </Animated.View>
 
-        {/* Buttons */}
-        <View style={styles.buttonsContainer}>
-          <TouchableOpacity
-            style={styles.startButton}
-            onPress={handleStartReading}
-            activeOpacity={0.8}>
-            <LinearGradient
-              colors={['#E60076', '#C27AFF']}
-              start={{x: 0.4, y: 0}}
-              end={{x: 1, y: 0}}
-              style={styles.gradientButton}
-              >
-              <Text style={styles.startButtonText}>Start reading</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+            {/* Main Heading */}
+            <Animated.Text
+              entering={FadeInDown.delay(200).duration(600).springify()}
+              style={styles.mainHeading}>
+              {t('onboarding.screen1.heading')}
+            </Animated.Text>
 
-          <TouchableOpacity
-            style={styles.skipButton}
-            onPress={handleSkip}
-            activeOpacity={0.7}
-            hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
-            <Text style={styles.skipButtonText}>Skip</Text>
-          </TouchableOpacity>
-        </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+            {/* Sub Heading */}
+            <Animated.Text
+              entering={FadeInDown.delay(350).duration(600).springify()}
+              style={styles.subHeading}>
+              {t('onboarding.screen1.subheading')}
+            </Animated.Text>
+
+            {/* Spacer */}
+            <View style={styles.spacer} />
+
+            {/* Options */}
+            <View style={styles.optionsContainer}>
+              {options.map((option, index) => (
+                <AnimatedTouchable
+                  key={option.id}
+                  entering={FadeInUp.delay(500 + index * 100)
+                    .duration(500)
+                    .springify()}
+                  style={[
+                    styles.optionButton,
+                    selectedOption === option.id && styles.optionButtonSelected,
+                  ]}
+                  onPress={() => handleOptionSelect(option.id)}
+                  activeOpacity={0.7}>
+                  <Text
+                    style={[
+                      styles.optionText,
+                      selectedOption === option.id && styles.optionTextSelected,
+                    ]}>
+                    {option.label}
+                  </Text>
+                </AnimatedTouchable>
+              ))}
+            </View>
+
+            {/* Bottom Section */}
+            <Animated.View
+              entering={FadeInUp.delay(800).duration(500)}
+              style={styles.bottomSection}>
+              {/* Continue Button */}
+              <AnimatedTouchable
+                style={[
+                  styles.continueButton,
+                  !selectedOption && styles.continueButtonDisabled,
+                  buttonAnimatedStyle,
+                ]}
+                disabled={!selectedOption}
+                onPress={handleContinue}
+                activeOpacity={0.8}>
+                <Text style={styles.continueButtonText}>{t('onboarding.screen1.button')}</Text>
+              </AnimatedTouchable>
+
+              {/* Footer Text */}
+              <Text style={styles.footerText}>
+                {t('onboarding.screen1.footer')}
+              </Text>
+            </Animated.View>
+          </View>
+        </SafeAreaView>
+      </ImageBackground>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
+  backgroundFallback: {
     flex: 1,
-    backgroundColor: Colors.background,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollViewContent: {
-    flexGrow: 1,
+    backgroundColor: Colors.cosmicBackground,
+    // backgroundColor:'pink'
+    
   },
   container: {
     flex: 1,
-    alignItems: 'center',
-    minHeight: Dimensions.get('window').height - verticalScale(80),
-    // backgroundColor:'red'
+    width: SCREEN_WIDTH,
+    height: SCREEN_HEIGHT,
   },
-  appTitle: {
-    fontFamily: FontFamilies.montserratBoldItalic,
-    fontSize: moderateScale(32),
-    color: Colors.white,
-    marginTop: verticalScale(20),
-    marginBottom: verticalScale(24),
+  safeArea: {
+    flex: 1,
   },
-  carouselContainer: {
-    height: CARD_HEIGHT + verticalScale(20),
-    justifyContent: 'center',
+  star: {
+    position: 'absolute',
+    backgroundColor: Colors.white,
+    elevation: 8, // Android glow
   },
-  carouselContent: {
-    paddingHorizontal: (SCREEN_WIDTH - CARD_WIDTH) / 2 - CARD_MARGIN,
-  },
-  carouselItem: {
-    width: CARD_WIDTH,
-    marginHorizontal: CARD_MARGIN,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  cardContainer: {
-    width: CARD_WIDTH,
-    height: CARD_HEIGHT,
-    borderRadius: BorderRadius.lg,
-    overflow: 'hidden',
-    backgroundColor: Colors.cardBackground,
-  },
-  cardImage: {
-    borderRadius: BorderRadius.lg,
-  },
-  dotsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: verticalScale(10),
-    marginBottom: verticalScale(24),
-  },
-  dot: {
-    width: moderateScale(8),
-    height: moderateScale(8),
-    borderRadius: moderateScale(0),
-    marginHorizontal: horizontalScale(3),
-  },
-  activeDot: {
-    backgroundColor: Colors.primary,
-    width: moderateScale(14),
-  },
-  inactiveDot: {
-    backgroundColor:'#2A2A2C',
-  },
-  categoryInfo: {
-    alignItems: 'center',
-    marginBottom: verticalScale(32),
-    paddingHorizontal: horizontalScale(20),
-    // backgroundColor:'red'
-  },
-  categoryTitle: {
-    fontFamily: FontFamilies.jetBrainsMonoExtraBold,
-    fontSize: moderateScale(32),
-    color: Colors.text,
-    marginBottom: verticalScale(8),
-  },
-  categoryDescription: {
-    fontFamily: FontFamilies.sfProDisplayRegular,
-    fontSize: moderateScale(18),
-    color: Colors.inactive,
-    textAlign: 'center',
-  },
-  buttonsContainer: {
-    width: '100%',
+  contentContainer: {
+    flex: 1,
     paddingHorizontal: horizontalScale(24),
-    // marginTop: 'auto',
-    marginBottom: verticalScale(20),
   },
-  startButton: {
-    marginBottom: verticalScale(12),
-    
-    
+  progressBarContainer: {
+    marginBottom: verticalScale(32),
   },
-  gradientButton: {
+  progressBarBackground: {
+    height: verticalScale(8),
+    backgroundColor: Colors.progressBarBackground,
+    borderRadius: radiusScale(8),
+    overflow: 'hidden',
+  },
+  progressBarFilled: {
+    width: '33%',
+    height: '100%',
+    backgroundColor: Colors.progressBarFilled,
+    borderRadius: radiusScale(2),
+  },
+  mainHeading: {
+    fontFamily: FontFamilies.sunlightDreams,
+    fontWeight: '400',
+    fontSize: fontScale(36),
+    lineHeight: fontScale(43),
+    color: Colors.white,
+    marginBottom: verticalScale(18),
+  },
+  subHeading: {
+    fontFamily: FontFamilies.interSemiBold,
+    fontWeight: '600',
+    fontSize: fontScale(16),
+    lineHeight: fontScale(16),
+    color: Colors.subHeading,
+  },
+  spacer: {
+    flex: 1,
+  },
+  optionsContainer: {
+    gap: verticalScale(13),
+    marginBottom: verticalScale(30),
+  },
+  optionButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: radiusScale(16),
+    paddingVertical: verticalScale(22),
+    paddingHorizontal: horizontalScale(15),
+    borderWidth: 1,
+    borderColor: Colors.transparent,
+  },
+  optionButtonSelected: {
+    backgroundColor: 'rgba(255, 255, 255, 0.11)',
+    borderColor: Colors.white,
+  },
+  optionText: {
+    fontFamily: FontFamilies.interSemiBold,
+    fontWeight: '600',
+    fontSize: fontScale(16),
+    color: Colors.subHeading,
+  },
+  optionTextSelected: {
+    color: Colors.white,
+  },
+  bottomSection: {
+    paddingBottom: verticalScale(10),
+  },
+  continueButton: {
+    backgroundColor: Colors.white,
+    borderRadius: radiusScale(16),
+    paddingVertical: verticalScale(21),
     alignItems: 'center',
     justifyContent: 'center',
-    
+    marginBottom: verticalScale(16),
   },
-  startButtonText: {
-    fontFamily: FontFamilies.sfProDisplayMedium,
-    fontSize: moderateScale(18),
+  continueButtonDisabled: {
+    opacity: 0.5,
+  },
+  continueButtonText: {
+    fontFamily: FontFamilies.interSemiBold,
+    fontWeight: '600',
+    fontSize: fontScale(18),
+    color: Colors.black,
+  },
+  footerText: {
+    fontFamily: FontFamilies.interRegular,
+    fontWeight: '400',
+    fontSize: fontScale(13),
+    color: Colors.subHeading,
+    textAlign: 'center',
+    lineHeight: fontScale(18),
+  },
+  footerTextHighlight: {
     color: Colors.white,
-    padding:moderateScale(13)
-  },
-  skipButton: {
-    paddingVertical: verticalScale(12),
-    alignItems: 'center',
-  },
-  skipButtonText: {
-    fontFamily: FontFamilies.poppinsMedium,
-    fontSize: moderateScale(16),
-    color: Colors.text,
   },
 });
 

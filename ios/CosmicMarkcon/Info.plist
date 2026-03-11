@@ -722,8 +722,6 @@
 	</array>
 	<key>UIAppFonts</key>
 	<array>
-		<string>UthmanicRegular.otf</string>
-		<string>IndoPak.ttf</string>
 		<string>AntDesign.ttf</string>
 		<string>Entypo.ttf</string>
 		<string>EvilIcons.ttf</string>
@@ -743,76 +741,62 @@
 		<string>Octicons.ttf</string>
 		<string>SimpleLineIcons.ttf</string>
 		<string>Zocial.ttf</string>
-		<string>Poppins-Black.ttf</string>
-		<string>Poppins-Bold.ttf</string>
-		<string>Poppins-ExtraBold.ttf</string>
-		<string>Poppins-Light.ttf</string>
-		<string>Poppins-Medium.ttf</string>
-		<string>Poppins-Regular.ttf</string>
-		<string>Poppins-SemiBold.ttf</string>
-		<string>JetBrainsMono-Thin.ttf</string>
-		<string>JetBrainsMono-Bold.ttf</string>
-		<string>JetBrainsMono-Italic.ttf</string>
-		<string>JetBrainsMono-LightItalic.ttf</string>
-		<string>JetBrainsMono-Regular.ttf</string>
-		<string>JetBrainsMono-ExtraLightItalic.ttf</string>
-		<string>JetBrainsMono-SemiBoldItalic.ttf</string>
-		<string>JetBrainsMono-Light.ttf</string>
-		<string>JetBrainsMono-MediumItalic.ttf</string>
-		<string>JetBrainsMono-ExtraBold.ttf</string>
-		<string>JetBrainsMono-SemiBold.ttf</string>
-		<string>JetBrainsMono-ExtraBoldItalic.ttf</string>
-		<string>JetBrainsMono-ThinItalic.ttf</string>
-		<string>JetBrainsMono-ExtraLight.ttf</string>
-		<string>JetBrainsMono-Medium.ttf</string>
-		<string>JetBrainsMono-BoldItalic.ttf</string>
-		<string>Poppins-ExtraLight.ttf</string>
-		<string>Poppins-ThinItalic.ttf</string>
-		<string>Poppins-ExtraLightItalic.ttf</string>
-		<string>Poppins-BoldItalic.ttf</string>
-		<string>Poppins-SemiBoldItalic.ttf</string>
-		<string>Poppins-ExtraBoldItalic.ttf</string>
-		<string>Poppins-BlackItalic.ttf</string>
-		<string>Poppins-LightItalic.ttf</string>
-		<string>Poppins-Thin.ttf</string>
-		<string>Poppins-Italic.ttf</string>
-		<string>Poppins-MediumItalic.ttf</string>
-		<string>Montserrat-LightItalic.ttf</string>
-		<string>Montserrat-Medium.ttf</string>
-		<string>Montserrat-BoldItalic.ttf</string>
-		<string>Montserrat-Light.ttf</string>
-		<string>Montserrat-ThinItalic.ttf</string>
-		<string>Montserrat-ExtraLight.ttf</string>
-		<string>Montserrat-Thin.ttf</string>
-		<string>Montserrat-Bold.ttf</string>
-		<string>Montserrat-MediumItalic.ttf</string>
-		<string>Montserrat-BlackItalic.ttf</string>
-		<string>Montserrat-SemiBold.ttf</string>
-		<string>Montserrat-ExtraLightItalic.ttf</string>
-		<string>Montserrat-ExtraBold.ttf</string>
-		<string>Montserrat-Black.ttf</string>
-		<string>Montserrat-Regular.ttf</string>
-		<string>Montserrat-Italic.ttf</string>
-		<string>Montserrat-SemiBoldItalic.ttf</string>
-		<string>Montserrat-ExtraBoldItalic.ttf</string>
-		<string>Outfit-Bold.ttf</string>
-		<string>Outfit-Regular.ttf</string>
-		<string>Outfit-Black.ttf</string>
-		<string>Outfit-Thin.ttf</string>
-		<string>Outfit-SemiBold.ttf</string>
-		<string>Outfit-ExtraLight.ttf</string>
-		<string>Outfit-ExtraBold.ttf</string>
-		<string>Outfit-Medium.ttf</string>
-		<string>Outfit-Light.ttf</string>
-		<string>SFPRODISPLAYREGULAR.OTF</string>
-		<string>SFPRODISPLAYMEDIUM.OTF</string>
-		<string>SFPRODISPLAYBOLD.OTF</string>
-		<string>SFPRODISPLAYTHINITALIC.OTF</string>
-		<string>SFPRODISPLAYULTRALIGHTITALIC.OTF</string>
-		<string>SFPRODISPLAYLIGHTITALIC.OTF</string>
-		<string>SFPRODISPLAYSEMIBOLDITALIC.OTF</string>
-		<string>SFPRODISPLAYHEAVYITALIC.OTF</string>
-		<string>SFPRODISPLAYBLACKITALIC.OTF</string>
+		<string>Sunlight Dreams 2.otf</string>
+		<string>Sunlight Dreams.otf</string>
+		<string>Inter_28pt-LightItalic.ttf</string>
+		<string>Inter_18pt-ExtraBoldItalic.ttf</string>
+		<string>Inter_24pt-Medium.ttf</string>
+		<string>Inter_28pt-ExtraLightItalic.ttf</string>
+		<string>Inter_28pt-Bold.ttf</string>
+		<string>Inter_28pt-ExtraLight.ttf</string>
+		<string>Inter_28pt-Thin.ttf</string>
+		<string>Inter_28pt-ThinItalic.ttf</string>
+		<string>Inter_24pt-ExtraBold.ttf</string>
+		<string>Inter_24pt-SemiBold.ttf</string>
+		<string>Inter_28pt-BoldItalic.ttf</string>
+		<string>Inter_24pt-Regular.ttf</string>
+		<string>Inter_28pt-ExtraBoldItalic.ttf</string>
+		<string>Inter_18pt-LightItalic.ttf</string>
+		<string>Inter_18pt-ExtraLight.ttf</string>
+		<string>Inter_18pt-ThinItalic.ttf</string>
+		<string>Inter_18pt-ExtraBold.ttf</string>
+		<string>Inter_18pt-BoldItalic.ttf</string>
+		<string>Inter_28pt-Light.ttf</string>
+		<string>Inter_18pt-Thin.ttf</string>
+		<string>Inter_28pt-Medium.ttf</string>
+		<string>Inter_18pt-BlackItalic.ttf</string>
+		<string>Inter_28pt-BlackItalic.ttf</string>
+		<string>Inter_18pt-Bold.ttf</string>
+		<string>Inter_18pt-ExtraLightItalic.ttf</string>
+		<string>Inter_18pt-Medium.ttf</string>
+		<string>Inter_24pt-ExtraLightItalic.ttf</string>
+		<string>Inter_18pt-Black.ttf</string>
+		<string>Inter_24pt-Light.ttf</string>
+		<string>Inter_28pt-SemiBoldItalic.ttf</string>
+		<string>Inter_24pt-ExtraBoldItalic.ttf</string>
+		<string>Inter_24pt-MediumItalic.ttf</string>
+		<string>Inter_28pt-SemiBold.ttf</string>
+		<string>Inter_18pt-MediumItalic.ttf</string>
+		<string>Inter_24pt-BlackItalic.ttf</string>
+		<string>Inter_28pt-Italic.ttf</string>
+		<string>Inter_24pt-Thin.ttf</string>
+		<string>Inter_24pt-SemiBoldItalic.ttf</string>
+		<string>Inter_24pt-Black.ttf</string>
+		<string>Inter_18pt-Light.ttf</string>
+		<string>Inter_28pt-Regular.ttf</string>
+		<string>Inter_28pt-MediumItalic.ttf</string>
+		<string>Inter_28pt-ExtraBold.ttf</string>
+		<string>Inter_24pt-Bold.ttf</string>
+		<string>Inter_18pt-Italic.ttf</string>
+		<string>Inter_28pt-Black.ttf</string>
+		<string>Inter_18pt-SemiBoldItalic.ttf</string>
+		<string>Inter_24pt-BoldItalic.ttf</string>
+		<string>Inter_18pt-SemiBold.ttf</string>
+		<string>Inter_24pt-ThinItalic.ttf</string>
+		<string>Inter_18pt-Regular.ttf</string>
+		<string>Inter_24pt-ExtraLight.ttf</string>
+		<string>Inter_24pt-Italic.ttf</string>
+		<string>Inter_24pt-LightItalic.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

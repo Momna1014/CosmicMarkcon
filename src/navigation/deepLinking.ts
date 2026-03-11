@@ -7,61 +7,22 @@
 
 import {LinkingOptions} from '@react-navigation/native';
 
-// Import types for PDFReader
-import { MangaInfo, PDFChapter } from '../components/ComicReader';
-
 export type RootStackParamList = {
   // Auth/Onboarding
   Onboarding: undefined;
   
+  // Paywall
+  Paywall: undefined;
+  
   // Main App
   MainApp: undefined;
-  
-  // Modal Screens
-  Paywall: {source?: string};
-  Details: {id?: string};
-  NotificationTest: undefined;
-  AdsTest: undefined;
-  
-  // Temporary (until drawer is installed)
-  HomeDetail: undefined;
-  DiscoveryDetail: undefined;
-  Chapters: undefined;
-  ReviewsDetail: undefined;
-  Settings: undefined;
-  
-  // PDF Reader Screen
-  PDFReader: {
-    manga: MangaInfo;
-    chapter: PDFChapter;
-    chapters?: PDFChapter[];
-  };
 };
 
 export type MainTabParamList = {
   Home: undefined;
-  Profile: undefined;
-  FirebaseTest: undefined;
-  ABTesting: undefined;
-  AdsTest: undefined;
   Library: undefined;
   Discover: undefined;
   Me: undefined;
-};
-
-export type DrawerParamList = {
-  MainTabs: undefined;
-  HomeDetail: undefined;
-  DiscoveryDetail: undefined;
-  Chapters: undefined;
-  ReviewsDetail: undefined;
-  Settings: undefined;
-  NotificationTest: undefined;
-  PDFReader: {
-    manga: MangaInfo;
-    chapter: PDFChapter;
-    chapters?: PDFChapter[];
-  };
 };
 
 /**
@@ -76,27 +37,15 @@ export const linking: LinkingOptions<RootStackParamList> = {
   config: {
     screens: {
       Onboarding: 'onboarding',
+      Paywall: 'paywall',
       MainApp: {
         screens: {
-          Drawer: {
-            screens: {
-              MainTabs: {
-                screens: {
-                  Home: 'home',
-                  Profile: 'profile',
-                  FirebaseTest: 'firebase',
-                  ABTesting: 'abtesting',
-                },
-              },
-              Settings: 'settings',
-            },
-          },
+          Home: 'home',
+          Library: 'library',
+          Discover: 'discover',
+          Me: 'me',
         },
       },
-      Paywall: 'paywall',
-      Details: 'details/:id',
-      NotificationTest: 'notifications',
-      AdsTest: 'ads',
     },
   },
 };
@@ -105,17 +54,9 @@ export const linking: LinkingOptions<RootStackParamList> = {
  * Example deep link URLs:
  * 
  * - templateapp://home
- * - templateapp://profile
- * - templateapp://settings
- * - templateapp://paywall
- * - templateapp://details/123
- * - templateapp://firebase
- * - templateapp://abtesting
- * 
- * Web URLs (if configured):
- * - https://templateapp.com/home
- * - https://templateapp.com/paywall
- * - https://templateapp.com/details/123
+ * - templateapp://library
+ * - templateapp://discover
+ * - templateapp://me
  */
 
 export default linking;

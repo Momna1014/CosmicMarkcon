@@ -18,13 +18,13 @@ PODS:
   - AppLovinMediationIronSourceAdapter (9.3.0.0.0):
     - AppLovinSDK (>= 13.0.0)
     - IronSourceSDK/Ads (= 9.3.0.0)
-  - AppLovinMediationMintegralAdapter (8.0.7.0.0):
+  - AppLovinMediationMintegralAdapter (8.0.8.0.0):
     - AppLovinSDK (>= 13.0.0)
-    - MintegralAdSDK (= 8.0.7)
-    - MintegralAdSDK/BidSplashAd (= 8.0.7)
-  - AppLovinMediationUnityAdsAdapter (4.16.6.0):
+    - MintegralAdSDK (= 8.0.8)
+    - MintegralAdSDK/BidSplashAd (= 8.0.8)
+  - AppLovinMediationUnityAdsAdapter (4.17.0.0):
     - AppLovinSDK (>= 13.0.0)
-    - UnityAds (= 4.16.6)
+    - UnityAds (= 4.17.0)
   - AppLovinMediationVungleAdapter (7.7.1.0):
     - AppLovinSDK (>= 13.0.0)
     - VungleAds (= 7.7.1)
@@ -264,45 +264,45 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - MintegralAdSDK (8.0.7):
-    - MintegralAdSDK/BannerAd (= 8.0.7)
-    - MintegralAdSDK/BidBannerAd (= 8.0.7)
-    - MintegralAdSDK/BidInterstitialVideoAd (= 8.0.7)
-    - MintegralAdSDK/BidNativeAd (= 8.0.7)
-    - MintegralAdSDK/BidNewInterstitialAd (= 8.0.7)
-    - MintegralAdSDK/BidRewardVideoAd (= 8.0.7)
-    - MintegralAdSDK/InterstitialVideoAd (= 8.0.7)
-    - MintegralAdSDK/NativeAd (= 8.0.7)
-    - MintegralAdSDK/NewInterstitialAd (= 8.0.7)
-    - MintegralAdSDK/RewardVideoAd (= 8.0.7)
-  - MintegralAdSDK/BannerAd (8.0.7):
+  - MintegralAdSDK (8.0.8):
+    - MintegralAdSDK/BannerAd (= 8.0.8)
+    - MintegralAdSDK/BidBannerAd (= 8.0.8)
+    - MintegralAdSDK/BidInterstitialVideoAd (= 8.0.8)
+    - MintegralAdSDK/BidNativeAd (= 8.0.8)
+    - MintegralAdSDK/BidNewInterstitialAd (= 8.0.8)
+    - MintegralAdSDK/BidRewardVideoAd (= 8.0.8)
+    - MintegralAdSDK/InterstitialVideoAd (= 8.0.8)
+    - MintegralAdSDK/NativeAd (= 8.0.8)
+    - MintegralAdSDK/NewInterstitialAd (= 8.0.8)
+    - MintegralAdSDK/RewardVideoAd (= 8.0.8)
+  - MintegralAdSDK/BannerAd (8.0.8):
     - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/BidBannerAd (8.0.7):
+  - MintegralAdSDK/BidBannerAd (8.0.8):
     - MintegralAdSDK/BannerAd
     - MintegralAdSDK/BidNativeAd
-  - MintegralAdSDK/BidInterstitialVideoAd (8.0.7):
+  - MintegralAdSDK/BidInterstitialVideoAd (8.0.8):
     - MintegralAdSDK/BidNativeAd
     - MintegralAdSDK/InterstitialVideoAd
-  - MintegralAdSDK/BidNativeAd (8.0.7):
+  - MintegralAdSDK/BidNativeAd (8.0.8):
     - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/BidNewInterstitialAd (8.0.7):
+  - MintegralAdSDK/BidNewInterstitialAd (8.0.8):
     - MintegralAdSDK/BidNativeAd
     - MintegralAdSDK/NewInterstitialAd
-  - MintegralAdSDK/BidRewardVideoAd (8.0.7):
+  - MintegralAdSDK/BidRewardVideoAd (8.0.8):
     - MintegralAdSDK/BidNativeAd
     - MintegralAdSDK/RewardVideoAd
-  - MintegralAdSDK/BidSplashAd (8.0.7):
+  - MintegralAdSDK/BidSplashAd (8.0.8):
     - MintegralAdSDK/BidNativeAd
     - MintegralAdSDK/SplashAd
-  - MintegralAdSDK/InterstitialVideoAd (8.0.7):
+  - MintegralAdSDK/InterstitialVideoAd (8.0.8):
     - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/NativeAd (8.0.7)
-  - MintegralAdSDK/NewInterstitialAd (8.0.7):
+  - MintegralAdSDK/NativeAd (8.0.8)
+  - MintegralAdSDK/NewInterstitialAd (8.0.8):
     - MintegralAdSDK/InterstitialVideoAd
     - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/RewardVideoAd (8.0.7):
+  - MintegralAdSDK/RewardVideoAd (8.0.8):
     - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/SplashAd (8.0.7):
+  - MintegralAdSDK/SplashAd (8.0.8):
     - MintegralAdSDK/NativeAd
   - MMKVCore (2.2.4)
   - nanopb (3.30910.0):
@@ -3530,7 +3530,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNSentry (8.2.0):
+  - RNSentry (8.3.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3557,7 +3557,7 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - Sentry (= 9.5.1)
+    - Sentry (= 9.6.0)
     - SocketRocket
     - Yoga
   - RNShare (12.2.5):
@@ -3768,11 +3768,11 @@ PODS:
   - SDWebImageWebPCoder (0.8.5):
     - libwebp (~> 1.0)
     - SDWebImage/Core (~> 5.10)
-  - Sentry (9.5.1):
-    - Sentry/Core (= 9.5.1)
-  - Sentry/Core (9.5.1)
+  - Sentry (9.6.0):
+    - Sentry/Core (= 9.6.0)
+  - Sentry/Core (9.6.0)
   - SocketRocket (0.7.1)
-  - UnityAds (4.16.6)
+  - UnityAds (4.17.0)
   - Usercentrics (2.24.4)
   - UsercentricsUI (2.24.4):
     - Usercentrics (= 2.24.4)
@@ -4219,8 +4219,8 @@ SPEC CHECKSUMS:
   AppLovinMediationFyberAdapter: 1a5c1aa957f5d12b885c346503c4c51a8c0cabb5
   AppLovinMediationGoogleAdapter: 82cdc40525ed7c21b01f344249aa25f340a4d6ca
   AppLovinMediationIronSourceAdapter: 4ed9f6ceca6e74f7a450c058826e970f6d24e9e1
-  AppLovinMediationMintegralAdapter: 40495b8df2427ebac55533781ef955c3ed1378e4
-  AppLovinMediationUnityAdsAdapter: e01826896558af6a4a1e506b8b97dc97a84a4aaf
+  AppLovinMediationMintegralAdapter: cb131198e2cb7030a94bc66af9143f9dda0f117a
+  AppLovinMediationUnityAdsAdapter: 23afa95da0fc9c02c868f583a682d95811447bf4
   AppLovinMediationVungleAdapter: fc35519fbe9b3860d3d46ec69b0f0a090ff593a8
   AppLovinSDK: 8d9af6c7617e4d35b38aa8393a3e9d161a74b230
   AppsFlyerFramework: 63577b60d6b9fcdab60135289979e7d1c9ec79b9
@@ -4267,7 +4267,7 @@ SPEC CHECKSUMS:
   libwebp: 02b23773aedb6ff1fd38cec7a77b81414c6842a8
   lottie-ios: 8f959969761e9c45d70353667d00af0e5b9cadb3
   lottie-react-native: e542fe4b6e8eddcf893d5a8cef9f8b5c6d2f7331
-  MintegralAdSDK: 9fde3aa7b739121e4e76ae83bcc612a4af27d7e5
+  MintegralAdSDK: f02fdbab6494030b4fe4b01d8bbf654263834a20
   MMKVCore: f2dd4c9befea04277a55e84e7812f930537993df
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   NitroMmkv: 4a2d747ce97a4ae740b3cb3a3853366813faf831
@@ -4377,16 +4377,16 @@ SPEC CHECKSUMS:
   RNPurchases: 862e44a40fc03117245e465fe11dd9cfea030f45
   RNReanimated: 085278ac0a7044df824e13af982bf50bd4771e1b
   RNScreens: 199799bdab32fa1e17ebf938b06fec52033e81e5
-  RNSentry: f73f4da92e4c20841ab16e1fa22fc289bc2f9f4e
+  RNSentry: e4062b9022c4e3fa5a1be2559620d9a1732d70a3
   RNShare: aecde3c90553869e633cb8143da784f03ce09edd
   RNSVG: 17a9a6fdd8e77e574d21aa0b9f2422f0166b3f97
   RNVectorIcons: e355dd0998d6b9020e560922a66614eb9636501b
   RNWorklets: edd6646f96b38e2ae089396088bc7fcadfd2612f
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
-  Sentry: 7475eb7bf6a41d7505f46341706015ad2d1766b9
+  Sentry: 9e8d102abb153ebd2b6f3ecb4057c57c57b1d6a7
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
-  UnityAds: 37544c41dd6916fa9074bf68cf07fce793460b84
+  UnityAds: adbe0d522fd14b8298c5e159164fc43396165843
   Usercentrics: 2f40056f9c43294b837b1b58dce549bb5f2098b5
   UsercentricsUI: d393f179dddcd0fac0eff4c5656cbf15e921979d
   VungleAds: c1f0dd0d8531b200b9f6a3f78e292ded75540eae
