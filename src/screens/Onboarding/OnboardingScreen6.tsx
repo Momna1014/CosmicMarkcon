@@ -1,19 +1,18 @@
 /**
- * OnboardingScreen4 - Cosmic Insight Screen
+ * OnboardingScreen6 - Cosmic Layers Analysis Screen
  *
- * Displays typewriter animation with zodiac-specific insight
- * and static subtext with haptic feedback during typing
+ * Shows three unlock cards with cosmic layers
+ * and a "Deepen my analysis" button
  */
 
-import React, {useEffect, useState, useMemo, useCallback} from 'react';
+import React, {useEffect} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ImageBackground,
   Dimensions,
-  Vibration,
-  Platform,
+  TouchableOpacity,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Animated, {
@@ -24,8 +23,9 @@ import Animated, {
   withSequence,
   Easing,
   FadeIn,
-  withDelay,
   FadeInDown,
+  FadeInUp,
+  withDelay,
 } from 'react-native-reanimated';
 import {
   Colors,
@@ -35,15 +35,20 @@ import {
   verticalScale,
   radiusScale,
 } from '../../theme';
-import {getZodiacSign, getRandomInsight} from '../../components/mock/zodiacMockData';
+import UnlockAnalysisIcon from '../../assets/icons/onboarding_icons/unlock_analysis.svg';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
 // Background image - same as other onboarding screens
 const BackgroundImageSource = require('../../assets/icons/onboarding_icons/background_image.png');
 
-// Static subtext
-const STATIC_SUBTEXT = 'Not everyone is weird to pick up subtle shifts.';
+// Card background images
+const Card1Background = require('../../assets/icons/onboarding_icons/1st analysis.png');
+const Card2Background = require('../../assets/icons/onboarding_icons/2nd_analysis.png');
+const Card3Background = require('../../assets/icons/onboarding_icons/3rd_analysis.png');
+
+// Animated TouchableOpacity
+const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 interface TwinklingStarProps {
   size: number;
@@ -144,36 +149,24 @@ const TwinklingStar: React.FC<TwinklingStarProps> = ({
   );
 };
 
-interface OnboardingScreen4Props {
+interface OnboardingScreen6Props {
   onNext?: () => void;
-  birthday: Date;
 }
 
-export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
+export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
   onNext,
-  birthday,
 }) => {
-  // Get zodiac sign and random insight based on birthday
-  const zodiac = useMemo(() => getZodiacSign(birthday), [birthday]);
-  const insight = useMemo(() => getRandomInsight(zodiac), [zodiac]);
+  // Progress bar animation - start from previous screen's value (45%)
+  const progressWidth = useSharedValue(45);
 
-  // Typewriter state
-  const [displayedMainText, setDisplayedMainText] = useState('');
-  const [displayedSubText, setDisplayedSubText] = useState('');
-  const [isMainTextComplete, setIsMainTextComplete] = useState(false);
-  const [isSubTextComplete, setIsSubTextComplete] = useState(false);
+  // Button scale animation
+  const buttonScale = useSharedValue(1);
 
-  // Progress bar animation - start from previous screen's value (27%)
-  const progressWidth = useSharedValue(27);
-
-  // Cursor animation
-  const cursorOpacity = useSharedValue(1);
-
-  // Animate progress bar on mount - Screen 4 of 11 (36%)
   useEffect(() => {
+    // Animate progress bar on mount - Screen 6 of 11 (55%)
     progressWidth.value = withDelay(
       300,
-      withTiming(36, {duration: 800, easing: Easing.out(Easing.cubic)}),
+      withTiming(55, {duration: 800, easing: Easing.out(Easing.cubic)}),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -182,89 +175,22 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
     width: `${progressWidth.value}%`,
   }));
 
-  // Trigger haptic feedback
-  const triggerHaptic = useCallback(() => {
-    if (Platform.OS === 'ios') {
-      // Light haptic on iOS
-      Vibration.vibrate(1);
-    } else {
-      // Short vibration on Android
-      Vibration.vibrate(10);
-    }
-  }, []);
-
-  // Cursor blink animation
-  useEffect(() => {
-    cursorOpacity.value = withRepeat(
-      withSequence(
-        withTiming(0, {duration: 500}),
-        withTiming(1, {duration: 500}),
-      ),
-      -1,
-      false,
+  const handleNext = () => {
+    // Button pulse animation
+    buttonScale.value = withSequence(
+      withTiming(1.02, {duration: 100}),
+      withTiming(1, {duration: 100}),
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    setTimeout(() => {
+      onNext?.();
+    }, 150);
+  };
 
-  // Main text typewriter effect
-  useEffect(() => {
-    if (!insight.mainText) return;
-
-    let currentIndex = 0;
-    const typingInterval = setInterval(() => {
-      if (currentIndex < insight.mainText.length) {
-        setDisplayedMainText(insight.mainText.slice(0, currentIndex + 1));
-        triggerHaptic();
-        currentIndex++;
-      } else {
-        clearInterval(typingInterval);
-        setIsMainTextComplete(true);
-      }
-    }, 50); // 50ms per character for smooth typing
-
-    return () => clearInterval(typingInterval);
-  }, [insight.mainText, triggerHaptic]);
-
-  // Subtext typewriter effect (starts after main text completes)
-  useEffect(() => {
-    if (!isMainTextComplete) return;
-
-    // Small delay before starting subtext
-    const startDelay = setTimeout(() => {
-      let currentIndex = 0;
-      const typingInterval = setInterval(() => {
-        if (currentIndex < STATIC_SUBTEXT.length) {
-          setDisplayedSubText(STATIC_SUBTEXT.slice(0, currentIndex + 1));
-          triggerHaptic();
-          currentIndex++;
-        } else {
-          clearInterval(typingInterval);
-          setIsSubTextComplete(true);
-        }
-      }, 40); // Slightly faster for subtext
-
-      return () => clearInterval(typingInterval);
-    }, 500); // 500ms delay after main text
-
-    return () => clearTimeout(startDelay);
-  }, [isMainTextComplete, triggerHaptic]);
-
-  // Auto-navigate after both texts complete
-  useEffect(() => {
-    if (isSubTextComplete && onNext) {
-      const navigateTimeout = setTimeout(() => {
-        onNext();
-      }, 2000); // 2 seconds after completion
-
-      return () => clearTimeout(navigateTimeout);
-    }
-  }, [isSubTextComplete, onNext]);
-
-  const cursorAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: cursorOpacity.value,
+  const buttonAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{scale: buttonScale.value}],
   }));
 
-  // Twinkling stars configuration
+  // Twinkling stars configuration - same as other onboarding screens
   const stars = [
     {size: 6, top: SCREEN_HEIGHT * 0.08, left: SCREEN_WIDTH * 0.15, delay: 0, intensity: 'high' as const},
     {size: 4, top: SCREEN_HEIGHT * 0.12, left: SCREEN_WIDTH * 0.75, delay: 300, intensity: 'medium' as const},
@@ -287,6 +213,13 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
     {size: 6, top: SCREEN_HEIGHT * 0.78, left: SCREEN_WIDTH * 0.65, delay: 100, intensity: 'high' as const},
     {size: 5, top: SCREEN_HEIGHT * 0.82, left: SCREEN_WIDTH * 0.9, delay: 550, intensity: 'medium' as const},
     {size: 7, top: SCREEN_HEIGHT * 0.85, left: SCREEN_WIDTH * 0.4, delay: 200, intensity: 'high' as const},
+  ];
+
+  // Unlock cards data with background images
+  const unlockCards = [
+    {id: 1, delay: 500, bgImage: Card1Background},
+    {id: 2, delay: 600, bgImage: Card2Background},
+    {id: 3, delay: 700, bgImage: Card3Background},
   ];
 
   return (
@@ -321,40 +254,56 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
               </View>
             </Animated.View>
 
-            {/* Centered Text Section */}
-            <View style={styles.centerSection}>
-              <View style={styles.textContainer}>
-                {/* Main Insight Text with Typewriter Effect */}
-                <Animated.View
-                  entering={FadeIn.delay(200).duration(400)}
-                  style={styles.mainTextContainer}>
-                  <Text style={styles.mainText}>
-                    {displayedMainText}
-                    {!isMainTextComplete && (
-                      <Animated.Text style={[styles.cursor, cursorAnimatedStyle]}>
-                        |
-                      </Animated.Text>
-                    )}
-                  </Text>
-                </Animated.View>
+            {/* Main Heading - at top like OnboardingScreen1 */}
+            <Animated.Text
+              entering={FadeInDown.delay(200).duration(600).springify()}
+              style={styles.mainHeading}>
+              Three deeper{'\n'}cosmic layers are{'\n'}influencing you{'\n'}right now.
+            </Animated.Text>
 
-                {/* Static Subtext with Typewriter Effect */}
-                {isMainTextComplete && (
-                  <Animated.View
-                    entering={FadeIn.duration(300)}
-                    style={styles.subTextContainer}>
-                    <Text style={styles.subText}>
-                      {displayedSubText}
-                      {!isSubTextComplete && (
-                        <Animated.Text style={[styles.cursor, styles.subCursor, cursorAnimatedStyle]}>
-                          |
-                        </Animated.Text>
-                      )}
-                    </Text>
-                  </Animated.View>
-                )}
-              </View>
+            {/* Sub Heading - just below heading like OnboardingScreen1 */}
+            <Animated.Text
+              entering={FadeInDown.delay(350).duration(600).springify()}
+              style={styles.subHeading}>
+              Most people live their lives ignoring these.
+            </Animated.Text>
+
+            {/* Spacer */}
+            <View style={styles.spacer} />
+
+            {/* Unlock Cards */}
+            <View style={styles.cardsContainer}>
+              {unlockCards.map((card) => (
+                <Animated.View
+                  key={card.id}
+                  entering={FadeInUp.delay(card.delay).duration(500).springify()}
+                  style={styles.unlockCardWrapper}>
+                  <ImageBackground
+                    source={card.bgImage}
+                    style={styles.unlockCard}
+                    imageStyle={styles.cardImageStyle}
+                    resizeMode="cover">
+                    {/* Centered Content */}
+                    <View style={styles.cardContent}>
+                      <UnlockAnalysisIcon width={52} height={52} />
+                      <Text style={styles.unlockCardText}>Unlock with analysis</Text>
+                    </View>
+                  </ImageBackground>
+                </Animated.View>
+              ))}
             </View>
+
+            {/* Bottom Section */}
+            <Animated.View
+              entering={FadeInUp.delay(800).duration(500)}
+              style={styles.bottomSection}>
+              <AnimatedTouchable
+                style={[styles.nextButton, buttonAnimatedStyle]}
+                onPress={handleNext}
+                activeOpacity={0.8}>
+                <Text style={styles.nextButtonText}>Deepen my analysis</Text>
+              </AnimatedTouchable>
+            </Animated.View>
           </View>
         </SafeAreaView>
       </ImageBackground>
@@ -394,52 +343,75 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   progressBarFilled: {
-    width: '25%',
+    width: '60%',
     height: '100%',
     backgroundColor: Colors.progressBarFilled,
     borderRadius: radiusScale(2),
   },
-  centerSection: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  textContainer: {
-    alignItems: 'center',
-    paddingHorizontal: horizontalScale(8),
-  },
-  mainTextContainer: {
-    marginBottom: verticalScale(16),
-  },
-  mainText: {
+  mainHeading: {
     fontFamily: FontFamilies.sunlightDreams,
     fontWeight: '400',
-    fontSize: fontScale(28),
-    lineHeight: fontScale(36),
+    fontSize: fontScale(36),
+    lineHeight: fontScale(43),
     color: Colors.white,
-    textAlign: 'center',
+    marginBottom: verticalScale(18),
   },
-  cursor: {
-    fontFamily: FontFamilies.interRegular,
-    fontWeight: '400',
-    fontSize: fontScale(28),
-    color: Colors.white,
+  subHeading: {
+    fontFamily: FontFamilies.interSemiBold,
+    fontWeight: '600',
+    fontSize: fontScale(16),
+    lineHeight: fontScale(16),
+    color: Colors.subHeading,
   },
-  subTextContainer: {
-    marginTop: verticalScale(8),
+  spacer: {
+    flex: 1,
   },
-  subText: {
+  cardsContainer: {
+    width: '100%',
+    gap: verticalScale(12),
+    marginBottom: verticalScale(50),
+  },
+  unlockCardWrapper: {
+    borderRadius: radiusScale(8),
+    overflow: 'hidden',
+  },
+  unlockCard: {
+    paddingVertical: verticalScale(10),
+    // paddingHorizontal: horizontalScale(16),
+  },
+  cardImageStyle: {
+    borderRadius: radiusScale(8),
+  },
+  cardContent: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: horizontalScale(3),
+  },
+  unlockCardText: {
     fontFamily: FontFamilies.interRegular,
     fontWeight: '400',
     fontSize: fontScale(16),
-    lineHeight: fontScale(24),
-    color: Colors.subHeading,
-    textAlign: 'center',
+    color: Colors.white,
+    opacity: 0.9,
   },
-  subCursor: {
-    fontSize: fontScale(16),
-    color: Colors.subHeading,
+  bottomSection: {
+    paddingBottom: verticalScale(10),
+  },
+  nextButton: {
+    backgroundColor: Colors.white,
+    borderRadius: radiusScale(16),
+    paddingVertical: verticalScale(21),
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: verticalScale(16),
+  },
+  nextButtonText: {
+    fontFamily: FontFamilies.interSemiBold,
+    fontWeight: '600',
+    fontSize: fontScale(18),
+    color: Colors.black,
   },
 });
 
-export default OnboardingScreen4;
+export default OnboardingScreen6;

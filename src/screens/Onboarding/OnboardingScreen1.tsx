@@ -150,10 +150,10 @@ export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
   const buttonScale = useSharedValue(1);
 
   useEffect(() => {
-    // Animate progress bar on mount
+    // Animate progress bar on mount - Screen 1 of 11 (9%)
     progressWidth.value = withDelay(
       300,
-      withTiming(33, {duration: 800, easing: Easing.out(Easing.cubic)}),
+      withTiming(9, {duration: 800, easing: Easing.out(Easing.cubic)}),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

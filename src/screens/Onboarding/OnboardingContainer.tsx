@@ -13,6 +13,12 @@ import OnboardingScreen2 from './OnboardingScreen2';
 import OnboardingScreen3 from './OnboardingScreen3';
 import OnboardingScreen4 from './OnboardingScreen4';
 import OnboardingScreen5 from './OnboardingScreen5';
+import OnboardingScreen6 from './OnboardingScreen6';
+import OnboardingScreen7 from './OnboardingScreen7';
+import OnboardingScreen8 from './OnboardingScreen8';
+import OnboardingScreen9 from './OnboardingScreen9';
+import OnboardingScreen10 from './OnboardingScreen10';
+import OnboardingScreen11 from './OnboardingScreen11';
 
 // Re-export for external use
 export type {AlignmentOption};
@@ -21,6 +27,9 @@ export interface OnboardingData {
   alignment: AlignmentOption;
   name: string;
   birthday: Date | null;
+  birthTime: string;
+  city: string;
+  country: string;
 }
 
 export const OnboardingContainer: React.FC = () => {
@@ -29,6 +38,9 @@ export const OnboardingContainer: React.FC = () => {
     alignment: null,
     name: '',
     birthday: null,
+    birthTime: '',
+    city: '',
+    country: '',
   });
 
   const handleScreen1Continue = (alignment: AlignmentOption) => {
@@ -51,8 +63,33 @@ export const OnboardingContainer: React.FC = () => {
   };
 
   const handleScreen5Next = () => {
+    setCurrentScreen(6);
+  };
+
+  const handleScreen6Next = () => {
+    setCurrentScreen(7);
+  };
+
+  const handleScreen7Next = () => {
+    setCurrentScreen(8);
+  };
+
+  const handleScreen8Next = () => {
+    setCurrentScreen(9);
+  };
+
+  const handleScreen9Next = (birthTime: string, city: string, country: string) => {
+    setOnboardingData(prev => ({...prev, birthTime, city, country}));
+    setCurrentScreen(10);
+  };
+
+  const handleScreen10Complete = () => {
+    setCurrentScreen(11);
+  };
+
+  const handleScreen11Next = () => {
     // TODO: Complete onboarding and navigate to main app
-    console.log('Onboarding complete:', onboardingData);
+    console.log('=== FINAL ONBOARDING DATA ===', onboardingData);
   };
 
   const renderScreen = () => {
@@ -82,6 +119,43 @@ export const OnboardingContainer: React.FC = () => {
         );
       case 5:
         return <OnboardingScreen5 onNext={handleScreen5Next} />;
+      case 6:
+        return <OnboardingScreen6 onNext={handleScreen6Next} />;
+      case 7:
+        return (
+          <OnboardingScreen7
+            onNext={handleScreen7Next}
+            onboardingData={onboardingData}
+          />
+        );
+      case 8:
+        return (
+          <OnboardingScreen8
+            onNext={handleScreen8Next}
+            onboardingData={onboardingData}
+          />
+        );
+      case 9:
+        return (
+          <OnboardingScreen9
+            onNext={handleScreen9Next}
+            onboardingData={onboardingData}
+          />
+        );
+      case 10:
+        return (
+          <OnboardingScreen10
+            onComplete={handleScreen10Complete}
+            onboardingData={onboardingData}
+          />
+        );
+      case 11:
+        return (
+          <OnboardingScreen11
+            onNext={handleScreen11Next}
+            onboardingData={onboardingData}
+          />
+        );
       default:
         return <OnboardingScreen1 onContinue={handleScreen1Continue} />;
     }

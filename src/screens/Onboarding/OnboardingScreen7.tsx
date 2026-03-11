@@ -1,11 +1,11 @@
 /**
- * OnboardingScreen5 - Cosmic Map Reveal Screen
+ * OnboardingScreen7 - Eastern Astrology Screen
  *
- * Shows sun, moon, and rising sign information
- * with a "Discover my map" button
+ * Shows Eastern/Chinese zodiac animal sign based on birth year
+ * Combined with Western zodiac for a unique cosmic pattern
  */
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import {
   View,
   Text,
@@ -24,6 +24,7 @@ import Animated, {
   Easing,
   FadeIn,
   FadeInDown,
+  FadeInUp,
   withDelay,
 } from 'react-native-reanimated';
 import {
@@ -33,11 +34,13 @@ import {
   horizontalScale,
   verticalScale,
   radiusScale,
-  moderateScale,
 } from '../../theme';
-import SunIcon from '../../assets/icons/onboarding_icons/sun.svg';
-import MoonIcon from '../../assets/icons/onboarding_icons/moon.svg';
-import RisingIcon from '../../assets/icons/onboarding_icons/rising.svg';
+import {
+  getZodiacSign,
+  getEasternZodiacSign,
+  getCombinationPercentage,
+} from '../../components/mock/zodiacMockData';
+import {OnboardingData} from './OnboardingContainer';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -146,24 +149,64 @@ const TwinklingStar: React.FC<TwinklingStarProps> = ({
   );
 };
 
-interface OnboardingScreen5Props {
+interface OnboardingScreen7Props {
   onNext?: () => void;
+  onboardingData: OnboardingData;
 }
 
-export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
+export const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({
   onNext,
+  onboardingData,
 }) => {
-  // Progress bar animation - start from previous screen's value (36%)
-  const progressWidth = useSharedValue(36);
+  // Get Western zodiac sign based on date and month
+  const westernZodiac = useMemo(() => {
+    if (!onboardingData.birthday) return null;
+    return getZodiacSign(onboardingData.birthday);
+  }, [onboardingData.birthday]);
+
+  // Get Eastern zodiac sign based on year
+  const easternZodiac = useMemo(() => {
+    if (!onboardingData.birthday) return null;
+    const year = onboardingData.birthday.getFullYear();
+    return getEasternZodiacSign(year);
+  }, [onboardingData.birthday]);
+
+  // Get combination percentage
+  const combinationPercentage = useMemo(() => {
+    if (!westernZodiac || !easternZodiac) return 4;
+    return getCombinationPercentage(westernZodiac.name, easternZodiac.name);
+  }, [westernZodiac, easternZodiac]);
+
+  // Log all onboarding data to console
+  useEffect(() => {
+    console.log('=== ONBOARDING DATA SUMMARY ===');
+    console.log('All User Selections:', {
+      alignment: onboardingData.alignment,
+      name: onboardingData.name,
+      birthday: onboardingData.birthday?.toISOString(),
+      birthYear: onboardingData.birthday?.getFullYear(),
+      birthMonth: onboardingData.birthday ? onboardingData.birthday.getMonth() + 1 : null,
+      birthDay: onboardingData.birthday?.getDate(),
+      westernZodiac: westernZodiac?.name,
+      westernElement: westernZodiac?.element,
+      easternZodiac: easternZodiac?.name,
+      easternTrait: easternZodiac?.trait,
+      combinationPercentage: `${combinationPercentage}%`,
+    });
+    console.log('=================================');
+  }, [onboardingData, westernZodiac, easternZodiac, combinationPercentage]);
+
+  // Progress bar animation - start from previous screen's value (55%)
+  const progressWidth = useSharedValue(55);
 
   // Button scale animation
   const buttonScale = useSharedValue(1);
 
   useEffect(() => {
-    // Animate progress bar on mount - Screen 5 of 11 (45%)
+    // Animate progress bar on mount - Screen 7 of 11 (64%)
     progressWidth.value = withDelay(
       300,
-      withTiming(45, {duration: 800, easing: Easing.out(Easing.cubic)}),
+      withTiming(64, {duration: 800, easing: Easing.out(Easing.cubic)}),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -171,6 +214,7 @@ export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
   const progressAnimatedStyle = useAnimatedStyle(() => ({
     width: `${progressWidth.value}%`,
   }));
+
   const handleNext = () => {
     // Button pulse animation
     buttonScale.value = withSequence(
@@ -186,7 +230,7 @@ export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
     transform: [{scale: buttonScale.value}],
   }));
 
-  // Twinkling stars configuration - same as OnboardingScreen4
+  // Twinkling stars configuration - same as other onboarding screens
   const stars = [
     {size: 6, top: SCREEN_HEIGHT * 0.08, left: SCREEN_WIDTH * 0.15, delay: 0, intensity: 'high' as const},
     {size: 4, top: SCREEN_HEIGHT * 0.12, left: SCREEN_WIDTH * 0.75, delay: 300, intensity: 'medium' as const},
@@ -243,63 +287,69 @@ export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
               </View>
             </Animated.View>
 
-            {/* Center Content */}
-            <View style={styles.centerSection}>
-              {/* Sun Icon */}
-              <Animated.View
-                entering={FadeInDown.delay(200).duration(600).springify()}
-                style={styles.sunIconContainer}>
-                <SunIcon width={moderateScale(64)} height={moderateScale(64)} />
-              </Animated.View>
+            {/* Main Heading */}
+            <Animated.Text
+              entering={FadeInDown.delay(200).duration(600).springify()}
+              style={styles.mainHeading}>
+              In Eastern{'\n'}astrology, you're{'\n'}a...
+            </Animated.Text>
 
-              {/* Sub Heading */}
-              <Animated.Text
-                entering={FadeInDown.delay(300).duration(600).springify()}
-                style={styles.subHeading}>
-                Most horoscope only read{'\n'}your Sun.
-              </Animated.Text>
+            {/* Spacer */}
+            <View style={styles.spacer} />
 
-              {/* Main Heading */}
-              <Animated.Text
-                entering={FadeInDown.delay(400).duration(600).springify()}
-                style={styles.mainHeading}>
-                But your reactions are shaped elsewhere.
-              </Animated.Text>
-
-              {/* Description */}
-              <Animated.Text
-                entering={FadeInDown.delay(500).duration(600).springify()}
-                style={styles.description}>
-                Not everyone is weird to pick up subtle{'\n'}shifts.
-              </Animated.Text>
-
-              {/* Icons Row */}
-              <Animated.View
-                entering={FadeInDown.delay(600).duration(600).springify()}
-                style={styles.iconsRow}>
-                {/* Moon / Hidden */}
-                <View style={styles.iconItem}>
-                  <MoonIcon width={40} height={40} />
-                  <Text style={styles.iconLabel}>HIDDEN</Text>
+            {/* Eastern Zodiac Card */}
+            <Animated.View
+              entering={FadeInUp.delay(400).duration(600).springify()}
+              style={styles.easternCard}>
+              <View style={styles.easternCardContent}>
+                <View style={styles.easternTextContainer}>
+                  <Text style={styles.easternAnimalName}>
+                    {easternZodiac?.name || 'Dragon'}
+                  </Text>
+                  <Text style={styles.easternCardTrait}>
+                    Know for {easternZodiac?.trait || 'charismatic confidence'}.
+                  </Text>
                 </View>
-
-                {/* Rising */}
-                <View style={styles.iconItem}>
-                  <RisingIcon width={40} height={40} />
-                  <Text style={styles.iconLabel}>RISING</Text>
+                <View style={styles.symbolCircle}>
+                  <Text style={styles.easternAnimalSymbol}>
+                    {easternZodiac?.symbol || '🐉'}
+                  </Text>
                 </View>
-              </Animated.View>
-            </View>
+              </View>
+            </Animated.View>
+
+            {/* Combination Card */}
+            <Animated.View
+              entering={FadeInUp.delay(500).duration(600).springify()}
+              style={styles.combinationCard}>
+              <Text style={styles.combinationText}>
+                When we combine your{' '}
+                <Text style={styles.highlightText}>{westernZodiac?.name || 'Gemini'}</Text>
+                {' '}sun and{' '}
+                <Text style={styles.highlightText}>{easternZodiac?.name || 'Dragon'}</Text>
+                {' '}energy, we get a rare pattern.
+              </Text>
+              <View style={styles.rarityContainer}>
+                <Text style={styles.sparkleEmoji}>✨</Text>
+                <Text style={styles.rarityText}>
+                  This combination appears in less than{' '}
+                  <Text style={styles.rarityHighlight}>{combinationPercentage}%</Text>
+                  {' '}of birth pattern.
+                </Text>
+              </View>
+            </Animated.View>
 
             {/* Bottom Section */}
-            <View style={styles.bottomSection}>
+            <Animated.View
+              entering={FadeInUp.delay(600).duration(500)}
+              style={styles.bottomSection}>
               <AnimatedTouchable
                 style={[styles.nextButton, buttonAnimatedStyle]}
                 onPress={handleNext}
                 activeOpacity={0.8}>
-                <Text style={styles.nextButtonText}>Discover my map</Text>
+                <Text style={styles.nextButtonText}>Continue</Text>
               </AnimatedTouchable>
-            </View>
+            </Animated.View>
           </View>
         </SafeAreaView>
       </ImageBackground>
@@ -330,7 +380,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: horizontalScale(24),
   },
   progressBarContainer: {
-    // marginBottom: verticalScale(32),
+    marginBottom: verticalScale(32),
   },
   progressBarBackground: {
     height: verticalScale(8),
@@ -339,62 +389,106 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   progressBarFilled: {
-    width: '50%',
+    width: '70%',
     height: '100%',
     backgroundColor: Colors.progressBarFilled,
     borderRadius: radiusScale(2),
-  },
-  centerSection: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  sunIconContainer: {
-    marginBottom: verticalScale(24),
-  },
-  subHeading: {
-    fontFamily: FontFamilies.interRegular,
-    fontWeight: '700',
-    fontSize: fontScale(20),
-    lineHeight: fontScale(22),
-    color: Colors.subHeading,
-    textAlign: 'center',
-    marginBottom: verticalScale(16),
   },
   mainHeading: {
     fontFamily: FontFamilies.sunlightDreams,
     fontWeight: '400',
     fontSize: fontScale(36),
-    lineHeight: fontScale(45),
+    lineHeight: fontScale(43),
     color: Colors.white,
-    textAlign: 'center',
+    marginBottom: verticalScale(18),
+  },
+  spacer: {
+    flex: 1,
+  },
+  easternCard: {
+  backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    borderRadius: radiusScale(24),
+    paddingVertical: verticalScale(20),
+    paddingHorizontal: horizontalScale(20),
     marginBottom: verticalScale(20),
+    borderWidth:1,
+    borderColor:Colors.white
   },
-  description: {
-    fontFamily: FontFamilies.interRegular,
-    fontWeight: '400',
-    fontSize: fontScale(16),
-    lineHeight: fontScale(20),
-    color: Colors.subHeading,
-    textAlign: 'center',
-    marginBottom: verticalScale(32),
-  },
-  iconsRow: {
+  easternCardContent: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  easternTextContainer: {
+    flex: 1,
+  },
+  easternAnimalName: {
+    fontFamily: FontFamilies.interSemiBold,
+    fontWeight: '700',
+    fontSize: fontScale(28),
+    color: Colors.white,
+    marginBottom: verticalScale(6),
+  },
+  symbolCircle: {
+    width: horizontalScale(60),
+    height: horizontalScale(60),
+    borderRadius: horizontalScale(30),
+    backgroundColor: '#b8aa3e7a',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: horizontalScale(48),
+    marginLeft: horizontalScale(12),
+    
   },
-  iconItem: {
-    alignItems: 'center',
-    gap: verticalScale(8),
+  easternAnimalSymbol: {
+    fontSize: fontScale(45),
   },
-  iconLabel: {
+  easternCardTrait: {
+    fontFamily: FontFamilies.interRegular,
+    fontWeight: '600',
+    fontSize: fontScale(14),
+    color: '#C2D1F3',
+  },
+  combinationCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    borderRadius: radiusScale(24),
+    paddingVertical: verticalScale(16),
+    paddingHorizontal: horizontalScale(16),
+    marginBottom: verticalScale(30),
+     borderColor:Colors.white,
+     borderWidth:1,
+  },
+  combinationText: {
+    fontFamily: FontFamilies.interRegular,
+    fontWeight: '400',
+    fontSize: fontScale(14),
+    lineHeight: fontScale(20),
+    color: Colors.white,
+    marginBottom: verticalScale(12),
+  },
+  highlightText: {
+    fontFamily: FontFamilies.interSemiBold,
+    fontWeight: '800',
+    color: '#C2D1F3',
+  },
+  rarityContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: horizontalScale(5),
+  },
+  sparkleEmoji: {
+    fontSize: fontScale(18),
+  },
+  rarityText: {
+    flex: 1,
+    fontFamily: FontFamilies.interRegular,
+    fontWeight: '400',
+    fontSize: fontScale(14),
+    lineHeight: fontScale(18),
+    color: '#eac805', // Gold/yellow color
+  },
+  rarityHighlight: {
     fontFamily: FontFamilies.interSemiBold,
     fontWeight: '600',
-    fontSize: fontScale(12),
-    color: Colors.subHeading,
-    letterSpacing: 1,
   },
   bottomSection: {
     paddingBottom: verticalScale(10),
@@ -415,4 +509,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default OnboardingScreen5;
+export default OnboardingScreen7;

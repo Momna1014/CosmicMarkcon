@@ -150,17 +150,17 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
 }) => {
   const [name, setName] = useState('');
 
-  // Progress bar animation
-  const progressWidth = useSharedValue(0);
+  // Progress bar animation - start from previous screen's value (9%)
+  const progressWidth = useSharedValue(9);
 
   // Button scale animation
   const buttonScale = useSharedValue(1);
 
   useEffect(() => {
-    // Animate progress bar on mount - 66% for screen 2
+    // Animate progress bar on mount - Screen 2 of 11 (18%)
     progressWidth.value = withDelay(
       300,
-      withTiming(66, {duration: 800, easing: Easing.out(Easing.cubic)}),
+      withTiming(18, {duration: 800, easing: Easing.out(Easing.cubic)}),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -283,9 +283,9 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
                   <View style={styles.vibrationContainer}>
                     <Text style={styles.vibrationEmoji}>✨</Text>
                     <Text style={styles.vibrationText}>
-                      The vibration{' '}
+                      The vibration{''}
                       <Text style={styles.vibrationName}>
-                        {name || 'Ali'}
+                        {name || ''}
                       </Text>{' '}
                       strong.
                     </Text>

@@ -1,19 +1,18 @@
 /**
- * OnboardingScreen4 - Cosmic Insight Screen
+ * OnboardingScreen8 - Energy Pattern Screen
  *
- * Displays typewriter animation with zodiac-specific insight
- * and static subtext with haptic feedback during typing
+ * Shows the unique cosmic pattern with rotating circles
+ * Dynamic text based on Western + Eastern zodiac combination
  */
 
-import React, {useEffect, useState, useMemo, useCallback} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ImageBackground,
   Dimensions,
-  Vibration,
-  Platform,
+  TouchableOpacity,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Animated, {
@@ -24,8 +23,9 @@ import Animated, {
   withSequence,
   Easing,
   FadeIn,
-  withDelay,
   FadeInDown,
+  FadeInUp,
+  withDelay,
 } from 'react-native-reanimated';
 import {
   Colors,
@@ -34,16 +34,27 @@ import {
   horizontalScale,
   verticalScale,
   radiusScale,
+  moderateScale,
 } from '../../theme';
-import {getZodiacSign, getRandomInsight} from '../../components/mock/zodiacMockData';
+import {
+  getZodiacSign,
+  getEasternZodiacSign,
+  getCombinationPercentage,
+  getCombinationEnergyText,
+} from '../../components/mock/zodiacMockData';
+import {OnboardingData} from './OnboardingContainer';
+
+// SVG Icons
+import RoundCircles from '../../assets/icons/onboarding_icons/round_circles.svg';
+import GreenDot from '../../assets/icons/onboarding_icons/green_dot.svg';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
 // Background image - same as other onboarding screens
 const BackgroundImageSource = require('../../assets/icons/onboarding_icons/background_image.png');
 
-// Static subtext
-const STATIC_SUBTEXT = 'Not everyone is weird to pick up subtle shifts.';
+// Animated TouchableOpacity
+const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 interface TwinklingStarProps {
   size: number;
@@ -144,36 +155,76 @@ const TwinklingStar: React.FC<TwinklingStarProps> = ({
   );
 };
 
-interface OnboardingScreen4Props {
+interface OnboardingScreen8Props {
   onNext?: () => void;
-  birthday: Date;
+  onboardingData: OnboardingData;
 }
 
-export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
+export const OnboardingScreen8: React.FC<OnboardingScreen8Props> = ({
   onNext,
-  birthday,
+  onboardingData,
 }) => {
-  // Get zodiac sign and random insight based on birthday
-  const zodiac = useMemo(() => getZodiacSign(birthday), [birthday]);
-  const insight = useMemo(() => getRandomInsight(zodiac), [zodiac]);
+  // Get Western zodiac sign based on date and month
+  const westernZodiac = useMemo(() => {
+    if (!onboardingData.birthday) return null;
+    return getZodiacSign(onboardingData.birthday);
+  }, [onboardingData.birthday]);
 
-  // Typewriter state
-  const [displayedMainText, setDisplayedMainText] = useState('');
-  const [displayedSubText, setDisplayedSubText] = useState('');
-  const [isMainTextComplete, setIsMainTextComplete] = useState(false);
-  const [isSubTextComplete, setIsSubTextComplete] = useState(false);
+  // Get Eastern zodiac sign based on year
+  const easternZodiac = useMemo(() => {
+    if (!onboardingData.birthday) return null;
+    const year = onboardingData.birthday.getFullYear();
+    return getEasternZodiacSign(year);
+  }, [onboardingData.birthday]);
 
-  // Progress bar animation - start from previous screen's value (27%)
-  const progressWidth = useSharedValue(27);
+  // Get combination percentage
+  const combinationPercentage = useMemo(() => {
+    if (!westernZodiac || !easternZodiac) return 18;
+    return getCombinationPercentage(westernZodiac.name, easternZodiac.name);
+  }, [westernZodiac, easternZodiac]);
 
-  // Cursor animation
-  const cursorOpacity = useSharedValue(1);
+  // Get combination energy text
+  const energyText = useMemo(() => {
+    if (!westernZodiac || !easternZodiac) {
+      return {mainText: "Your energy doesn't come from the crowd.", highlightWord: "alignment"};
+    }
+    return getCombinationEnergyText(westernZodiac.element, easternZodiac.name);
+  }, [westernZodiac, easternZodiac]);
 
-  // Animate progress bar on mount - Screen 4 of 11 (36%)
+  // Progress bar animation - start from previous screen's value (64%)
+  const progressWidth = useSharedValue(64);
+
+  // Button scale animation
+  const buttonScale = useSharedValue(1);
+
+  // Rotating circles animation
+  const circleRotation = useSharedValue(0);
+
+  // Green dot scale animation (zoom in/out)
+  const greenDotScale = useSharedValue(1);
+
   useEffect(() => {
+    // Animate progress bar on mount - Screen 8 of 11 (73%)
     progressWidth.value = withDelay(
       300,
-      withTiming(36, {duration: 800, easing: Easing.out(Easing.cubic)}),
+      withTiming(73, {duration: 800, easing: Easing.out(Easing.cubic)}),
+    );
+
+    // Continuous rotation for circles
+    circleRotation.value = withRepeat(
+      withTiming(360, {duration: 20000, easing: Easing.linear}),
+      -1,
+      false,
+    );
+
+    // Zoom in/out animation for green dot
+    greenDotScale.value = withRepeat(
+      withSequence(
+        withTiming(1.3, {duration: 1000, easing: Easing.inOut(Easing.ease)}),
+        withTiming(1, {duration: 1000, easing: Easing.inOut(Easing.ease)}),
+      ),
+      -1,
+      true,
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -182,89 +233,30 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
     width: `${progressWidth.value}%`,
   }));
 
-  // Trigger haptic feedback
-  const triggerHaptic = useCallback(() => {
-    if (Platform.OS === 'ios') {
-      // Light haptic on iOS
-      Vibration.vibrate(1);
-    } else {
-      // Short vibration on Android
-      Vibration.vibrate(10);
-    }
-  }, []);
-
-  // Cursor blink animation
-  useEffect(() => {
-    cursorOpacity.value = withRepeat(
-      withSequence(
-        withTiming(0, {duration: 500}),
-        withTiming(1, {duration: 500}),
-      ),
-      -1,
-      false,
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Main text typewriter effect
-  useEffect(() => {
-    if (!insight.mainText) return;
-
-    let currentIndex = 0;
-    const typingInterval = setInterval(() => {
-      if (currentIndex < insight.mainText.length) {
-        setDisplayedMainText(insight.mainText.slice(0, currentIndex + 1));
-        triggerHaptic();
-        currentIndex++;
-      } else {
-        clearInterval(typingInterval);
-        setIsMainTextComplete(true);
-      }
-    }, 50); // 50ms per character for smooth typing
-
-    return () => clearInterval(typingInterval);
-  }, [insight.mainText, triggerHaptic]);
-
-  // Subtext typewriter effect (starts after main text completes)
-  useEffect(() => {
-    if (!isMainTextComplete) return;
-
-    // Small delay before starting subtext
-    const startDelay = setTimeout(() => {
-      let currentIndex = 0;
-      const typingInterval = setInterval(() => {
-        if (currentIndex < STATIC_SUBTEXT.length) {
-          setDisplayedSubText(STATIC_SUBTEXT.slice(0, currentIndex + 1));
-          triggerHaptic();
-          currentIndex++;
-        } else {
-          clearInterval(typingInterval);
-          setIsSubTextComplete(true);
-        }
-      }, 40); // Slightly faster for subtext
-
-      return () => clearInterval(typingInterval);
-    }, 500); // 500ms delay after main text
-
-    return () => clearTimeout(startDelay);
-  }, [isMainTextComplete, triggerHaptic]);
-
-  // Auto-navigate after both texts complete
-  useEffect(() => {
-    if (isSubTextComplete && onNext) {
-      const navigateTimeout = setTimeout(() => {
-        onNext();
-      }, 2000); // 2 seconds after completion
-
-      return () => clearTimeout(navigateTimeout);
-    }
-  }, [isSubTextComplete, onNext]);
-
-  const cursorAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: cursorOpacity.value,
+  const circleAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{rotate: `${circleRotation.value}deg`}],
   }));
 
-  // Twinkling stars configuration
+  const greenDotAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{scale: greenDotScale.value}],
+  }));
+
+  const handleNext = () => {
+    // Button pulse animation
+    buttonScale.value = withSequence(
+      withTiming(1.02, {duration: 100}),
+      withTiming(1, {duration: 100}),
+    );
+    setTimeout(() => {
+      onNext?.();
+    }, 150);
+  };
+
+  const buttonAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{scale: buttonScale.value}],
+  }));
+
+  // Twinkling stars configuration - same as other onboarding screens
   const stars = [
     {size: 6, top: SCREEN_HEIGHT * 0.08, left: SCREEN_WIDTH * 0.15, delay: 0, intensity: 'high' as const},
     {size: 4, top: SCREEN_HEIGHT * 0.12, left: SCREEN_WIDTH * 0.75, delay: 300, intensity: 'medium' as const},
@@ -321,40 +313,52 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
               </View>
             </Animated.View>
 
-            {/* Centered Text Section */}
+            {/* Center Section with Circles Background and Text */}
             <View style={styles.centerSection}>
-              <View style={styles.textContainer}>
-                {/* Main Insight Text with Typewriter Effect */}
+              {/* Rotating Circles as Background */}
+              <Animated.View style={[styles.circlesBackground, circleAnimatedStyle]}>
+                <RoundCircles width={280} height={280} />
+              </Animated.View>
+
+              {/* Text Content Overlayed on Circles */}
+              <View style={styles.textOverlay}>
+                <Animated.Text
+                  entering={FadeInDown.delay(400).duration(600).springify()}
+                  style={styles.mainHeading}>
+                  {energyText.mainText}
+                </Animated.Text>
+
+                <Animated.Text
+                  entering={FadeInDown.delay(550).duration(600).springify()}
+                  style={styles.subHeading}>
+                  It comes from <Text style={styles.highlightText}>{energyText.highlightWord}</Text>.
+                </Animated.Text>
+
+                {/* Pattern Badge */}
                 <Animated.View
-                  entering={FadeIn.delay(200).duration(400)}
-                  style={styles.mainTextContainer}>
-                  <Text style={styles.mainText}>
-                    {displayedMainText}
-                    {!isMainTextComplete && (
-                      <Animated.Text style={[styles.cursor, cursorAnimatedStyle]}>
-                        |
-                      </Animated.Text>
-                    )}
+                  entering={FadeInUp.delay(700).duration(500)}
+                  style={styles.patternBadge}>
+                  <Animated.View style={[styles.greenDotContainer, greenDotAnimatedStyle]}>
+                    <GreenDot width={moderateScale(20)} height={moderateScale(20)} />
+                  </Animated.View>
+                  <Text style={styles.patternText}>
+                    Only {combinationPercentage}% of people experience this pattern
                   </Text>
                 </Animated.View>
-
-                {/* Static Subtext with Typewriter Effect */}
-                {isMainTextComplete && (
-                  <Animated.View
-                    entering={FadeIn.duration(300)}
-                    style={styles.subTextContainer}>
-                    <Text style={styles.subText}>
-                      {displayedSubText}
-                      {!isSubTextComplete && (
-                        <Animated.Text style={[styles.cursor, styles.subCursor, cursorAnimatedStyle]}>
-                          |
-                        </Animated.Text>
-                      )}
-                    </Text>
-                  </Animated.View>
-                )}
               </View>
             </View>
+
+            {/* Bottom Section */}
+            <Animated.View
+              entering={FadeInUp.delay(800).duration(500)}
+              style={styles.bottomSection}>
+              <AnimatedTouchable
+                style={[styles.nextButton, buttonAnimatedStyle]}
+                onPress={handleNext}
+                activeOpacity={0.8}>
+                <Text style={styles.nextButtonText}>Final step</Text>
+              </AnimatedTouchable>
+            </Animated.View>
           </View>
         </SafeAreaView>
       </ImageBackground>
@@ -394,7 +398,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   progressBarFilled: {
-    width: '25%',
+    width: '80%',
     height: '100%',
     backgroundColor: Colors.progressBarFilled,
     borderRadius: radiusScale(2),
@@ -404,42 +408,79 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  textContainer: {
+  circlesBackground: {
+    position: 'absolute',
+    width: 280,
+    height: 280,
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: horizontalScale(8),
   },
-  mainTextContainer: {
-    marginBottom: verticalScale(16),
+  textOverlay: {
+    alignItems: 'center',
+    // paddingHorizontal: horizontalScale(20),
   },
-  mainText: {
+  mainHeading: {
     fontFamily: FontFamilies.sunlightDreams,
     fontWeight: '400',
-    fontSize: fontScale(28),
-    lineHeight: fontScale(36),
+    fontSize: fontScale(32),
+    lineHeight: fontScale(40),
     color: Colors.white,
     textAlign: 'center',
+    marginBottom: verticalScale(8),
+    // backgroundColor:'red'
   },
-  cursor: {
+  subHeading: {
     fontFamily: FontFamilies.interRegular,
-    fontWeight: '400',
-    fontSize: fontScale(28),
-    color: Colors.white,
-  },
-  subTextContainer: {
-    marginTop: verticalScale(8),
-  },
-  subText: {
-    fontFamily: FontFamilies.interRegular,
-    fontWeight: '400',
+    fontWeight: '600',
     fontSize: fontScale(16),
-    lineHeight: fontScale(24),
-    color: Colors.subHeading,
+    color: '#C2D1F3',
     textAlign: 'center',
+    marginBottom: verticalScale(24),
   },
-  subCursor: {
-    fontSize: fontScale(16),
-    color: Colors.subHeading,
+  highlightText: {
+    color: Colors.white,
+    fontFamily: FontFamilies.interSemiBold,
+    fontWeight: '600',
+  },
+  patternBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    borderRadius: radiusScale(30),
+    paddingVertical: verticalScale(12),
+    paddingHorizontal: horizontalScale(16),
+    gap: horizontalScale(3),
+    borderWidth:1,
+    borderColor:Colors.white
+  },
+  greenDotContainer: {
+    width: moderateScale(20),
+    height: moderateScale(20),
+    // backgroundColor:'red'
+  },
+  patternText: {
+    fontFamily: FontFamilies.interRegular,
+    fontWeight: '600',
+    fontSize: fontScale(13),
+    color: '#C2D1F3',
+  },
+  bottomSection: {
+    paddingBottom: verticalScale(10),
+  },
+  nextButton: {
+    backgroundColor: Colors.white,
+    borderRadius: radiusScale(16),
+    paddingVertical: verticalScale(21),
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: verticalScale(16),
+  },
+  nextButtonText: {
+    fontFamily: FontFamilies.interSemiBold,
+    fontWeight: '600',
+    fontSize: fontScale(18),
+    color: Colors.black,
   },
 });
 
-export default OnboardingScreen4;
+export default OnboardingScreen8;

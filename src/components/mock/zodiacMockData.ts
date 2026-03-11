@@ -3,6 +3,7 @@
  * 
  * Comprehensive zodiac signs data with authentic personality traits
  * Contains all zodiac sign information including elements, traits, and date ranges
+ * Also includes Eastern/Chinese zodiac data based on birth year
  */
 
 // Zodiac sign trait data
@@ -26,6 +27,197 @@ export interface ZodiacSign {
   traits: ZodiacTrait[]; // 5 random trait sets per sign
   insights: ZodiacInsight[]; // 5 insights per sign for typewriter screen
 }
+
+// Eastern/Chinese zodiac sign data structure
+export interface EasternZodiacSign {
+  name: string;
+  symbol: string;
+  trait: string; // Short description like "charismatic confidence"
+  description: string; // Full description
+  years: number[]; // Example birth years
+}
+
+// Eastern Zodiac Signs data
+export const EASTERN_ZODIAC_SIGNS: EasternZodiacSign[] = [
+  {
+    name: 'Rat',
+    symbol: '🐀',
+    trait: 'clever resourcefulness',
+    description: 'Known for clever resourcefulness.',
+    years: [1924, 1936, 1948, 1960, 1972, 1984, 1996, 2008, 2020],
+  },
+  {
+    name: 'Ox',
+    symbol: '🐂',
+    trait: 'patient dependability',
+    description: 'Known for patient dependability.',
+    years: [1925, 1937, 1949, 1961, 1973, 1985, 1997, 2009, 2021],
+  },
+  {
+    name: 'Tiger',
+    symbol: '🐅',
+    trait: 'bold bravery',
+    description: 'Known for bold bravery.',
+    years: [1926, 1938, 1950, 1962, 1974, 1986, 1998, 2010, 2022],
+  },
+  {
+    name: 'Rabbit',
+    symbol: '🐇',
+    trait: 'gentle elegance',
+    description: 'Known for gentle elegance.',
+    years: [1927, 1939, 1951, 1963, 1975, 1987, 1999, 2011, 2023],
+  },
+  {
+    name: 'Dragon',
+    symbol: '🐉',
+    trait: 'charismatic confidence',
+    description: 'Known for charismatic confidence.',
+    years: [1928, 1940, 1952, 1964, 1976, 1988, 2000, 2012, 2024],
+  },
+  {
+    name: 'Snake',
+    symbol: '🐍',
+    trait: 'wise intuition',
+    description: 'Known for wise intuition.',
+    years: [1929, 1941, 1953, 1965, 1977, 1989, 2001, 2013, 2025],
+  },
+  {
+    name: 'Horse',
+    symbol: '🐴',
+    trait: 'energetic independence',
+    description: 'Known for energetic independence.',
+    years: [1930, 1942, 1954, 1966, 1978, 1990, 2002, 2014, 2026],
+  },
+  {
+    name: 'Goat',
+    symbol: '🐐',
+    trait: 'artistic compassion',
+    description: 'Known for artistic compassion.',
+    years: [1931, 1943, 1955, 1967, 1979, 1991, 2003, 2015, 2027],
+  },
+  {
+    name: 'Monkey',
+    symbol: '🐒',
+    trait: 'playful cleverness',
+    description: 'Known for playful cleverness.',
+    years: [1932, 1944, 1956, 1968, 1980, 1992, 2004, 2016, 2028],
+  },
+  {
+    name: 'Rooster',
+    symbol: '🐓',
+    trait: 'confident precision',
+    description: 'Known for confident precision.',
+    years: [1933, 1945, 1957, 1969, 1981, 1993, 2005, 2017, 2029],
+  },
+  {
+    name: 'Dog',
+    symbol: '🐕',
+    trait: 'loyal protectiveness',
+    description: 'Known for loyal protectiveness.',
+    years: [1934, 1946, 1958, 1970, 1982, 1994, 2006, 2018, 2030],
+  },
+  {
+    name: 'Pig',
+    symbol: '🐷',
+    trait: 'generous warmth',
+    description: 'Known for generous warmth.',
+    years: [1935, 1947, 1959, 1971, 1983, 1995, 2007, 2019, 2031],
+  },
+];
+
+// Combination rarity percentages (Western + Eastern combinations)
+export const COMBINATION_PERCENTAGES: {[key: string]: number} = {
+  // Each combination has a unique percentage (1-8%)
+  'Aries-Rat': 3, 'Aries-Ox': 2, 'Aries-Tiger': 5, 'Aries-Rabbit': 2, 'Aries-Dragon': 4, 'Aries-Snake': 3,
+  'Aries-Horse': 6, 'Aries-Goat': 2, 'Aries-Monkey': 4, 'Aries-Rooster': 3, 'Aries-Dog': 5, 'Aries-Pig': 2,
+  'Taurus-Rat': 2, 'Taurus-Ox': 4, 'Taurus-Tiger': 3, 'Taurus-Rabbit': 5, 'Taurus-Dragon': 3, 'Taurus-Snake': 4,
+  'Taurus-Horse': 2, 'Taurus-Goat': 6, 'Taurus-Monkey': 3, 'Taurus-Rooster': 4, 'Taurus-Dog': 2, 'Taurus-Pig': 5,
+  'Gemini-Rat': 4, 'Gemini-Ox': 2, 'Gemini-Tiger': 3, 'Gemini-Rabbit': 4, 'Gemini-Dragon': 4, 'Gemini-Snake': 3,
+  'Gemini-Horse': 5, 'Gemini-Goat': 3, 'Gemini-Monkey': 6, 'Gemini-Rooster': 2, 'Gemini-Dog': 3, 'Gemini-Pig': 4,
+  'Cancer-Rat': 5, 'Cancer-Ox': 3, 'Cancer-Tiger': 2, 'Cancer-Rabbit': 6, 'Cancer-Dragon': 3, 'Cancer-Snake': 4,
+  'Cancer-Horse': 2, 'Cancer-Goat': 5, 'Cancer-Monkey': 3, 'Cancer-Rooster': 2, 'Cancer-Dog': 4, 'Cancer-Pig': 6,
+  'Leo-Rat': 3, 'Leo-Ox': 2, 'Leo-Tiger': 6, 'Leo-Rabbit': 2, 'Leo-Dragon': 7, 'Leo-Snake': 3,
+  'Leo-Horse': 5, 'Leo-Goat': 2, 'Leo-Monkey': 4, 'Leo-Rooster': 5, 'Leo-Dog': 3, 'Leo-Pig': 2,
+  'Virgo-Rat': 4, 'Virgo-Ox': 5, 'Virgo-Tiger': 2, 'Virgo-Rabbit': 4, 'Virgo-Dragon': 2, 'Virgo-Snake': 5,
+  'Virgo-Horse': 3, 'Virgo-Goat': 4, 'Virgo-Monkey': 3, 'Virgo-Rooster': 6, 'Virgo-Dog': 4, 'Virgo-Pig': 3,
+  'Libra-Rat': 2, 'Libra-Ox': 3, 'Libra-Tiger': 4, 'Libra-Rabbit': 5, 'Libra-Dragon': 4, 'Libra-Snake': 3,
+  'Libra-Horse': 4, 'Libra-Goat': 6, 'Libra-Monkey': 4, 'Libra-Rooster': 3, 'Libra-Dog': 5, 'Libra-Pig': 4,
+  'Scorpio-Rat': 5, 'Scorpio-Ox': 4, 'Scorpio-Tiger': 5, 'Scorpio-Rabbit': 2, 'Scorpio-Dragon': 6, 'Scorpio-Snake': 7,
+  'Scorpio-Horse': 3, 'Scorpio-Goat': 2, 'Scorpio-Monkey': 4, 'Scorpio-Rooster': 3, 'Scorpio-Dog': 5, 'Scorpio-Pig': 3,
+  'Sagittarius-Rat': 3, 'Sagittarius-Ox': 2, 'Sagittarius-Tiger': 5, 'Sagittarius-Rabbit': 3, 'Sagittarius-Dragon': 5, 'Sagittarius-Snake': 2,
+  'Sagittarius-Horse': 7, 'Sagittarius-Goat': 3, 'Sagittarius-Monkey': 5, 'Sagittarius-Rooster': 3, 'Sagittarius-Dog': 4, 'Sagittarius-Pig': 4,
+  'Capricorn-Rat': 4, 'Capricorn-Ox': 6, 'Capricorn-Tiger': 3, 'Capricorn-Rabbit': 2, 'Capricorn-Dragon': 4, 'Capricorn-Snake': 5,
+  'Capricorn-Horse': 2, 'Capricorn-Goat': 3, 'Capricorn-Monkey': 3, 'Capricorn-Rooster': 5, 'Capricorn-Dog': 4, 'Capricorn-Pig': 3,
+  'Aquarius-Rat': 5, 'Aquarius-Ox': 2, 'Aquarius-Tiger': 4, 'Aquarius-Rabbit': 3, 'Aquarius-Dragon': 5, 'Aquarius-Snake': 4,
+  'Aquarius-Horse': 4, 'Aquarius-Goat': 3, 'Aquarius-Monkey': 6, 'Aquarius-Rooster': 2, 'Aquarius-Dog': 5, 'Aquarius-Pig': 3,
+  'Pisces-Rat': 3, 'Pisces-Ox': 4, 'Pisces-Tiger': 2, 'Pisces-Rabbit': 6, 'Pisces-Dragon': 4, 'Pisces-Snake': 5,
+  'Pisces-Horse': 3, 'Pisces-Goat': 5, 'Pisces-Monkey': 3, 'Pisces-Rooster': 2, 'Pisces-Dog': 4, 'Pisces-Pig': 6,
+};
+
+// Get Eastern zodiac sign from birth year
+export const getEasternZodiacSign = (year: number): EasternZodiacSign => {
+  // Chinese zodiac follows a 12-year cycle
+  // Using 1924 as base year (Rat year)
+  const baseYear = 1924;
+  const cyclePosition = ((year - baseYear) % 12 + 12) % 12; // Handle negative years
+  return EASTERN_ZODIAC_SIGNS[cyclePosition];
+};
+
+// Get combination rarity percentage
+export const getCombinationPercentage = (westernSign: string, easternSign: string): number => {
+  const key = `${westernSign}-${easternSign}`;
+  return COMBINATION_PERCENTAGES[key] || Math.floor(Math.random() * 6) + 2; // Fallback to random 2-7%
+};
+
+// Combination energy texts based on Western + Eastern zodiac patterns
+export interface CombinationEnergy {
+  mainText: string;
+  highlightWord: string; // The word to highlight (like "alignment")
+}
+
+// Energy texts based on alignment patterns - these are shown dynamically based on combination
+export const COMBINATION_ENERGY_TEXTS: {[element: string]: CombinationEnergy[]} = {
+  // Fire signs (Aries, Leo, Sagittarius)
+  Fire: [
+    {mainText: "Your energy doesn't come from the crowd.", highlightWord: "alignment"},
+    {mainText: "Your passion ignites from within.", highlightWord: "fire"},
+    {mainText: "Your spirit burns brighter than most.", highlightWord: "intensity"},
+    {mainText: "Your courage flows from your core.", highlightWord: "bravery"},
+    {mainText: "Your light shines from deep inside.", highlightWord: "radiance"},
+  ],
+  // Earth signs (Taurus, Virgo, Capricorn)
+  Earth: [
+    {mainText: "Your strength doesn't come from the crowd.", highlightWord: "grounding"},
+    {mainText: "Your stability builds from foundation.", highlightWord: "roots"},
+    {mainText: "Your power grows from patience.", highlightWord: "endurance"},
+    {mainText: "Your success comes from persistence.", highlightWord: "determination"},
+    {mainText: "Your wisdom emerges from experience.", highlightWord: "mastery"},
+  ],
+  // Air signs (Gemini, Libra, Aquarius)
+  Air: [
+    {mainText: "Your ideas don't come from the crowd.", highlightWord: "innovation"},
+    {mainText: "Your thoughts transcend boundaries.", highlightWord: "freedom"},
+    {mainText: "Your mind connects unseen patterns.", highlightWord: "insight"},
+    {mainText: "Your vision extends beyond horizons.", highlightWord: "perspective"},
+    {mainText: "Your intellect bridges distant worlds.", highlightWord: "connection"},
+  ],
+  // Water signs (Cancer, Scorpio, Pisces)
+  Water: [
+    {mainText: "Your intuition doesn't come from the crowd.", highlightWord: "depth"},
+    {mainText: "Your emotions flow from ancient sources.", highlightWord: "wisdom"},
+    {mainText: "Your sensitivity reveals hidden truths.", highlightWord: "perception"},
+    {mainText: "Your empathy connects souls together.", highlightWord: "understanding"},
+    {mainText: "Your dreams reach beyond this realm.", highlightWord: "transcendence"},
+  ],
+};
+
+// Get combination energy text based on Western zodiac element and Eastern sign
+export const getCombinationEnergyText = (westernElement: 'Fire' | 'Earth' | 'Air' | 'Water', easternSign: string): CombinationEnergy => {
+  const texts = COMBINATION_ENERGY_TEXTS[westernElement] || COMBINATION_ENERGY_TEXTS.Fire;
+  // Use Eastern sign to deterministically select a text from array
+  const index = easternSign.length % texts.length;
+  return texts[index];
+};
 
 // Comprehensive zodiac signs data with authentic personality traits
 export const ZODIAC_SIGNS: ZodiacSign[] = [

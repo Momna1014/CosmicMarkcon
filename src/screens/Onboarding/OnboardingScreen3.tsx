@@ -145,17 +145,17 @@ export const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
 }) => {
   const [birthday, setBirthday] = useState<Date | null>(null);
 
-  // Progress bar animation
-  const progressWidth = useSharedValue(0);
+  // Progress bar animation - start from previous screen's value (18%)
+  const progressWidth = useSharedValue(18);
 
   // Button scale animation
   const buttonScale = useSharedValue(1);
 
   useEffect(() => {
-    // Animate progress bar on mount - 100% for screen 3
+    // Animate progress bar on mount - Screen 3 of 11 (27%)
     progressWidth.value = withDelay(
       300,
-      withTiming(100, {duration: 800, easing: Easing.out(Easing.cubic)}),
+      withTiming(27, {duration: 800, easing: Easing.out(Easing.cubic)}),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
