@@ -47,6 +47,8 @@ import {
   trackOnboarding2NameStarted,
   trackOnboarding2NameSubmitted,
 } from '../../utils/onboardingAnalytics';
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 const BackgroundImageSource = require('../../assets/icons/onboarding_icons/background_image.png');
@@ -159,6 +161,13 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
   const [name, setName] = useState('');
   const [hasStartedTyping, setHasStartedTyping] = useState(false);
 
+  // ===== Analytics: Track screen view =====
+  useScreenView('OnboardingScreen2', {
+    screen_category: 'onboarding',
+    step: 2,
+    total_steps: 11,
+  });
+
   // Progress bar animation - start from previous screen's value (9%)
   const progressWidth = useSharedValue(9);
 
@@ -168,6 +177,14 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
   useEffect(() => {
     // Track screen view
     trackOnboarding2View();
+    
+    // Firebase screen view logging
+    firebaseService.logScreenView('OnboardingScreen2', 'OnboardingScreen2');
+    firebaseService.logEvent('onboarding_2_screen_viewed', {
+      step: 2,
+      screen_name: 'name_input',
+      timestamp: Date.now(),
+    });
     
     // Animate progress bar on mount - Screen 2 of 11 (18%)
     progressWidth.value = withDelay(

@@ -6,7 +6,9 @@
 
 import React, {useState} from 'react';
 import {View, StyleSheet} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import {Colors} from '../../theme';
+import {useApp} from '../../contexts/AppContext';
 
 import OnboardingScreen1, {AlignmentOption} from './OnboardingScreen1';
 import OnboardingScreen2 from './OnboardingScreen2';
@@ -33,6 +35,8 @@ export interface OnboardingData {
 }
 
 export const OnboardingContainer: React.FC = () => {
+  const navigation = useNavigation();
+  const {setOnboardingCompleted} = useApp();
   const [currentScreen, setCurrentScreen] = useState(1);
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
     alignment: null,
@@ -87,9 +91,23 @@ export const OnboardingContainer: React.FC = () => {
     setCurrentScreen(11);
   };
 
-  const handleScreen11Next = () => {
-    // TODO: Complete onboarding and navigate to main app
+  const handleScreen11Next = async () => {
     console.log('=== FINAL ONBOARDING DATA ===', onboardingData);
+    
+    // Mark onboarding as completed
+    await setOnboardingCompleted(true);
+    
+    // Navigate to Paywall screen
+    console.log('[OnboardingContainer] 🎬 Navigating to Paywall...');
+    navigation.reset({
+      index: 0,
+      routes: [
+        {
+          name: 'Paywall' as never,
+          params: {source: 'onboarding_completed'},
+        },
+      ],
+    });
   };
 
   const renderScreen = () => {

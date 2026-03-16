@@ -43,6 +43,8 @@ import {
   trackOnboarding3BirthdaySelected,
   trackOnboarding3Continue,
 } from '../../utils/onboardingAnalytics';
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 const BackgroundImageSource = require('../../assets/icons/onboarding_icons/background_image.png');
@@ -155,6 +157,13 @@ export const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
   const [birthday, setBirthday] = useState<Date | null>(null);
   const [hasTrackedBirthday, setHasTrackedBirthday] = useState(false);
 
+  // ===== Analytics: Track screen view =====
+  useScreenView('OnboardingScreen3', {
+    screen_category: 'onboarding',
+    step: 3,
+    total_steps: 11,
+  });
+
   // Progress bar animation - start from previous screen's value (18%)
   const progressWidth = useSharedValue(18);
 
@@ -164,6 +173,14 @@ export const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
   useEffect(() => {
     // Track screen view
     trackOnboarding3View();
+    
+    // Firebase screen view logging
+    firebaseService.logScreenView('OnboardingScreen3', 'OnboardingScreen3');
+    firebaseService.logEvent('onboarding_3_screen_viewed', {
+      step: 3,
+      screen_name: 'birthday_input',
+      timestamp: Date.now(),
+    });
     
     // Animate progress bar on mount - Screen 3 of 11 (27%)
     progressWidth.value = withDelay(

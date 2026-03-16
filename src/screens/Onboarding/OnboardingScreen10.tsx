@@ -46,6 +46,8 @@ import {
   trackOnboarding10LoadingComplete,
   trackOnboarding10Continue,
 } from '../../utils/onboardingAnalytics';
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -65,6 +67,13 @@ export const OnboardingScreen10: React.FC<OnboardingScreen10Props> = ({
   onboardingData: _onboardingData,
 }) => {
   const {t} = useTranslation();
+
+  // ===== Analytics: Track screen view =====
+  useScreenView('OnboardingScreen10', {
+    screen_category: 'onboarding',
+    step: 10,
+    total_steps: 11,
+  });
 
   // State
   const [isLoadingComplete, setIsLoadingComplete] = useState(false);
@@ -97,6 +106,18 @@ export const OnboardingScreen10: React.FC<OnboardingScreen10Props> = ({
   useEffect(() => {
     // Track screen view (loading started)
     trackOnboarding10View();
+    
+    // Firebase screen view logging
+    firebaseService.logScreenView('OnboardingScreen10', 'OnboardingScreen10');
+    firebaseService.logEvent('onboarding_10_screen_viewed', {
+      step: 10,
+      screen_name: 'alignment_result',
+      timestamp: Date.now(),
+    });
+    firebaseService.logEvent('onboarding_10_loading_started', {
+      step: 10,
+      timestamp: Date.now(),
+    });
     
     // Animate leaf with subtle pulse
     leafScale.value = withRepeat(

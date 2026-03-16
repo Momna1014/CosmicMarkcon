@@ -47,6 +47,8 @@ import {
   trackOnboarding11View,
   trackOnboarding11Complete,
 } from '../../utils/onboardingAnalytics';
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -191,6 +193,13 @@ export const OnboardingScreen11: React.FC<OnboardingScreen11Props> = ({
 }) => {
   const {t} = useTranslation();
 
+  // ===== Analytics: Track screen view =====
+  useScreenView('OnboardingScreen11', {
+    screen_category: 'onboarding',
+    step: 11,
+    total_steps: 11,
+  });
+
   // Progress bar animation - start from previous screen's value (91%)
   const progressWidth = useSharedValue(91);
 
@@ -200,6 +209,14 @@ export const OnboardingScreen11: React.FC<OnboardingScreen11Props> = ({
   useEffect(() => {
     // Track final screen view
     trackOnboarding11View();
+    
+    // Firebase screen view logging
+    firebaseService.logScreenView('OnboardingScreen11', 'OnboardingScreen11');
+    firebaseService.logEvent('onboarding_11_screen_viewed', {
+      step: 11,
+      screen_name: 'energetic_signature',
+      timestamp: Date.now(),
+    });
     
     // Animate progress bar to 100%
     progressWidth.value = withDelay(

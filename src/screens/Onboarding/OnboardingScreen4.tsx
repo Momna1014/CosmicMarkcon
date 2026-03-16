@@ -40,6 +40,8 @@ import {
   trackOnboarding4TypewriterComplete,
   trackOnboarding4AutoNavigate,
 } from '../../utils/onboardingAnalytics';
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -181,6 +183,13 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
   const insightText = t(`zodiac.insights.${zodiacKey}.insight${insightNumber}`);
   const subtextText = t('onboarding.screen4.subtext');
 
+  // ===== Analytics: Track screen view =====
+  useScreenView('OnboardingScreen4', {
+    screen_category: 'onboarding',
+    step: 4,
+    total_steps: 11,
+  });
+
   // Typewriter state
   const [displayedMainText, setDisplayedMainText] = useState('');
   const [displayedSubText, setDisplayedSubText] = useState('');
@@ -197,6 +206,16 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
   useEffect(() => {
     // Track screen view with zodiac name and insight number
     trackOnboarding4View(zodiac.name, insightNumber);
+    
+    // Firebase screen view logging
+    firebaseService.logScreenView('OnboardingScreen4', 'OnboardingScreen4');
+    firebaseService.logEvent('onboarding_4_screen_viewed', {
+      step: 4,
+      screen_name: 'cosmic_insight',
+      zodiac_sign: zodiac.name,
+      insight_number: insightNumber,
+      timestamp: Date.now(),
+    });
     
     progressWidth.value = withDelay(
       300,

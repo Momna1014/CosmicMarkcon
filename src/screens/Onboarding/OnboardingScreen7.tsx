@@ -47,6 +47,8 @@ import {
   trackOnboarding7View,
   trackOnboarding7Continue,
 } from '../../utils/onboardingAnalytics';
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -166,6 +168,13 @@ export const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({
 }) => {
   const {t} = useTranslation();
 
+  // ===== Analytics: Track screen view =====
+  useScreenView('OnboardingScreen7', {
+    screen_category: 'onboarding',
+    step: 7,
+    total_steps: 11,
+  });
+
   // Get Western zodiac sign based on date and month
   const westernZodiac = useMemo(() => {
     if (!onboardingData.birthday) return null;
@@ -219,6 +228,17 @@ export const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({
         combinationPercentage
       );
     }
+    
+    // Firebase screen view logging
+    firebaseService.logScreenView('OnboardingScreen7', 'OnboardingScreen7');
+    firebaseService.logEvent('onboarding_7_screen_viewed', {
+      step: 7,
+      screen_name: 'eastern_astrology',
+      western_sign: westernZodiac?.name || 'unknown',
+      eastern_sign: easternZodiac?.name || 'unknown',
+      combination_percentage: combinationPercentage,
+      timestamp: Date.now(),
+    });
     
     // Animate progress bar on mount - Screen 7 of 11 (64%)
     progressWidth.value = withDelay(

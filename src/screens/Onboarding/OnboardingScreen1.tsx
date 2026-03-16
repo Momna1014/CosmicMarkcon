@@ -40,6 +40,8 @@ import {
   trackOnboarding1AlignmentSelected,
   trackOnboardingStarted,
 } from '../../utils/onboardingAnalytics';
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 const BackgroundImageSource = require('../../assets/icons/onboarding_icons/background_image.png');
@@ -151,6 +153,13 @@ export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
   const {t} = useTranslation();
   const [selectedOption, setSelectedOption] = useState<AlignmentOption>(null);
 
+  // ===== Analytics: Track screen view =====
+  useScreenView('OnboardingScreen1', {
+    screen_category: 'onboarding',
+    step: 1,
+    total_steps: 11,
+  });
+
   // Progress bar animation
   const progressWidth = useSharedValue(0);
 
@@ -161,6 +170,14 @@ export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
     // Track screen view and onboarding start
     trackOnboardingStarted();
     trackOnboarding1View();
+    
+    // Firebase screen view logging
+    firebaseService.logScreenView('OnboardingScreen1', 'OnboardingScreen1');
+    firebaseService.logEvent('onboarding_1_screen_viewed', {
+      step: 1,
+      screen_name: 'life_alignment',
+      timestamp: Date.now(),
+    });
     
     // Animate progress bar on mount - Screen 1 of 11 (9%)
     progressWidth.value = withDelay(

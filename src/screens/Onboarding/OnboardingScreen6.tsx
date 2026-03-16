@@ -42,6 +42,8 @@ import {
   trackOnboarding6View,
   trackOnboarding6DeepenAnalysisClicked,
 } from '../../utils/onboardingAnalytics';
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -164,6 +166,13 @@ export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
 }) => {
   const {t} = useTranslation();
 
+  // ===== Analytics: Track screen view =====
+  useScreenView('OnboardingScreen6', {
+    screen_category: 'onboarding',
+    step: 6,
+    total_steps: 11,
+  });
+
   // Progress bar animation - start from previous screen's value (45%)
   const progressWidth = useSharedValue(45);
 
@@ -173,6 +182,14 @@ export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
   useEffect(() => {
     // Track screen view
     trackOnboarding6View();
+    
+    // Firebase screen view logging
+    firebaseService.logScreenView('OnboardingScreen6', 'OnboardingScreen6');
+    firebaseService.logEvent('onboarding_6_screen_viewed', {
+      step: 6,
+      screen_name: 'cosmic_layers',
+      timestamp: Date.now(),
+    });
     
     // Animate progress bar on mount - Screen 6 of 11 (55%)
     progressWidth.value = withDelay(
