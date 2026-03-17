@@ -20,9 +20,10 @@ export type RootStackParamList = {
 
 export type MainTabParamList = {
   Home: undefined;
-  Library: undefined;
-  Discover: undefined;
-  Me: undefined;
+  Horoscope: undefined;
+  Love: undefined;
+  Chiromancy: undefined;
+  Profile: undefined;
 };
 
 /**
@@ -41,9 +42,10 @@ export const linking: LinkingOptions<RootStackParamList> = {
       MainApp: {
         screens: {
           Home: 'home',
-          Library: 'library',
-          Discover: 'discover',
-          Me: 'me',
+          Horoscope: 'horoscope',
+          Love: 'love',
+          Chiromancy: 'chiromancy',
+          Profile: 'profile',
         },
       },
     },
@@ -54,9 +56,10 @@ export const linking: LinkingOptions<RootStackParamList> = {
  * Example deep link URLs:
  * 
  * - templateapp://home
- * - templateapp://library
- * - templateapp://discover
- * - templateapp://me
+ * - templateapp://horoscope
+ * - templateapp://love
+ * - templateapp://chiromancy
+ * - templateapp://profile
  */
 
 export default linking;

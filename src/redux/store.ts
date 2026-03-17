@@ -14,7 +14,7 @@ const persistConfig = {
   key: 'root',
   version: 1,
   storage: AsyncStorage,
-  whitelist: ['auth', 'readingProgress', 'savedManga', 'downloads'], // Persist auth, readingProgress, savedManga, and downloads slices
+  whitelist: ['auth', 'onboarding'], // Persist auth, readingProgress, savedManga, downloads, and onboarding slices
   // blacklist: ['ui', 'temp'], // Don't persist these slices
   timeout: 10000, // 10 seconds timeout for rehydration
 };

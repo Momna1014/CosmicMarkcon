@@ -78,30 +78,30 @@ export const PaywallScreen: React.FC = () => {
     
     hasNavigatedRef.current = true;
     
-    // Check if this was explicitly opened from within the app (Me screen, settings, etc.)
+    // Check if this was explicitly opened from within the app (Profile screen, settings, etc.)
     // Known in-app sources that should go back
-    const inAppSources = ['settings_upgrade', 'settings_button', 'me_screen', 'drawer', 'home_cta'];
+    const inAppSources = ['settings_upgrade', 'settings_button', 'profile_screen', 'drawer', 'home_cta'];
     const isFromInApp = source && inAppSources.some(s => source.includes(s));
     
     console.log('[PaywallScreen] 🔍 Source:', source, 'isFromInApp:', isFromInApp);
     
     if (isFromInApp) {
-      // From within app (Me screen, drawer, etc.)
-      // Check if we can go back, otherwise navigate to Me tab
+      // From within app (Profile screen, drawer, etc.)
+      // Check if we can go back, otherwise navigate to Profile tab
       console.log('[PaywallScreen] ⬅️ From app - navigating back...');
       
       if (navigation.canGoBack()) {
         navigation.goBack();
       } else {
-        // Fallback: Navigate to MainApp and ensure Me tab is shown
-        console.log('[PaywallScreen] ⚠️ Cannot go back, navigating to MainApp (Me tab)...');
+        // Fallback: Navigate to MainApp and ensure Profile tab is shown
+        console.log('[PaywallScreen] ⚠️ Cannot go back, navigating to MainApp (Profile tab)...');
         navigation.reset({
           index: 0,
           routes: [
             { 
               name: 'MainApp' as never,
               state: {
-                routes: [{ name: 'Me' }],
+                routes: [{ name: 'Profile' }],
                 index: 0,
               },
             }

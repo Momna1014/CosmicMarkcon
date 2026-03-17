@@ -9,7 +9,7 @@ type Props = {
   navigation: any;
 };
 
-const HomeScreen: React.FC<Props> = () => {
+const LoveScreen: React.FC<Props> = () => {
   return (
     <View style={styles.backgroundFallback}>
       <ImageBackground
@@ -19,8 +19,8 @@ const HomeScreen: React.FC<Props> = () => {
         <SafeAreaView style={styles.container} edges={['top']}>
           <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
           <View style={styles.content}>
-            <Text style={styles.title}>Home</Text>
-            <Text style={styles.subtitle}>Welcome to the Home screen</Text>
+            <Text style={styles.title}>Love</Text>
+            <Text style={styles.subtitle}>Explore your love compatibility</Text>
           </View>
         </SafeAreaView>
       </ImageBackground>
@@ -60,4 +60,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default LoveScreen;

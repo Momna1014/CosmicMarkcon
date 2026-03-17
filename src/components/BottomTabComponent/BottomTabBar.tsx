@@ -1,75 +1,56 @@
 import React from 'react';
 import {
   View,
-  Text,
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { SvgProps } from 'react-native-svg';
+import { BlurView } from '@react-native-community/blur';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Import theme and scaling functions
 import {
-  Colors,
-  FontFamilies,
-  verticalScale,
   moderateScale,
-  fontScale,
+  radiusScale,
+  verticalScale,
 } from '../../theme';
 
-// import HomeSvg from '../../assets/icons/svgicons/BottomTabIcons/Home.svg';
-// import DiscoverSvg from '../../assets/icons/svgicons/BottomTabIcons/Discover.svg';
-// import LibrarySvg from '../../assets/icons/svgicons/BottomTabIcons/Library.svg';
-// import MeSvg from '../../assets/icons/svgicons/BottomTabIcons/Me.svg';
+// Import SVG icons - outline (inactive)
+import HomeIcon from '../../assets/icons/bottomtab_icons/home.svg';
+import HoroscopeIcon from '../../assets/icons/bottomtab_icons/horoscope.svg';
+import LoveIcon from '../../assets/icons/bottomtab_icons/love_companion.svg';
+import ChiromancyIcon from '../../assets/icons/bottomtab_icons/chiromancy.svg';
+import ProfileIcon from '../../assets/icons/bottomtab_icons/profile.svg';
 
-// import ActiveHomeSvg from '../../assets/icons/svgicons/BottomTabIcons/active_home.svg';
-// import ActiveDiscoverSvg from '../../assets/icons/svgicons/BottomTabIcons/active_discover.svg';
-// import ActiveLibrarySvg from '../../assets/icons/svgicons/BottomTabIcons/active_library.svg';
-// import ActiveMeSvg from '../../assets/icons/svgicons/BottomTabIcons/active_me.svg';
+// Import SVG icons - filled (active)
+import FillHomeIcon from '../../assets/icons/bottomtab_icons/fill_home.svg';
+import FillHoroscopeIcon from '../../assets/icons/bottomtab_icons/fill_horoscope.svg';
+import FillLoveIcon from '../../assets/icons/bottomtab_icons/fill_love_companion.svg';
+import FillChiromancyIcon from '../../assets/icons/bottomtab_icons/fill_chiromancy.svg';
 
-// interface TabIconProps extends SvgProps {
-//   focused: boolean;
-//   size?: number;
-// }
+// Active color for dot indicator
+const ACTIVE_COLOR = '#EEDF9B';
 
-// const HomeIcon: React.FC<TabIconProps> = ({ focused, size = moderateScale(32), ...props }) => (
-//   focused ? (
-//     <ActiveHomeSvg width={size} height={size} {...props} />
-//   ) : (
-//     <HomeSvg width={size} height={size} stroke={Colors.dark.textSecondary} {...props} />
-//   )
-// );
+// Icon size
+const ICON_SIZE = moderateScale(32);
 
-// const DiscoverIcon: React.FC<TabIconProps> = ({ focused, size = moderateScale(32), ...props }) => (
-//   focused ? (
-//     <ActiveDiscoverSvg width={size} height={size} {...props} />
-//   ) : (
-//     <DiscoverSvg width={size} height={size} stroke={Colors.dark.textSecondary} {...props} />
-//   )
-// );
+// Icon map for each tab - outline icons (inactive)
+const outlineIconMap: Record<string, React.FC<{ width: number; height: number }>> = {
+  Home: HomeIcon,
+  Horoscope: HoroscopeIcon,
+  Love: LoveIcon,
+  Chiromancy: ChiromancyIcon,
+  Profile: ProfileIcon,
+};
 
-// const LibraryIcon: React.FC<TabIconProps> = ({ focused, size = moderateScale(32), ...props }) => (
-//   focused ? (
-//     <ActiveLibrarySvg width={size} height={size} {...props} />
-//   ) : (
-//     <LibrarySvg width={size} height={size} stroke={Colors.dark.textSecondary} {...props} />
-//   )
-// );
-
-// const MeIcon: React.FC<TabIconProps> = ({ focused, size = moderateScale(32), ...props }) => (
-//   focused ? (
-//     <ActiveMeSvg width={size} height={size} {...props} />
-//   ) : (
-//     <MeSvg width={size} height={size} stroke={Colors.dark.textSecondary} {...props} />
-//   )
-// );
-
-// const iconMap: Record<string, React.FC<TabIconProps>> = {
-//   Home: HomeIcon,
-//   Discover: DiscoverIcon,
-//   Library: LibraryIcon,
-//   Me: MeIcon,
-// };
+// Icon map for each tab - filled icons (active)
+const filledIconMap: Record<string, React.FC<{ width: number; height: number }>> = {
+  Home: FillHomeIcon,
+  Horoscope: FillHoroscopeIcon,
+  Love: FillLoveIcon,
+  Chiromancy: FillChiromancyIcon,
+  Profile: ProfileIcon, // Use outline for profile as no fill variant
+};
 
 interface CustomBottomTabBarProps extends BottomTabBarProps {}
 
@@ -78,20 +59,31 @@ const BottomTabBar: React.FC<CustomBottomTabBarProps> = ({
   descriptors,
   navigation,
 }) => {
+  const insets = useSafeAreaInsets();
+  
   return (
     <View style={styles.container}>
-      <View style={styles.tabBar}>
+      {/* Blur background - works on both iOS and Android */}
+      <BlurView
+        style={styles.blurView}
+        blurType="dark"
+        blurAmount={56}
+        reducedTransparencyFallbackColor="rgba(0, 0, 0, 0.08)"
+      />
+      
+      {/* Semi-transparent overlay matching Figma: #00000014 */}
+      <View style={styles.glassOverlay} />
+      
+      {/* Tab bar content */}
+      <View style={[styles.tabBar, { paddingBottom: 8 + insets.bottom }]}>
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
-          const label =
-            options.tabBarLabel !== undefined
-              ? options.tabBarLabel
-              : options.title !== undefined
-              ? options.title
-              : route.name;
-
           const isFocused = state.index === index;
-          // const IconComponent = iconMap[route.name];
+          
+          // Get the appropriate icon based on active state
+          const IconComponent = isFocused 
+            ? filledIconMap[route.name] 
+            : outlineIconMap[route.name];
 
           const onPress = () => {
             const event = navigation.emit({
@@ -125,20 +117,15 @@ const BottomTabBar: React.FC<CustomBottomTabBarProps> = ({
               activeOpacity={0.7}
             >
               <View style={styles.iconContainer}>
-                {/* {IconComponent && (
-                  <IconComponent focused={isFocused} size={moderateScale(32)} />
-                )} */}
+                {IconComponent && (
+                  <IconComponent
+                    width={ICON_SIZE}
+                    height={ICON_SIZE}
+                  />
+                )}
+                {/* Active indicator dot - positioned exactly below icon */}
+                {isFocused && <View style={styles.activeDot} />}
               </View>
-              <Text
-                style={[
-                  styles.tabLabel,
-                  {
-                    color: isFocused ? Colors.white : Colors.dark.textSecondary,
-                  },
-                ]}
-              >
-                {typeof label === 'string' ? label : route.name}
-              </Text>
             </TouchableOpacity>
           );
         })}
@@ -149,36 +136,41 @@ const BottomTabBar: React.FC<CustomBottomTabBarProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.dark.background,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  blurView: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  glassOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.08)', // #00000014 from Figma
   },
   tabBar: {
     flexDirection: 'row',
-    backgroundColor: Colors.dark.background,
-    paddingTop: verticalScale(12),
-    // paddingBottom: verticalScale(20), // Extra padding for safe area
-    // paddingHorizontal: horizontalScale(16),
-    borderTopWidth: 0, // Remove default border
-    elevation: 0, // Remove shadow on Android
-    shadowOpacity: 0, // Remove shadow on iOS
+    paddingTop: verticalScale(0), // Figma padding-top
+    // paddingBottom handled dynamically with safe area
+    alignItems: 'center',
+    // minHeight: 104, // Figma height
   },
   tabItem: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    // paddingVertical: verticalScale(8),
+    bottom:moderateScale(-15)
+    // backgroundColor:'pink'
   },
   iconContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: verticalScale(8),
+    // backgroundColor:'red'
   },
-  tabLabel: {
-    fontFamily: FontFamilies.interRegular,
-    fontSize: fontScale(14),
-    fontWeight: '400',
-    lineHeight: fontScale(18), // Increased for iPad compatibility
-    letterSpacing: fontScale(14) * 0.02, // 2% letter spacing
-    textAlign: 'center',
+  activeDot: {
+    width: moderateScale(8),
+    height: moderateScale(8),
+    borderRadius: radiusScale(10),
+    backgroundColor: ACTIVE_COLOR,
+    marginTop: verticalScale(5),
   },
 });
 
