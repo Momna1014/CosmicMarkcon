@@ -274,7 +274,7 @@ export const styles = StyleSheet.create({
   guideCard: {
     borderRadius: radiusScale(16),
     overflow: 'hidden',
-    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+    backgroundColor: 'rgba(0, 0, 0, 0.08)',
     borderWidth: 1,
     borderColor: '#C2D1F333',
   },
@@ -301,8 +301,8 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   guideTitle: {
-    fontFamily: FontFamilies.interMedium,
-    fontSize: fontScale(14),
+    fontFamily: FontFamilies.sunlightDreams,
+    fontSize: fontScale(16),
     color: '#FFFFFF',
   },
   guideArrow: {

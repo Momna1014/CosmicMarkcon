@@ -16,6 +16,14 @@ export type RootStackParamList = {
   
   // Main App
   MainApp: undefined;
+
+  // Cosmic Guide Screens (Stack screens without tabs)
+  CosmicGuideDetail: {guideId: string};
+  LessonDetail: {
+    guideId: string;
+    lessonId: string;
+    totalLessons: number;
+  };
 };
 
 export type MainTabParamList = {

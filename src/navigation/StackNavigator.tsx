@@ -22,6 +22,7 @@ import NavigationConfig from './NavigationConfig';
 import TabNavigator from './TabNavigator';
 import {OnboardingContainer} from '../screens/Onboarding';
 import PaywallScreen from '../screens/Paywall';
+import {CosmicGuideDetail, LessonDetail} from '../screens/CosmicGuide';
 
 
 
@@ -128,6 +129,24 @@ export const StackNavigator: React.FC = () => {
           }}
         />
       )}
+
+      {/* Cosmic Guide Screens - Stack screens without bottom tabs */}
+      <Stack.Screen
+        name="CosmicGuideDetail"
+        component={CosmicGuideDetail}
+        options={{
+          headerShown: false,
+          animation: 'slide_from_right',
+        }}
+      />
+      <Stack.Screen
+        name="LessonDetail"
+        component={LessonDetail}
+        options={{
+          headerShown: false,
+          animation: 'slide_from_right',
+        }}
+      />
 
       {/* Other Modal Screens can go here if needed */}
       
