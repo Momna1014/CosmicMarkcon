@@ -1,7 +1,7 @@
 import React, {memo} from 'react';
 import {View, Text, ImageBackground, StyleSheet} from 'react-native';
 import {styles} from './styles';
-import {HoroscopeData} from './mockData';
+import {HoroscopeData} from '../../components/mock/mockData';
 import {moderateScale, radiusScale} from '../../theme';
 
 // Icons

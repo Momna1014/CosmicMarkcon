@@ -24,6 +24,12 @@ export type RootStackParamList = {
     lessonId: string;
     totalLessons: number;
   };
+
+  // Love Match Screen (Stack screen without tabs)
+  LoveMatch: {
+    yourSign: string;
+    theirSign: string;
+  };
 };
 
 export type MainTabParamList = {

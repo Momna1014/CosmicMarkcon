@@ -23,6 +23,7 @@ import TabNavigator from './TabNavigator';
 import {OnboardingContainer} from '../screens/Onboarding';
 import PaywallScreen from '../screens/Paywall';
 import {CosmicGuideDetail, LessonDetail} from '../screens/CosmicGuide';
+import LoveMatchScreen from '../screens/Love/LoveMatchScreen';
 
 
 
@@ -142,6 +143,16 @@ export const StackNavigator: React.FC = () => {
       <Stack.Screen
         name="LessonDetail"
         component={LessonDetail}
+        options={{
+          headerShown: false,
+          animation: 'slide_from_right',
+        }}
+      />
+
+      {/* Love Match Screen - Stack screen without bottom tabs */}
+      <Stack.Screen
+        name="LoveMatch"
+        component={LoveMatchScreen}
         options={{
           headerShown: false,
           animation: 'slide_from_right',

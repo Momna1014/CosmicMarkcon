@@ -1,15 +1,225 @@
-import React from 'react';
-import { View, Text, StyleSheet, StatusBar, ImageBackground, Dimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, {useState, useCallback, useMemo, memo, useRef, useEffect} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  StatusBar,
+  ImageBackground,
+  TouchableOpacity,
+  ScrollView,
+  Animated,
+} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {useSelector} from 'react-redux';
+import {selectOnboardingState} from '../../redux/slices/onboardingSlice';
+import GradientText from '../../components/GradientText';
+import {
+  FontFamilies,
+  fontScale,
+  horizontalScale,
+  verticalScale,
+  radiusScale,
+  moderateScale,
+} from '../../theme';
+import SignSelectModal, {ZodiacSignItem, getZodiacIcon} from '../../components/home_components/SignSelectModal';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+// Import SVG icons
+import AddThemIcon from '../../assets/icons/horoscope_icons/add_them.svg';
+import AddLineIcon from '../../assets/icons/horoscope_icons/add_line.svg';
+import CancerIcon from '../../assets/icons/horoscope_icons/cancer.svg';
+
+// Import zodiac sign SVGs for user's sign
+import GeminisIcon from '../../assets/icons/horoscope_icons/geminis.svg';
+import TauroIcon from '../../assets/icons/horoscope_icons/tauro.svg';
+import AriesIcon from '../../assets/icons/horoscope_icons/aries.svg';
+import CapricornioIcon from '../../assets/icons/horoscope_icons/capricornio.svg';
+import VirgoIcon from '../../assets/icons/horoscope_icons/virgo.svg';
+import PiscisIcon from '../../assets/icons/horoscope_icons/piscis.svg';
+import AcuarioIcon from '../../assets/icons/horoscope_icons/acuario.svg';
+import EscorpioIcon from '../../assets/icons/horoscope_icons/escorpio.svg';
+import SagitarioIcon from '../../assets/icons/horoscope_icons/sagitario.svg';
+import LeoIcon from '../../assets/icons/horoscope_icons/leo.svg';
+import LibraIcon from '../../assets/icons/horoscope_icons/libra.svg';
+
 const BackgroundImage = require('../../assets/icons/bottomtab_icons/main_screen_background.png');
+
+type TabType = 'quickMatch' | 'deepBond';
 
 type Props = {
   navigation: any;
 };
 
-const LoveScreen: React.FC<Props> = () => {
+// Get user zodiac icon based on sign name
+const getUserZodiacIcon = (sign: string, size: number): React.ReactElement => {
+  const signLower = sign?.toLowerCase() || '';
+  const props = {width: size, height: size};
+
+  switch (signLower) {
+    case 'gemini':
+      return <GeminisIcon {...props} />;
+    case 'taurus':
+      return <TauroIcon {...props} />;
+    case 'aries':
+      return <AriesIcon {...props} />;
+    case 'cancer':
+      return <CancerIcon {...props} />;
+    case 'capricorn':
+      return <CapricornioIcon {...props} />;
+    case 'virgo':
+      return <VirgoIcon {...props} />;
+    case 'pisces':
+      return <PiscisIcon {...props} />;
+    case 'aquarius':
+      return <AcuarioIcon {...props} />;
+    case 'scorpio':
+      return <EscorpioIcon {...props} />;
+    case 'sagittarius':
+      return <SagitarioIcon {...props} />;
+    case 'leo':
+      return <LeoIcon {...props} />;
+    case 'libra':
+      return <LibraIcon {...props} />;
+    default:
+      return <CancerIcon {...props} />;
+  }
+};
+
+// Tab Bar Component with Animation
+const TabBar = memo(
+  ({
+    activeTab,
+    onTabPress,
+  }: {
+    activeTab: TabType;
+    onTabPress: (tab: TabType) => void;
+  }) => {
+    const slideAnim = useRef(new Animated.Value(activeTab === 'quickMatch' ? 0 : 1)).current;
+
+    useEffect(() => {
+      Animated.spring(slideAnim, {
+        toValue: activeTab === 'quickMatch' ? 0 : 1,
+        useNativeDriver: false,
+        speed: 15,
+        bounciness: 8,
+      }).start();
+    }, [activeTab, slideAnim]);
+
+    const indicatorLeft = slideAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['0%', '50%'],
+    });
+
+    return (
+      <View style={styles.tabBar}>
+        <Animated.View
+          style={[
+            styles.tabIndicator,
+            {left: indicatorLeft},
+          ]}
+        />
+        <TouchableOpacity
+          style={styles.tabItem}
+          onPress={() => onTabPress('quickMatch')}
+          activeOpacity={0.7}>
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === 'quickMatch' && styles.tabTextActive,
+            ]}>
+            QUICK MATCH
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.tabItem}
+          onPress={() => onTabPress('deepBond')}
+          activeOpacity={0.7}>
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === 'deepBond' && styles.tabTextActive,
+            ]}>
+            DEEP BOND
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  },
+);
+
+// Sign Circle Component
+const SignCircle = memo(
+  ({
+    type,
+    signName,
+    signId,
+    onPress,
+  }: {
+    type: 'you' | 'them';
+    signName: string;
+    signId?: string;
+    onPress?: () => void;
+  }) => {
+    const isYou = type === 'you';
+    const iconSize = moderateScale(50);
+
+    return (
+      <TouchableOpacity
+        style={styles.signCircleContainer}
+        onPress={onPress}
+        disabled={isYou}
+        activeOpacity={0.7}>
+        <View
+          style={[
+            styles.signCircle,
+            isYou ? styles.signCircleYou : styles.signCircleThem,
+          ]}>
+          {isYou ? (
+            getUserZodiacIcon(signName, iconSize)
+          ) : signId ? (
+            getZodiacIcon(signId)
+          ) : (
+            <AddThemIcon width={iconSize} height={iconSize} />
+          )}
+        </View>
+        <Text style={styles.signLabel}>{isYou ? 'YOU' : 'THEM'}</Text>
+        <Text style={styles.signName}>{signName}</Text>
+      </TouchableOpacity>
+    );
+  },
+);
+
+const LoveScreen: React.FC<Props> = ({navigation}) => {
+  const [activeTab, setActiveTab] = useState<TabType>('quickMatch');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedSign, setSelectedSign] = useState<ZodiacSignItem | null>(null);
+  const onboardingData = useSelector(selectOnboardingState);
+
+  const userZodiacSign = useMemo(() => {
+    return onboardingData?.zodiacSign || 'Aries';
+  }, [onboardingData?.zodiacSign]);
+
+  const handleTabPress = useCallback((tab: TabType) => {
+    setActiveTab(tab);
+  }, []);
+
+  const handleOpenModal = useCallback(() => {
+    setModalVisible(true);
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setModalVisible(false);
+  }, []);
+
+  const handleSelectSign = useCallback((sign: ZodiacSignItem) => {
+    setSelectedSign(sign);
+    setModalVisible(false);
+    // Navigate to LoveMatch screen with both signs
+    navigation.navigate('LoveMatch', {
+      yourSign: onboardingData?.zodiacSign || 'Aries',
+      theirSign: sign.name,
+    });
+  }, [navigation, onboardingData?.zodiacSign]);
+
   return (
     <View style={styles.backgroundFallback}>
       <ImageBackground
@@ -17,13 +227,59 @@ const LoveScreen: React.FC<Props> = () => {
         style={styles.backgroundImage}
         resizeMode="cover">
         <SafeAreaView style={styles.container} edges={['top']}>
-          <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-          <View style={styles.content}>
-            <Text style={styles.title}>Love</Text>
-            <Text style={styles.subtitle}>Explore your love compatibility</Text>
-          </View>
+          <StatusBar
+            barStyle="light-content"
+            backgroundColor="transparent"
+            translucent
+          />
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}>
+            {/* Title */}
+            <View style={styles.titleContainer}>
+              <GradientText style={styles.mainTitle}>Cosmic Synastry</GradientText>
+            </View>
+
+            {/* Tab Bar */}
+            <TabBar activeTab={activeTab} onTabPress={handleTabPress} />
+
+            {/* Subtitle */}
+            <Text style={styles.subtitle}>
+              Discover the energetic resonance between{'\n'}your sign and others.
+            </Text>
+
+            {/* Sign Selector Section */}
+            <View style={styles.signSelectorContainer}>
+              {/* You Sign */}
+              <SignCircle type="you" signName={userZodiacSign} />
+
+              {/* Add Line Icon */}
+              <View style={styles.addIconContainer}>
+                <AddLineIcon
+                  width={moderateScale(24)}
+                  height={moderateScale(24)}
+                />
+              </View>
+
+              {/* Them Sign */}
+              <SignCircle
+                type="them"
+                signName={selectedSign?.name || 'Select Sign'}
+                signId={selectedSign?.id}
+                onPress={handleOpenModal}
+              />
+            </View>
+          </ScrollView>
         </SafeAreaView>
       </ImageBackground>
+
+      {/* Sign Select Modal */}
+      <SignSelectModal
+        visible={modalVisible}
+        onClose={handleCloseModal}
+        onSelectSign={handleSelectSign}
+      />
     </View>
   );
 };
@@ -35,28 +291,120 @@ const styles = StyleSheet.create({
   },
   backgroundImage: {
     flex: 1,
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
+    width: '100%',
+    height: '100%',
   },
   container: {
     flex: 1,
   },
-  content: {
+  scrollView: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 12,
+  scrollContent: {
+    paddingHorizontal: horizontalScale(16),
+    paddingBottom: verticalScale(120),
+  },
+  titleContainer: {
+    alignItems: 'center',
+    marginTop: verticalScale(30),
+  },
+  mainTitle: {
+    fontFamily: FontFamilies.sunlightDreams,
+    fontSize: fontScale(40),
+    fontWeight: '400',
+    textAlign: 'center',
+  },
+  tabBar: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(194, 209, 243, 0.08)',
+    borderRadius: radiusScale(100),
+    paddingHorizontal: moderateScale(6),
+    paddingVertical: verticalScale(6),
+    marginTop: verticalScale(24),
+    marginBottom: verticalScale(4),
+    borderWidth: 1,
+    borderColor: 'rgba(194, 209, 243, 0.2)',
+    position: 'relative',
+  },
+  tabIndicator: {
+    position: 'absolute',
+    top: verticalScale(6),
+    bottom: verticalScale(6),
+    width: '48%',
+    backgroundColor: 'rgba(255, 255, 255, 1)',
+    borderRadius: radiusScale(100),
+    marginLeft: moderateScale(6),
+  },
+  tabItem: {
+    flex: 1,
+    paddingVertical: verticalScale(15),
+    alignItems: 'center',
+    borderRadius: radiusScale(100),
+    zIndex: 1,
+  },
+  tabText: {
+    fontFamily: FontFamilies.interMedium,
+    fontSize: fontScale(14),
+    color: 'rgba(255, 255, 255, 0.45)',
+    fontWeight: '700',
+  },
+  tabTextActive: {
+    color: '#000000',
   },
   subtitle: {
-    fontSize: 16,
-    color: '#8E8E93',
+    fontFamily: FontFamilies.interRegular,
+    fontSize: fontScale(16),
+    color: 'rgba(194, 209, 243, 1)',
     textAlign: 'center',
+    marginTop: verticalScale(24),
+    lineHeight: fontScale(20),
+  },
+  signSelectorContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginTop: verticalScale(70),
+    paddingHorizontal: horizontalScale(10),
+  },
+  signCircleContainer: {
+    alignItems: 'center',
+    width: horizontalScale(130),
+  },
+  signCircle: {
+    width: moderateScale(130),
+    height: moderateScale(130),
+    borderRadius: radiusScale(100),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+  },
+  signCircleYou: {
+    backgroundColor: 'rgba(238, 223, 155, 0.16)',
+    borderColor: 'rgba(221, 197, 96, 1)',
+  borderStyle: 'dashed',
+  },
+  signCircleThem: {
+    backgroundColor: 'rgba(194, 209, 243, 0.08)',
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderStyle: 'dashed',
+  },
+  signLabel: {
+    fontFamily: FontFamilies.interRegular,
+    fontSize: fontScale(14),
+    color: 'rgba(194, 209, 243, 0.56)',
+    marginTop: verticalScale(20),
+    letterSpacing: 1,
+  },
+  signName: {
+    fontFamily: FontFamilies.sunlightDreams,
+    fontSize: fontScale(20),
+    color: '#FFFFFF',
+    fontWeight: '600',
+    marginTop: verticalScale(8),
+  },
+  addIconContainer: {
+    marginTop: moderateScale(48),
+    paddingHorizontal: horizontalScale(10),
   },
 });
 

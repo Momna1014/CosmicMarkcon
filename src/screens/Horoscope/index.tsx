@@ -18,6 +18,7 @@ import {styles} from './styles';
 import TodayTab from './TodayTab';
 import TomorrowTab from './TomorrowTab';
 import WeeklyTab from './WeeklyTab';
+import StarfieldAnimation from '../../components/home_components/StarfieldAnimation';
 
 const BackgroundImage = require('../../assets/icons/bottomtab_icons/main_screen_background.png');
 
@@ -114,6 +115,9 @@ const HoroscopeScreen: React.FC<Props> = () => {
         source={BackgroundImage}
         style={styles.backgroundImage}
         resizeMode="cover">
+        {/* Animated Starfield Background */}
+        <StarfieldAnimation />
+        
         <SafeAreaView style={styles.container} edges={['top']}>
           <StatusBar
             barStyle="light-content"
