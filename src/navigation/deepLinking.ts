@@ -30,6 +30,9 @@ export type RootStackParamList = {
     yourSign: string;
     theirSign: string;
   };
+
+  // Chat Screen (Stack screen without tabs)
+  Chat: undefined;
 };
 
 export type MainTabParamList = {

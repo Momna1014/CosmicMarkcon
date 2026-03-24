@@ -24,6 +24,7 @@ import {OnboardingContainer} from '../screens/Onboarding';
 import PaywallScreen from '../screens/Paywall';
 import {CosmicGuideDetail, LessonDetail} from '../screens/CosmicGuide';
 import LoveMatchScreen from '../screens/Love/LoveMatchScreen';
+import ChatScreen from '../screens/Chat';
 
 
 
@@ -156,6 +157,16 @@ export const StackNavigator: React.FC = () => {
         options={{
           headerShown: false,
           animation: 'slide_from_right',
+        }}
+      />
+
+      {/* Chat Screen - Stack screen without bottom tabs */}
+      <Stack.Screen
+        name="Chat"
+        component={ChatScreen}
+        options={{
+          headerShown: false,
+          animation: 'slide_from_bottom',
         }}
       />
 

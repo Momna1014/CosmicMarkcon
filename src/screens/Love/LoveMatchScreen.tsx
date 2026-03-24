@@ -408,10 +408,9 @@ const LoveMatchScreen: React.FC<Props> = ({route}) => {
     navigation.goBack();
   }, [navigation]);
 
-  const handleAskOracle = () => {
-    // Handle oracle navigation or action
-    console.log('Ask Oracle pressed');
-  };
+  const handleAskOracle = useCallback(() => {
+    navigation.navigate('Chat' as never);
+  }, [navigation]);
 
   return (
     <View style={styles.backgroundFallback}>
