@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useRef, useCallback } from 'react';
+import React, {memo, useEffect, useRef, useCallback} from 'react';
 import {
   View,
   Text,
@@ -9,21 +9,22 @@ import {
   Dimensions,
 } from 'react-native';
 import {
-  Colors,
   FontFamilies,
   horizontalScale,
   verticalScale,
   moderateScale,
+  radiusScale,
+  fontScale,
 } from '../../theme';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 export type AlertType = 'success' | 'error' | 'warning' | 'info';
 
 export interface CustomAlertButton {
   text: string;
   onPress?: () => void;
-  style?: 'default' | 'cancel' | 'destructive';
+  style?: 'default' | 'cancel' | 'destructive' | 'primary';
 }
 
 export interface CustomAlertProps {
@@ -40,14 +41,14 @@ export interface CustomAlertProps {
 const getTypeColor = (type: AlertType): string => {
   switch (type) {
     case 'success':
-      return '#4CAF50';
+      return 'rgba(221, 197, 96, 1)'; // Golden
     case 'error':
-      return '#F44336';
+      return 'rgba(239, 68, 68, 1)'; // Red
     case 'warning':
-      return '#FF9800';
+      return 'rgba(245, 158, 11, 1)'; // Orange
     case 'info':
     default:
-      return Colors.primary || '#2196F3';
+      return 'rgba(125, 211, 252, 1)'; // Cyan
   }
 };
 
@@ -70,7 +71,7 @@ const CustomAlert: React.FC<CustomAlertProps> = memo(({
   type = 'info',
   title,
   message,
-  buttons = [{ text: 'OK', style: 'default' as const }],
+  buttons = [{text: 'OK', style: 'primary' as const}],
   onDismiss,
   autoHide = false,
   autoHideDuration = 3000,
@@ -131,14 +132,32 @@ const CustomAlert: React.FC<CustomAlertProps> = memo(({
   const typeColor = getTypeColor(type);
   const typeIcon = getTypeIcon(type);
 
-  const getButtonStyle = (buttonStyle?: 'default' | 'cancel' | 'destructive') => {
+  const getButtonStyle = (buttonStyle?: 'default' | 'cancel' | 'destructive' | 'primary') => {
     switch (buttonStyle) {
+      case 'primary':
+        return {
+          backgroundColor: 'rgba(221, 197, 96, 0.36)',
+          borderColor: 'rgba(221, 197, 96, 1)',
+          textColor: '#FFFFFF',
+        };
       case 'destructive':
-        return { color: '#F44336' };
+        return {
+          backgroundColor: 'rgba(239, 68, 68, 0.2)',
+          borderColor: 'rgba(239, 68, 68, 0.6)',
+          textColor: 'rgba(239, 68, 68, 1)',
+        };
       case 'cancel':
-        return { color: Colors.inactive };
+        return {
+          backgroundColor: 'rgba(194, 209, 243, 0.1)',
+          borderColor: 'rgba(194, 209, 243, 0.3)',
+          textColor: 'rgba(194, 209, 243, 0.8)',
+        };
       default:
-        return { color: typeColor };
+        return {
+          backgroundColor: 'rgba(125, 211, 252, 0.36)',
+          borderColor: 'rgba(125, 211, 252, 1)',
+          textColor: '#FFFFFF',
+        };
     }
   };
 
@@ -147,17 +166,15 @@ const CustomAlert: React.FC<CustomAlertProps> = memo(({
       visible={visible}
       transparent
       animationType="none"
-      onRequestClose={handleDismiss}
-    >
-      <Animated.View style={[styles.overlay, { opacity: opacityAnim }]}>
+      onRequestClose={handleDismiss}>
+      <Animated.View style={[styles.overlay, {opacity: opacityAnim}]}>
         <Animated.View
           style={[
             styles.alertContainer,
-            { transform: [{ scale: scaleAnim }] },
-          ]}
-        >
+            {transform: [{scale: scaleAnim}]},
+          ]}>
           {/* Icon Circle */}
-          <View style={[styles.iconCircle, { backgroundColor: typeColor }]}>
+          <View style={[styles.iconCircle, {backgroundColor: typeColor}]}>
             <Text style={styles.iconText}>{typeIcon}</Text>
           </View>
 
@@ -169,21 +186,26 @@ const CustomAlert: React.FC<CustomAlertProps> = memo(({
 
           {/* Buttons */}
           <View style={styles.buttonContainer}>
-            {buttons.map((button, index) => (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.button,
-                  index < buttons.length - 1 && styles.buttonSeparator,
-                ]}
-                onPress={() => handleButtonPress(button)}
-                activeOpacity={0.7}
-              >
-                <Text style={[styles.buttonText, getButtonStyle(button.style)]}>
-                  {button.text}
-                </Text>
-              </TouchableOpacity>
-            ))}
+            {buttons.map((button, index) => {
+              const buttonStyles = getButtonStyle(button.style);
+              return (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.button,
+                    {
+                      backgroundColor: buttonStyles.backgroundColor,
+                      borderColor: buttonStyles.borderColor,
+                    },
+                  ]}
+                  onPress={() => handleButtonPress(button)}
+                  activeOpacity={0.7}>
+                  <Text style={[styles.buttonText, {color: buttonStyles.textColor}]}>
+                    {button.text}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </Animated.View>
       </Animated.View>
@@ -196,53 +218,53 @@ CustomAlert.displayName = 'CustomAlert';
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(10, 22, 40, 0.85)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   alertContainer: {
-    width: SCREEN_WIDTH - horizontalScale(60),
-    backgroundColor: Colors.cardBackground || '#1E1E21',
-    borderRadius: moderateScale(16),
-    paddingTop: verticalScale(24),
-    paddingHorizontal: horizontalScale(20),
-    paddingBottom: verticalScale(16),
+    width: SCREEN_WIDTH - horizontalScale(48),
+    backgroundColor: '#0F1E35',
+    borderRadius: radiusScale(24),
+    borderWidth: 1,
+    borderColor: 'rgba(194, 209, 243, 0.2)',
+    paddingTop: verticalScale(28),
+    paddingHorizontal: horizontalScale(24),
+    paddingBottom: verticalScale(24),
     alignItems: 'center',
   },
   iconCircle: {
-    width: moderateScale(60),
-    height: moderateScale(60),
-    borderRadius: moderateScale(30),
+    width: moderateScale(56),
+    height: moderateScale(56),
+    borderRadius: moderateScale(28),
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: verticalScale(16),
   },
   iconText: {
-    fontSize: moderateScale(28),
-    color: '#FFFFFF',
+    fontSize: moderateScale(26),
+    color: '#0A1628',
     fontWeight: 'bold',
   },
   title: {
-    fontFamily: FontFamilies.jetBrainsMonoBold,
-    fontSize: moderateScale(18),
-    fontWeight: '700',
-    color: Colors.text,
+    fontFamily: FontFamilies.sunlightDreams,
+    fontSize: fontScale(22),
+    fontWeight: '400',
+    color: '#FFFFFF',
     textAlign: 'center',
-    marginBottom: verticalScale(8),
+    marginBottom: verticalScale(10),
   },
   message: {
-    fontFamily: FontFamilies.outfitRegular,
-    fontSize: moderateScale(14),
-    color: Colors.inactive,
+    fontFamily: FontFamilies.interRegular,
+    fontSize: fontScale(14),
+    color: 'rgba(194, 209, 243, 0.8)',
     textAlign: 'center',
-    marginBottom: verticalScale(20),
-    lineHeight: moderateScale(20),
+    marginBottom: verticalScale(24),
+    lineHeight: fontScale(20),
   },
   buttonContainer: {
     flexDirection: 'row',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.1)',
-    marginTop: verticalScale(8),
+    gap: horizontalScale(12),
     width: '100%',
   },
   button: {
@@ -250,15 +272,14 @@ const styles = StyleSheet.create({
     paddingVertical: verticalScale(14),
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  buttonSeparator: {
-    borderRightWidth: 1,
-    borderRightColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: radiusScale(30),
+    borderWidth: 1,
   },
   buttonText: {
-    fontFamily: FontFamilies.outfitSemiBold,
-    fontSize: moderateScale(16),
-    fontWeight: '600',
+    fontFamily: FontFamilies.interMedium,
+    fontSize: fontScale(14),
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
 });
 

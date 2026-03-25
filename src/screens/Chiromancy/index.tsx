@@ -20,6 +20,7 @@ import {
   moderateScale,
 } from '../../theme';
 
+
 // Import camera icon
 import CameraIcon from '../../assets/icons/chat_icons/camera.svg';
 
@@ -156,15 +157,94 @@ const ScanPalmCard = memo(({handType, onPress}: {handType: TabType; onPress: () 
 
 const ChiromancyScreen: React.FC<Props> = ({navigation}) => {
   const [activeTab, setActiveTab] = useState<TabType>('leftHand');
+  
+  // Entrance animations
+  const titleFadeAnim = useRef(new Animated.Value(0)).current;
+  const titleSlideAnim = useRef(new Animated.Value(30)).current;
+  const subtitleFadeAnim = useRef(new Animated.Value(0)).current;
+  const subtitleSlideAnim = useRef(new Animated.Value(30)).current;
+  const tabBarFadeAnim = useRef(new Animated.Value(0)).current;
+  const tabBarSlideAnim = useRef(new Animated.Value(30)).current;
+  const cardFadeAnim = useRef(new Animated.Value(0)).current;
+  const cardSlideAnim = useRef(new Animated.Value(40)).current;
+  const cardScaleAnim = useRef(new Animated.Value(0.95)).current;
+
+  useEffect(() => {
+    // Staggered entrance animations
+    Animated.stagger(120, [
+      // Title animation
+      Animated.parallel([
+        Animated.timing(titleFadeAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.spring(titleSlideAnim, {
+          toValue: 0,
+          friction: 8,
+          tension: 40,
+          useNativeDriver: true,
+        }),
+      ]),
+      // Subtitle animation
+      Animated.parallel([
+        Animated.timing(subtitleFadeAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.spring(subtitleSlideAnim, {
+          toValue: 0,
+          friction: 8,
+          tension: 40,
+          useNativeDriver: true,
+        }),
+      ]),
+      // Tab bar animation
+      Animated.parallel([
+        Animated.timing(tabBarFadeAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.spring(tabBarSlideAnim, {
+          toValue: 0,
+          friction: 8,
+          tension: 40,
+          useNativeDriver: true,
+        }),
+      ]),
+      // Card animation
+      Animated.parallel([
+        Animated.timing(cardFadeAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.spring(cardSlideAnim, {
+          toValue: 0,
+          friction: 7,
+          tension: 35,
+          useNativeDriver: true,
+        }),
+        Animated.spring(cardScaleAnim, {
+          toValue: 1,
+          friction: 8,
+          tension: 40,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleTabPress = useCallback((tab: TabType) => {
     setActiveTab(tab);
   }, []);
 
   const handleScanPress = useCallback(() => {
-    // TODO: Open camera to scan palm
-    console.log('Open camera for', activeTab);
-  }, [activeTab]);
+    navigation.navigate('PalmCapture', {handType: activeTab});
+  }, [navigation, activeTab]);
 
   return (
     <View style={styles.backgroundFallback}>
@@ -183,20 +263,45 @@ const ChiromancyScreen: React.FC<Props> = ({navigation}) => {
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}>
             {/* Title */}
-            <View style={styles.titleContainer}>
+            <Animated.View style={[
+              styles.titleContainer,
+              {
+                opacity: titleFadeAnim,
+                transform: [{translateY: titleSlideAnim}],
+              }
+            ]}>
               <GradientText style={styles.mainTitle}>AI Palmistry</GradientText>
-            </View>
+            </Animated.View>
 
             {/* Subtitle */}
-            <Text style={styles.subtitle}>
+            <Animated.Text style={[
+              styles.subtitle,
+              {
+                opacity: subtitleFadeAnim,
+                transform: [{translateY: subtitleSlideAnim}],
+              }
+            ]}>
               Capture an image of your palm and let the{'\n'}Cosmic Whoop decode the map written on your hands.
-            </Text>
+            </Animated.Text>
 
             {/* Tab Bar */}
-            <TabBar activeTab={activeTab} onTabPress={handleTabPress} />
+            <Animated.View style={{
+              opacity: tabBarFadeAnim,
+              transform: [{translateY: tabBarSlideAnim}],
+            }}>
+              <TabBar activeTab={activeTab} onTabPress={handleTabPress} />
+            </Animated.View>
 
             {/* Scan Palm Card */}
-            <ScanPalmCard handType={activeTab} onPress={handleScanPress} />
+            <Animated.View style={{
+              opacity: cardFadeAnim,
+              transform: [
+                {translateY: cardSlideAnim},
+                {scale: cardScaleAnim},
+              ],
+            }}>
+              <ScanPalmCard handType={activeTab} onPress={handleScanPress} />
+            </Animated.View>
           </ScrollView>
         </SafeAreaView>
       </ImageBackground>

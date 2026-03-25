@@ -194,6 +194,86 @@ const LoveScreen: React.FC<Props> = ({navigation}) => {
   const [selectedSign, setSelectedSign] = useState<ZodiacSignItem | null>(null);
   const onboardingData = useSelector(selectOnboardingState);
 
+  // Entrance animations
+  const titleFadeAnim = useRef(new Animated.Value(0)).current;
+  const titleSlideAnim = useRef(new Animated.Value(30)).current;
+  const tabBarFadeAnim = useRef(new Animated.Value(0)).current;
+  const tabBarSlideAnim = useRef(new Animated.Value(30)).current;
+  const subtitleFadeAnim = useRef(new Animated.Value(0)).current;
+  const subtitleSlideAnim = useRef(new Animated.Value(30)).current;
+  const signsFadeAnim = useRef(new Animated.Value(0)).current;
+  const signsSlideAnim = useRef(new Animated.Value(40)).current;
+  const signsScaleAnim = useRef(new Animated.Value(0.95)).current;
+
+  useEffect(() => {
+    // Staggered entrance animations
+    Animated.stagger(100, [
+      // Title animation
+      Animated.parallel([
+        Animated.timing(titleFadeAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.spring(titleSlideAnim, {
+          toValue: 0,
+          friction: 8,
+          tension: 40,
+          useNativeDriver: true,
+        }),
+      ]),
+      // Tab bar animation
+      Animated.parallel([
+        Animated.timing(tabBarFadeAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.spring(tabBarSlideAnim, {
+          toValue: 0,
+          friction: 8,
+          tension: 40,
+          useNativeDriver: true,
+        }),
+      ]),
+      // Subtitle animation
+      Animated.parallel([
+        Animated.timing(subtitleFadeAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.spring(subtitleSlideAnim, {
+          toValue: 0,
+          friction: 8,
+          tension: 40,
+          useNativeDriver: true,
+        }),
+      ]),
+      // Sign selector animation
+      Animated.parallel([
+        Animated.timing(signsFadeAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.spring(signsSlideAnim, {
+          toValue: 0,
+          friction: 7,
+          tension: 35,
+          useNativeDriver: true,
+        }),
+        Animated.spring(signsScaleAnim, {
+          toValue: 1,
+          friction: 8,
+          tension: 40,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const userZodiacSign = useMemo(() => {
     return onboardingData?.zodiacSign || 'Aries';
   }, [onboardingData?.zodiacSign]);
@@ -237,20 +317,46 @@ const LoveScreen: React.FC<Props> = ({navigation}) => {
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}>
             {/* Title */}
-            <View style={styles.titleContainer}>
+            <Animated.View style={[
+              styles.titleContainer,
+              {
+                opacity: titleFadeAnim,
+                transform: [{translateY: titleSlideAnim}],
+              }
+            ]}>
               <GradientText style={styles.mainTitle}>Cosmic Synastry</GradientText>
-            </View>
+            </Animated.View>
 
             {/* Tab Bar */}
-            <TabBar activeTab={activeTab} onTabPress={handleTabPress} />
+            <Animated.View style={{
+              opacity: tabBarFadeAnim,
+              transform: [{translateY: tabBarSlideAnim}],
+            }}>
+              <TabBar activeTab={activeTab} onTabPress={handleTabPress} />
+            </Animated.View>
 
             {/* Subtitle */}
-            <Text style={styles.subtitle}>
+            <Animated.Text style={[
+              styles.subtitle,
+              {
+                opacity: subtitleFadeAnim,
+                transform: [{translateY: subtitleSlideAnim}],
+              }
+            ]}>
               Discover the energetic resonance between{'\n'}your sign and others.
-            </Text>
+            </Animated.Text>
 
             {/* Sign Selector Section */}
-            <View style={styles.signSelectorContainer}>
+            <Animated.View style={[
+              styles.signSelectorContainer,
+              {
+                opacity: signsFadeAnim,
+                transform: [
+                  {translateY: signsSlideAnim},
+                  {scale: signsScaleAnim},
+                ],
+              }
+            ]}>
               {/* You Sign */}
               <SignCircle type="you" signName={userZodiacSign} />
 
@@ -269,7 +375,7 @@ const LoveScreen: React.FC<Props> = ({navigation}) => {
                 signId={selectedSign?.id}
                 onPress={handleOpenModal}
               />
-            </View>
+            </Animated.View>
           </ScrollView>
         </SafeAreaView>
       </ImageBackground>

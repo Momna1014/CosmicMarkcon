@@ -25,6 +25,7 @@ import PaywallScreen from '../screens/Paywall';
 import {CosmicGuideDetail, LessonDetail} from '../screens/CosmicGuide';
 import LoveMatchScreen from '../screens/Love/LoveMatchScreen';
 import ChatScreen from '../screens/Chat';
+import PalmCaptureScreen from '../screens/Chiromancy/PalmCaptureScreen';
 
 
 
@@ -164,6 +165,16 @@ export const StackNavigator: React.FC = () => {
       <Stack.Screen
         name="Chat"
         component={ChatScreen}
+        options={{
+          headerShown: false,
+          animation: 'slide_from_bottom',
+        }}
+      />
+
+      {/* Palm Capture Screen - Stack screen without bottom tabs */}
+      <Stack.Screen
+        name="PalmCapture"
+        component={PalmCaptureScreen}
         options={{
           headerShown: false,
           animation: 'slide_from_bottom',

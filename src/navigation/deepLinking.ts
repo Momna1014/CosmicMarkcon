@@ -32,7 +32,18 @@ export type RootStackParamList = {
   };
 
   // Chat Screen (Stack screen without tabs)
-  Chat: undefined;
+  Chat: {
+    source?: 'palm' | 'love';
+    imageUri?: string;
+    handType?: 'leftHand' | 'rightHand';
+    yourSign?: string;
+    theirSign?: string;
+  } | undefined;
+
+  // Palm Capture Screen (Stack screen without tabs)
+  PalmCapture: {
+    handType: 'leftHand' | 'rightHand';
+  };
 };
 
 export type MainTabParamList = {

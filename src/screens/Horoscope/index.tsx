@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useMemo} from 'react';
+import React, {useState, useCallback, useMemo, useRef, useEffect} from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   ImageBackground,
   ScrollView,
   TouchableOpacity,
+  Animated,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSelector} from 'react-redux';
@@ -82,6 +83,95 @@ const HoroscopeScreen: React.FC<Props> = () => {
   const [activeTab, setActiveTab] = useState<TabType>('today');
   const onboardingData = useSelector(selectOnboardingState);
 
+  // Entrance animations
+  const dateBadgeFadeAnim = useRef(new Animated.Value(0)).current;
+  const dateBadgeSlideAnim = useRef(new Animated.Value(20)).current;
+  const titleFadeAnim = useRef(new Animated.Value(0)).current;
+  const titleSlideAnim = useRef(new Animated.Value(30)).current;
+  const zodiacFadeAnim = useRef(new Animated.Value(0)).current;
+  const zodiacScaleAnim = useRef(new Animated.Value(0.9)).current;
+  const tabBarFadeAnim = useRef(new Animated.Value(0)).current;
+  const tabBarSlideAnim = useRef(new Animated.Value(30)).current;
+  const contentFadeAnim = useRef(new Animated.Value(0)).current;
+  const contentSlideAnim = useRef(new Animated.Value(40)).current;
+
+  useEffect(() => {
+    // Staggered entrance animations
+    Animated.stagger(100, [
+      // Date badge animation
+      Animated.parallel([
+        Animated.timing(dateBadgeFadeAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.spring(dateBadgeSlideAnim, {
+          toValue: 0,
+          friction: 8,
+          tension: 40,
+          useNativeDriver: true,
+        }),
+      ]),
+      // Title animation
+      Animated.parallel([
+        Animated.timing(titleFadeAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.spring(titleSlideAnim, {
+          toValue: 0,
+          friction: 8,
+          tension: 40,
+          useNativeDriver: true,
+        }),
+      ]),
+      // Zodiac badge animation
+      Animated.parallel([
+        Animated.timing(zodiacFadeAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.spring(zodiacScaleAnim, {
+          toValue: 1,
+          friction: 8,
+          tension: 40,
+          useNativeDriver: true,
+        }),
+      ]),
+      // Tab bar animation
+      Animated.parallel([
+        Animated.timing(tabBarFadeAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.spring(tabBarSlideAnim, {
+          toValue: 0,
+          friction: 8,
+          tension: 40,
+          useNativeDriver: true,
+        }),
+      ]),
+      // Content animation
+      Animated.parallel([
+        Animated.timing(contentFadeAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.spring(contentSlideAnim, {
+          toValue: 0,
+          friction: 7,
+          tension: 35,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const userName = useMemo(() => {
     return onboardingData?.name || 'Seeker';
   }, [onboardingData?.name]);
@@ -130,24 +220,48 @@ const HoroscopeScreen: React.FC<Props> = () => {
             showsVerticalScrollIndicator={false}>
             
             {/* Date Badge */}
-            <View style={styles.dateBadge}>
+            <Animated.View style={[
+              styles.dateBadge,
+              {
+                opacity: dateBadgeFadeAnim,
+                transform: [{translateY: dateBadgeSlideAnim}],
+              }
+            ]}>
               <Text style={styles.dateText}>{currentDate}</Text>
-            </View>
+            </Animated.View>
 
             {/* Title Section */}
-            <View style={styles.titleSection}>
+            <Animated.View style={[
+              styles.titleSection,
+              {
+                opacity: titleFadeAnim,
+                transform: [{translateY: titleSlideAnim}],
+              }
+            ]}>
               <Text style={styles.mainTitle}>The Stars for</Text>
               <GradientText text={userName} />
-            </View>
+            </Animated.View>
 
             {/* Zodiac Badge */}
-            <View style={styles.zodiacBadge}>
+            <Animated.View style={[
+              styles.zodiacBadge,
+              {
+                opacity: zodiacFadeAnim,
+                transform: [{scale: zodiacScaleAnim}],
+              }
+            ]}>
               {/* <Text style={styles.zodiacIcon}>{getZodiacSymbol(zodiacSign)}</Text> */}
               <Text style={styles.zodiacText}>{zodiacSign}</Text>
-            </View>
+            </Animated.View>
 
             {/* Tab Bar */}
-            <View style={styles.tabBar}>
+            <Animated.View style={[
+              styles.tabBar,
+              {
+                opacity: tabBarFadeAnim,
+                transform: [{translateY: tabBarSlideAnim}],
+              }
+            ]}>
               <TouchableOpacity
                 style={[styles.tabItem, activeTab === 'today' && styles.tabItemActive]}
                 onPress={() => handleTabPress('today')}
@@ -172,10 +286,15 @@ const HoroscopeScreen: React.FC<Props> = () => {
                   WEEKLY
                 </Text>
               </TouchableOpacity>
-            </View>
+            </Animated.View>
 
             {/* Tab Content */}
-            {renderTabContent()}
+            <Animated.View style={{
+              opacity: contentFadeAnim,
+              transform: [{translateY: contentSlideAnim}],
+            }}>
+              {renderTabContent()}
+            </Animated.View>
 
           </ScrollView>
         </SafeAreaView>

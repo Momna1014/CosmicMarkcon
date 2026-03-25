@@ -23,6 +23,7 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {useRoute, RouteProp} from '@react-navigation/native';
 import {
   verticalScale,
   horizontalScale,
@@ -55,6 +56,16 @@ import {
 
 const BackgroundImage = require('../../assets/icons/bottomtab_icons/main_screen_background.png');
 
+type ChatRouteParams = {
+  Chat: {
+    source?: 'palm' | 'love';
+    imageUri?: string;
+    handType?: 'leftHand' | 'rightHand';
+    yourSign?: string;
+    theirSign?: string;
+  };
+};
+
 type Props = NativeStackScreenProps<any, 'Chat'>;
 
 // Scroll threshold to show/hide scroll button
@@ -67,6 +78,10 @@ interface AttachedImage {
 }
 
 const ChatScreen: React.FC<Props> = () => {
+  // Get route params
+  const route = useRoute<RouteProp<ChatRouteParams, 'Chat'>>();
+  const {source, imageUri, handType, yourSign, theirSign} = route.params || {};
+  
   // State
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
@@ -74,6 +89,7 @@ const ChatScreen: React.FC<Props> = () => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [attachedImage, setAttachedImage] = useState<AttachedImage | null>(null);
+  const [hasHandledInitialMessage, setHasHandledInitialMessage] = useState(false);
   
   // Refs
   const flatListRef = useRef<FlatList>(null);
@@ -93,6 +109,54 @@ const ChatScreen: React.FC<Props> = () => {
       isInitialLoad.current = false;
     }, 100);
   }, []);
+
+  // Handle initial message from Palm Capture or Love Match
+  useEffect(() => {
+    if (hasHandledInitialMessage) return;
+    
+    if (source === 'palm' && imageUri && handType) {
+      // Send palm reading request
+      const handLabel = handType === 'leftHand' ? 'left' : 'right';
+      const message = `I've just scanned my ${handLabel} palm. Can you give me a reading based on this image?`;
+      
+      setTimeout(() => {
+        const userMessage = createUserMessage(message, imageUri);
+        setMessages(prev => [...prev, userMessage]);
+        setHasHandledInitialMessage(true);
+        
+        // Simulate AI response
+        setIsTyping(true);
+        setTimeout(() => {
+          const aiResponse = createAIResponse(userMessage);
+          setMessages(prev => [...prev, aiResponse]);
+          setIsTyping(false);
+          flatListRef.current?.scrollToEnd({animated: true});
+        }, 1500 + Math.random() * 1000);
+        
+        flatListRef.current?.scrollToEnd({animated: true});
+      }, 500);
+    } else if (source === 'love' && yourSign && theirSign) {
+      // Send love compatibility request
+      const message = `Can you tell me about the love compatibility between ${yourSign} and ${theirSign}?`;
+      
+      setTimeout(() => {
+        const userMessage = createUserMessage(message);
+        setMessages(prev => [...prev, userMessage]);
+        setHasHandledInitialMessage(true);
+        
+        // Simulate AI response
+        setIsTyping(true);
+        setTimeout(() => {
+          const aiResponse = createAIResponse(userMessage);
+          setMessages(prev => [...prev, aiResponse]);
+          setIsTyping(false);
+          flatListRef.current?.scrollToEnd({animated: true});
+        }, 1500 + Math.random() * 1000);
+        
+        flatListRef.current?.scrollToEnd({animated: true});
+      }, 500);
+    }
+  }, [source, imageUri, handType, yourSign, theirSign, hasHandledInitialMessage]);
 
   // Handle keyboard events
   useEffect(() => {
@@ -172,8 +236,8 @@ const ChatScreen: React.FC<Props> = () => {
 
   // Send text message (with optional image)
   const handleSendMessage = useCallback(
-    (text: string, imageUri?: string) => {
-      const userMessage = createUserMessage(text, imageUri);
+    (text: string, attachedImageUri?: string) => {
+      const userMessage = createUserMessage(text, attachedImageUri);
       addMessage(userMessage);
       simulateAIResponse(userMessage);
       // Clear attached image after sending
