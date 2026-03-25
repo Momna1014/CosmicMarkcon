@@ -3432,6 +3432,34 @@ PODS:
   - RNPaywalls (9.8.0):
     - PurchasesHybridCommonUI (= 17.33.0)
     - React-Core
+  - RNPermissions (5.5.1):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - Yoga
   - RNPurchases (9.8.0):
     - PurchasesHybridCommon (= 17.33.0)
     - React-Core
@@ -3962,6 +3990,7 @@ DEPENDENCIES:
   - RNLocalize (from `../node_modules/react-native-localize`)
   - "RNNotifee (from `../node_modules/@notifee/react-native`)"
   - RNPaywalls (from `../node_modules/react-native-purchases-ui`)
+  - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNPurchases (from `../node_modules/react-native-purchases`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
@@ -4256,6 +4285,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@notifee/react-native"
   RNPaywalls:
     :path: "../node_modules/react-native-purchases-ui"
+  RNPermissions:
+    :path: "../node_modules/react-native-permissions"
   RNPurchases:
     :path: "../node_modules/react-native-purchases"
   RNReanimated:
@@ -4438,6 +4469,7 @@ SPEC CHECKSUMS:
   RNLocalize: 9988fa71fb84c415902898b35cc6aa5af052731e
   RNNotifee: 5e3b271e8ea7456a36eec994085543c9adca9168
   RNPaywalls: d4a83eae1b84542e53bfeca86f20d4be940551f1
+  RNPermissions: 964fce58b2e6ba6176ac5c63a45050e015dbc735
   RNPurchases: 862e44a40fc03117245e465fe11dd9cfea030f45
   RNReanimated: 085278ac0a7044df824e13af982bf50bd4771e1b
   RNScreens: 199799bdab32fa1e17ebf938b06fec52033e81e5
@@ -4456,6 +4488,6 @@ SPEC CHECKSUMS:
   VungleAds: c1f0dd0d8531b200b9f6a3f78e292ded75540eae
   Yoga: 526f25666395d30c297d53154398ffd249eaf9e1
 
-PODFILE CHECKSUM: c7d949154016d224870b996191907d28b11822a0
+PODFILE CHECKSUM: 39a4f441c37646c2b6dca2cf46dd4494c714ed97
 
 COCOAPODS: 1.16.2

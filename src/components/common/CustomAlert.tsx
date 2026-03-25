@@ -7,7 +7,9 @@ import {
   TouchableOpacity,
   Animated,
   Dimensions,
+  Platform,
 } from 'react-native';
+import {BlurView} from '@react-native-community/blur';
 import {
   FontFamilies,
   horizontalScale,
@@ -166,7 +168,20 @@ const CustomAlert: React.FC<CustomAlertProps> = memo(({
       visible={visible}
       transparent
       animationType="none"
+      statusBarTranslucent
       onRequestClose={handleDismiss}>
+      {/* Platform-specific blur background */}
+      {Platform.OS === 'ios' ? (
+        <BlurView
+          style={StyleSheet.absoluteFill}
+          blurType="dark"
+          blurAmount={10}
+          reducedTransparencyFallbackColor="rgba(0, 0, 0, 0.85)"
+        />
+      ) : (
+        <View style={[StyleSheet.absoluteFill, styles.androidBlur]} />
+      )}
+
       <Animated.View style={[styles.overlay, {opacity: opacityAnim}]}>
         <Animated.View
           style={[
@@ -218,9 +233,11 @@ CustomAlert.displayName = 'CustomAlert';
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(10, 22, 40, 0.85)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  androidBlur: {
+    backgroundColor: 'rgba(0, 0, 0, 0.92)',
   },
   alertContainer: {
     width: SCREEN_WIDTH - horizontalScale(48),

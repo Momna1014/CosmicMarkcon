@@ -17,7 +17,14 @@
  * - android.permission.READ_MEDIA_IMAGES (for Android 13+)
  */
 
-import {Platform, Alert, PermissionsAndroid} from 'react-native';
+import {Platform, Alert, PermissionsAndroid, Linking} from 'react-native';
+import {
+  check,
+  request,
+  PERMISSIONS,
+  RESULTS,
+  Permission,
+} from 'react-native-permissions';
 
 export interface ImagePickerResult {
   uri: string;
@@ -36,6 +43,8 @@ export interface ImagePickerOptions {
   mediaType?: 'photo' | 'video' | 'mixed';
 }
 
+type PermissionStatus = 'granted' | 'denied' | 'never_ask_again';
+
 const DEFAULT_OPTIONS: ImagePickerOptions = {
   maxWidth: 1024,
   maxHeight: 1024,
@@ -45,14 +54,99 @@ const DEFAULT_OPTIONS: ImagePickerOptions = {
 };
 
 /**
- * Request camera permission for Android
+ * Open app settings
  */
-const requestCameraPermission = async (): Promise<boolean> => {
-  if (Platform.OS !== 'android') {
-    return true;
+const openAppSettings = (): void => {
+  Linking.openSettings();
+};
+
+/**
+ * Show permission denied alert with option to open settings
+ */
+const showPermissionDeniedAlert = (
+  permissionType: 'Camera' | 'Photo Library',
+  isPermanentlyDenied: boolean,
+): void => {
+  if (isPermanentlyDenied) {
+    Alert.alert(
+      `${permissionType} Access Required`,
+      `${permissionType} permission has been denied. Please enable it in your device settings to use this feature.`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Open Settings',
+          onPress: openAppSettings,
+        },
+      ],
+    );
+  } else {
+    Alert.alert(
+      'Permission Required',
+      `${permissionType} permission is required to continue. Please grant access when prompted.`,
+    );
+  }
+};
+
+/**
+ * Check and request iOS permission
+ */
+const checkAndRequestIOSPermission = async (
+  permission: Permission,
+): Promise<PermissionStatus> => {
+  try {
+    // First check current status
+    const currentStatus = await check(permission);
+    
+    if (currentStatus === RESULTS.GRANTED || currentStatus === RESULTS.LIMITED) {
+      return 'granted';
+    }
+    
+    if (currentStatus === RESULTS.BLOCKED) {
+      return 'never_ask_again';
+    }
+    
+    if (currentStatus === RESULTS.UNAVAILABLE) {
+      return 'denied';
+    }
+    
+    // If denied or not determined, request permission
+    const requestResult = await request(permission);
+    
+    if (requestResult === RESULTS.GRANTED || requestResult === RESULTS.LIMITED) {
+      return 'granted';
+    } else if (requestResult === RESULTS.BLOCKED) {
+      return 'never_ask_again';
+    }
+    return 'denied';
+  } catch (err) {
+    console.warn('iOS permission error:', err);
+    return 'denied';
+  }
+};
+
+/**
+ * Request camera permission for both platforms
+ */
+const requestCameraPermission = async (): Promise<PermissionStatus> => {
+  if (Platform.OS === 'ios') {
+    return checkAndRequestIOSPermission(PERMISSIONS.IOS.CAMERA);
   }
 
+  // Android handling
   try {
+    // First check if permission was already granted
+    const hasPermission = await PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.CAMERA,
+    );
+    
+    if (hasPermission) {
+      return 'granted';
+    }
+
+    // Request permission
     const granted = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.CAMERA,
       {
@@ -63,42 +157,44 @@ const requestCameraPermission = async (): Promise<boolean> => {
         buttonPositive: 'OK',
       },
     );
-    return granted === PermissionsAndroid.RESULTS.GRANTED;
+    
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      return 'granted';
+    } else if (granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+      return 'never_ask_again';
+    }
+    return 'denied';
   } catch (err) {
     console.warn('Camera permission error:', err);
-    return false;
+    return 'denied';
   }
 };
 
 /**
- * Request photo library permission for Android
+ * Request photo library permission for both platforms
  */
-const requestGalleryPermission = async (): Promise<boolean> => {
-  if (Platform.OS !== 'android') {
-    return true;
+const requestGalleryPermission = async (): Promise<PermissionStatus> => {
+  if (Platform.OS === 'ios') {
+    return checkAndRequestIOSPermission(PERMISSIONS.IOS.PHOTO_LIBRARY);
   }
 
+  // Android handling
   try {
-    const androidVersion = Platform.Version;
+    const androidVersion = typeof Platform.Version === 'number' ? Platform.Version : parseInt(Platform.Version, 10);
+    const permission = androidVersion >= 33
+      ? PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
+      : PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
+
+    // First check if permission was already granted
+    const hasPermission = await PermissionsAndroid.check(permission);
     
-    // Android 13+ uses READ_MEDIA_IMAGES
-    if (androidVersion >= 33) {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-        {
-          title: 'Photo Library Permission',
-          message: 'This app needs access to your photos.',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
-      );
-      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    if (hasPermission) {
+      return 'granted';
     }
-    
-    // Android < 13 uses READ_EXTERNAL_STORAGE
+
+    // Request permission
     const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+      permission,
       {
         title: 'Photo Library Permission',
         message: 'This app needs access to your photos.',
@@ -107,10 +203,16 @@ const requestGalleryPermission = async (): Promise<boolean> => {
         buttonPositive: 'OK',
       },
     );
-    return granted === PermissionsAndroid.RESULTS.GRANTED;
+    
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      return 'granted';
+    } else if (granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+      return 'never_ask_again';
+    }
+    return 'denied';
   } catch (err) {
     console.warn('Gallery permission error:', err);
-    return false;
+    return 'denied';
   }
 };
 
@@ -120,13 +222,10 @@ const requestGalleryPermission = async (): Promise<boolean> => {
 export const launchCamera = async (
   options: ImagePickerOptions = {},
 ): Promise<ImagePickerResult | null> => {
-  const hasPermission = await requestCameraPermission();
+  const permissionStatus = await requestCameraPermission();
   
-  if (!hasPermission) {
-    Alert.alert(
-      'Permission Required',
-      'Camera permission is required to take photos. Please enable it in settings.',
-    );
+  if (permissionStatus !== 'granted') {
+    showPermissionDeniedAlert('Camera', permissionStatus === 'never_ask_again');
     return null;
   }
 
@@ -150,6 +249,12 @@ export const launchCamera = async (
           if (response.didCancel) {
             resolve(null);
           } else if (response.errorCode) {
+            // Handle permission error from iOS
+            if (response.errorCode === 'camera_unavailable' || response.errorCode === 'permission') {
+              showPermissionDeniedAlert('Camera', true);
+              resolve(null);
+              return;
+            }
             console.error('Camera error:', response.errorMessage);
             Alert.alert('Error', 'Failed to capture image. Please try again.');
             resolve(null);
@@ -185,13 +290,10 @@ export const launchCamera = async (
 export const launchImageLibrary = async (
   options: ImagePickerOptions = {},
 ): Promise<ImagePickerResult | null> => {
-  const hasPermission = await requestGalleryPermission();
+  const permissionStatus = await requestGalleryPermission();
   
-  if (!hasPermission) {
-    Alert.alert(
-      'Permission Required',
-      'Photo library permission is required to select photos. Please enable it in settings.',
-    );
+  if (permissionStatus !== 'granted') {
+    showPermissionDeniedAlert('Photo Library', permissionStatus === 'never_ask_again');
     return null;
   }
 
@@ -215,6 +317,12 @@ export const launchImageLibrary = async (
           if (response.didCancel) {
             resolve(null);
           } else if (response.errorCode) {
+            // Handle permission error from iOS
+            if (response.errorCode === 'permission') {
+              showPermissionDeniedAlert('Photo Library', true);
+              resolve(null);
+              return;
+            }
             console.error('Gallery error:', response.errorMessage);
             Alert.alert('Error', 'Failed to select image. Please try again.');
             resolve(null);

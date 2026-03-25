@@ -3,6 +3,7 @@ import {
   View,
   TouchableOpacity,
   StyleSheet,
+  Platform,
 } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { BlurView } from '@react-native-community/blur';
@@ -63,13 +64,18 @@ const BottomTabBar: React.FC<CustomBottomTabBarProps> = ({
   
   return (
     <View style={styles.container}>
-      {/* Blur background - works on both iOS and Android */}
-      <BlurView
-        style={styles.blurView}
-        blurType="dark"
-        blurAmount={56}
-        reducedTransparencyFallbackColor="rgba(0, 0, 0, 0.08)"
-      />
+      {/* Blur background - use different approach for Android to avoid hardware bitmap crash */}
+      {Platform.OS === 'ios' ? (
+        <BlurView
+          style={styles.blurView}
+          blurType="dark"
+          blurAmount={56}
+          reducedTransparencyFallbackColor="rgba(0, 0, 0, 0.08)"
+        />
+      ) : (
+  
+        <View style={styles.androidBlurFallback} />
+      )}
       
       {/* Semi-transparent overlay matching Figma: #00000014 */}
       <View style={styles.glassOverlay} />
@@ -141,6 +147,10 @@ const styles = StyleSheet.create({
   },
   blurView: {
     ...StyleSheet.absoluteFillObject,
+  },
+  androidBlurFallback: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(20, 20, 30, 0.85)', // Dark translucent background for Android
   },
   glassOverlay: {
     ...StyleSheet.absoluteFillObject,

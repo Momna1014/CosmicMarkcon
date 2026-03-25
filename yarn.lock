@@ -7920,6 +7920,11 @@ react-native-pdf@^7.0.3:
     crypto-js "4.2.0"
     deprecated-react-native-prop-types "^2.3.0"
 
+react-native-permissions@^5.5.1:
+  version "5.5.1"
+  resolved "https://registry.yarnpkg.com/react-native-permissions/-/react-native-permissions-5.5.1.tgz#c262a3727f94700bcf2984893021f9c180bb8320"
+  integrity sha512-nTKFoj47b6EXNqbbg+8VFwBWMpxF1/UTbrNBLpXkWpt005pH4BeFv/NwpcC1iNhToKBrxQD+5kI0z6+kTYoYWA==
+
 react-native-purchases-ui@^9.7.6:
   version "9.8.0"
   resolved "https://registry.yarnpkg.com/react-native-purchases-ui/-/react-native-purchases-ui-9.8.0.tgz#ed64ef906fbcff3f576e72cc74ae73e9cbd624e2"

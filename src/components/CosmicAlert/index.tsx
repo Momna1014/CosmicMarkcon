@@ -8,7 +8,9 @@ import {
   Dimensions,
   Animated,
   Easing,
+  Platform,
 } from 'react-native';
+import {BlurView} from '@react-native-community/blur';
 import {FontFamilies, moderateScale, horizontalScale, verticalScale} from '../../theme';
 
 const {width} = Dimensions.get('window');
@@ -70,6 +72,18 @@ const CosmicAlert: React.FC<CosmicAlertProps> = ({
 
   return (
     <Modal transparent visible={visible} animationType="none" statusBarTranslucent>
+      {/* Platform-specific blur background */}
+      {Platform.OS === 'ios' ? (
+        <BlurView
+          style={StyleSheet.absoluteFill}
+          blurType="dark"
+          blurAmount={10}
+          reducedTransparencyFallbackColor="rgba(0, 0, 0, 0.85)"
+        />
+      ) : (
+        <View style={[StyleSheet.absoluteFill, styles.androidBlur]} />
+      )}
+
       <Animated.View style={[styles.overlay, {opacity: opacityAnim}]}>
         <Animated.View
           style={[
@@ -107,10 +121,12 @@ const CosmicAlert: React.FC<CosmicAlertProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: horizontalScale(24),
+  },
+  androidBlur: {
+    backgroundColor: 'rgba(0, 0, 0, 0.92)',
   },
   card: {
     width: width * 0.82,

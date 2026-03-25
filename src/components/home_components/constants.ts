@@ -19,14 +19,70 @@ import HumanDesignIntroIcon from '../../assets/icons/home_icons/human_design_int
 
 // Transit data
 export const TRANSITS_DATA: TransitData[] = [
-  {id: 'mercury', name: 'Mercury', subtext: 'In Sagittarius', Icon: MercuryIcon, color: TRANSIT_COLORS.mercury},
-  {id: 'venus', name: 'Venus', subtext: 'In Capricorn', Icon: VenusIcon, color: TRANSIT_COLORS.venus},
-  {id: 'mars', name: 'Mars', subtext: 'In Pisces', Icon: MarsIcon, color: TRANSIT_COLORS.mars},
-  {id: 'jupiter', name: 'Jupiter', subtext: 'In Cancer', Icon: JupiterIcon, color: TRANSIT_COLORS.jupiter},
-  {id: 'saturn', name: 'Saturn', subtext: 'In Aquarius', Icon: SaturnIcon, color: TRANSIT_COLORS.saturn},
-  {id: 'uranus', name: 'Uranus', subtext: 'In Taurus', Icon: UranusIcon, color: TRANSIT_COLORS.uranus},
-  {id: 'neptune', name: 'Neptune', subtext: 'In Pisces', Icon: NeptuneIcon, color: TRANSIT_COLORS.neptune},
-  {id: 'pluto', name: 'Pluto', subtext: 'In Aquarius', Icon: PlutoIcon, color: TRANSIT_COLORS.pluto},
+  {
+    id: 'mercury',
+    name: 'Mercury',
+    subtext: 'In Sagittarius',
+    description: 'Communication expands. Big ideas flow easily, but watch out for overlooking the fine details. Speak your truth boldly.',
+    Icon: MercuryIcon,
+    color: TRANSIT_COLORS.mercury,
+  },
+  {
+    id: 'venus',
+    name: 'Venus',
+    subtext: 'In Capricorn',
+    description: 'Love becomes grounded and practical. Focus on building lasting connections. Value quality over quantity in relationships.',
+    Icon: VenusIcon,
+    color: TRANSIT_COLORS.venus,
+  },
+  {
+    id: 'mars',
+    name: 'Mars',
+    subtext: 'In Pisces',
+    description: 'Action flows with intuition. Channel your energy into creative pursuits. Trust your instincts when taking initiative.',
+    Icon: MarsIcon,
+    color: TRANSIT_COLORS.mars,
+  },
+  {
+    id: 'jupiter',
+    name: 'Jupiter',
+    subtext: 'In Cancer',
+    description: 'Abundance flows through emotional connections and home life. Nurture your roots for expansion and growth.',
+    Icon: JupiterIcon,
+    color: TRANSIT_COLORS.jupiter,
+  },
+  {
+    id: 'saturn',
+    name: 'Saturn',
+    subtext: 'In Aquarius',
+    description: 'Structure meets innovation. Build frameworks for your future vision. Discipline in unconventional ways pays off.',
+    Icon: SaturnIcon,
+    color: TRANSIT_COLORS.saturn,
+  },
+  {
+    id: 'uranus',
+    name: 'Uranus',
+    subtext: 'In Taurus',
+    description: 'Revolutionary changes in values and finances. Embrace new approaches to stability and material security.',
+    Icon: UranusIcon,
+    color: TRANSIT_COLORS.uranus,
+  },
+  {
+    id: 'neptune',
+    name: 'Neptune',
+    subtext: 'In Pisces',
+    description: 'Dreams and intuition are heightened. Tap into your spiritual side. Creativity flows like water through your soul.',
+    Icon: NeptuneIcon,
+    color: TRANSIT_COLORS.neptune,
+  },
+  {
+    id: 'pluto',
+    name: 'Pluto',
+    subtext: 'In Aquarius',
+    description: 'Deep transformation of society and collective ideals. Embrace the power of community and progressive change.',
+    Icon: PlutoIcon,
+    color: TRANSIT_COLORS.pluto,
+  },
 ];
 
 // Cosmic guides data
