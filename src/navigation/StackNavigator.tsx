@@ -24,6 +24,7 @@ import {OnboardingContainer} from '../screens/Onboarding';
 import PaywallScreen from '../screens/Paywall';
 import {CosmicGuideDetail, LessonDetail} from '../screens/CosmicGuide';
 import LoveMatchScreen from '../screens/Love/LoveMatchScreen';
+import AddPartnerScreen from '../screens/Love/AddPartnerScreen';
 import ChatScreen from '../screens/Chat';
 import PalmCaptureScreen from '../screens/Chiromancy/PalmCaptureScreen';
 
@@ -158,6 +159,16 @@ export const StackNavigator: React.FC = () => {
         options={{
           headerShown: false,
           animation: 'slide_from_right',
+        }}
+      />
+
+      {/* Add Partner Screen - Stack screen without bottom tabs */}
+      <Stack.Screen
+        name="AddPartner"
+        component={AddPartnerScreen}
+        options={{
+          headerShown: false,
+          animation: 'slide_from_bottom',
         }}
       />
 

@@ -10,8 +10,10 @@ import {
   Animated,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {useSelector} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
 import {selectOnboardingState} from '../../redux/slices/onboardingSlice';
+import {selectPartners, removePartner, Partner} from '../../redux/slices/partnersSlice';
+import {useAlert} from '../../contexts/AlertContext';
 import GradientText from '../../components/GradientText';
 import {
   FontFamilies,
@@ -27,6 +29,10 @@ import SignSelectModal, {ZodiacSignItem, getZodiacIcon} from '../../components/h
 import AddThemIcon from '../../assets/icons/horoscope_icons/add_them.svg';
 import AddLineIcon from '../../assets/icons/horoscope_icons/add_line.svg';
 import CancerIcon from '../../assets/icons/horoscope_icons/cancer.svg';
+import HeartIcon from '../../assets/icons/horoscope_icons/heart.svg';
+import AddPartnerIcon from '../../assets/icons/horoscope_icons/add_partner.svg';
+import AddThemSmallIcon from '../../assets/icons/horoscope_icons/add_them.svg';
+import DeleteIcon from '../../assets/icons/horoscope_icons/delete.svg';
 
 // Import zodiac sign SVGs for user's sign
 import GeminisIcon from '../../assets/icons/horoscope_icons/geminis.svg';
@@ -189,10 +195,13 @@ const SignCircle = memo(
 );
 
 const LoveScreen: React.FC<Props> = ({navigation}) => {
+  const dispatch = useDispatch();
+  const {showWarningAlert} = useAlert();
   const [activeTab, setActiveTab] = useState<TabType>('quickMatch');
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSign, setSelectedSign] = useState<ZodiacSignItem | null>(null);
   const onboardingData = useSelector(selectOnboardingState);
+  const partners = useSelector(selectPartners);
 
   // Entrance animations
   const titleFadeAnim = useRef(new Animated.Value(0)).current;
@@ -300,6 +309,30 @@ const LoveScreen: React.FC<Props> = ({navigation}) => {
     });
   }, [navigation, onboardingData?.zodiacSign]);
 
+  const handleAddPartner = useCallback(() => {
+    navigation.navigate('AddPartner');
+  }, [navigation]);
+
+  const handleDeletePartner = useCallback((partner: Partner) => {
+    showWarningAlert(
+      'Delete Partner',
+      `Are you sure you want to remove ${partner.name} from your connections?`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            dispatch(removePartner(partner.id));
+          },
+        },
+      ],
+    );
+  }, [dispatch, showWarningAlert]);
+
   return (
     <View style={styles.backgroundFallback}>
       <ImageBackground
@@ -343,39 +376,115 @@ const LoveScreen: React.FC<Props> = ({navigation}) => {
                 transform: [{translateY: subtitleSlideAnim}],
               }
             ]}>
-              Discover the energetic resonance between{'\n'}your sign and others.
+              {activeTab === 'quickMatch'
+                ? 'Discover the energetic resonance between\nyour sign and others.'
+                : 'Add a specific person for a deeply personalized\ncompatibility reading'}
             </Animated.Text>
 
-            {/* Sign Selector Section */}
-            <Animated.View style={[
-              styles.signSelectorContainer,
-              {
-                opacity: signsFadeAnim,
-                transform: [
-                  {translateY: signsSlideAnim},
-                  {scale: signsScaleAnim},
-                ],
-              }
-            ]}>
-              {/* You Sign */}
-              <SignCircle type="you" signName={userZodiacSign} />
+            {activeTab === 'quickMatch' ? (
+              /* Sign Selector Section */
+              <Animated.View style={[
+                styles.signSelectorContainer,
+                {
+                  opacity: signsFadeAnim,
+                  transform: [
+                    {translateY: signsSlideAnim},
+                    {scale: signsScaleAnim},
+                  ],
+                }
+              ]}>
+                {/* You Sign */}
+                <SignCircle type="you" signName={userZodiacSign} />
 
-              {/* Add Line Icon */}
-              <View style={styles.addIconContainer}>
-                <AddLineIcon
-                  width={moderateScale(24)}
-                  height={moderateScale(24)}
+                {/* Add Line Icon */}
+                <View style={styles.addIconContainer}>
+                  <AddLineIcon
+                    width={moderateScale(24)}
+                    height={moderateScale(24)}
+                  />
+                </View>
+
+                {/* Them Sign */}
+                <SignCircle
+                  type="them"
+                  signName={selectedSign?.name || 'Select Sign'}
+                  signId={selectedSign?.id}
+                  onPress={handleOpenModal}
                 />
-              </View>
+              </Animated.View>
+            ) : (
+              /* Deep Bond Section */
+              <Animated.View style={[
+                styles.deepBondContainer,
+                {
+                  opacity: signsFadeAnim,
+                  transform: [
+                    {translateY: signsSlideAnim},
+                    {scale: signsScaleAnim},
+                  ],
+                }
+              ]}>
+                {/* Your Connections Header with Add Button */}
+                <View style={styles.connectionsHeaderRow}>
+                  <Text style={styles.connectionsHeader}>Your Connections</Text>
+                  {partners.length > 0 && (
+                    <TouchableOpacity
+                      style={styles.addButton}
+                      onPress={handleAddPartner}
+                      activeOpacity={0.7}>
+                      <AddThemSmallIcon width={moderateScale(24)} height={moderateScale(24)} />
+                      <Text style={styles.addButtonText}>ADD</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
 
-              {/* Them Sign */}
-              <SignCircle
-                type="them"
-                signName={selectedSign?.name || 'Select Sign'}
-                signId={selectedSign?.id}
-                onPress={handleOpenModal}
-              />
-            </Animated.View>
+                {partners.length === 0 ? (
+                  <>
+                    {/* Heart Icon Circle */}
+                    <View style={styles.heartIconContainer}>
+                      <HeartIcon width={moderateScale(80)} height={moderateScale(80)} />
+                    </View>
+
+                    {/* Empty State Text */}
+                    <Text style={styles.emptyStateText}>
+                      You haven't added any cosmic connections yet.
+                    </Text>
+
+                    {/* Add Partner Button */}
+                    <TouchableOpacity
+                      style={styles.addPartnerButton}
+                      onPress={handleAddPartner}
+                      activeOpacity={0.7}>
+                      <Text style={styles.addPartnerText}>Add a Partner</Text>
+                      <AddPartnerIcon width={moderateScale(18)} height={moderateScale(18)} />
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                  /* Partner Cards */
+                  <View style={styles.partnersList}>
+                    {partners.map((partner) => (
+                      <View key={partner.id} style={styles.partnerCard}>
+                        <View style={styles.partnerAvatar}>
+                          <Text style={styles.partnerAvatarText}>
+                            {partner.name.charAt(0).toUpperCase()}
+                          </Text>
+                        </View>
+                        <View style={styles.partnerInfo}>
+                          <Text style={styles.partnerName}>{partner.name}</Text>
+                          <Text style={styles.partnerSign}>{partner.zodiacSign.toUpperCase()}</Text>
+                        </View>
+                        <TouchableOpacity
+                          style={styles.deleteButton}
+                          onPress={() => handleDeletePartner(partner)}
+                          activeOpacity={0.7}>
+                          <DeleteIcon width={22} height={22} />
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </Animated.View>
+            )}
           </ScrollView>
         </SafeAreaView>
       </ImageBackground>
@@ -511,6 +620,119 @@ const styles = StyleSheet.create({
   addIconContainer: {
     marginTop: moderateScale(48),
     paddingHorizontal: horizontalScale(10),
+  },
+  // Deep Bond styles
+  deepBondContainer: {
+    alignItems: 'center',
+    marginTop: verticalScale(30),
+    width: '100%',
+  },
+  connectionsHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: verticalScale(30),
+  },
+  connectionsHeader: {
+    fontFamily: FontFamilies.sunlightDreams,
+    fontSize: fontScale(24),
+    color: '#FFFFFF',
+    fontWeight: '700',
+  },
+  addButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: horizontalScale(6),
+  },
+  addButtonText: {
+    fontFamily: FontFamilies.interMedium,
+    fontSize: fontScale(14),
+    color: 'rgba(194, 209, 243, 1)',
+    letterSpacing: 1,
+    fontWeight:'700'
+  },
+  heartIconContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: verticalScale(16),
+  },
+  emptyStateText: {
+    fontFamily: FontFamilies.interRegular,
+    fontSize: fontScale(14),
+    color: 'rgba(194, 209, 243, 0.56)',
+    textAlign: 'center',
+    marginBottom: verticalScale(24),
+  },
+  addPartnerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: verticalScale(16),
+    paddingHorizontal: horizontalScale(27),
+    borderRadius: radiusScale(100),
+    borderWidth: 1,
+    borderColor: 'rgba(221, 197, 96, 1)',
+    backgroundColor: 'transparent',
+    gap: horizontalScale(8),
+  },
+  addPartnerText: {
+    fontFamily: FontFamilies.interMedium,
+    fontSize: fontScale(16),
+    color: 'rgba(221, 197, 96, 1)',
+    fontWeight: '600',
+  },
+  // Partner List styles
+  partnersList: {
+    width: '100%',
+    gap: verticalScale(12),
+  },
+  partnerCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(194, 209, 243, 0.08)',
+    borderRadius: radiusScale(16),
+    borderWidth: 1,
+    borderColor: 'rgba(194, 209, 243, 0.2)',
+    paddingVertical: verticalScale(14),
+    paddingHorizontal: horizontalScale(16),
+  },
+  partnerAvatar: {
+    width: moderateScale(44),
+    height: moderateScale(44),
+    borderRadius: radiusScale(22),
+    backgroundColor: 'rgba(194, 209, 243, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: horizontalScale(14),
+  },
+  partnerAvatarText: {
+    fontFamily: FontFamilies.sunlightDreams,
+    fontSize: fontScale(20),
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  partnerInfo: {
+    flex: 1,
+  },
+  partnerName: {
+    fontFamily: FontFamilies.interSemiBold,
+    fontSize: fontScale(16),
+    color: '#FFFFFF',
+    fontWeight: '600',
+    marginBottom: verticalScale(2),
+  },
+  partnerSign: {
+    fontFamily: FontFamilies.interRegular,
+    fontSize: fontScale(12),
+    color: 'rgba(221, 197, 96, 1)',
+    letterSpacing: 0.5,
+  },
+  deleteButton: {
+    padding: moderateScale(8),
+  },
+  deleteIcon: {
+    fontSize: fontScale(18),
   },
 });
 

@@ -12,7 +12,7 @@ export type RootStackParamList = {
   Onboarding: undefined;
   
   // Paywall
-  Paywall: undefined;
+  Paywall: {source?: string; offeringIdentifier?: string} | undefined;
   
   // Main App
   MainApp: undefined;
@@ -30,6 +30,9 @@ export type RootStackParamList = {
     yourSign: string;
     theirSign: string;
   };
+
+  // Add Partner Screen (Stack screen without tabs)
+  AddPartner: undefined;
 
   // Chat Screen (Stack screen without tabs)
   Chat: {

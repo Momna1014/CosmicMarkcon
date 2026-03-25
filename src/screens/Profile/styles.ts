@@ -51,14 +51,15 @@ export const styles = StyleSheet.create({
     borderRadius: radiusScale(20),
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.12)',
+    borderColor: 'rgba(194, 209, 243, 0.2)',
+    backgroundColor: 'rgba(194, 209, 243, 0.06)',
   },
   absoluteBlur: {
     ...StyleSheet.absoluteFillObject,
   },
   glassOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#eaf0ff16',
+    // backgroundColor: '#eaf0ff16',
   },
 
   // Form Styles
@@ -154,13 +155,21 @@ export const styles = StyleSheet.create({
     width: horizontalScale(52),
     height: horizontalScale(52),
     borderRadius: horizontalScale(26),
-    backgroundColor: 'rgba(100, 140, 200, 0.25)',
+    backgroundColor: 'rgba(221, 197, 96, 0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(221, 197, 96, 0.4)',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: horizontalScale(16),
   },
   profileIconText: {
     fontSize: fontScale(24),
+  },
+  avatarText: {
+    fontFamily: FontFamilies.sunlightDreams,
+    fontSize: fontScale(22),
+    color: 'rgba(221, 197, 96, 1)',
+    fontWeight: '600',
   },
   profileInfo: {
     flex: 1,
@@ -194,6 +203,22 @@ export const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.6)',
   },
 
+  // Edit Button
+  editButton: {
+    paddingHorizontal: horizontalScale(16),
+    paddingVertical: verticalScale(8),
+    borderRadius: radiusScale(20),
+    borderWidth: 1,
+    borderColor: 'rgba(221, 197, 96, 0.6)',
+    backgroundColor: 'rgba(194, 209, 243, 0.08)',
+  },
+  editButtonText: {
+    fontFamily: FontFamilies.interMedium,
+    fontSize: fontScale(13),
+    color: 'rgba(221, 197, 96, 1)',
+    fontWeight: '600',
+  },
+
   // Saved Souls Section
   savedSoulsSection: {
     marginTop: verticalScale(32),
@@ -203,5 +228,83 @@ export const styles = StyleSheet.create({
     fontSize: fontScale(18),
     color: '#FFFFFF',
     marginBottom: verticalScale(16),
+  },
+
+  // Premium Card Styles
+  premiumCard: {
+    marginTop: verticalScale(24),
+    borderRadius: radiusScale(20),
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(194, 209, 243, 0.2)',
+    backgroundColor: 'rgba(194, 209, 243, 0.06)',
+  },
+  premiumCardActive: {
+    borderColor: 'rgba(221, 197, 96, 0.3)',
+    backgroundColor: 'rgba(221, 197, 96, 0.06)',
+  },
+  premiumContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: horizontalScale(18),
+    paddingVertical: verticalScale(18),
+  },
+  premiumIconContainer: {
+    width: horizontalScale(48),
+    height: horizontalScale(48),
+    borderRadius: horizontalScale(24),
+    backgroundColor: 'rgba(194, 209, 243, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(194, 209, 243, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: horizontalScale(14),
+  },
+  premiumIconActive: {
+    backgroundColor: 'rgba(221, 197, 96, 0.15)',
+    borderColor: 'rgba(221, 197, 96, 0.3)',
+  },
+  premiumTextContainer: {
+    flex: 1,
+  },
+  premiumTitle: {
+    fontFamily: FontFamilies.interSemiBold,
+    fontSize: fontScale(16),
+    color: '#FFFFFF',
+    marginBottom: verticalScale(4),
+  },
+  premiumTitleActive: {
+    color: 'rgba(221, 197, 96, 1)',
+  },
+  premiumSubtitle: {
+    fontFamily: FontFamilies.interRegular,
+    fontSize: fontScale(13),
+    color: 'rgba(255, 255, 255, 0.6)',
+  },
+  premiumButton: {
+    paddingHorizontal: horizontalScale(16),
+    paddingVertical: verticalScale(10),
+    borderRadius: radiusScale(20),
+    backgroundColor: '#FFFFFF',
+  },
+  premiumButtonText: {
+    fontFamily: FontFamilies.interSemiBold,
+    fontSize: fontScale(13),
+    color: '#0A1628',
+  },
+  premiumBadge: {
+    width: horizontalScale(32),
+    height: horizontalScale(32),
+    borderRadius: horizontalScale(16),
+    backgroundColor: 'rgba(221, 197, 96, 0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(221, 197, 96, 0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  premiumBadgeText: {
+    fontSize: fontScale(16),
+    color: 'rgba(221, 197, 96, 1)',
+    fontWeight: '700',
   },
 });

@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback, useMemo} from 'react';
+import React, {useState, useEffect, useCallback, useMemo, useRef} from 'react';
 import {
   View,
   Text,
@@ -7,11 +7,15 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Animated,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSelector, useDispatch} from 'react-redux';
-import {BlurView} from '@react-native-community/blur';
 import {ICountry, ICity, City, Country} from 'country-state-city';
+import {useApp} from '../../contexts/AppContext';
+
+// Icons
+import StarIcon from '../../assets/icons/home_icons/welcome_star.svg';
 import {
   selectOnboardingState,
   saveOnboardingData,
@@ -33,9 +37,10 @@ type Props = {
   navigation: any;
 };
 
-const ProfileScreen: React.FC<Props> = () => {
+const ProfileScreen: React.FC<Props> = ({navigation}) => {
   const dispatch = useDispatch<AppDispatch>();
   const onboardingData = useSelector(selectOnboardingState);
+  const {isPremium} = useApp();
 
   // Form state
   const [name, setName] = useState('');
@@ -44,7 +49,56 @@ const ProfileScreen: React.FC<Props> = () => {
   const [selectedCountry, setSelectedCountry] = useState<ICountry | null>(null);
   const [selectedCity, setSelectedCity] = useState<ICity | null>(null);
   const [countryHasCities, setCountryHasCities] = useState(false);
-  const [showProfileCard, setShowProfileCard] = useState(false);
+  // Show profile card initially if user has completed onboarding (has name)
+  const [showProfileCard, setShowProfileCard] = useState(!!onboardingData.name);
+
+  // Entrance animations
+  const headerFadeAnim = useRef(new Animated.Value(0)).current;
+  const headerSlideAnim = useRef(new Animated.Value(30)).current;
+  const cardFadeAnim = useRef(new Animated.Value(0)).current;
+  const cardSlideAnim = useRef(new Animated.Value(40)).current;
+  const cardScaleAnim = useRef(new Animated.Value(0.95)).current;
+
+  useEffect(() => {
+    // Staggered entrance animations
+    Animated.stagger(120, [
+      // Header animation
+      Animated.parallel([
+        Animated.timing(headerFadeAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.spring(headerSlideAnim, {
+          toValue: 0,
+          friction: 8,
+          tension: 40,
+          useNativeDriver: true,
+        }),
+      ]),
+      // Card animation
+      Animated.parallel([
+        Animated.timing(cardFadeAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.spring(cardSlideAnim, {
+          toValue: 0,
+          friction: 7,
+          tension: 35,
+          useNativeDriver: true,
+        }),
+        Animated.spring(cardScaleAnim, {
+          toValue: 1,
+          friction: 8,
+          tension: 40,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Picker visibility
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -138,6 +192,12 @@ const ProfileScreen: React.FC<Props> = () => {
     setShowProfileCard(false);
   };
 
+  const handlePremiumPress = useCallback(() => {
+    if (!isPremium) {
+      navigation.navigate('Paywall', {source: 'profile_screen'});
+    }
+  }, [isPremium, navigation]);
+
   // Time picker handlers
   const handleOpenTimePicker = useCallback(() => {
     setShowTimePicker(true);
@@ -185,12 +245,12 @@ const ProfileScreen: React.FC<Props> = () => {
 
   const renderForm = () => (
     <View style={styles.glassCard}>
-      <BlurView
+      {/* <BlurView
         style={styles.absoluteBlur}
         blurType="dark"
         blurAmount={25}
         reducedTransparencyFallbackColor="transparent"
-      />
+      /> */}
       <View style={styles.glassOverlay} />
       <View style={styles.formContent}>
         {/* Name Field */}
@@ -230,7 +290,6 @@ const ProfileScreen: React.FC<Props> = () => {
               ]}>
               {formatTimeDisplay(timeValue)}
             </Text>
-            <Text style={styles.inputIcon}>🕐</Text>
           </TouchableOpacity>
         </View>
 
@@ -245,7 +304,6 @@ const ProfileScreen: React.FC<Props> = () => {
               ]}>
               {selectedCountry?.name || 'Select Country'}
             </Text>
-            <Text style={styles.inputIcon}>🌍</Text>
           </TouchableOpacity>
         </View>
 
@@ -278,41 +336,55 @@ const ProfileScreen: React.FC<Props> = () => {
     </View>
   );
 
-  const renderProfileCard = () => (
-    <TouchableOpacity style={styles.glassCard} onPress={handleEditProfile} activeOpacity={0.8}>
-      <BlurView
-        style={styles.absoluteBlur}
-        blurType="dark"
-        blurAmount={25}
-        reducedTransparencyFallbackColor="transparent"
-      />
-      <View style={styles.glassOverlay} />
-      <View style={styles.profileContent}>
-        {/* Profile Icon */}
-        <View style={styles.profileIcon}>
-          <Text style={styles.profileIconText}>👋</Text>
-        </View>
-
-        {/* Profile Info */}
-        <View style={styles.profileInfo}>
-          <Text style={styles.profileName}>{name || onboardingData.name}</Text>
-          <View style={styles.profileDetails}>
-            <Text style={styles.zodiacBadge}>
-              {calculatedZodiacSign?.toUpperCase() || 'UNKNOWN'}
-            </Text>
-            {(selectedCity?.name || onboardingData.city) && (
-              <>
-                <View style={styles.dot} />
-                <Text style={styles.locationText}>
-                  {selectedCity?.name || onboardingData.city}
-                </Text>
-              </>
-            )}
+  const renderProfileCard = () => {
+    // Get first letter of name for avatar
+    const displayName = name || onboardingData.name || '';
+    const firstLetter = displayName.charAt(0).toUpperCase();
+    
+    return (
+      <View style={styles.glassCard}>
+        {/* <BlurView
+          style={styles.absoluteBlur}
+          blurType="dark"
+          blurAmount={25}
+          reducedTransparencyFallbackColor="transparent"
+        /> */}
+        <View style={styles.glassOverlay} />
+        <View style={styles.profileContent}>
+          {/* Profile Avatar */}
+          <View style={styles.profileIcon}>
+            <Text style={styles.avatarText}>{firstLetter || '?'}</Text>
           </View>
+
+          {/* Profile Info */}
+          <View style={styles.profileInfo}>
+            <Text style={styles.profileName}>{name || onboardingData.name}</Text>
+            <View style={styles.profileDetails}>
+              <Text style={styles.zodiacBadge}>
+                {calculatedZodiacSign?.toUpperCase() || 'UNKNOWN'}
+              </Text>
+              {(selectedCity?.name || onboardingData.city) && (
+                <>
+                  <View style={styles.dot} />
+                  <Text style={styles.locationText}>
+                    {selectedCity?.name || onboardingData.city}
+                  </Text>
+                </>
+              )}
+            </View>
+          </View>
+
+          {/* Edit Button */}
+          <TouchableOpacity 
+            style={styles.editButton} 
+            onPress={handleEditProfile}
+            activeOpacity={0.7}>
+            <Text style={styles.editButtonText}>Edit</Text>
+          </TouchableOpacity>
         </View>
       </View>
-    </TouchableOpacity>
-  );
+    );
+  };
 
   return (
     <View style={styles.backgroundFallback}>
@@ -332,19 +404,61 @@ const ProfileScreen: React.FC<Props> = () => {
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled">
             {/* Header */}
-            <View style={styles.header}>
+            <Animated.View style={[
+              styles.header,
+              {
+                opacity: headerFadeAnim,
+                transform: [{translateY: headerSlideAnim}],
+              }
+            ]}>
               <Text style={styles.title}>Profile</Text>
               <Text style={styles.subtitle}>Your Celestial Identity</Text>
-            </View>
+            </Animated.View>
 
             {/* Form or Profile Card */}
-            {showProfileCard ? renderProfileCard() : renderForm()}
+            <Animated.View style={{
+              opacity: cardFadeAnim,
+              transform: [
+                {translateY: cardSlideAnim},
+                {scale: cardScaleAnim},
+              ],
+            }}>
+              {showProfileCard ? renderProfileCard() : renderForm()}
+            </Animated.View>
 
-            {/* Saved Souls Section */}
-            <View style={styles.savedSoulsSection}>
-              <Text style={styles.savedSoulsTitle}>Saved Souls</Text>
-              {/* Empty state - can add saved profiles here later */}
-            </View>
+            {/* Premium Card */}
+            <TouchableOpacity
+              style={[styles.premiumCard, isPremium && styles.premiumCardActive]}
+              onPress={handlePremiumPress}
+              activeOpacity={isPremium ? 1 : 0.8}>
+              <View style={styles.glassOverlay} />
+              <View style={styles.premiumContent}>
+                <View style={[styles.premiumIconContainer, isPremium && styles.premiumIconActive]}>
+                  <StarIcon width={28} height={28} />
+                </View>
+                <View style={styles.premiumTextContainer}>
+                  <Text style={[styles.premiumTitle, isPremium && styles.premiumTitleActive]}>
+                    {isPremium ? 'Premium Active' : 'Unlock Premium'}
+                  </Text>
+                  <Text style={styles.premiumSubtitle}>
+                    {isPremium 
+                      ? 'Enjoy unlimited cosmic insights'
+                      : 'Get unlimited readings & features'
+                    }
+                  </Text>
+                </View>
+                {!isPremium && (
+                  <View style={styles.premiumButton}>
+                    <Text style={styles.premiumButtonText}>Upgrade</Text>
+                  </View>
+                )}
+                {isPremium && (
+                  <View style={styles.premiumBadge}>
+                    <Text style={styles.premiumBadgeText}>✓</Text>
+                  </View>
+                )}
+              </View>
+            </TouchableOpacity>
           </ScrollView>
         </SafeAreaView>
       </ImageBackground>
