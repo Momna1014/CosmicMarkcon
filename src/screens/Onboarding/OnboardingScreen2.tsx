@@ -181,11 +181,6 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
     
     // Firebase screen view logging
     firebaseService.logScreenView('OnboardingScreen2', 'OnboardingScreen2');
-    firebaseService.logEvent('onboarding_2_screen_viewed', {
-      step: 2,
-      screen_name: 'name_input',
-      timestamp: Date.now(),
-    });
     
     // Animate progress bar on mount - Screen 2 of 11 (18%)
     progressWidth.value = withDelay(

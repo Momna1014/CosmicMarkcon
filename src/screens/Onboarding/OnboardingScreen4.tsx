@@ -43,6 +43,7 @@ import {
 } from '../../utils/onboardingAnalytics';
 import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
+import {hapticLight} from '../../utils/haptics';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -210,13 +211,6 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
     
     // Firebase screen view logging
     firebaseService.logScreenView('OnboardingScreen4', 'OnboardingScreen4');
-    firebaseService.logEvent('onboarding_4_screen_viewed', {
-      step: 4,
-      screen_name: 'cosmic_insight',
-      zodiac_sign: zodiac.name,
-      insight_number: insightNumber,
-      timestamp: Date.now(),
-    });
     
     progressWidth.value = withDelay(
       300,
@@ -250,6 +244,7 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
     const typingInterval = setInterval(() => {
       if (currentIndex < insightText.length) {
         setDisplayedMainText(insightText.slice(0, currentIndex + 1));
+        hapticLight();
         currentIndex++;
       } else {
         clearInterval(typingInterval);
@@ -270,6 +265,7 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
       const typingInterval = setInterval(() => {
         if (currentIndex < subtextText.length) {
           setDisplayedSubText(subtextText.slice(0, currentIndex + 1));
+          hapticLight();
           currentIndex++;
         } else {
           clearInterval(typingInterval);

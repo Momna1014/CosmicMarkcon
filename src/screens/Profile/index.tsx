@@ -14,6 +14,16 @@ import {useSelector, useDispatch} from 'react-redux';
 import {ICountry, ICity, City, Country} from 'country-state-city';
 import {useApp} from '../../contexts/AppContext';
 
+// Analytics
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
+import {
+  trackProfileView,
+  trackProfileEditTap,
+  trackProfileSave,
+  trackProfileSubscriptionTap,
+} from '../../utils/mainScreenAnalytics';
+
 // Icons
 import StarIcon from '../../assets/icons/home_icons/welcome_star.svg';
 import {
@@ -58,6 +68,18 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
   const cardFadeAnim = useRef(new Animated.Value(0)).current;
   const cardSlideAnim = useRef(new Animated.Value(40)).current;
   const cardScaleAnim = useRef(new Animated.Value(0.95)).current;
+
+  // Analytics - Screen View
+  useScreenView('Profile', {
+    screen_category: 'main',
+    zodiac_sign: onboardingData?.zodiacSign || '',
+  });
+
+  // Analytics - Track screen view on mount
+  useEffect(() => {
+    trackProfileView(onboardingData?.zodiacSign || '');
+    firebaseService.logScreenView('Profile', 'ProfileScreen');
+  }, [onboardingData?.zodiacSign]);
 
   useEffect(() => {
     // Staggered entrance animations
@@ -173,6 +195,16 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
   const handleSaveIdentity = () => {
     if (!name.trim()) return;
 
+    // Track which fields changed
+    const changedFields: string[] = [];
+    if (name.trim() !== onboardingData.name) changedFields.push('name');
+    if (birthDate && birthDate.toISOString() !== onboardingData.birthday) changedFields.push('birthday');
+    if (timeValue && formatTimeForStorage(timeValue) !== onboardingData.birthTime) changedFields.push('birthTime');
+    if (selectedCity?.name !== onboardingData.city) changedFields.push('city');
+    if (selectedCountry?.name !== onboardingData.country) changedFields.push('country');
+    
+    trackProfileSave(changedFields);
+
     dispatch(
       saveOnboardingData({
         alignment: onboardingData.alignment,
@@ -189,11 +221,13 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
   };
 
   const handleEditProfile = () => {
+    trackProfileEditTap();
     setShowProfileCard(false);
   };
 
   const handlePremiumPress = useCallback(() => {
     if (!isPremium) {
+      trackProfileSubscriptionTap();
       navigation.navigate('Paywall', {source: 'profile_screen'});
     }
   }, [isPremium, navigation]);

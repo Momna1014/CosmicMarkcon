@@ -213,11 +213,6 @@ export const OnboardingScreen11: React.FC<OnboardingScreen11Props> = ({
     
     // Firebase screen view logging
     firebaseService.logScreenView('OnboardingScreen11', 'OnboardingScreen11');
-    firebaseService.logEvent('onboarding_11_screen_viewed', {
-      step: 11,
-      screen_name: 'energetic_signature',
-      timestamp: Date.now(),
-    });
     
     // Animate progress bar to 100%
     progressWidth.value = withDelay(

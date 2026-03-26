@@ -21,6 +21,15 @@ import TomorrowTab from './TomorrowTab';
 import WeeklyTab from './WeeklyTab';
 import StarfieldAnimation from '../../components/home_components/StarfieldAnimation';
 
+// Analytics
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
+import {
+  trackHoroscopeView,
+  trackHoroscopeTabChange,
+} from '../../utils/mainScreenAnalytics';
+import {hapticLight} from '../../utils/haptics';
+
 const BackgroundImage = require('../../assets/icons/bottomtab_icons/main_screen_background.png');
 
 type TabType = 'today' | 'tomorrow' | 'weekly';
@@ -182,9 +191,23 @@ const HoroscopeScreen: React.FC<Props> = () => {
 
   const currentDate = useMemo(() => formatDate(), []);
 
+  // Analytics - Screen View
+  useScreenView('Horoscope', {
+    screen_category: 'main',
+    zodiac_sign: zodiacSign,
+  });
+
+  // Analytics - Track screen view on mount
+  useEffect(() => {
+    trackHoroscopeView(zodiacSign);
+    firebaseService.logScreenView('Horoscope', 'HoroscopeScreen');
+  }, [zodiacSign]);
+
   const handleTabPress = useCallback((tab: TabType) => {
+    hapticLight();
+    trackHoroscopeTabChange(tab, zodiacSign);
     setActiveTab(tab);
-  }, []);
+  }, [zodiacSign]);
 
   const renderTabContent = useCallback(() => {
     switch (activeTab) {

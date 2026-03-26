@@ -25,6 +25,15 @@ import GradientText from '../../components/GradientText';
 import {generateLoveMatchData, LoveMatchData, CompatibilityMetric} from './loveMatchMockData';
 import CosmicLoader from '../../components/CosmicLoader';
 
+// Analytics
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
+import {
+  trackLoveMatchView,
+  trackLoveMatchAskOracleTap,
+  trackLoveMatchDismiss,
+} from '../../utils/mainScreenAnalytics';
+
 // Import icons
 import CosmicInsightIcon from '../../assets/icons/horoscope_icons/cosmic_insight.svg';
 import AskOracleStarIcon from '../../assets/icons/horoscope_icons/ask_oracle_star.svg';
@@ -400,6 +409,25 @@ const LoveMatchScreen: React.FC<Props> = ({route}) => {
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(true);
 
+  // Generate match data based on signs
+  const matchData: LoveMatchData = useMemo(
+    () => generateLoveMatchData(yourSign, theirSign),
+    [yourSign, theirSign],
+  );
+
+  // Analytics - Screen View
+  useScreenView('LoveMatch', {
+    screen_category: 'love',
+    your_sign: yourSign,
+    their_sign: theirSign,
+  });
+
+  // Analytics - Track screen view on mount
+  useEffect(() => {
+    trackLoveMatchView(yourSign, theirSign, matchData.overallScore);
+    firebaseService.logScreenView('LoveMatch', 'LoveMatchScreen');
+  }, [yourSign, theirSign, matchData.overallScore]);
+
   // Show loader for 4 seconds then show content
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -409,19 +437,15 @@ const LoveMatchScreen: React.FC<Props> = ({route}) => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Generate match data based on signs
-  const matchData: LoveMatchData = useMemo(
-    () => generateLoveMatchData(yourSign, theirSign),
-    [yourSign, theirSign],
-  );
-
   const handleClose = useCallback(() => {
+    trackLoveMatchDismiss(yourSign, theirSign);
     navigation.goBack();
-  }, [navigation]);
+  }, [navigation, yourSign, theirSign]);
 
   const handleAskOracle = useCallback(() => {
+    trackLoveMatchAskOracleTap(yourSign, theirSign);
     navigation.navigate('Chat' as never);
-  }, [navigation]);
+  }, [navigation, yourSign, theirSign]);
 
   // Show loader while loading
   if (isLoading) {

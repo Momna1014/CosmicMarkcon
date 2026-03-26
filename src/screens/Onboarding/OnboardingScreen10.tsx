@@ -144,15 +144,6 @@ export const OnboardingScreen10: React.FC<OnboardingScreen10Props> = ({
     
     // Firebase screen view logging
     firebaseService.logScreenView('OnboardingScreen10', 'OnboardingScreen10');
-    firebaseService.logEvent('onboarding_10_screen_viewed', {
-      step: 10,
-      screen_name: 'alignment_result',
-      timestamp: Date.now(),
-    });
-    firebaseService.logEvent('onboarding_10_loading_started', {
-      step: 10,
-      timestamp: Date.now(),
-    });
     
     // Animate leaf with subtle pulse
     leafScale.value = withRepeat(

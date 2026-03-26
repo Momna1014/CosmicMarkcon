@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo} from 'react';
+import React, {useCallback, useMemo, useEffect} from 'react';
 import {View, StatusBar, ImageBackground, ScrollView} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSelector} from 'react-redux';
@@ -9,6 +9,16 @@ import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {selectOnboardingState} from '../../redux/slices/onboardingSlice';
 import {styles} from './styles';
 import {RootStackParamList, MainTabParamList} from '../../navigation/deepLinking';
+
+// Analytics
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
+import {
+  trackHomeView,
+  trackHomeFeatureCardTap,
+  trackHomeCosmicGuideTap,
+  trackHomeDailyHoroscopeTap,
+} from '../../utils/mainScreenAnalytics';
 
 // Home Components
 import {
@@ -46,20 +56,36 @@ const HomeScreen: React.FC = () => {
     return onboardingData?.zodiacSign?.toUpperCase() || 'ARIES';
   }, [onboardingData?.zodiacSign]);
 
+  // Analytics - Screen View
+  useScreenView('Home', {
+    screen_category: 'main',
+    zodiac_sign: zodiacSign,
+  });
+
+  // Analytics - Track screen view on mount
+  useEffect(() => {
+    trackHomeView();
+    firebaseService.logScreenView('Home', 'HomeScreen');
+  }, []);
+
   // Memoized callback handlers - prevents child component re-renders
   const handleReadHoroscope = useCallback(() => {
+    trackHomeDailyHoroscopeTap(zodiacSign);
     navigation.navigate('Horoscope');
-  }, [navigation]);
+  }, [navigation, zodiacSign]);
 
   const handleSynastryPress = useCallback(() => {
+    trackHomeFeatureCardTap('synastry');
     navigation.navigate('Love');
   }, [navigation]);
 
   const handleChiromancyPress = useCallback(() => {
+    trackHomeFeatureCardTap('chiromancy');
     navigation.navigate('Chiromancy');
   }, [navigation]);
 
   const handleCosmicGuidePress = useCallback((guideId: string) => {
+    trackHomeCosmicGuideTap(guideId, guideId);
     navigation.navigate('CosmicGuideDetail', {guideId});
   }, [navigation]);
 

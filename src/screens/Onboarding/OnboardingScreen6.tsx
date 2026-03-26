@@ -186,11 +186,6 @@ export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
     
     // Firebase screen view logging
     firebaseService.logScreenView('OnboardingScreen6', 'OnboardingScreen6');
-    firebaseService.logEvent('onboarding_6_screen_viewed', {
-      step: 6,
-      screen_name: 'cosmic_layers',
-      timestamp: Date.now(),
-    });
     
     // Animate progress bar on mount - Screen 6 of 11 (55%)
     progressWidth.value = withDelay(

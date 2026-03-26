@@ -8,6 +8,7 @@ import {
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { BlurView } from '@react-native-community/blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { hapticLight } from '../../utils/haptics';
 
 // Import theme and scaling functions
 import {
@@ -92,6 +93,7 @@ const BottomTabBar: React.FC<CustomBottomTabBarProps> = ({
             : outlineIconMap[route.name];
 
           const onPress = () => {
+            hapticLight();
             const event = navigation.emit({
               type: 'tabPress',
               target: route.key,

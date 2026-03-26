@@ -242,12 +242,6 @@ export const OnboardingScreen8: React.FC<OnboardingScreen8Props> = ({
     
     // Firebase screen view logging
     firebaseService.logScreenView('OnboardingScreen8', 'OnboardingScreen8');
-    firebaseService.logEvent('onboarding_8_screen_viewed', {
-      step: 8,
-      screen_name: 'energy_pattern',
-      element: westernZodiac?.element || 'unknown',
-      timestamp: Date.now(),
-    });
     
     // Animate progress bar on mount - Screen 8 of 11 (73%)
     progressWidth.value = withDelay(

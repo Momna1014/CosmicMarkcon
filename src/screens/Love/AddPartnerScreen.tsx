@@ -49,6 +49,16 @@ import {getZodiacSign} from '../../components/mock/zodiacMockData';
 import {hapticLight} from '../../utils/haptics';
 import {ICountry, ICity, City} from 'country-state-city';
 
+// Analytics
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
+import {
+  trackAddPartnerView,
+  trackAddPartnerStep,
+  trackAddPartnerComplete,
+  trackAddPartnerDismiss,
+} from '../../utils/mainScreenAnalytics';
+
 // Icons
 import CloseIcon from '../../assets/icons/home_icons/cross.svg';
 import ClockIcon from '../../assets/icons/onboarding_icons/watch.svg';
@@ -109,6 +119,17 @@ const AddPartnerScreen: React.FC<AddPartnerScreenProps> = ({navigation}) => {
   const progressWidth = useSharedValue(33);
   const buttonScale = useSharedValue(1);
 
+  // Analytics - Screen View
+  useScreenView('AddPartner', {
+    screen_category: 'love',
+  });
+
+  // Analytics - Track screen view on mount
+  useEffect(() => {
+    trackAddPartnerView();
+    firebaseService.logScreenView('AddPartner', 'AddPartnerScreen');
+  }, []);
+
   // Update progress bar based on step
   useEffect(() => {
     const stepProgress = {
@@ -120,6 +141,8 @@ const AddPartnerScreen: React.FC<AddPartnerScreenProps> = ({navigation}) => {
       duration: 500,
       easing: Easing.out(Easing.cubic),
     });
+    // Track step changes
+    trackAddPartnerStep(currentStep);
   }, [currentStep, progressWidth]);
 
 
@@ -136,6 +159,7 @@ const AddPartnerScreen: React.FC<AddPartnerScreenProps> = ({navigation}) => {
   // Handle close
   const handleClose = () => {
     hapticLight();
+    trackAddPartnerDismiss(currentStep);
     navigation.goBack();
   };
 
@@ -156,6 +180,7 @@ const AddPartnerScreen: React.FC<AddPartnerScreenProps> = ({navigation}) => {
         // Save partner to Redux
         if (birthday) {
           const zodiacSign = getZodiacSign(birthday);
+          trackAddPartnerComplete(zodiacSign.name, selectedCity !== null);
           dispatch(addPartner({
             name: partnerName.trim(),
             birthday: birthday.toISOString(),

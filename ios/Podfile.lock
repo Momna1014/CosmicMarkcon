@@ -3463,6 +3463,34 @@ PODS:
   - RNPurchases (9.8.0):
     - PurchasesHybridCommon (= 17.33.0)
     - React-Core
+  - RNReactNativeHapticFeedback (2.3.4):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - Yoga
   - RNReanimated (4.2.1):
     - boost
     - DoubleConversion
@@ -3992,6 +4020,7 @@ DEPENDENCIES:
   - RNPaywalls (from `../node_modules/react-native-purchases-ui`)
   - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNPurchases (from `../node_modules/react-native-purchases`)
+  - RNReactNativeHapticFeedback (from `../node_modules/react-native-haptic-feedback`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - "RNSentry (from `../node_modules/@sentry/react-native`)"
@@ -4289,6 +4318,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-permissions"
   RNPurchases:
     :path: "../node_modules/react-native-purchases"
+  RNReactNativeHapticFeedback:
+    :path: "../node_modules/react-native-haptic-feedback"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
@@ -4471,6 +4502,7 @@ SPEC CHECKSUMS:
   RNPaywalls: d4a83eae1b84542e53bfeca86f20d4be940551f1
   RNPermissions: 964fce58b2e6ba6176ac5c63a45050e015dbc735
   RNPurchases: 862e44a40fc03117245e465fe11dd9cfea030f45
+  RNReactNativeHapticFeedback: b9623bdeb59a778ca905e97035d5cc73a15d00f3
   RNReanimated: 085278ac0a7044df824e13af982bf50bd4771e1b
   RNScreens: 199799bdab32fa1e17ebf938b06fec52033e81e5
   RNSentry: e4062b9022c4e3fa5a1be2559620d9a1732d70a3

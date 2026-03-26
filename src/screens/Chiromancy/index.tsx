@@ -20,6 +20,16 @@ import {
   moderateScale,
 } from '../../theme';
 
+// Analytics
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
+import {
+  trackChiromancyView,
+  trackChiromancyHandSelect,
+  trackChiromancyScanTap,
+} from '../../utils/mainScreenAnalytics';
+import {hapticLight} from '../../utils/haptics';
+
 
 // Import camera icon
 import CameraIcon from '../../assets/icons/chat_icons/camera.svg';
@@ -158,6 +168,17 @@ const ScanPalmCard = memo(({handType, onPress}: {handType: TabType; onPress: () 
 const ChiromancyScreen: React.FC<Props> = ({navigation}) => {
   const [activeTab, setActiveTab] = useState<TabType>('leftHand');
   
+  // Analytics - Screen View
+  useScreenView('Chiromancy', {
+    screen_category: 'main',
+  });
+
+  // Analytics - Track screen view on mount
+  useEffect(() => {
+    trackChiromancyView();
+    firebaseService.logScreenView('Chiromancy', 'ChiromancyScreen');
+  }, []);
+  
   // Entrance animations
   const titleFadeAnim = useRef(new Animated.Value(0)).current;
   const titleSlideAnim = useRef(new Animated.Value(30)).current;
@@ -239,10 +260,13 @@ const ChiromancyScreen: React.FC<Props> = ({navigation}) => {
   }, []);
 
   const handleTabPress = useCallback((tab: TabType) => {
+    hapticLight();
+    trackChiromancyHandSelect(tab === 'leftHand' ? 'left' : 'right');
     setActiveTab(tab);
   }, []);
 
   const handleScanPress = useCallback(() => {
+    trackChiromancyScanTap(activeTab === 'leftHand' ? 'left' : 'right');
     navigation.navigate('PalmCapture', {handType: activeTab});
   }, [navigation, activeTab]);
 

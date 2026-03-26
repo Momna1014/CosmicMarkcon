@@ -418,11 +418,6 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
     
     // Firebase screen view logging
     firebaseService.logScreenView('OnboardingScreen9', 'OnboardingScreen9');
-    firebaseService.logEvent('onboarding_9_screen_viewed', {
-      step: 9,
-      screen_name: 'birth_time_place',
-      timestamp: Date.now(),
-    });
     
     // Use requestAnimationFrame as a lightweight alternative to InteractionManager
     const frameId = requestAnimationFrame(() => {

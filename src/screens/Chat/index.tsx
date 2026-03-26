@@ -54,6 +54,15 @@ import {
   ImagePickerResult,
 } from '../../utils/imagePicker';
 
+// Analytics
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
+import {
+  trackChatView,
+  trackChatMessageSend,
+  trackChatQuickReplyTap,
+} from '../../utils/mainScreenAnalytics';
+
 const BackgroundImage = require('../../assets/icons/bottomtab_icons/main_screen_background.png');
 
 type ChatRouteParams = {
@@ -108,6 +117,18 @@ const ChatScreen: React.FC<Props> = () => {
       flatListRef.current?.scrollToEnd({animated: false});
       isInitialLoad.current = false;
     }, 100);
+  }, []);
+
+  // Analytics - Screen View
+  useScreenView('Chat', {
+    screen_category: 'main',
+    source: source || 'direct',
+  });
+
+  // Analytics - Track screen view on mount
+  useEffect(() => {
+    trackChatView();
+    firebaseService.logScreenView('Chat', 'ChatScreen');
   }, []);
 
   // Handle initial message from Palm Capture or Love Match
@@ -237,6 +258,7 @@ const ChatScreen: React.FC<Props> = () => {
   // Send text message (with optional image)
   const handleSendMessage = useCallback(
     (text: string, attachedImageUri?: string) => {
+      trackChatMessageSend(text.length);
       const userMessage = createUserMessage(text, attachedImageUri);
       addMessage(userMessage);
       simulateAIResponse(userMessage);
@@ -292,6 +314,7 @@ const ChatScreen: React.FC<Props> = () => {
   // Quick reply press handler
   const handleQuickReplyPress = useCallback(
     (reply: QuickReply) => {
+      trackChatQuickReplyTap(reply.label);
       const messageText = `Tell me about my ${reply.label}`;
       handleSendMessage(messageText);
     },

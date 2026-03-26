@@ -25,6 +25,18 @@ import {
 } from '../../theme';
 import SignSelectModal, {ZodiacSignItem, getZodiacIcon} from '../../components/home_components/SignSelectModal';
 
+// Analytics
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
+import {
+  trackLoveView,
+  trackLoveTabChange,
+  trackLoveSignSelect,
+  trackLoveMatchNowTap,
+  trackLoveAddPartnerTap,
+} from '../../utils/mainScreenAnalytics';
+import {hapticLight} from '../../utils/haptics';
+
 // Import SVG icons
 import AddThemIcon from '../../assets/icons/horoscope_icons/add_them.svg';
 import AddLineIcon from '../../assets/icons/horoscope_icons/add_line.svg';
@@ -288,7 +300,21 @@ const LoveScreen: React.FC<Props> = ({navigation}) => {
     return onboardingData?.zodiacSign || 'Aries';
   }, [onboardingData?.zodiacSign]);
 
+  // Analytics - Screen View
+  useScreenView('Love', {
+    screen_category: 'main',
+    zodiac_sign: userZodiacSign,
+  });
+
+  // Analytics - Track screen view on mount
+  useEffect(() => {
+    trackLoveView();
+    firebaseService.logScreenView('Love', 'LoveScreen');
+  }, []);
+
   const handleTabPress = useCallback((tab: TabType) => {
+    hapticLight();
+    trackLoveTabChange(tab === 'quickMatch' ? 'quick_match' : 'deep_bond');
     setActiveTab(tab);
   }, []);
 
@@ -303,6 +329,8 @@ const LoveScreen: React.FC<Props> = ({navigation}) => {
   const handleSelectSign = useCallback((sign: ZodiacSignItem) => {
     setSelectedSign(sign);
     setModalVisible(false);
+    trackLoveSignSelect('their', sign.name);
+    trackLoveMatchNowTap(onboardingData?.zodiacSign || 'Aries', sign.name);
     // Navigate to LoveMatch screen with both signs
     navigation.navigate('LoveMatch', {
       yourSign: onboardingData?.zodiacSign || 'Aries',
@@ -311,6 +339,7 @@ const LoveScreen: React.FC<Props> = ({navigation}) => {
   }, [navigation, onboardingData?.zodiacSign]);
 
   const handleAddPartner = useCallback(() => {
+    trackLoveAddPartnerTap();
     navigation.navigate('AddPartner');
   }, [navigation]);
 
