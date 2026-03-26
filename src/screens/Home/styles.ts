@@ -176,10 +176,13 @@ export const styles = StyleSheet.create({
   transitsScrollView: {
     marginHorizontal: horizontalScale(-20),
     paddingHorizontal: horizontalScale(20),
+    // paddingEnd:300
   },
   transitsContainer: {
     flexDirection: 'row',
     gap: horizontalScale(16),
+    // backgroundColor:'red',
+    paddingEnd:moderateScale(40)
   },
   transitItem: {
     alignItems: 'center',

@@ -16,6 +16,7 @@ import {
   Platform,
   Keyboard,
   TouchableWithoutFeedback,
+  StatusBar,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useTranslation} from 'react-i18next';
@@ -274,6 +275,11 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
             style={styles.keyboardAvoidingView}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
             <SafeAreaView style={styles.safeArea}>
+              <StatusBar
+                barStyle="light-content"
+                backgroundColor="transparent"
+                translucent
+              />
               {/* Twinkling Stars Overlay */}
               {stars.map((star, index) => (
                 <TwinklingStar
@@ -412,6 +418,7 @@ const styles = StyleSheet.create({
   },
   progressBarContainer: {
     marginBottom: verticalScale(32),
+    paddingTop: verticalScale(10),
   },
   progressBarBackground: {
     height: verticalScale(8),

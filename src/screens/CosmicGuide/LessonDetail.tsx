@@ -1,4 +1,4 @@
-import React, {memo, useCallback, useState, useMemo} from 'react';
+import React, {memo, useCallback, useMemo} from 'react';
 import {
   View,
   Text,
@@ -6,16 +6,17 @@ import {
   ImageBackground,
   ScrollView,
   TouchableOpacity,
-  DeviceEventEmitter,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Animated, {FadeInDown} from 'react-native-reanimated';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {useSelector, useDispatch} from 'react-redux';
 import {styles} from './styles';
 import {getGuideById, getLessonById} from './mockData';
 import {moderateScale} from '../../theme';
 import GradientText from '../../components/GradientText';
-import {LESSON_COMPLETED_EVENT} from './CosmicGuideDetail';
+import {markLessonCompleted, selectIsLessonCompleted} from '../../redux/slices/cosmicGuidesSlice';
+import {RootState} from '../../redux/rootReducer';
 import CosmicAlert from '../../components/CosmicAlert';
 
 // Icons
@@ -41,13 +42,19 @@ const LessonDetail: React.FC<LessonDetailProps> = ({navigation, route}) => {
     totalLessons: number;
   };
 
+  const dispatch = useDispatch();
+
   // Get data
   const guide = useMemo(() => getGuideById(guideId), [guideId]);
   const lesson = useMemo(() => getLessonById(guideId, lessonId), [guideId, lessonId]);
   
-  // Track completion state
-  const [isCompleted, setIsCompleted] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
+  // Get completion state from Redux
+  const isCompleted = useSelector((state: RootState) =>
+    selectIsLessonCompleted(state, guideId, lessonId),
+  );
+  
+  // Track alert visibility
+  const [showAlert, setShowAlert] = React.useState(false);
 
   // Close handler
   const handleClose = useCallback(() => {
@@ -57,13 +64,12 @@ const LessonDetail: React.FC<LessonDetailProps> = ({navigation, route}) => {
   // Complete handler
   const handleComplete = useCallback(() => {
     if (!isCompleted) {
-      setIsCompleted(true);
-      // Emit completion event
-      DeviceEventEmitter.emit(LESSON_COMPLETED_EVENT, {guideId, lessonId});
+      // Dispatch Redux action to mark lesson as completed
+      dispatch(markLessonCompleted({guideId, lessonId}));
       // Show completion alert
       setShowAlert(true);
     }
-  }, [isCompleted, guideId, lessonId]);
+  }, [isCompleted, dispatch, guideId, lessonId]);
 
   // Handle alert dismiss
   const handleAlertDismiss = useCallback(() => {

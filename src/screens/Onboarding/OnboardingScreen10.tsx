@@ -15,6 +15,7 @@ import {
   ImageBackground,
   Dimensions,
   TouchableOpacity,
+  StatusBar,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useTranslation} from 'react-i18next';
@@ -324,6 +325,11 @@ export const OnboardingScreen10: React.FC<OnboardingScreen10Props> = ({
         style={styles.container}
         resizeMode="cover">
         <SafeAreaView style={styles.safeArea}>
+          <StatusBar
+            barStyle="light-content"
+            backgroundColor="transparent"
+            translucent
+          />
           <View style={styles.contentContainer}>
             {!isLoadingComplete ? renderLoadingState() : renderResultState()}
              {/* {renderLoadingState()} */}
@@ -412,6 +418,7 @@ const styles = StyleSheet.create({
   },
   topProgressBarContainer: {
     marginBottom: verticalScale(24),
+    paddingTop: verticalScale(10),
   },
   topProgressBarBackground: {
     height: verticalScale(8),

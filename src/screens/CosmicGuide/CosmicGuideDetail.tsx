@@ -1,4 +1,4 @@
-import React, {memo, useCallback, useState, useMemo, useEffect} from 'react';
+import React, {memo, useCallback, useMemo} from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,6 @@ import {
   ImageBackground,
   ScrollView,
   TouchableOpacity,
-  DeviceEventEmitter,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Animated, {
@@ -16,18 +15,18 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {useSelector} from 'react-redux';
 import {styles} from './styles';
 import {getGuideById, Lesson} from './mockData';
 import {moderateScale} from '../../theme';
 import GradientText from '../../components/GradientText';
+import {selectCompletedLessonsForGuide} from '../../redux/slices/cosmicGuidesSlice';
+import {RootState} from '../../redux/rootReducer';
 
 // Icons
 import CrossIcon from '../../assets/icons/home_icons/cross.svg';
 import GoRightIcon from '../../assets/icons/home_icons/go_right.svg';
 import ReadDoneIcon from '../../assets/icons/home_icons/read_done.svg';
-
-// Event name for lesson completion
-export const LESSON_COMPLETED_EVENT = 'LESSON_COMPLETED';
 
 // Background Image
 const BackgroundImage = require('../../assets/icons/bottomtab_icons/main_screen_background.png');
@@ -96,21 +95,10 @@ const CosmicGuideDetail: React.FC<CosmicGuideDetailProps> = ({navigation, route}
   // Get guide data
   const guide = useMemo(() => getGuideById(guideId), [guideId]);
   
-  // Track completed lessons locally (in real app, use Redux/AsyncStorage)
-  const [completedLessons, setCompletedLessons] = useState<Set<string>>(new Set());
-
-  // Listen for lesson completion events
-  useEffect(() => {
-    const subscription = DeviceEventEmitter.addListener(
-      LESSON_COMPLETED_EVENT,
-      (data: {guideId: string; lessonId: string}) => {
-        if (data.guideId === guideId) {
-          setCompletedLessons(prev => new Set(prev).add(data.lessonId));
-        }
-      },
-    );
-    return () => subscription.remove();
-  }, [guideId]);
+  // Get completed lessons from Redux (persisted)
+  const completedLessons = useSelector((state: RootState) =>
+    selectCompletedLessonsForGuide(state, guideId),
+  );
 
   // Close handler
   const handleClose = useCallback(() => {
@@ -187,7 +175,7 @@ const CosmicGuideDetail: React.FC<CosmicGuideDetailProps> = ({navigation, route}
                 key={lesson.id}
                 lesson={{
                   ...lesson,
-                  isCompleted: completedLessons.has(lesson.id),
+                  isCompleted: completedLessons.includes(lesson.id),
                 }}
                 index={index}
                 onPress={() => handleLessonPress(lesson)}

@@ -358,7 +358,16 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
 
           {/* Profile Info */}
           <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>{name || onboardingData.name}</Text>
+            <View style={styles.nameRow}>
+              <Text style={styles.profileName}>{name || onboardingData.name}</Text>
+              {/* Edit Button - in row with name */}
+              <TouchableOpacity 
+                style={styles.editButton} 
+                onPress={handleEditProfile}
+                activeOpacity={0.7}>
+                <Text style={styles.editButtonText}>Edit</Text>
+              </TouchableOpacity>
+            </View>
             <View style={styles.profileDetails}>
               <Text style={styles.zodiacBadge}>
                 {calculatedZodiacSign?.toUpperCase() || 'UNKNOWN'}
@@ -373,14 +382,6 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
               )}
             </View>
           </View>
-
-          {/* Edit Button */}
-          <TouchableOpacity 
-            style={styles.editButton} 
-            onPress={handleEditProfile}
-            activeOpacity={0.7}>
-            <Text style={styles.editButtonText}>Edit</Text>
-          </TouchableOpacity>
         </View>
       </View>
     );
@@ -416,15 +417,9 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
             </Animated.View>
 
             {/* Form or Profile Card */}
-            <Animated.View style={{
-              opacity: cardFadeAnim,
-              transform: [
-                {translateY: cardSlideAnim},
-                {scale: cardScaleAnim},
-              ],
-            }}>
+            <View>
               {showProfileCard ? renderProfileCard() : renderForm()}
-            </Animated.View>
+            </View>
 
             {/* Premium Card */}
             <TouchableOpacity

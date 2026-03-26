@@ -174,11 +174,17 @@ export const styles = StyleSheet.create({
   profileInfo: {
     flex: 1,
   },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: verticalScale(6),
+    justifyContent:'space-between'
+  },
   profileName: {
     fontFamily: FontFamilies.interSemiBold,
     fontSize: fontScale(18),
     color: '#FFFFFF',
-    marginBottom: verticalScale(6),
+    marginRight: horizontalScale(10),
   },
   profileDetails: {
     flexDirection: 'row',

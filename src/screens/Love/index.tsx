@@ -167,6 +167,7 @@ const SignCircle = memo(
   }) => {
     const isYou = type === 'you';
     const iconSize = moderateScale(50);
+    const addIconSize = moderateScale(30);
 
     return (
       <TouchableOpacity
@@ -184,7 +185,7 @@ const SignCircle = memo(
           ) : signId ? (
             getZodiacIcon(signId)
           ) : (
-            <AddThemIcon width={iconSize} height={iconSize} />
+            <AddThemIcon width={addIconSize} height={addIconSize} />
           )}
         </View>
         <Text style={styles.signLabel}>{isYou ? 'YOU' : 'THEM'}</Text>

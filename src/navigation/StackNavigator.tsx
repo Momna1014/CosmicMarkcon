@@ -110,7 +110,17 @@ export const StackNavigator: React.FC = () => {
           }}
         />
       )}
-
+ {NavigationConfig.enablePaywall && (
+        <Stack.Screen
+          name="Paywall"
+          component={PaywallScreen}
+          options={{
+            headerShown: false,
+            gestureEnabled: false, // Don't allow swipe back from paywall
+            animation: 'fade',
+          }}
+        />
+      )}
       {/* Main App - Either Drawer or Tabs based on config */}
       <Stack.Screen
         name="MainApp"
@@ -122,17 +132,7 @@ export const StackNavigator: React.FC = () => {
 
       {/* Paywall Screen - Full screen, not modal */}
       {/* Can be used as initial route or navigated to from anywhere */}
-      {NavigationConfig.enablePaywall && (
-        <Stack.Screen
-          name="Paywall"
-          component={PaywallScreen}
-          options={{
-            headerShown: false,
-            gestureEnabled: false, // Don't allow swipe back from paywall
-            animation: 'fade',
-          }}
-        />
-      )}
+     
 
       {/* Cosmic Guide Screens - Stack screens without bottom tabs */}
       <Stack.Screen

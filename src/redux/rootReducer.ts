@@ -2,6 +2,7 @@ import {combineReducers} from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
 import onboardingReducer from './slices/onboardingSlice';
 import partnersReducer from './slices/partnersSlice';
+import cosmicGuidesReducer from './slices/cosmicGuidesSlice';
 // Import other reducers here as you create them
 // import userReducer from './slices/userSlice';
 // import postsReducer from './slices/postsSlice';
@@ -16,6 +17,7 @@ const rootReducer = combineReducers({
   auth: authReducer,
   onboarding: onboardingReducer,
   partners: partnersReducer,
+  cosmicGuides: cosmicGuidesReducer,
   // Add other reducers here:
   // user: userReducer,
   // posts: postsReducer,

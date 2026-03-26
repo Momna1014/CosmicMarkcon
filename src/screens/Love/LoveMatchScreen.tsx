@@ -1,4 +1,4 @@
-import React, {memo, useEffect, useRef, useMemo, useCallback} from 'react';
+import React, {memo, useEffect, useRef, useMemo, useCallback, useState} from 'react';
 import {
   View,
   Text,
@@ -23,6 +23,7 @@ import {
 } from '../../theme';
 import GradientText from '../../components/GradientText';
 import {generateLoveMatchData, LoveMatchData, CompatibilityMetric} from './loveMatchMockData';
+import CosmicLoader from '../../components/CosmicLoader';
 
 // Import icons
 import CosmicInsightIcon from '../../assets/icons/horoscope_icons/cosmic_insight.svg';
@@ -397,6 +398,16 @@ const oracleStyles = StyleSheet.create({
 const LoveMatchScreen: React.FC<Props> = ({route}) => {
   const {yourSign, theirSign} = route.params;
   const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Show loader for 4 seconds then show content
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 4000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Generate match data based on signs
   const matchData: LoveMatchData = useMemo(
@@ -411,6 +422,22 @@ const LoveMatchScreen: React.FC<Props> = ({route}) => {
   const handleAskOracle = useCallback(() => {
     navigation.navigate('Chat' as never);
   }, [navigation]);
+
+  // Show loader while loading
+  if (isLoading) {
+    return (
+      <View style={styles.backgroundFallback}>
+        <ImageBackground
+          source={BackgroundImage}
+          style={styles.backgroundImage}
+          resizeMode="cover">
+          <View style={styles.loaderContainer}>
+            <CosmicLoader visible={true} text="Calculating your cosmic compatibility..." inline />
+          </View>
+        </ImageBackground>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.backgroundFallback}>
@@ -481,6 +508,11 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     height: '100%',
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   container: {
     flex: 1,

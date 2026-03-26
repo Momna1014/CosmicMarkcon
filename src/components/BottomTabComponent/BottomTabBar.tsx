@@ -121,6 +121,7 @@ const BottomTabBar: React.FC<CustomBottomTabBarProps> = ({
               onLongPress={onLongPress}
               style={styles.tabItem}
               activeOpacity={0.7}
+              hitSlop={{ top: 15, bottom: 15, left: 10, right: 10 }}
             >
               <View style={styles.iconContainer}>
                 {IconComponent && (
@@ -158,7 +159,7 @@ const styles = StyleSheet.create({
   },
   tabBar: {
     flexDirection: 'row',
-    paddingTop: verticalScale(0), // Figma padding-top
+    paddingTop: verticalScale(3),
     // paddingBottom handled dynamically with safe area
     alignItems: 'center',
     // minHeight: 104, // Figma height
@@ -167,7 +168,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    bottom:moderateScale(-15)
+    bottom:Platform.OS ==='ios'? moderateScale(-10):undefined
     // backgroundColor:'pink'
   },
   iconContainer: {

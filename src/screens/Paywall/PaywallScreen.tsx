@@ -9,8 +9,8 @@
  * navigation.navigate('Paywall', { source: 'onboarding_start_reading' })
  */
 
-import React, {useCallback, useEffect} from 'react';
-import {StyleSheet} from 'react-native';
+import React, {useCallback, useEffect, useState} from 'react';
+import {StyleSheet, View, ActivityIndicator, Text} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {useApp} from '../../contexts/AppContext';
 import RevenueCatUI from 'react-native-purchases-ui';
@@ -35,6 +35,17 @@ export const PaywallScreen: React.FC = () => {
   
   // Track if we've already navigated to prevent double navigation
   const hasNavigatedRef = React.useRef(false);
+  
+  // Track if paywall is ready
+  const [isReady, setIsReady] = useState(false);
+  
+  // Set ready state after a brief delay to allow RevenueCat to initialize
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsReady(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   // ===== Analytics: Track screen view =====
   useScreenView('PaywallScreen', {
@@ -253,6 +264,15 @@ export const PaywallScreen: React.FC = () => {
   }, [logFirebaseEvent, source]);
 
   // Render the paywall directly - NO background, the paywall IS the screen
+  // Show loading state briefly to ensure RevenueCat is ready
+  if (!isReady) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#D4AF37" />
+      </View>
+    );
+  }
+  
   return (
     <RevenueCatUI.Paywall
       style={styles.paywall}
@@ -268,6 +288,12 @@ export const PaywallScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: '#0A1628',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   paywall: {
     flex: 1,
   },

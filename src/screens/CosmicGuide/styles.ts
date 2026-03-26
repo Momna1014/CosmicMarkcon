@@ -1,4 +1,4 @@
-import {StyleSheet, Dimensions} from 'react-native';
+import {StyleSheet} from 'react-native';
 import {
   FontFamilies,
   fontScale,
@@ -8,8 +8,6 @@ import {
   moderateScale,
 } from '../../theme';
 
-const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
-
 export const styles = StyleSheet.create({
   // Background & Container
   backgroundFallback: {
@@ -18,8 +16,8 @@ export const styles = StyleSheet.create({
   },
   backgroundImage: {
     flex: 1,
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
+    width: '100%',
+    height: '100%',
   },
   container: {
     flex: 1,

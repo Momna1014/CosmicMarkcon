@@ -8,7 +8,9 @@ import {
   FlatList,
   Pressable,
   Animated,
+  Platform,
 } from 'react-native';
+import {BlurView} from '@react-native-community/blur';
 import {
   FontFamilies,
   fontScale,
@@ -185,6 +187,16 @@ const SignSelectModal: React.FC<SignSelectModalProps> = memo(
         transparent
         animationType="fade"
         onRequestClose={onClose}>
+        {Platform.OS === 'ios' ? (
+          <BlurView
+            style={StyleSheet.absoluteFill}
+            blurType="dark"
+            blurAmount={20}
+            reducedTransparencyFallbackColor="rgba(0, 0, 0, 0.9)"
+          />
+        ) : (
+          <View style={[StyleSheet.absoluteFill, styles.androidBlur]} />
+        )}
         <Pressable style={styles.overlay} onPress={onClose}>
           <Pressable style={styles.modalContainer} onPress={e => e.stopPropagation()}>
             {/* Header */}
@@ -222,12 +234,14 @@ const SignSelectModal: React.FC<SignSelectModalProps> = memo(
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.73)',
     justifyContent: 'center',
     alignItems: 'center',
   },
+  androidBlur: {
+    backgroundColor: 'rgba(0, 0, 0, 0.92)',
+  },
   modalContainer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.79)',
+    backgroundColor: 'rgba(0, 0, 0, 0.17)',
     borderRadius: radiusScale(36),
     borderWidth: 1,
     borderColor: 'rgba(194, 209, 243, 0.2)',

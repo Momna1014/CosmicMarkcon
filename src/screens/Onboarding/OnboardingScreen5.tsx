@@ -13,6 +13,7 @@ import {
   ImageBackground,
   Dimensions,
   TouchableOpacity,
+  StatusBar,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useTranslation} from 'react-i18next';
@@ -249,6 +250,11 @@ export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
         style={styles.container}
         resizeMode="cover">
         <SafeAreaView style={styles.safeArea}>
+          <StatusBar
+            barStyle="light-content"
+            backgroundColor="transparent"
+            translucent
+          />
           {/* Twinkling Stars Overlay */}
           {stars.map((star, index) => (
             <TwinklingStar
@@ -362,6 +368,7 @@ const styles = StyleSheet.create({
   },
   progressBarContainer: {
     // marginBottom: verticalScale(32),
+    paddingTop: verticalScale(10),
   },
   progressBarBackground: {
     height: verticalScale(8),

@@ -6,11 +6,10 @@
 
 import React, {useState} from 'react';
 import {View, StyleSheet} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, CommonActions} from '@react-navigation/native';
 import {Colors} from '../../theme';
 import {useApp} from '../../contexts/AppContext';
 import {getZodiacSign} from '../../components/mock/zodiacMockData';
-import {showPaywall} from '../../utils/showPaywall';
 
 import OnboardingScreen1, {AlignmentOption} from './OnboardingScreen1';
 import OnboardingScreen2 from './OnboardingScreen2';
@@ -39,7 +38,7 @@ export interface OnboardingData {
 
 export const OnboardingContainer: React.FC = () => {
   const navigation = useNavigation();
-  const {setOnboardingCompleted} = useApp();
+  const {setOnboardingCompleted, isPremium} = useApp();
   const [currentScreen, setCurrentScreen] = useState(1);
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
     alignment: null,
@@ -140,12 +139,30 @@ export const OnboardingContainer: React.FC = () => {
     console.log('📦 FINAL ONBOARDING DATA:', JSON.stringify(onboardingData, null, 2));
     console.log('========================================\n');
     
-    // Mark onboarding as completed
-    await setOnboardingCompleted(true);
+    // Determine where to navigate based on premium status
+    const targetScreen = isPremium ? 'MainApp' : 'Paywall';
+    console.log('[OnboardingContainer] 🎬 isPremium:', isPremium, '-> navigating to:', targetScreen);
     
-    // Navigate to Paywall screen using showPaywall utility
-    console.log('[OnboardingContainer] 🎬 Navigating to Paywall...');
-    showPaywall('onboarding_start_reading', navigation);
+    // IMPORTANT: Reset navigation FIRST, then save onboarding state
+    // This prevents race condition where component unmounts before navigation completes
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [
+          {
+            name: targetScreen,
+            params: targetScreen === 'Paywall' ? {source: 'onboarding_complete'} : undefined,
+          },
+        ],
+      }),
+    );
+    
+    // Mark onboarding as completed AFTER navigation reset
+    // Use setTimeout to ensure navigation completes before state change
+    // This prevents race condition where StackNavigator re-renders and removes Onboarding screen
+    setTimeout(() => {
+      setOnboardingCompleted(true);
+    }, 300);
   };
 
   const renderScreen = () => {

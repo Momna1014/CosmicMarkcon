@@ -52,8 +52,8 @@ const HomeScreen: React.FC = () => {
   }, [navigation]);
 
   const handleSynastryPress = useCallback(() => {
-    // Navigation to Synastry screen
-  }, []);
+    navigation.navigate('Love');
+  }, [navigation]);
 
   const handleChiromancyPress = useCallback(() => {
     navigation.navigate('Chiromancy');
