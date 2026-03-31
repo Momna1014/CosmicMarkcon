@@ -22,6 +22,11 @@ import NavigationConfig from './NavigationConfig';
 import TabNavigator from './TabNavigator';
 import {OnboardingContainer} from '../screens/Onboarding';
 import PaywallScreen from '../screens/Paywall';
+import {CosmicGuideDetail, LessonDetail} from '../screens/CosmicGuide';
+import LoveMatchScreen from '../screens/Love/LoveMatchScreen';
+import AddPartnerScreen from '../screens/Love/AddPartnerScreen';
+import ChatScreen from '../screens/Chat';
+import PalmCaptureScreen from '../screens/Chiromancy/PalmCaptureScreen';
 
 
 
@@ -105,7 +110,17 @@ export const StackNavigator: React.FC = () => {
           }}
         />
       )}
-
+ {NavigationConfig.enablePaywall && (
+        <Stack.Screen
+          name="Paywall"
+          component={PaywallScreen}
+          options={{
+            headerShown: false,
+            gestureEnabled: false, // Don't allow swipe back from paywall
+            animation: 'fade',
+          }}
+        />
+      )}
       {/* Main App - Either Drawer or Tabs based on config */}
       <Stack.Screen
         name="MainApp"
@@ -117,17 +132,65 @@ export const StackNavigator: React.FC = () => {
 
       {/* Paywall Screen - Full screen, not modal */}
       {/* Can be used as initial route or navigated to from anywhere */}
-      {NavigationConfig.enablePaywall && (
-        <Stack.Screen
-          name="Paywall"
-          component={PaywallScreen}
-          options={{
-            headerShown: false,
-            gestureEnabled: false, // Don't allow swipe back from paywall
-            animation: 'fade',
-          }}
-        />
-      )}
+     
+
+      {/* Cosmic Guide Screens - Stack screens without bottom tabs */}
+      <Stack.Screen
+        name="CosmicGuideDetail"
+        component={CosmicGuideDetail}
+        options={{
+          headerShown: false,
+          animation: 'slide_from_right',
+        }}
+      />
+      <Stack.Screen
+        name="LessonDetail"
+        component={LessonDetail}
+        options={{
+          headerShown: false,
+          animation: 'slide_from_right',
+        }}
+      />
+
+      {/* Love Match Screen - Stack screen without bottom tabs */}
+      <Stack.Screen
+        name="LoveMatch"
+        component={LoveMatchScreen}
+        options={{
+          headerShown: false,
+          animation: 'slide_from_right',
+        }}
+      />
+
+      {/* Add Partner Screen - Stack screen without bottom tabs */}
+      <Stack.Screen
+        name="AddPartner"
+        component={AddPartnerScreen}
+        options={{
+          headerShown: false,
+          animation: 'slide_from_bottom',
+        }}
+      />
+
+      {/* Chat Screen - Stack screen without bottom tabs */}
+      <Stack.Screen
+        name="Chat"
+        component={ChatScreen}
+        options={{
+          headerShown: false,
+          animation: 'slide_from_bottom',
+        }}
+      />
+
+      {/* Palm Capture Screen - Stack screen without bottom tabs */}
+      <Stack.Screen
+        name="PalmCapture"
+        component={PalmCaptureScreen}
+        options={{
+          headerShown: false,
+          animation: 'slide_from_bottom',
+        }}
+      />
 
       {/* Other Modal Screens can go here if needed */}
       

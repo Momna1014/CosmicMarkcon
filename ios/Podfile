@@ -11,6 +11,20 @@ prepare_react_native_project!
 # Use static frameworks - required for Firebase Swift pods to generate proper headers
 use_frameworks! :linkage => :static
 
+# react-native-permissions configuration
+# Only include the permissions you need to reduce app size
+def node_require(script)
+  require Pod::Executable.execute_command('node', ['-p',
+    "require.resolve('#{script}', {paths: [process.argv[1]]})", __dir__]).strip
+end
+
+node_require('react-native-permissions/scripts/setup.rb')
+
+setup_permissions([
+  'Camera',
+  'PhotoLibrary',
+])
+
 target 'CosmicMarkcon' do
   config = use_native_modules!
   

@@ -13,6 +13,7 @@ import {
   ImageBackground,
   Dimensions,
   TouchableOpacity,
+  StatusBar,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useTranslation} from 'react-i18next';
@@ -42,6 +43,8 @@ import {
   trackOnboarding6View,
   trackOnboarding6DeepenAnalysisClicked,
 } from '../../utils/onboardingAnalytics';
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -164,6 +167,13 @@ export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
 }) => {
   const {t} = useTranslation();
 
+  // ===== Analytics: Track screen view =====
+  useScreenView('OnboardingScreen6', {
+    screen_category: 'onboarding',
+    step: 6,
+    total_steps: 11,
+  });
+
   // Progress bar animation - start from previous screen's value (45%)
   const progressWidth = useSharedValue(45);
 
@@ -173,6 +183,9 @@ export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
   useEffect(() => {
     // Track screen view
     trackOnboarding6View();
+    
+    // Firebase screen view logging
+    firebaseService.logScreenView('OnboardingScreen6', 'OnboardingScreen6');
     
     // Animate progress bar on mount - Screen 6 of 11 (55%)
     progressWidth.value = withDelay(
@@ -243,6 +256,11 @@ export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
         style={styles.container}
         resizeMode="cover">
         <SafeAreaView style={styles.safeArea}>
+          <StatusBar
+            barStyle="light-content"
+            backgroundColor="transparent"
+            translucent
+          />
           {/* Twinkling Stars Overlay */}
           {stars.map((star, index) => (
             <TwinklingStar
@@ -349,6 +367,7 @@ const styles = StyleSheet.create({
   },
   progressBarContainer: {
     marginBottom: verticalScale(32),
+    paddingTop: verticalScale(10),
   },
   progressBarBackground: {
     height: verticalScale(8),

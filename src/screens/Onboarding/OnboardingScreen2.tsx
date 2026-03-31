@@ -16,6 +16,7 @@ import {
   Platform,
   Keyboard,
   TouchableWithoutFeedback,
+  StatusBar,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useTranslation} from 'react-i18next';
@@ -47,6 +48,8 @@ import {
   trackOnboarding2NameStarted,
   trackOnboarding2NameSubmitted,
 } from '../../utils/onboardingAnalytics';
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 const BackgroundImageSource = require('../../assets/icons/onboarding_icons/background_image.png');
@@ -159,6 +162,13 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
   const [name, setName] = useState('');
   const [hasStartedTyping, setHasStartedTyping] = useState(false);
 
+  // ===== Analytics: Track screen view =====
+  useScreenView('OnboardingScreen2', {
+    screen_category: 'onboarding',
+    step: 2,
+    total_steps: 11,
+  });
+
   // Progress bar animation - start from previous screen's value (9%)
   const progressWidth = useSharedValue(9);
 
@@ -168,6 +178,9 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
   useEffect(() => {
     // Track screen view
     trackOnboarding2View();
+    
+    // Firebase screen view logging
+    firebaseService.logScreenView('OnboardingScreen2', 'OnboardingScreen2');
     
     // Animate progress bar on mount - Screen 2 of 11 (18%)
     progressWidth.value = withDelay(
@@ -257,6 +270,11 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
             style={styles.keyboardAvoidingView}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
             <SafeAreaView style={styles.safeArea}>
+              <StatusBar
+                barStyle="light-content"
+                backgroundColor="transparent"
+                translucent
+              />
               {/* Twinkling Stars Overlay */}
               {stars.map((star, index) => (
                 <TwinklingStar
@@ -395,6 +413,7 @@ const styles = StyleSheet.create({
   },
   progressBarContainer: {
     marginBottom: verticalScale(32),
+    paddingTop: verticalScale(10),
   },
   progressBarBackground: {
     height: verticalScale(8),

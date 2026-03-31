@@ -16,9 +16,10 @@ import BottomTabBar from '../components/BottomTabComponent/BottomTabBar';
 
 // Import screens
 import HomeScreen from '../screens/Home';
-import LibraryScreen from '../screens/Library';
-import DiscoverScreen from '../screens/Discover';
-import MeScreen from '../screens/Me';
+import HoroscopeScreen from '../screens/Horoscope';
+import LoveScreen from '../screens/Love';
+import ChiromancyScreen from '../screens/Chiromancy';
+import ProfileScreen from '../screens/Profile';
 
 // Types
 import {MainTabParamList} from './deepLinking';
@@ -37,7 +38,7 @@ export const HIDDEN_TABS_SCREENS = NavigationConfig.hiddenTabScreens;
  */
 const CustomTabBar: React.FC<BottomTabBarProps> = (props) => {
   return (
-    <View>
+    <View style={customTabBarStyles.container}>
       <BannerAdComponent 
         size={BannerAdSize.BANNER}
         visible={true}
@@ -46,6 +47,15 @@ const CustomTabBar: React.FC<BottomTabBarProps> = (props) => {
     </View>
   );
 };
+
+const customTabBarStyles = StyleSheet.create({
+  container: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+});
 
 /**
  * Tab Navigator Component
@@ -68,6 +78,7 @@ const TabNavigatorCore: React.FC = () => {
         // Dynamically hide tab bar on specific screens
         tabBarStyle: getTabBarStyle(route.name),
         headerShown: shouldShowHeader,
+        tabBarBackground: () => null, // Transparent background for blur effect
       })}>
       {config.showHome && (
         <Tab.Screen
@@ -81,27 +92,35 @@ const TabNavigatorCore: React.FC = () => {
       )}
 
       <Tab.Screen
-        name="Library"
-        component={LibraryScreen}
+        name="Horoscope"
+        component={HoroscopeScreen}
         options={{
-          tabBarLabel: 'Library',
-          title: 'Library',
+          tabBarLabel: 'Horoscope',
+          title: 'Horoscope',
         }}
       />
       <Tab.Screen
-        name="Discover"
-        component={DiscoverScreen}
+        name="Love"
+        component={LoveScreen}
         options={{
-          tabBarLabel: 'Discover',
-          title: 'Discover',
+          tabBarLabel: 'Love',
+          title: 'Love',
         }}
       />
       <Tab.Screen
-        name="Me"
-        component={MeScreen}
+        name="Chiromancy"
+        component={ChiromancyScreen}
         options={{
-          tabBarLabel: 'Me',
-          title: 'Me',
+          tabBarLabel: 'Chiromancy',
+          title: 'Chiromancy',
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{
+          tabBarLabel: 'Profile',
+          title: 'Profile',
         }}
       />
     </Tab.Navigator>

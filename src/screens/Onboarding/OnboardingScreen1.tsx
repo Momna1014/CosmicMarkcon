@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   ImageBackground,
   Dimensions,
+  StatusBar,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useTranslation} from 'react-i18next';
@@ -40,6 +41,8 @@ import {
   trackOnboarding1AlignmentSelected,
   trackOnboardingStarted,
 } from '../../utils/onboardingAnalytics';
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 const BackgroundImageSource = require('../../assets/icons/onboarding_icons/background_image.png');
@@ -151,6 +154,13 @@ export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
   const {t} = useTranslation();
   const [selectedOption, setSelectedOption] = useState<AlignmentOption>(null);
 
+  // ===== Analytics: Track screen view =====
+  useScreenView('OnboardingScreen1', {
+    screen_category: 'onboarding',
+    step: 1,
+    total_steps: 11,
+  });
+
   // Progress bar animation
   const progressWidth = useSharedValue(0);
 
@@ -161,6 +171,9 @@ export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
     // Track screen view and onboarding start
     trackOnboardingStarted();
     trackOnboarding1View();
+    
+    // Firebase screen view logging
+    firebaseService.logScreenView('OnboardingScreen1', 'OnboardingScreen1');
     
     // Animate progress bar on mount - Screen 1 of 11 (9%)
     progressWidth.value = withDelay(
@@ -258,6 +271,11 @@ export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
         style={styles.container}
         resizeMode="cover">
         <SafeAreaView style={styles.safeArea}>
+          <StatusBar
+            barStyle="light-content"
+            backgroundColor="transparent"
+            translucent
+          />
           {/* Twinkling Stars Overlay */}
           {stars.map((star, index) => (
             <TwinklingStar
@@ -380,6 +398,7 @@ const styles = StyleSheet.create({
   },
   progressBarContainer: {
     marginBottom: verticalScale(32),
+    paddingTop:verticalScale(10)
   },
   progressBarBackground: {
     height: verticalScale(8),

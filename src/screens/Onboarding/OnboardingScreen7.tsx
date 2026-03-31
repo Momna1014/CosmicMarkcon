@@ -13,6 +13,7 @@ import {
   ImageBackground,
   Dimensions,
   TouchableOpacity,
+  StatusBar,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useTranslation} from 'react-i18next';
@@ -47,6 +48,8 @@ import {
   trackOnboarding7View,
   trackOnboarding7Continue,
 } from '../../utils/onboardingAnalytics';
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -166,6 +169,13 @@ export const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({
 }) => {
   const {t} = useTranslation();
 
+  // ===== Analytics: Track screen view =====
+  useScreenView('OnboardingScreen7', {
+    screen_category: 'onboarding',
+    step: 7,
+    total_steps: 11,
+  });
+
   // Get Western zodiac sign based on date and month
   const westernZodiac = useMemo(() => {
     if (!onboardingData.birthday) return null;
@@ -219,6 +229,9 @@ export const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({
         combinationPercentage
       );
     }
+    
+    // Firebase screen view logging
+    firebaseService.logScreenView('OnboardingScreen7', 'OnboardingScreen7');
     
     // Animate progress bar on mount - Screen 7 of 11 (64%)
     progressWidth.value = withDelay(
@@ -284,6 +297,11 @@ export const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({
         style={styles.container}
         resizeMode="cover">
         <SafeAreaView style={styles.safeArea}>
+          <StatusBar
+            barStyle="light-content"
+            backgroundColor="transparent"
+            translucent
+          />
           {/* Twinkling Stars Overlay */}
           {stars.map((star, index) => (
             <TwinklingStar
@@ -400,6 +418,7 @@ const styles = StyleSheet.create({
   },
   progressBarContainer: {
     marginBottom: verticalScale(32),
+    paddingTop: verticalScale(10),
   },
   progressBarBackground: {
     height: verticalScale(8),

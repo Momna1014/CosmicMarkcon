@@ -12,17 +12,49 @@ export type RootStackParamList = {
   Onboarding: undefined;
   
   // Paywall
-  Paywall: undefined;
+  Paywall: {source?: string; offeringIdentifier?: string} | undefined;
   
   // Main App
   MainApp: undefined;
+
+  // Cosmic Guide Screens (Stack screens without tabs)
+  CosmicGuideDetail: {guideId: string};
+  LessonDetail: {
+    guideId: string;
+    lessonId: string;
+    totalLessons: number;
+  };
+
+  // Love Match Screen (Stack screen without tabs)
+  LoveMatch: {
+    yourSign: string;
+    theirSign: string;
+  };
+
+  // Add Partner Screen (Stack screen without tabs)
+  AddPartner: undefined;
+
+  // Chat Screen (Stack screen without tabs)
+  Chat: {
+    source?: 'palm' | 'love';
+    imageUri?: string;
+    handType?: 'leftHand' | 'rightHand';
+    yourSign?: string;
+    theirSign?: string;
+  } | undefined;
+
+  // Palm Capture Screen (Stack screen without tabs)
+  PalmCapture: {
+    handType: 'leftHand' | 'rightHand';
+  };
 };
 
 export type MainTabParamList = {
   Home: undefined;
-  Library: undefined;
-  Discover: undefined;
-  Me: undefined;
+  Horoscope: undefined;
+  Love: undefined;
+  Chiromancy: undefined;
+  Profile: undefined;
 };
 
 /**
@@ -41,9 +73,10 @@ export const linking: LinkingOptions<RootStackParamList> = {
       MainApp: {
         screens: {
           Home: 'home',
-          Library: 'library',
-          Discover: 'discover',
-          Me: 'me',
+          Horoscope: 'horoscope',
+          Love: 'love',
+          Chiromancy: 'chiromancy',
+          Profile: 'profile',
         },
       },
     },
@@ -54,9 +87,10 @@ export const linking: LinkingOptions<RootStackParamList> = {
  * Example deep link URLs:
  * 
  * - templateapp://home
- * - templateapp://library
- * - templateapp://discover
- * - templateapp://me
+ * - templateapp://horoscope
+ * - templateapp://love
+ * - templateapp://chiromancy
+ * - templateapp://profile
  */
 
 export default linking;

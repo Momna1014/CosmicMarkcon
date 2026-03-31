@@ -9,8 +9,8 @@
  * navigation.navigate('Paywall', { source: 'onboarding_start_reading' })
  */
 
-import React, {useCallback, useEffect} from 'react';
-import {StyleSheet} from 'react-native';
+import React, {useCallback, useEffect, useState} from 'react';
+import {StyleSheet, View, ActivityIndicator, Text} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {useApp} from '../../contexts/AppContext';
 import RevenueCatUI from 'react-native-purchases-ui';
@@ -35,6 +35,17 @@ export const PaywallScreen: React.FC = () => {
   
   // Track if we've already navigated to prevent double navigation
   const hasNavigatedRef = React.useRef(false);
+  
+  // Track if paywall is ready
+  const [isReady, setIsReady] = useState(false);
+  
+  // Set ready state after a brief delay to allow RevenueCat to initialize
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsReady(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   // ===== Analytics: Track screen view =====
   useScreenView('PaywallScreen', {
@@ -78,30 +89,30 @@ export const PaywallScreen: React.FC = () => {
     
     hasNavigatedRef.current = true;
     
-    // Check if this was explicitly opened from within the app (Me screen, settings, etc.)
+    // Check if this was explicitly opened from within the app (Profile screen, settings, etc.)
     // Known in-app sources that should go back
-    const inAppSources = ['settings_upgrade', 'settings_button', 'me_screen', 'drawer', 'home_cta'];
+    const inAppSources = ['settings_upgrade', 'settings_button', 'profile_screen', 'drawer', 'home_cta'];
     const isFromInApp = source && inAppSources.some(s => source.includes(s));
     
     console.log('[PaywallScreen] 🔍 Source:', source, 'isFromInApp:', isFromInApp);
     
     if (isFromInApp) {
-      // From within app (Me screen, drawer, etc.)
-      // Check if we can go back, otherwise navigate to Me tab
+      // From within app (Profile screen, drawer, etc.)
+      // Check if we can go back, otherwise navigate to Profile tab
       console.log('[PaywallScreen] ⬅️ From app - navigating back...');
       
       if (navigation.canGoBack()) {
         navigation.goBack();
       } else {
-        // Fallback: Navigate to MainApp and ensure Me tab is shown
-        console.log('[PaywallScreen] ⚠️ Cannot go back, navigating to MainApp (Me tab)...');
+        // Fallback: Navigate to MainApp and ensure Profile tab is shown
+        console.log('[PaywallScreen] ⚠️ Cannot go back, navigating to MainApp (Profile tab)...');
         navigation.reset({
           index: 0,
           routes: [
             { 
               name: 'MainApp' as never,
               state: {
-                routes: [{ name: 'Me' }],
+                routes: [{ name: 'Profile' }],
                 index: 0,
               },
             }
@@ -253,6 +264,15 @@ export const PaywallScreen: React.FC = () => {
   }, [logFirebaseEvent, source]);
 
   // Render the paywall directly - NO background, the paywall IS the screen
+  // Show loading state briefly to ensure RevenueCat is ready
+  if (!isReady) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#D4AF37" />
+      </View>
+    );
+  }
+  
   return (
     <RevenueCatUI.Paywall
       style={styles.paywall}
@@ -268,6 +288,12 @@ export const PaywallScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: '#0A1628',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   paywall: {
     flex: 1,
   },

@@ -2,72 +2,38 @@
  * Haptic Feedback Utility
  *
  * Provides cross-platform haptic feedback for iOS and Android
- * with different intensity levels for various interactions
+ * using react-native-haptic-feedback for proper Taptic Engine support
  */
 
-import {Platform, Vibration} from 'react-native';
+import ReactNativeHapticFeedback, {
+  HapticFeedbackTypes,
+} from 'react-native-haptic-feedback';
 
 export type HapticType = 'light' | 'medium' | 'heavy' | 'selection' | 'success' | 'error';
+
+// Haptic feedback options
+const hapticOptions = {
+  enableVibrateFallback: true,
+  ignoreAndroidSystemSettings: false,
+};
+
+// Map our types to react-native-haptic-feedback types
+const hapticTypeMap: Record<HapticType, keyof typeof HapticFeedbackTypes> = {
+  light: 'impactLight',
+  medium: 'impactMedium',
+  heavy: 'impactHeavy',
+  selection: 'selection',
+  success: 'notificationSuccess',
+  error: 'notificationError',
+};
 
 /**
  * Trigger haptic feedback
  * @param type - The type of haptic feedback
  */
 export const triggerHaptic = (type: HapticType = 'light'): void => {
-  if (Platform.OS === 'ios') {
-    // iOS haptics - uses the Taptic Engine
-    // Note: For more refined haptics, consider react-native-haptic-feedback
-    switch (type) {
-      case 'light':
-        Vibration.vibrate(1);
-        break;
-      case 'medium':
-        Vibration.vibrate(2);
-        break;
-      case 'heavy':
-        Vibration.vibrate(3);
-        break;
-      case 'selection':
-        Vibration.vibrate(1);
-        break;
-      case 'success':
-        // Double tap pattern for success
-        Vibration.vibrate([0, 1, 50, 1]);
-        break;
-      case 'error':
-        // Triple tap pattern for error
-        Vibration.vibrate([0, 2, 30, 2, 30, 2]);
-        break;
-      default:
-        Vibration.vibrate(1);
-    }
-  } else {
-    // Android haptics - vibration in milliseconds
-    switch (type) {
-      case 'light':
-        Vibration.vibrate(10);
-        break;
-      case 'medium':
-        Vibration.vibrate(20);
-        break;
-      case 'heavy':
-        Vibration.vibrate(30);
-        break;
-      case 'selection':
-        Vibration.vibrate(5);
-        break;
-      case 'success':
-        // Double vibration pattern for success
-        Vibration.vibrate([0, 15, 50, 15]);
-        break;
-      case 'error':
-        // Triple vibration pattern for error
-        Vibration.vibrate([0, 20, 40, 20, 40, 20]);
-        break;
-      default:
-        Vibration.vibrate(10);
-    }
-  }
+  const feedbackType = hapticTypeMap[type] || 'impactLight';
+  ReactNativeHapticFeedback.trigger(feedbackType, hapticOptions);
 };
 
 /**

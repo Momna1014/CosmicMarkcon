@@ -6,7 +6,10 @@
 
 import React, {useState} from 'react';
 import {View, StyleSheet} from 'react-native';
+import {useNavigation, CommonActions} from '@react-navigation/native';
 import {Colors} from '../../theme';
+import {useApp} from '../../contexts/AppContext';
+import {getZodiacSign} from '../../components/mock/zodiacMockData';
 
 import OnboardingScreen1, {AlignmentOption} from './OnboardingScreen1';
 import OnboardingScreen2 from './OnboardingScreen2';
@@ -27,69 +30,139 @@ export interface OnboardingData {
   alignment: AlignmentOption;
   name: string;
   birthday: Date | null;
+  zodiacSign: string | null;
   birthTime: string;
   city: string;
   country: string;
 }
 
 export const OnboardingContainer: React.FC = () => {
+  const navigation = useNavigation();
+  const {setOnboardingCompleted, isPremium} = useApp();
   const [currentScreen, setCurrentScreen] = useState(1);
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
     alignment: null,
     name: '',
     birthday: null,
+    zodiacSign: null,
     birthTime: '',
     city: '',
     country: '',
   });
 
   const handleScreen1Continue = (alignment: AlignmentOption) => {
-    setOnboardingData(prev => ({...prev, alignment}));
+    console.log('\n🔵 [Screen 1] Life Alignment Selected:', alignment);
+    setOnboardingData(prev => {
+      const updated = {...prev, alignment};
+      console.log('📦 [OnboardingData] Current state:', JSON.stringify(updated, null, 2));
+      return updated;
+    });
     setCurrentScreen(2);
   };
 
   const handleScreen2Next = (name: string) => {
-    setOnboardingData(prev => ({...prev, name}));
+    console.log('\n🔵 [Screen 2] Name Entered:', name);
+    setOnboardingData(prev => {
+      const updated = {...prev, name};
+      console.log('📦 [OnboardingData] Current state:', JSON.stringify(updated, null, 2));
+      return updated;
+    });
     setCurrentScreen(3);
   };
 
   const handleScreen3Next = (birthday: Date) => {
-    setOnboardingData(prev => ({...prev, birthday}));
+    const zodiacData = getZodiacSign(birthday);
+    const zodiacSign = zodiacData?.name || null;
+    console.log('\n🔵 [Screen 3] Birthday Selected:', birthday.toISOString());
+    console.log('🔵 [Screen 3] Zodiac Sign Calculated:', zodiacSign);
+    setOnboardingData(prev => {
+      const updated = {...prev, birthday, zodiacSign};
+      console.log('📦 [OnboardingData] Current state:', JSON.stringify(updated, null, 2));
+      return updated;
+    });
     setCurrentScreen(4);
   };
 
   const handleScreen4Next = () => {
+    console.log('\n🔵 [Screen 4] Cosmic Insight Viewed - Auto navigating...');
+    console.log('📦 [OnboardingData] Passing forward:', JSON.stringify(onboardingData, null, 2));
     setCurrentScreen(5);
   };
 
   const handleScreen5Next = () => {
+    console.log('\n🔵 [Screen 5] Zodiac Signs Info Viewed');
+    console.log('📦 [OnboardingData] Passing forward:', JSON.stringify(onboardingData, null, 2));
     setCurrentScreen(6);
   };
 
   const handleScreen6Next = () => {
+    console.log('\n🔵 [Screen 6] Unlock Analysis Info Viewed');
+    console.log('📦 [OnboardingData] Passing forward:', JSON.stringify(onboardingData, null, 2));
     setCurrentScreen(7);
   };
 
   const handleScreen7Next = () => {
+    console.log('\n🔵 [Screen 7] Personalized Insights Info Viewed');
+    console.log('📦 [OnboardingData] Passing forward:', JSON.stringify(onboardingData, null, 2));
     setCurrentScreen(8);
   };
 
   const handleScreen8Next = () => {
+    console.log('\n🔵 [Screen 8] Chart Preview Viewed');
+    console.log('📦 [OnboardingData] Passing forward:', JSON.stringify(onboardingData, null, 2));
     setCurrentScreen(9);
   };
 
   const handleScreen9Next = (birthTime: string, city: string, country: string) => {
-    setOnboardingData(prev => ({...prev, birthTime, city, country}));
+    console.log('\n🔵 [Screen 9] Birth Details Entered:');
+    console.log('   - Birth Time:', birthTime);
+    console.log('   - City:', city);
+    console.log('   - Country:', country);
+    setOnboardingData(prev => {
+      const updated = {...prev, birthTime, city, country};
+      console.log('📦 [OnboardingData] COMPLETE DATA for Screen 10:', JSON.stringify(updated, null, 2));
+      return updated;
+    });
     setCurrentScreen(10);
   };
 
   const handleScreen10Complete = () => {
+    console.log('\n🔵 [Screen 10] Loading Complete - Data Saved to Redux');
+    console.log('📦 [OnboardingData] Final state:', JSON.stringify(onboardingData, null, 2));
     setCurrentScreen(11);
   };
 
-  const handleScreen11Next = () => {
-    // TODO: Complete onboarding and navigate to main app
-    console.log('=== FINAL ONBOARDING DATA ===', onboardingData);
+  const handleScreen11Next = async () => {
+    console.log('\n========================================');
+    console.log('🎉 [Screen 11] ONBOARDING COMPLETE!');
+    console.log('========================================');
+    console.log('📦 FINAL ONBOARDING DATA:', JSON.stringify(onboardingData, null, 2));
+    console.log('========================================\n');
+    
+    // Determine where to navigate based on premium status
+    const targetScreen = isPremium ? 'MainApp' : 'Paywall';
+    console.log('[OnboardingContainer] 🎬 isPremium:', isPremium, '-> navigating to:', targetScreen);
+    
+    // IMPORTANT: Reset navigation FIRST, then save onboarding state
+    // This prevents race condition where component unmounts before navigation completes
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [
+          {
+            name: targetScreen,
+            params: targetScreen === 'Paywall' ? {source: 'onboarding_complete'} : undefined,
+          },
+        ],
+      }),
+    );
+    
+    // Mark onboarding as completed AFTER navigation reset
+    // Use setTimeout to ensure navigation completes before state change
+    // This prevents race condition where StackNavigator re-renders and removes Onboarding screen
+    setTimeout(() => {
+      setOnboardingCompleted(true);
+    }, 300);
   };
 
   const renderScreen = () => {

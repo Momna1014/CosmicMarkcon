@@ -3,6 +3,8 @@
  *
  * Shows loading animation with progress bar while "aligning planetary ephemeris"
  * Then reveals the alignment result with call-to-action
+ * 
+ * IMPORTANT: This screen saves all onboarding data to Redux when loading completes
  */
 
 import React, {useEffect, useState, useCallback} from 'react';
@@ -13,9 +15,11 @@ import {
   ImageBackground,
   Dimensions,
   TouchableOpacity,
+  StatusBar,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useTranslation} from 'react-i18next';
+import {useDispatch} from 'react-redux';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -37,6 +41,8 @@ import {
   moderateScale,
 } from '../../theme';
 import {OnboardingData} from './OnboardingContainer';
+import {saveOnboardingData} from '../../redux/slices/onboardingSlice';
+import {AppDispatch} from '../../redux/store';
 
 // SVG Icons
 import LeafIcon from '../../assets/icons/onboarding_icons/leaf.svg';
@@ -46,6 +52,8 @@ import {
   trackOnboarding10LoadingComplete,
   trackOnboarding10Continue,
 } from '../../utils/onboardingAnalytics';
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -62,9 +70,17 @@ interface OnboardingScreen10Props {
 
 export const OnboardingScreen10: React.FC<OnboardingScreen10Props> = ({
   onComplete,
-  onboardingData: _onboardingData,
+  onboardingData,
 }) => {
   const {t} = useTranslation();
+  const dispatch = useDispatch<AppDispatch>();
+
+  // ===== Analytics: Track screen view =====
+  useScreenView('OnboardingScreen10', {
+    screen_category: 'onboarding',
+    step: 10,
+    total_steps: 11,
+  });
 
   // State
   const [isLoadingComplete, setIsLoadingComplete] = useState(false);
@@ -82,8 +98,26 @@ export const OnboardingScreen10: React.FC<OnboardingScreen10Props> = ({
     setProgressPercent(Math.round(value));
   }, []);
 
-  // Mark loading as complete
+  // Mark loading as complete and save data to Redux
   const onLoadingComplete = useCallback(() => {
+    console.log('\n========================================');
+    console.log('🔄 [Screen 10] Loading Complete!');
+    console.log('========================================');
+    console.log('📦 Received onboardingData:', JSON.stringify(onboardingData, null, 2));
+    
+    // Save all onboarding data to Redux
+    // Convert Date to ISO string to avoid non-serializable warning
+    console.log('\n💾 Saving onboarding data to Redux...');
+    dispatch(saveOnboardingData({
+      alignment: onboardingData.alignment,
+      name: onboardingData.name,
+      birthday: onboardingData.birthday ? onboardingData.birthday.toISOString() : null,
+      birthTime: onboardingData.birthTime,
+      city: onboardingData.city,
+      country: onboardingData.country,
+      zodiacSign: onboardingData.zodiacSign || undefined,
+    }));
+    
     setIsLoadingComplete(true);
     // Track loading complete
     trackOnboarding10LoadingComplete();
@@ -92,11 +126,24 @@ export const OnboardingScreen10: React.FC<OnboardingScreen10Props> = ({
       duration: 800,
       easing: Easing.out(Easing.cubic),
     });
-  }, [topProgressWidth]);
+  }, [topProgressWidth, dispatch, onboardingData]);
 
   useEffect(() => {
+    // Log the data received from previous screens
+    console.log('\n🟢 [Screen 10] MOUNTED - Received Onboarding Data:');
+    console.log('   - Alignment:', onboardingData.alignment);
+    console.log('   - Name:', onboardingData.name);
+    console.log('   - Birthday:', onboardingData.birthday?.toISOString());
+    console.log('   - Zodiac Sign:', onboardingData.zodiacSign);
+    console.log('   - Birth Time:', onboardingData.birthTime);
+    console.log('   - City:', onboardingData.city);
+    console.log('   - Country:', onboardingData.country);
+    
     // Track screen view (loading started)
     trackOnboarding10View();
+    
+    // Firebase screen view logging
+    firebaseService.logScreenView('OnboardingScreen10', 'OnboardingScreen10');
     
     // Animate leaf with subtle pulse
     leafScale.value = withRepeat(
@@ -269,6 +316,11 @@ export const OnboardingScreen10: React.FC<OnboardingScreen10Props> = ({
         style={styles.container}
         resizeMode="cover">
         <SafeAreaView style={styles.safeArea}>
+          <StatusBar
+            barStyle="light-content"
+            backgroundColor="transparent"
+            translucent
+          />
           <View style={styles.contentContainer}>
             {!isLoadingComplete ? renderLoadingState() : renderResultState()}
              {/* {renderLoadingState()} */}
@@ -357,6 +409,7 @@ const styles = StyleSheet.create({
   },
   topProgressBarContainer: {
     marginBottom: verticalScale(24),
+    paddingTop: verticalScale(10),
   },
   topProgressBarBackground: {
     height: verticalScale(8),

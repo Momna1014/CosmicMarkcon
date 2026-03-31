@@ -13,6 +13,7 @@ import {
   ImageBackground,
   Dimensions,
   TouchableOpacity,
+  StatusBar,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useTranslation} from 'react-i18next';
@@ -47,6 +48,8 @@ import {
   trackOnboarding11View,
   trackOnboarding11Complete,
 } from '../../utils/onboardingAnalytics';
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -191,6 +194,13 @@ export const OnboardingScreen11: React.FC<OnboardingScreen11Props> = ({
 }) => {
   const {t} = useTranslation();
 
+  // ===== Analytics: Track screen view =====
+  useScreenView('OnboardingScreen11', {
+    screen_category: 'onboarding',
+    step: 11,
+    total_steps: 11,
+  });
+
   // Progress bar animation - start from previous screen's value (91%)
   const progressWidth = useSharedValue(91);
 
@@ -200,6 +210,9 @@ export const OnboardingScreen11: React.FC<OnboardingScreen11Props> = ({
   useEffect(() => {
     // Track final screen view
     trackOnboarding11View();
+    
+    // Firebase screen view logging
+    firebaseService.logScreenView('OnboardingScreen11', 'OnboardingScreen11');
     
     // Animate progress bar to 100%
     progressWidth.value = withDelay(
@@ -238,6 +251,11 @@ export const OnboardingScreen11: React.FC<OnboardingScreen11Props> = ({
         style={styles.container}
         resizeMode="cover">
         <SafeAreaView style={styles.safeArea}>
+          <StatusBar
+            barStyle="light-content"
+            backgroundColor="transparent"
+            translucent
+          />
           {/* Twinkling Stars Overlay */}
           {STARS_CONFIG.map((star, index) => (
             <TwinklingStar
@@ -337,6 +355,7 @@ const styles = StyleSheet.create({
   },
   progressBarContainer: {
     marginBottom: verticalScale(24),
+    paddingTop: verticalScale(10),
   },
   progressBarBackground: {
     height: verticalScale(8),

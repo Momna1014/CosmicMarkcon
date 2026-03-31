@@ -1,8 +1,8 @@
 import {combineReducers} from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
-import readingProgressReducer from './slices/readingProgressSlice';
-import savedMangaReducer from './slices/savedMangaSlice';
-import downloadReducer from './slices/downloadSlice';
+import onboardingReducer from './slices/onboardingSlice';
+import partnersReducer from './slices/partnersSlice';
+import cosmicGuidesReducer from './slices/cosmicGuidesSlice';
 // Import other reducers here as you create them
 // import userReducer from './slices/userSlice';
 // import postsReducer from './slices/postsSlice';
@@ -15,9 +15,9 @@ import downloadReducer from './slices/downloadSlice';
  */
 const rootReducer = combineReducers({
   auth: authReducer,
-  readingProgress: readingProgressReducer,
-  savedManga: savedMangaReducer,
-  downloads: downloadReducer,
+  onboarding: onboardingReducer,
+  partners: partnersReducer,
+  cosmicGuides: cosmicGuidesReducer,
   // Add other reducers here:
   // user: userReducer,
   // posts: postsReducer,

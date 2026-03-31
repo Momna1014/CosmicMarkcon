@@ -15,6 +15,7 @@ import {
   ImageBackground,
   Dimensions,
   TouchableOpacity,
+  StatusBar,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useTranslation} from 'react-i18next';
@@ -58,6 +59,8 @@ import {
   trackOnboarding9CitySelected,
   trackOnboarding9Continue,
 } from '../../utils/onboardingAnalytics';
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -384,6 +387,13 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
 }) => {
   const {t} = useTranslation();
 
+  // ===== Analytics: Track screen view =====
+  useScreenView('OnboardingScreen9', {
+    screen_category: 'onboarding',
+    step: 9,
+    total_steps: 11,
+  });
+
   // State - Deferred loading for modals
   const [isReady, setIsReady] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -405,6 +415,9 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
   useEffect(() => {
     // Track screen view
     trackOnboarding9View();
+    
+    // Firebase screen view logging
+    firebaseService.logScreenView('OnboardingScreen9', 'OnboardingScreen9');
     
     // Use requestAnimationFrame as a lightweight alternative to InteractionManager
     const frameId = requestAnimationFrame(() => {
@@ -523,6 +536,11 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
         style={styles.container}
         resizeMode="cover">
         <SafeAreaView style={styles.safeArea}>
+          <StatusBar
+            barStyle="light-content"
+            backgroundColor="transparent"
+            translucent
+          />
           {/* Twinkling Stars Overlay */}
           {STARS_CONFIG.map((star, index) => (
             <TwinklingStar
@@ -695,6 +713,7 @@ const styles = StyleSheet.create({
   },
   progressBarContainer: {
     marginBottom: verticalScale(24),
+    paddingTop: verticalScale(10),
   },
   progressBarBackground: {
     height: verticalScale(8),

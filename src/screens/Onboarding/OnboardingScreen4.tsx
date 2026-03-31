@@ -12,6 +12,7 @@ import {
   StyleSheet,
   ImageBackground,
   Dimensions,
+  StatusBar,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Animated, {
@@ -40,6 +41,9 @@ import {
   trackOnboarding4TypewriterComplete,
   trackOnboarding4AutoNavigate,
 } from '../../utils/onboardingAnalytics';
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
+import {hapticLight} from '../../utils/haptics';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -181,6 +185,13 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
   const insightText = t(`zodiac.insights.${zodiacKey}.insight${insightNumber}`);
   const subtextText = t('onboarding.screen4.subtext');
 
+  // ===== Analytics: Track screen view =====
+  useScreenView('OnboardingScreen4', {
+    screen_category: 'onboarding',
+    step: 4,
+    total_steps: 11,
+  });
+
   // Typewriter state
   const [displayedMainText, setDisplayedMainText] = useState('');
   const [displayedSubText, setDisplayedSubText] = useState('');
@@ -197,6 +208,9 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
   useEffect(() => {
     // Track screen view with zodiac name and insight number
     trackOnboarding4View(zodiac.name, insightNumber);
+    
+    // Firebase screen view logging
+    firebaseService.logScreenView('OnboardingScreen4', 'OnboardingScreen4');
     
     progressWidth.value = withDelay(
       300,
@@ -230,6 +244,7 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
     const typingInterval = setInterval(() => {
       if (currentIndex < insightText.length) {
         setDisplayedMainText(insightText.slice(0, currentIndex + 1));
+        hapticLight();
         currentIndex++;
       } else {
         clearInterval(typingInterval);
@@ -250,6 +265,7 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
       const typingInterval = setInterval(() => {
         if (currentIndex < subtextText.length) {
           setDisplayedSubText(subtextText.slice(0, currentIndex + 1));
+          hapticLight();
           currentIndex++;
         } else {
           clearInterval(typingInterval);
@@ -315,6 +331,11 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
         style={styles.container}
         resizeMode="cover">
         <SafeAreaView style={styles.safeArea}>
+          <StatusBar
+            barStyle="light-content"
+            backgroundColor="transparent"
+            translucent
+          />
           {/* Twinkling Stars Overlay */}
           {stars.map((star, index) => (
             <TwinklingStar
@@ -405,6 +426,7 @@ const styles = StyleSheet.create({
   },
   progressBarContainer: {
     marginBottom: verticalScale(32),
+    paddingTop: verticalScale(10),
   },
   progressBarBackground: {
     height: verticalScale(8),
