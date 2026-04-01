@@ -90,6 +90,10 @@ const HomeScreen: React.FC = () => {
     navigation.navigate('Chiromancy');
   }, [navigation]);
 
+  const handleProfilePress = useCallback(() => {
+    navigation.navigate('Profile');
+  }, [navigation]);
+
   const handleCosmicGuidePress = useCallback((guideId: string) => {
     trackHomeCosmicGuideTap(guideId, guideId);
     navigation.navigate('CosmicGuideDetail', {guideId});
@@ -136,7 +140,7 @@ const HomeScreen: React.FC = () => {
               />
             }>
             {/* Header Section (Welcome + Title) */}
-            <HeaderSection userName={userName} />
+            <HeaderSection userName={userName} onProfilePress={handleProfilePress} />
 
             {/* Daily Energy Card */}
             <DailyEnergyCard

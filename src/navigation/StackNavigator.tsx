@@ -27,6 +27,7 @@ import LoveMatchScreen from '../screens/Love/LoveMatchScreen';
 import AddPartnerScreen from '../screens/Love/AddPartnerScreen';
 import ChatScreen from '../screens/Chat';
 import PalmCaptureScreen from '../screens/Chiromancy/PalmCaptureScreen';
+import ProfileScreen from '../screens/Profile';
 
 
 
@@ -189,6 +190,16 @@ export const StackNavigator: React.FC = () => {
         options={{
           headerShown: false,
           animation: 'slide_from_bottom',
+        }}
+      />
+
+      {/* Profile Screen - Stack screen without bottom tabs */}
+      <Stack.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{
+          headerShown: false,
+          animation: 'slide_from_right',
         }}
       />
 

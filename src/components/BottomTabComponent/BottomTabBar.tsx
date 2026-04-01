@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
+  Image,
 } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { BlurView } from '@react-native-community/blur';
@@ -22,7 +23,9 @@ import HomeIcon from '../../assets/icons/bottomtab_icons/home.svg';
 import HoroscopeIcon from '../../assets/icons/bottomtab_icons/horoscope.svg';
 import LoveIcon from '../../assets/icons/bottomtab_icons/love_companion.svg';
 import ChiromancyIcon from '../../assets/icons/bottomtab_icons/chiromancy.svg';
-import ProfileIcon from '../../assets/icons/bottomtab_icons/profile.svg';
+import InactiveChatIcon from '../../assets/icons/chat_icons/in_active_chat_icon.svg';
+
+const ActiveChatIcon = require('../../assets/icons/chat_icons/chat.png');
 
 // Import SVG icons - filled (active)
 import FillHomeIcon from '../../assets/icons/bottomtab_icons/fill_home.svg';
@@ -42,7 +45,7 @@ const outlineIconMap: Record<string, React.FC<{ width: number; height: number }>
   Horoscope: HoroscopeIcon,
   Love: LoveIcon,
   Chiromancy: ChiromancyIcon,
-  Profile: ProfileIcon,
+  Chat: InactiveChatIcon,
 };
 
 // Icon map for each tab - filled icons (active)
@@ -51,7 +54,11 @@ const filledIconMap: Record<string, React.FC<{ width: number; height: number }>>
   Horoscope: FillHoroscopeIcon,
   Love: FillLoveIcon,
   Chiromancy: FillChiromancyIcon,
-  Profile: ProfileIcon, // Use outline for profile as no fill variant
+};
+
+// Tabs that use PNG images for active state
+const activePngMap: Record<string, any> = {
+  Chat: ActiveChatIcon,
 };
 
 interface CustomBottomTabBarProps extends BottomTabBarProps {}
@@ -88,8 +95,9 @@ const BottomTabBar: React.FC<CustomBottomTabBarProps> = ({
           const isFocused = state.index === index;
           
           // Get the appropriate icon based on active state
+          const activePng = activePngMap[route.name];
           const IconComponent = isFocused 
-            ? filledIconMap[route.name] 
+            ? (activePng ? null : filledIconMap[route.name]) 
             : outlineIconMap[route.name];
 
           const onPress = () => {
@@ -126,12 +134,18 @@ const BottomTabBar: React.FC<CustomBottomTabBarProps> = ({
               hitSlop={{ top: 15, bottom: 15, left: 10, right: 10 }}
             >
               <View style={styles.iconContainer}>
-                {IconComponent && (
+                {isFocused && activePng ? (
+                  <Image
+                    source={activePng}
+                    style={{width: ICON_SIZE, height: ICON_SIZE}}
+                    resizeMode="contain"
+                  />
+                ) : IconComponent ? (
                   <IconComponent
                     width={ICON_SIZE}
                     height={ICON_SIZE}
                   />
-                )}
+                ) : null}
                 {/* Active indicator dot - positioned exactly below icon */}
                 {isFocused && <View style={styles.activeDot} />}
               </View>

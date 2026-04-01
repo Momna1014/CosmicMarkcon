@@ -26,6 +26,9 @@ import {
 
 // Icons
 import StarIcon from '../../assets/icons/home_icons/welcome_star.svg';
+
+// Chat Header (same as Chat screen)
+import {ChatHeader} from '../Chat/components';
 import {
   selectOnboardingState,
   saveOnboardingData,
@@ -433,22 +436,12 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
             backgroundColor="transparent"
             translucent
           />
+          <ChatHeader title="Profile" subtitle="Your Celestial Identity" />
           <ScrollView
             style={styles.scrollView}
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled">
-            {/* Header */}
-            <Animated.View style={[
-              styles.header,
-              {
-                opacity: headerFadeAnim,
-                transform: [{translateY: headerSlideAnim}],
-              }
-            ]}>
-              <Text style={styles.title}>Profile</Text>
-              <Text style={styles.subtitle}>Your Celestial Identity</Text>
-            </Animated.View>
 
             {/* Form or Profile Card */}
             <View>

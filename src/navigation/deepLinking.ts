@@ -34,6 +34,9 @@ export type RootStackParamList = {
   // Add Partner Screen (Stack screen without tabs)
   AddPartner: undefined;
 
+  // Profile Screen (Stack screen without tabs)
+  Profile: undefined;
+
   // Chat Screen (Stack screen without tabs)
   Chat: {
     source?: 'palm' | 'love';
@@ -55,7 +58,7 @@ export type MainTabParamList = {
   Horoscope: undefined;
   Love: undefined;
   Chiromancy: undefined;
-  Profile: undefined;
+  Chat: undefined;
 };
 
 /**
@@ -77,7 +80,7 @@ export const linking: LinkingOptions<RootStackParamList> = {
           Horoscope: 'horoscope',
           Love: 'love',
           Chiromancy: 'chiromancy',
-          Profile: 'profile',
+          Chat: 'chat',
         },
       },
     },

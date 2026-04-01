@@ -38,6 +38,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: verticalScale(8),
+    justifyContent: 'space-between',
   },
   welcomeIcon: {
     width: horizontalScale(16),
@@ -64,6 +65,10 @@ export const styles = StyleSheet.create({
     textTransform: 'uppercase',
     fontWeight:'bold',
     marginLeft: horizontalScale(4),
+  },
+  profileButton: {
+    marginLeft: 'auto',
+    padding: moderateScale(4),
   },
 
   // Title Section

@@ -29,22 +29,6 @@ export const styles = StyleSheet.create({
     paddingHorizontal: horizontalScale(20),
     paddingBottom: verticalScale(120),
   },
-  header: {
-    alignItems: 'center',
-    marginTop: verticalScale(10),
-    marginBottom: verticalScale(24),
-  },
-  title: {
-    fontFamily: FontFamilies.sunlightDreams,
-    fontSize: fontScale(32),
-    color: '#D4AF37',
-    marginBottom: verticalScale(6),
-  },
-  subtitle: {
-    fontFamily: FontFamilies.interRegular,
-    fontSize: fontScale(14),
-    color: 'rgba(255, 255, 255, 0.7)',
-  },
 
   // Glass Card - Transparent with blur
   glassCard: {
