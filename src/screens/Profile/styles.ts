@@ -5,6 +5,7 @@ import {
   horizontalScale,
   verticalScale,
   radiusScale,
+  moderateScale,
 } from '../../theme';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
@@ -28,6 +29,7 @@ export const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: horizontalScale(20),
     paddingBottom: verticalScale(120),
+    paddingTop:moderateScale(30)
   },
 
   // Glass Card - Transparent with blur

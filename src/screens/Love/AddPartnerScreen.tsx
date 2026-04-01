@@ -21,7 +21,8 @@ import {
   ScrollView,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+import {selectOnboardingState} from '../../redux/slices/onboardingSlice';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -70,7 +71,7 @@ const BackgroundImageSource = require('../../assets/icons/bottomtab_icons/main_s
 // Animated TouchableOpacity
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
-type StepType = 'name' | 'birthday' | 'location';
+type StepType = 'name' | 'birthday' | 'location' | 'analyze';
 
 interface AddPartnerScreenProps {
   navigation: any;
@@ -96,10 +97,17 @@ const STEP_CONFIG = {
     subheading: 'City and Time of arrival (OPYTIONAL)',
     placeholder: 'e.g. New York',
   },
+  analyze: {
+    heading: 'Partner Added\nSuccessfully! ✨',
+    subheading: 'Want to discover your cosmic compatibility?',
+    placeholder: '',
+  },
 };
 
 const AddPartnerScreen: React.FC<AddPartnerScreenProps> = ({navigation}) => {
   const dispatch = useDispatch();
+  const onboardingData = useSelector(selectOnboardingState);
+  const [savedPartnerSign, setSavedPartnerSign] = useState<string>('');
   
   // Form state
   const [currentStep, setCurrentStep] = useState<StepType>('name');
@@ -132,17 +140,20 @@ const AddPartnerScreen: React.FC<AddPartnerScreenProps> = ({navigation}) => {
 
   // Update progress bar based on step
   useEffect(() => {
-    const stepProgress = {
-      name: 33,
-      birthday: 66,
-      location: 100,
+    const stepProgress: Record<StepType, number> = {
+      name: 25,
+      birthday: 50,
+      location: 75,
+      analyze: 100,
     };
     progressWidth.value = withTiming(stepProgress[currentStep], {
       duration: 500,
       easing: Easing.out(Easing.cubic),
     });
     // Track step changes
-    trackAddPartnerStep(currentStep);
+    if (currentStep !== 'analyze') {
+      trackAddPartnerStep(currentStep);
+    }
   }, [currentStep, progressWidth]);
 
 
@@ -152,7 +163,7 @@ const AddPartnerScreen: React.FC<AddPartnerScreenProps> = ({navigation}) => {
 
   // Get step index for progress dots
   const getStepIndex = () => {
-    const steps: StepType[] = ['name', 'birthday', 'location'];
+    const steps: StepType[] = ['name', 'birthday', 'location', 'analyze'];
     return steps.indexOf(currentStep);
   };
 
@@ -177,7 +188,7 @@ const AddPartnerScreen: React.FC<AddPartnerScreenProps> = ({navigation}) => {
       } else if (currentStep === 'birthday') {
         setCurrentStep('location');
       } else if (currentStep === 'location') {
-        // Save partner to Redux
+        // Save partner to Redux, then show analyze step
         if (birthday) {
           const zodiacSign = getZodiacSign(birthday);
           trackAddPartnerComplete(zodiacSign.name, selectedCity !== null);
@@ -188,7 +199,8 @@ const AddPartnerScreen: React.FC<AddPartnerScreenProps> = ({navigation}) => {
             city: selectedCity?.name,
             country: selectedCountry?.name,
           }));
-          navigation.goBack();
+          setSavedPartnerSign(zodiacSign.name);
+          setCurrentStep('analyze');
         }
       }
     }, 150);
@@ -208,6 +220,9 @@ const AddPartnerScreen: React.FC<AddPartnerScreenProps> = ({navigation}) => {
       const hasCity = countryHasCities ? selectedCity !== null : true;
       const hasTime = birthTime !== null;
       return hasCountry && hasCity && hasTime;
+    }
+    if (currentStep === 'analyze') {
+      return true;
     }
     return true;
   };
@@ -285,7 +300,7 @@ const AddPartnerScreen: React.FC<AddPartnerScreenProps> = ({navigation}) => {
 
                 {/* Progress Dots */}
                 <View style={styles.progressDots}>
-                  {[0, 1, 2].map((index) => (
+                  {[0, 1, 2, 3].map((index) => (
                     <View
                       key={index}
                       style={[
@@ -405,26 +420,86 @@ const AddPartnerScreen: React.FC<AddPartnerScreenProps> = ({navigation}) => {
                       <View style={styles.inputUnderline} />
                     </Animated.View>
                   )}
+
+                  {currentStep === 'analyze' && (
+                    <Animated.View
+                      entering={FadeInUp.delay(400).duration(500)}
+                      style={styles.analyzeContainer}>
+                      {/* Success checkmark */}
+                      <View style={styles.analyzeIconCircle}>
+                        <Text style={styles.analyzeCheckmark}>✓</Text>
+                      </View>
+
+                      {/* Partner info card */}
+                      <View style={styles.analyzeCard}>
+                        <View style={styles.analyzeCardOverlay} />
+                        <View style={styles.analyzeAvatarRow}>
+                          <View style={styles.analyzeAvatar}>
+                            <Text style={styles.analyzeAvatarText}>
+                              {partnerName.charAt(0).toUpperCase()}
+                            </Text>
+                          </View>
+                          <View style={styles.analyzePartnerInfo}>
+                            <Text style={styles.analyzePartnerName}>{partnerName}</Text>
+                            <Text style={styles.analyzePartnerSign}>{savedPartnerSign}</Text>
+                          </View>
+                        </View>
+                      </View>
+
+                      {/* Description */}
+                      <Text style={styles.analyzeDescription}>
+                        See how {onboardingData?.zodiacSign || 'your sign'} and {savedPartnerSign} align in love, communication, and passion.
+                      </Text>
+                    </Animated.View>
+                  )}
                 </View>
               </View>
             </ScrollView>
 
-            {/* Bottom Section with Continue Button */}
+            {/* Bottom Section with Continue/Analyze Button */}
             <Animated.View
               entering={FadeInUp.delay(600).duration(500)}
               style={styles.bottomSection}>
-              <AnimatedTouchable
-                style={[
-                  styles.continueButton,
-                  !isContinueEnabled() && styles.continueButtonDisabled,
-                  buttonAnimatedStyle,
-                ]}
-                disabled={!isContinueEnabled()}
-                onPress={handleContinue}
-                activeOpacity={0.8}>
-                <Text style={styles.continueButtonText}>Continue</Text>
-                <ArrowRightIcon width={20} height={20} />
-              </AnimatedTouchable>
+              {currentStep === 'analyze' ? (
+                <>
+                  <AnimatedTouchable
+                    style={[styles.analyzeButton, buttonAnimatedStyle]}
+                    onPress={() => {
+                      hapticLight();
+                      const userSign = onboardingData?.zodiacSign || '';
+                      navigation.replace('LoveMatch', {
+                        yourSign: userSign,
+                        theirSign: savedPartnerSign,
+                      });
+                    }}
+                    activeOpacity={0.8}>
+                    <Text style={styles.analyzeButtonText}>Analyze Compatibility</Text>
+                    <Text style={styles.analyzeButtonEmoji}>💫</Text>
+                  </AnimatedTouchable>
+                  <TouchableOpacity
+                    style={styles.skipButton}
+                    onPress={() => {
+                      hapticLight();
+                      navigation.goBack();
+                    }}
+                    activeOpacity={0.7}>
+                    <Text style={styles.skipButtonText}>Maybe Later</Text>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <AnimatedTouchable
+                  style={[
+                    styles.continueButton,
+                    !isContinueEnabled() && styles.continueButtonDisabled,
+                    buttonAnimatedStyle,
+                  ]}
+                  disabled={!isContinueEnabled()}
+                  onPress={handleContinue}
+                  activeOpacity={0.8}>
+                  <Text style={styles.continueButtonText}>Continue</Text>
+                  <ArrowRightIcon width={20} height={20} />
+                </AnimatedTouchable>
+              )}
             </Animated.View>
           </KeyboardAvoidingView>
         </SafeAreaView>
@@ -607,6 +682,113 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: fontScale(18),
     color: Colors.black,
+  },
+  // Analyze step styles
+  analyzeContainer: {
+    alignItems: 'center',
+    paddingTop: verticalScale(10),
+  },
+  analyzeIconCircle: {
+    width: moderateScale(70),
+    height: moderateScale(70),
+    borderRadius: moderateScale(35),
+    backgroundColor: 'rgba(221, 197, 96, 0.15)',
+    borderWidth: 2,
+    borderColor: 'rgba(221, 197, 96, 0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: verticalScale(24),
+  },
+  analyzeCheckmark: {
+    fontSize: fontScale(30),
+    color: '#DDC560',
+  },
+  analyzeCard: {
+    width: '100%',
+    borderRadius: radiusScale(16),
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(194, 209, 243, 0.2)',
+    backgroundColor: 'rgba(194, 209, 243, 0.06)',
+    padding: horizontalScale(18),
+    marginBottom: verticalScale(20),
+  },
+  analyzeCardOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(10, 22, 40, 0.2)',
+    borderRadius: radiusScale(16),
+  },
+  analyzeAvatarRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  analyzeAvatar: {
+    width: moderateScale(48),
+    height: moderateScale(48),
+    borderRadius: moderateScale(24),
+    backgroundColor: 'rgba(221, 197, 96, 0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(221, 197, 96, 0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: horizontalScale(14),
+  },
+  analyzeAvatarText: {
+    fontFamily: FontFamilies.sunlightDreams,
+    fontSize: fontScale(22),
+    color: '#EEDF9B',
+  },
+  analyzePartnerInfo: {
+    flex: 1,
+  },
+  analyzePartnerName: {
+    fontFamily: FontFamilies.interSemiBold,
+    fontSize: fontScale(18),
+    color: '#FFFFFF',
+    fontWeight: '600',
+    marginBottom: verticalScale(2),
+  },
+  analyzePartnerSign: {
+    fontFamily: FontFamilies.interRegular,
+    fontSize: fontScale(13),
+    color: '#DDC560',
+    letterSpacing: 0.5,
+  },
+  analyzeDescription: {
+    fontFamily: FontFamilies.interRegular,
+    fontSize: fontScale(14),
+    color: 'rgba(194, 209, 243, 0.7)',
+    textAlign: 'center',
+    lineHeight: fontScale(21),
+    paddingHorizontal: horizontalScale(10),
+  },
+  analyzeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.white,
+    borderRadius: radiusScale(16),
+    paddingVertical: verticalScale(18),
+    gap: horizontalScale(8),
+  },
+  analyzeButtonText: {
+    fontFamily: FontFamilies.interSemiBold,
+    fontWeight: '600',
+    fontSize: fontScale(18),
+    color: Colors.black,
+  },
+  analyzeButtonEmoji: {
+    fontSize: fontScale(18),
+  },
+  skipButton: {
+    alignItems: 'center',
+    paddingVertical: verticalScale(14),
+  },
+  skipButtonText: {
+    fontFamily: FontFamilies.interMedium,
+    fontSize: fontScale(15),
+    color: 'rgba(194, 209, 243, 0.6)',
+    fontWeight: '500',
   },
 });
 

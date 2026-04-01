@@ -356,7 +356,7 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
                 ]}>
                 {selectedCity?.name || 'Select City'}
               </Text>
-              <Text style={styles.inputIcon}>🏙️</Text>
+              {/* <Text style={styles.inputIcon}>🏙️</Text> */}
             </TouchableOpacity>
           </View>
         )}
