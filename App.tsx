@@ -291,6 +291,8 @@ import { setUserId } from './src/redux/slices/authSlice';
 import { AlertProvider } from './src/contexts/AlertContext';
 import { NotificationProvider } from './src/contexts/NotificationContext';
 import { RatingProvider } from './src/contexts/RatingContext';
+import { keysService } from './src/services/keysService';
+import { setKeysConfig } from './src/redux/slices/keysSlice';
 
 
 
@@ -415,6 +417,16 @@ const AppContent = (): JSX.Element => {
         const userId = await signInAnonymously();
         dispatch(setUserId(userId));
         console.log('✅ Anonymous login complete, userId stored:', userId);
+
+        // Fetch GPT keys in background (non-blocking)
+        keysService.getGptKeys().then(keysData => {
+          if (keysData) {
+            dispatch(setKeysConfig(keysData));
+            console.log('✅ [App] GPT Keys fetched and stored');
+          } else {
+            console.warn('⚠️ [App] No GPT keys received');
+          }
+        });
       } catch (error) {
         console.error('❌ Anonymous login failed:', error);
       }

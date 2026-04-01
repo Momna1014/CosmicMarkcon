@@ -45,6 +45,9 @@ declare module '@env' {
   // Consent Management (Usercentrics)
   export const USER_CENTRIC: string
 
+  // GPT Keys API
+  export const GPT_KEYS_BASE_URL: string
+
   // Social Sign-In (Optional - App works without these)
   // See SOCIAL_SIGNIN_GUIDE.md for setup instructions
   export const GOOGLE_WEB_CLIENT_ID: string  // From Google Cloud Console

@@ -41,6 +41,7 @@ export type RootStackParamList = {
     handType?: 'leftHand' | 'rightHand';
     yourSign?: string;
     theirSign?: string;
+    loveMatchSummary?: string;
   } | undefined;
 
   // Palm Capture Screen (Stack screen without tabs)

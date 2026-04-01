@@ -3,6 +3,8 @@ import authReducer from './slices/authSlice';
 import onboardingReducer from './slices/onboardingSlice';
 import partnersReducer from './slices/partnersSlice';
 import cosmicGuidesReducer from './slices/cosmicGuidesSlice';
+import keysReducer from './slices/keysSlice';
+import horoscopeReducer from './slices/horoscopeSlice';
 // Import other reducers here as you create them
 // import userReducer from './slices/userSlice';
 // import postsReducer from './slices/postsSlice';
@@ -18,6 +20,8 @@ const rootReducer = combineReducers({
   onboarding: onboardingReducer,
   partners: partnersReducer,
   cosmicGuides: cosmicGuidesReducer,
+  keys: keysReducer,
+  horoscope: horoscopeReducer,
   // Add other reducers here:
   // user: userReducer,
   // posts: postsReducer,

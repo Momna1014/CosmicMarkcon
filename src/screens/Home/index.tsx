@@ -1,5 +1,5 @@
 import React, {useCallback, useMemo, useEffect} from 'react';
-import {View, StatusBar, ImageBackground, ScrollView} from 'react-native';
+import {View, StatusBar, ImageBackground, ScrollView, RefreshControl} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSelector} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
@@ -20,6 +20,12 @@ import {
   trackHomeDailyHoroscopeTap,
 } from '../../utils/mainScreenAnalytics';
 
+// Cosmic data hook
+import {useCosmicData} from '../../hooks/useCosmicData';
+
+// Cosmic Loader
+import CosmicLoader from '../../components/CosmicLoader';
+
 // Home Components
 import {
   HeaderSection,
@@ -34,9 +40,6 @@ import {
 // Background Image
 const BackgroundImage = require('../../assets/icons/bottomtab_icons/main_screen_background.png');
 
-// Daily horoscope message constant
-const DAILY_MESSAGE = "The cosmos aligns in your favor. Trust your intuition.";
-
 type NavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<MainTabParamList, 'Home'>,
   NativeStackNavigationProp<RootStackParamList>
@@ -45,6 +48,9 @@ type NavigationProp = CompositeNavigationProp<
 const HomeScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const onboardingData = useSelector(selectOnboardingState);
+
+  // Fetch dynamic cosmic data from ChatGPT
+  const {data: cosmicData, loading: cosmicLoading, refreshing, refresh} = useCosmicData();
 
   // Memoized user name - prevents recalculation on every render
   const userName = useMemo(() => {
@@ -89,6 +95,22 @@ const HomeScreen: React.FC = () => {
     navigation.navigate('CosmicGuideDetail', {guideId});
   }, [navigation]);
 
+  // Show inline loader while initial data loads
+  if (cosmicLoading) {
+    return (
+      <View style={styles.backgroundFallback}>
+        <ImageBackground
+          source={BackgroundImage}
+          style={styles.backgroundImage}
+          resizeMode="cover">
+          <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+            <CosmicLoader visible={true} inline />
+          </View>
+        </ImageBackground>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.backgroundFallback}>
       <ImageBackground
@@ -104,19 +126,27 @@ const HomeScreen: React.FC = () => {
           <ScrollView
             style={styles.scrollView}
             contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}>
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={refresh}
+                tintColor="rgba(255,255,255,0.6)"
+                colors={['#7B68EE']}
+              />
+            }>
             {/* Header Section (Welcome + Title) */}
             <HeaderSection userName={userName} />
 
             {/* Daily Energy Card */}
             <DailyEnergyCard
               zodiacSign={zodiacSign}
-              dailyMessage={DAILY_MESSAGE}
+              dailyMessage={cosmicData?.dailyEnergy?.message || 'The cosmos aligns in your favor. Trust your intuition.'}
               onReadHoroscope={handleReadHoroscope}
             />
 
             {/* Today's Transits Section */}
-            <TransitsSection transits={TRANSITS_DATA} />
+            <TransitsSection transits={TRANSITS_DATA} dynamicTransits={cosmicData?.transits} />
 
             {/* Feature Cards (Synastry & Chiromancy) */}
             <FeatureCardsSection

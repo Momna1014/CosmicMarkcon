@@ -20,6 +20,8 @@ import TodayTab from './TodayTab';
 import TomorrowTab from './TomorrowTab';
 import WeeklyTab from './WeeklyTab';
 import StarfieldAnimation from '../../components/home_components/StarfieldAnimation';
+import CosmicLoader from '../../components/CosmicLoader';
+import {useHoroscopeData} from '../../hooks/useHoroscopeData';
 
 // Analytics
 import {useScreenView} from '../../hooks/useFacebookAnalytics';
@@ -53,22 +55,30 @@ const getZodiacSymbol = (sign: string): string => {
   return symbols[sign.toLowerCase()] || '♈';
 };
 
-// Format current date
-const formatDate = (): string => {
+// Format date for a given Date object
+const formatDate = (date: Date): string => {
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 
                   'July', 'August', 'September', 'October', 'November', 'December'];
-  const date = new Date();
   const day = days[date.getDay()];
   const month = months[date.getMonth()];
   const dateNum = date.getDate();
   
-  // Add ordinal suffix
   const suffix = dateNum === 1 || dateNum === 21 || dateNum === 31 ? 'st' :
                  dateNum === 2 || dateNum === 22 ? 'nd' :
                  dateNum === 3 || dateNum === 23 ? 'rd' : 'th';
   
   return `${day}, ${month} ${dateNum}${suffix}`;
+};
+
+// Format week range string
+const formatWeekRange = (): string => {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const start = new Date();
+  const end = new Date();
+  end.setDate(end.getDate() + 6);
+  return `${months[start.getMonth()]} ${start.getDate()} - ${months[end.getMonth()]} ${end.getDate()}`;
 };
 
 // Gradient Text Component for Seeker
@@ -91,6 +101,7 @@ type Props = {
 const HoroscopeScreen: React.FC<Props> = () => {
   const [activeTab, setActiveTab] = useState<TabType>('today');
   const onboardingData = useSelector(selectOnboardingState);
+  const {todayData, tomorrowData, weeklyData, loading} = useHoroscopeData();
 
   // Entrance animations
   const dateBadgeFadeAnim = useRef(new Animated.Value(0)).current;
@@ -105,6 +116,21 @@ const HoroscopeScreen: React.FC<Props> = () => {
   const contentSlideAnim = useRef(new Animated.Value(40)).current;
 
   useEffect(() => {
+    if (loading) {
+      return;
+    }
+    // Reset animation values so they can replay
+    dateBadgeFadeAnim.setValue(0);
+    dateBadgeSlideAnim.setValue(20);
+    titleFadeAnim.setValue(0);
+    titleSlideAnim.setValue(30);
+    zodiacFadeAnim.setValue(0);
+    zodiacScaleAnim.setValue(0.9);
+    tabBarFadeAnim.setValue(0);
+    tabBarSlideAnim.setValue(30);
+    contentFadeAnim.setValue(0);
+    contentSlideAnim.setValue(40);
+
     // Staggered entrance animations
     Animated.stagger(100, [
       // Date badge animation
@@ -179,7 +205,7 @@ const HoroscopeScreen: React.FC<Props> = () => {
       ]),
     ]).start();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [loading]);
 
   const userName = useMemo(() => {
     return onboardingData?.name || 'Seeker';
@@ -189,7 +215,17 @@ const HoroscopeScreen: React.FC<Props> = () => {
     return onboardingData?.zodiacSign || 'Pisces';
   }, [onboardingData?.zodiacSign]);
 
-  const currentDate = useMemo(() => formatDate(), []);
+  const displayDate = useMemo(() => {
+    if (activeTab === 'tomorrow') {
+      const tmrw = new Date();
+      tmrw.setDate(tmrw.getDate() + 1);
+      return formatDate(tmrw);
+    }
+    if (activeTab === 'weekly') {
+      return formatWeekRange();
+    }
+    return formatDate(new Date());
+  }, [activeTab]);
 
   // Analytics - Screen View
   useScreenView('Horoscope', {
@@ -212,15 +248,32 @@ const HoroscopeScreen: React.FC<Props> = () => {
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
       case 'today':
-        return <TodayTab />;
+        return <TodayTab data={todayData} />;
       case 'tomorrow':
-        return <TomorrowTab />;
+        return <TomorrowTab data={tomorrowData} />;
       case 'weekly':
-        return <WeeklyTab />;
+        return <WeeklyTab data={weeklyData} />;
       default:
-        return <TodayTab />;
+        return <TodayTab data={todayData} />;
     }
-  }, [activeTab]);
+  }, [activeTab, todayData, tomorrowData, weeklyData]);
+
+  // Show loader while fetching horoscope data
+  if (loading) {
+    return (
+      <View style={styles.backgroundFallback}>
+        <ImageBackground
+          source={BackgroundImage}
+          style={styles.backgroundImage}
+          resizeMode="cover">
+          {/* <StarfieldAnimation /> */}
+          <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+            <CosmicLoader visible={true} inline />
+          </View>
+        </ImageBackground>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.backgroundFallback}>
@@ -229,7 +282,7 @@ const HoroscopeScreen: React.FC<Props> = () => {
         style={styles.backgroundImage}
         resizeMode="cover">
         {/* Animated Starfield Background */}
-        <StarfieldAnimation />
+        {/* <StarfieldAnimation /> */}
         
         <SafeAreaView style={styles.container} edges={['top']}>
           <StatusBar
@@ -250,7 +303,7 @@ const HoroscopeScreen: React.FC<Props> = () => {
                 transform: [{translateY: dateBadgeSlideAnim}],
               }
             ]}>
-              <Text style={styles.dateText}>{currentDate}</Text>
+              <Text style={styles.dateText}>{displayDate}</Text>
             </Animated.View>
 
             {/* Title Section */}
