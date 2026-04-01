@@ -1,28 +1,32 @@
-import {useState, useEffect, useRef, useCallback} from 'react';
-import {useSelector} from 'react-redux';
+import {useState, useEffect, useCallback} from 'react';
+import {useSelector, useDispatch} from 'react-redux';
 import {RootState} from '../redux/rootReducer';
+import {setCosmicData} from '../redux/slices/cosmicDataSlice';
 import {
   conversationService,
-  CosmicHomeData,
 } from '../services/ConversationService';
 
 /**
  * Hook that fetches daily energy + transits from ChatGPT
  * when the user lands on Home screen.
  *
- * - Fires only once per day (caches by date string).
+ * - Caches in Redux (persisted via redux-persist) — survives app restarts.
+ * - Only hits the API once per day — checks fetchedDate against today.
  * - Waits until GPT keys are loaded before calling.
  * - Never blocks UI — returns loading/data/error states.
- * - Exposes refresh() for pull-to-refresh.
+ * - Exposes refresh() for pull-to-refresh (always fetches fresh).
  */
 export function useCosmicData() {
-  const [data, setData] = useState<CosmicHomeData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const fetchedDateRef = useRef<string | null>(null);
 
+  const cached = useSelector((s: RootState) => s.cosmicData);
   const keysLoaded = useSelector((s: RootState) => s.keys.isLoaded);
+
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const needsFetch = !cached.data || cached.fetchedDate !== todayKey;
 
   const fetchData = useCallback(async (isRefresh = false) => {
     if (isRefresh) {
@@ -33,21 +37,18 @@ export function useCosmicData() {
     setError(null);
     try {
       const result = await conversationService.getCosmicHomeData();
-      setData(result);
-      fetchedDateRef.current = new Date().toISOString().slice(0, 10);
+      dispatch(setCosmicData(result));
     } catch (err: any) {
       setError(err.message || 'Failed to load cosmic data');
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (!keysLoaded) return;
-
-    const todayKey = new Date().toISOString().slice(0, 10);
-    if (fetchedDateRef.current === todayKey && data) return;
+    if (!needsFetch) return;
 
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -57,5 +58,5 @@ export function useCosmicData() {
     fetchData(true);
   }, [fetchData]);
 
-  return {data, loading, refreshing, error, refresh};
+  return {data: cached.data, loading: loading && needsFetch, refreshing, error, refresh};
 }

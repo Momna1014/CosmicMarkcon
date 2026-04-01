@@ -9,6 +9,7 @@ export interface ChatMessage {
   type: 'text' | 'image' | 'text_with_image';
   content?: string;
   imageUrl?: string;
+  palmDiagram?: number;
   sender: 'user' | 'ai';
   timestamp: Date;
   isRead: boolean;
@@ -90,6 +91,21 @@ export const createAIImageMessage = (imageUrl: string, content?: string): ChatMe
     type: content ? 'text_with_image' : 'image',
     content: content || undefined,
     imageUrl,
+    sender: 'ai',
+    timestamp: new Date(),
+    isRead: false,
+  };
+};
+
+/**
+ * Create an AI palm reading message with the hand diagram above the reading text
+ */
+export const createPalmReadingMessage = (palmDiagram: number, content: string): ChatMessage => {
+  return {
+    id: generateMessageId(),
+    type: 'text',
+    content,
+    palmDiagram,
     sender: 'ai',
     timestamp: new Date(),
     isRead: false,

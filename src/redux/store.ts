@@ -14,7 +14,7 @@ const persistConfig = {
   key: 'root',
   version: 1,
   storage: AsyncStorage,
-  whitelist: ['auth', 'onboarding', 'partners', 'cosmicGuides', 'keys', 'horoscope'], // Persist auth, onboarding, partners, cosmicGuides, keys, and horoscope slices
+  whitelist: ['auth', 'onboarding', 'partners', 'cosmicGuides', 'keys', 'horoscope', 'cosmicData'], // Persist auth, onboarding, partners, cosmicGuides, keys, and horoscope slices
   // blacklist: ['ui', 'temp'], // Don't persist these slices
   timeout: 10000, // 10 seconds timeout for rehydration
 };

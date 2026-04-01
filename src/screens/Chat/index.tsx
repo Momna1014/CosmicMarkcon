@@ -31,7 +31,7 @@ import {
 } from '../../theme';
 
 // Components
-import {ChatHeader, MessageBubble, ChatInput, ImagePreviewModal, TypingIndicator} from './components';
+import {ChatHeader, MessageBubble, ChatInput, ImagePreviewModal, TypingIndicator, PalmLineTabs} from './components';
 
 // Icons
 const ArrowDownIcon = require('../../assets/icons/chat_icons/arrow.png');
@@ -41,6 +41,7 @@ import {
   ChatMessage,
   createUserMessage,
   createAIMessage,
+  createPalmReadingMessage,
 } from './chatMockData';
 
 // Chat AI Service
@@ -66,6 +67,10 @@ import {
 } from '../../utils/mainScreenAnalytics';
 
 const BackgroundImage = require('../../assets/icons/bottomtab_icons/main_screen_background.png');
+
+// Palm diagram assets
+const LeftHandDiagram = require('../../assets/icons/chat_icons/left_hand.png');
+const RightHandDiagram = require('../../assets/icons/chat_icons/right_hand.png');
 
 type ChatRouteParams = {
   Chat: {
@@ -189,13 +194,15 @@ const ChatScreen: React.FC<Props> = () => {
             return;
           }
 
-          // Step 2: Validation passed — proceed with reading
+          // Step 2: Validation passed — proceed with reading (include hand diagram in response)
           setIsTyping(false);
-          sendToOracle(message, imageUri);
+          const diagram = handType === 'leftHand' ? LeftHandDiagram : RightHandDiagram;
+          sendToOracle(message, imageUri, diagram);
         } catch {
           // If validation errors out, proceed with reading anyway
           setIsTyping(false);
-          sendToOracle(message, imageUri);
+          const diagram = handType === 'leftHand' ? LeftHandDiagram : RightHandDiagram;
+          sendToOracle(message, imageUri, diagram);
         }
       }, 500);
     } else if (source === 'love' && yourSign && theirSign) {
@@ -281,7 +288,7 @@ const ChatScreen: React.FC<Props> = () => {
 
   // Send a message to the Oracle API
   const sendToOracle = useCallback(
-    async (text: string, imgUri?: string) => {
+    async (text: string, imgUri?: string, palmDiagram?: number) => {
       // Add user message to conversation history
       conversationRef.current.push({role: 'user', content: text});
 
@@ -299,8 +306,10 @@ const ChatScreen: React.FC<Props> = () => {
         // Add assistant reply to conversation history
         conversationRef.current.push({role: 'assistant', content: reply});
 
-        // Add to UI
-        const aiMessage = createAIMessage(reply);
+        // Add to UI — if palmDiagram is provided, show hand diagram above the reading
+        const aiMessage = palmDiagram
+          ? createPalmReadingMessage(palmDiagram, reply)
+          : createAIMessage(reply);
         addMessage(aiMessage);
       } catch (error: any) {
         console.error('❌ [Chat] Oracle error:', error.message);
@@ -348,12 +357,14 @@ const ChatScreen: React.FC<Props> = () => {
             return;
           }
 
-          // Correct hand — proceed with reading
+          // Correct hand — proceed with reading (include hand diagram in response)
           setIsTyping(false);
-          sendToOracle(text, attachedImageUri);
+          const diagram = handType === 'leftHand' ? LeftHandDiagram : RightHandDiagram;
+          sendToOracle(text, attachedImageUri, diagram);
         } catch {
           setIsTyping(false);
-          sendToOracle(text, attachedImageUri);
+          const diagram = handType === 'leftHand' ? LeftHandDiagram : RightHandDiagram;
+          sendToOracle(text, attachedImageUri, diagram);
         }
       } else if (attachedImageUri && source !== 'palm') {
         // User attached an image in general/love chat — detect if it's a palm
@@ -368,7 +379,8 @@ const ChatScreen: React.FC<Props> = () => {
             // Prepend palm context so the AI knows which hand
             const augmented = `[Palm image detected: ${detection.detectedHand.toUpperCase()} hand]\n\n${text}`;
             setIsTyping(false);
-            sendToOracle(augmented, attachedImageUri);
+            const diagram = detection.detectedHand === 'left' ? LeftHandDiagram : RightHandDiagram;
+            sendToOracle(augmented, attachedImageUri, diagram);
           } else if (detection.isPalm) {
             // It's a palm but hand unknown — let AI figure it out
             const augmented = `[Palm image detected — hand could not be determined]\n\n${text}`;
@@ -389,6 +401,18 @@ const ChatScreen: React.FC<Props> = () => {
       }
     },
     [addMessage, sendToOracle, source, handType],
+  );
+
+  // Handle palm line tab press — ask Oracle about a specific line
+  const handlePalmLinePress = useCallback(
+    (lineName: string) => {
+      const handLabel = handType === 'leftHand' ? 'left' : 'right';
+      const text = `Tell me about my ${lineName} on my ${handLabel} palm.`;
+      const userMessage = createUserMessage(text);
+      addMessage(userMessage);
+      sendToOracle(text, imageUri);
+    },
+    [addMessage, sendToOracle, handType, imageUri],
   );
 
   // Attach image (from picker) - doesn't send immediately
@@ -582,6 +606,12 @@ const ChatScreen: React.FC<Props> = () => {
 
             {/* Input Area */}
             <SafeAreaView edges={['bottom']} style={styles.inputSafeArea}>
+              {source === 'palm' && (
+                <PalmLineTabs
+                  onLinePress={handlePalmLinePress}
+                  disabled={isTyping}
+                />
+              )}
               <ChatInput
                 onSendMessage={handleSendMessage}
                 onCameraPress={handleCameraPress}

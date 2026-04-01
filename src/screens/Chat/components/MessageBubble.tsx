@@ -2,6 +2,7 @@ import React, {memo, useCallback, useState, useRef, useMemo} from 'react';
 import {
   View,
   Text,
+  Image,
   StyleSheet,
   TouchableOpacity,
   Dimensions,
@@ -28,6 +29,7 @@ const MAX_BUBBLE_WIDTH = SCREEN_WIDTH * 0.75;
 const MAX_IMAGE_WIDTH = SCREEN_WIDTH * 0.55;
 const MAX_IMAGE_HEIGHT = SCREEN_WIDTH * 0.7;
 const MIN_IMAGE_HEIGHT = SCREEN_WIDTH * 0.3;
+const PALM_IMAGE_WIDTH = SCREEN_WIDTH * 0.65;
 
 interface ImageDimensions {
   width: number;
@@ -274,6 +276,31 @@ const MessageBubble: React.FC<MessageBubbleProps> = memo(
         return renderImage();
       }
 
+      // Palm reading message: show hand diagram above the reading text
+      if (message.palmDiagram && message.content) {
+        return (
+          <TouchableOpacity
+            onLongPress={handleLongPress}
+            delayLongPress={400}
+            activeOpacity={0.9}
+            style={[styles.bubble, styles.aiBubble, styles.palmBubble]}>
+            <View style={styles.palmImageContainer}>
+              <Image
+                source={message.palmDiagram}
+                style={styles.palmImage}
+                resizeMode="contain"
+              />
+            </View>
+            <Text
+              style={[styles.messageText, styles.aiText, styles.palmText]}
+              selectable={Platform.OS === 'android'}>
+              {message.content}
+            </Text>
+            <CopyFeedback visible={showCopyFeedback} animValue={copyAnimValue} />
+          </TouchableOpacity>
+        );
+      }
+
       return (
         <TouchableOpacity
           onLongPress={handleLongPress}
@@ -370,6 +397,25 @@ const styles = StyleSheet.create({
   },
   messageImage: {
     borderRadius: radiusScale(12),
+  },
+  palmBubble: {
+    paddingHorizontal: 0,
+    paddingTop: 0,
+    overflow: 'hidden',
+  },
+  palmImageContainer: {
+    width: '100%',
+    overflow: 'hidden',
+    marginBottom: verticalScale(10),
+    backgroundColor: '#FFFFFF',
+  },
+  palmImage: {
+    width: '100%',
+    height: PALM_IMAGE_WIDTH * 1.1,
+  },
+  palmText: {
+    paddingHorizontal: horizontalScale(14),
+    paddingBottom: verticalScale(4),
   },
   // Copy feedback styles - Cosmic floating pill design
   copyFeedbackOverlay: {
