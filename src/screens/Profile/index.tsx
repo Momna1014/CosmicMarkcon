@@ -33,6 +33,9 @@ import {
   selectOnboardingState,
   saveOnboardingData,
 } from '../../redux/slices/onboardingSlice';
+import {clearCosmicData} from '../../redux/slices/cosmicDataSlice';
+import {clearHoroscopeBundle} from '../../redux/slices/horoscopeSlice';
+import {useAlert} from '../../contexts/AlertContext';
 import {AppDispatch} from '../../redux/store';
 import {DatePicker} from '../../components/DatePicker';
 import {
@@ -54,6 +57,7 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
   const dispatch = useDispatch<AppDispatch>();
   const onboardingData = useSelector(selectOnboardingState);
   const {isPremium} = useApp();
+  const {showAlert} = useAlert();
 
   // Form state
   const [name, setName] = useState('');
@@ -205,7 +209,10 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
     if (timeValue && formatTimeForStorage(timeValue) !== onboardingData.birthTime) changedFields.push('birthTime');
     if (selectedCity?.name !== onboardingData.city) changedFields.push('city');
     if (selectedCountry?.name !== onboardingData.country) changedFields.push('country');
-    
+
+    const signChanged = calculatedZodiacSign !== onboardingData.zodiacSign;
+    if (signChanged) changedFields.push('zodiacSign');
+
     trackProfileSave(changedFields);
 
     dispatch(
@@ -219,7 +226,34 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
         zodiacSign: calculatedZodiacSign || undefined, // Use calculated zodiac sign
       }),
     );
+
+    // Clear cached data so Home & Horoscope refetch with updated profile
+    if (changedFields.length > 0) {
+      dispatch(clearCosmicData());
+      dispatch(clearHoroscopeBundle());
+    }
+
     setShowProfileCard(true);
+
+    // Show appropriate alert
+    if (signChanged) {
+      showAlert({
+        type: 'info',
+        title: 'Zodiac Sign Changed ✨',
+        message: `Your sign updated to ${calculatedZodiacSign}. Your cosmic readings will refresh with your new celestial identity.`,
+        buttons: [{text: 'OK', style: 'default'}],
+        hideIcon: true,
+      });
+    } else if (changedFields.length > 0) {
+      showAlert({
+        type: 'success',
+        title: 'Identity Saved ✅',
+        message: 'Your profile has been updated. Cosmic readings will refresh with your new details.',
+        buttons: [{text: 'OK', style: 'default'}],
+        hideIcon: true,
+      });
+    }
+
     console.log('✅ Identity saved! Zodiac:', calculatedZodiacSign);
   };
 

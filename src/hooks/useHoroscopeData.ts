@@ -84,16 +84,14 @@ export function useHoroscopeData() {
     };
 
     fetchBundle().finally(() => {
-      if (!cancelled) {
-        setLoading(false);
-      }
+      setLoading(false);
     });
 
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [keysLoaded]);
+  }, [keysLoaded, bundle]);
 
   // Resolve data — cached or fallback to mock
   const todayData: HoroscopeData = bundle?.days?.[todayKey] || TODAY_HOROSCOPE;

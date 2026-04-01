@@ -52,7 +52,7 @@ export function useCosmicData() {
 
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [keysLoaded]);
+  }, [keysLoaded, cached.fetchedDate]);
 
   const refresh = useCallback(() => {
     fetchData(true);

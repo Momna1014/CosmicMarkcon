@@ -38,6 +38,7 @@ export interface CustomAlertProps {
   onDismiss?: () => void;
   autoHide?: boolean;
   autoHideDuration?: number;
+  hideIcon?: boolean;
 }
 
 const getTypeColor = (type: AlertType): string => {
@@ -77,6 +78,7 @@ const CustomAlert: React.FC<CustomAlertProps> = memo(({
   onDismiss,
   autoHide = false,
   autoHideDuration = 3000,
+  hideIcon = false,
 }) => {
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
@@ -189,9 +191,11 @@ const CustomAlert: React.FC<CustomAlertProps> = memo(({
             {transform: [{scale: scaleAnim}]},
           ]}>
           {/* Icon Circle */}
-          <View style={[styles.iconCircle, {backgroundColor: typeColor}]}>
-            <Text style={styles.iconText}>{typeIcon}</Text>
-          </View>
+          {!hideIcon && (
+            <View style={[styles.iconCircle, {backgroundColor: typeColor}]}>
+              <Text style={styles.iconText}>{typeIcon}</Text>
+            </View>
+          )}
 
           {/* Title */}
           <Text style={styles.title}>{title}</Text>
