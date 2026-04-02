@@ -445,7 +445,7 @@ const AppContent = (): JSX.Element => {
   }, [appStartTime, initState]);
 
   return (
-    <View style={{ flex: 1,}}>
+    <View style={{ flex: 1,backgroundColor:'#2C2C90'}}>
       <StatusBar
         barStyle={isDark ? 'light-content' : 'dark-content'}
         backgroundColor={theme.colors.background}
