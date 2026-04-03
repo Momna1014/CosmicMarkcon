@@ -37,6 +37,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     reactNativeFactory = factory
 
     window = UIWindow(frame: UIScreen.main.bounds)
+    
+    // Match BootSplash background color (#2C2C90) to prevent flash/jitter
+    // between splash screen hide and React Native view rendering
+    window?.backgroundColor = UIColor(
+      red: 0.172549019607843,
+      green: 0.172549019607843,
+      blue: 0.564705882352941,
+      alpha: 1.0
+    )
 
     factory.startReactNative(
       withModuleName: "CosmicMarkcon",
@@ -171,5 +180,16 @@ class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
 #else
     Bundle.main.url(forResource: "main", withExtension: "jsbundle")
 #endif
+  }
+
+  // Match BootSplash background (#2C2C90) on the root view to prevent jitter
+  override func customize(_ rootView: RCTRootView) {
+    super.customize(rootView)
+    rootView.backgroundColor = UIColor(
+      red: 0.172549019607843,
+      green: 0.172549019607843,
+      blue: 0.564705882352941,
+      alpha: 1.0
+    )
   }
 }
