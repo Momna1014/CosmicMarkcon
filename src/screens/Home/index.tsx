@@ -23,6 +23,9 @@ import {
 // Cosmic data hook
 import {useCosmicData} from '../../hooks/useCosmicData';
 
+// Notifications
+import {useNotifications} from '../../contexts/NotificationContext';
+
 // Cosmic Loader
 import CosmicLoader from '../../components/CosmicLoader';
 
@@ -51,6 +54,19 @@ const HomeScreen: React.FC = () => {
 
   // Fetch dynamic cosmic data from ChatGPT
   const {data: cosmicData, loading: cosmicLoading, refreshing, refresh} = useCosmicData();
+
+  // Notifications - request permission on first landing
+  const {permissionStatus, hasShownFirstPrompt, requestPermission, markFirstPromptShown} = useNotifications();
+
+  useEffect(() => {
+    const askNotificationPermission = async () => {
+      if (!hasShownFirstPrompt && permissionStatus === 'not-determined') {
+        await markFirstPromptShown();
+        await requestPermission();
+      }
+    };
+    askNotificationPermission();
+  }, [hasShownFirstPrompt, permissionStatus, requestPermission, markFirstPromptShown]);
 
   // Memoized user name - prevents recalculation on every render
   const userName = useMemo(() => {

@@ -17,6 +17,12 @@ import {selectOnboardingState} from '../../redux/slices/onboardingSlice';
 import {RootStackParamList} from '../../navigation/deepLinking';
 import StarfieldAnimation from '../../components/home_components/StarfieldAnimation';
 import {styles} from './styles';
+import {useScreenView} from '../../hooks/useFacebookAnalytics';
+import firebaseService from '../../services/firebase/FirebaseService';
+import {
+  trackHoroscopeChatView,
+  trackHoroscopeChatStartTap,
+} from '../../utils/mainScreenAnalytics';
 
 // Icons
 import OracleStarIcon from '../../assets/icons/horoscope_icons/ask_oracle_star.svg';
@@ -121,6 +127,14 @@ const HoroscopeChatScreen: React.FC = () => {
   const zodiacSymbol = getZodiacSymbol(zodiacSign);
   const userName = onboardingData?.name || 'Seeker';
 
+  // Analytics
+  useScreenView('HoroscopeChat', {zodiac_sign: zodiacSign});
+
+  useEffect(() => {
+    trackHoroscopeChatView(zodiacSign);
+    firebaseService.logScreenView('HoroscopeChat', 'HoroscopeChatScreen');
+  }, [zodiacSign]);
+
   // Animations
   const headerFade = useRef(new Animated.Value(0)).current;
   const headerSlide = useRef(new Animated.Value(40)).current;
@@ -173,6 +187,7 @@ const HoroscopeChatScreen: React.FC = () => {
   }, [headerFade, headerSlide, orbContainerFade, orbContainerScale, cardFade, cardSlide, buttonFade, buttonScale, pulseAnim]);
 
   const handleStartChat = () => {
+    trackHoroscopeChatStartTap(zodiacSign);
     navigation.getParent<NativeStackNavigationProp<RootStackParamList>>()?.navigate('Chat');
   };
 

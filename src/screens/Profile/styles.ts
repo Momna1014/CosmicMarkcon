@@ -222,9 +222,53 @@ export const styles = StyleSheet.create({
     marginBottom: verticalScale(16),
   },
 
+  // Notification Card Styles
+  notificationCard: {
+    marginTop: verticalScale(24),
+    borderRadius: radiusScale(20),
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(194, 209, 243, 0.2)',
+    backgroundColor: 'rgba(194, 209, 243, 0.06)',
+  },
+  notificationContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: horizontalScale(18),
+    paddingVertical: verticalScale(18),
+  },
+  notificationIconContainer: {
+    width: horizontalScale(48),
+    height: horizontalScale(48),
+    borderRadius: horizontalScale(24),
+    backgroundColor: 'rgba(194, 209, 243, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(194, 209, 243, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: horizontalScale(14),
+  },
+  notificationIconText: {
+    fontSize: fontScale(22),
+  },
+  notificationTextContainer: {
+    flex: 1,
+  },
+  notificationTitle: {
+    fontFamily: FontFamilies.interSemiBold,
+    fontSize: fontScale(16),
+    color: '#FFFFFF',
+    marginBottom: verticalScale(4),
+  },
+  notificationSubtitle: {
+    fontFamily: FontFamilies.interRegular,
+    fontSize: fontScale(13),
+    color: 'rgba(255, 255, 255, 0.6)',
+  },
+
   // Premium Card Styles
   premiumCard: {
-    marginTop: verticalScale(24),
+    marginTop: verticalScale(16),
     borderRadius: radiusScale(20),
     overflow: 'hidden',
     borderWidth: 1,

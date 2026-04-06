@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   ScrollView,
   Animated,
+  Switch,
+  AppState,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSelector, useDispatch} from 'react-redux';
@@ -23,6 +25,9 @@ import {
   trackProfileSave,
   trackProfileSubscriptionTap,
 } from '../../utils/mainScreenAnalytics';
+
+// Notifications
+import {useNotifications} from '../../contexts/NotificationContext';
 
 // Icons
 import StarIcon from '../../assets/icons/home_icons/welcome_star.svg';
@@ -58,6 +63,12 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
   const onboardingData = useSelector(selectOnboardingState);
   const {isPremium} = useApp();
   const {showAlert} = useAlert();
+  const {
+    notificationsEnabled,
+    permissionStatus,
+    openNotificationSettings,
+    checkPermissionStatus,
+  } = useNotifications();
 
   // Form state
   const [name, setName] = useState('');
@@ -128,6 +139,16 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
     ]).start();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Re-check notification permission when returning from Settings
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      if (nextState === 'active') {
+        checkPermissionStatus();
+      }
+    });
+    return () => subscription.remove();
+  }, [checkPermissionStatus]);
 
   // Picker visibility
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -480,6 +501,30 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
             {/* Form or Profile Card */}
             <View>
               {showProfileCard ? renderProfileCard() : renderForm()}
+            </View>
+
+            {/* Notification Toggle Card */}
+            <View style={styles.notificationCard}>
+              <View style={styles.glassOverlay} />
+              <View style={styles.notificationContent}>
+                <View style={styles.notificationIconContainer}>
+                  <Text style={styles.notificationIconText}>🔔</Text>
+                </View>
+                <View style={styles.notificationTextContainer}>
+                  <Text style={styles.notificationTitle}>Notifications</Text>
+                  <Text style={styles.notificationSubtitle}>
+                    {notificationsEnabled
+                      ? 'Daily horoscope at 8:00 PM'
+                      : 'Enable for cosmic insights'}
+                  </Text>
+                </View>
+                <Switch
+                  value={notificationsEnabled}
+                  onValueChange={openNotificationSettings}
+                  trackColor={{false: 'rgba(255,255,255,0.15)', true: 'rgba(221, 197, 96, 0.4)'}}
+                  thumbColor={notificationsEnabled ? '#D4AF37' : '#888'}
+                />
+              </View>
             </View>
 
             {/* Premium Card */}
