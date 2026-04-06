@@ -310,7 +310,7 @@ export const RatingProvider: React.FC<RatingProviderProps> = ({ children }) => {
   const openStorePageFallback = (): void => {
     const storeUrl = Platform.select({
       ios: 'https://apps.apple.com/app/id6759445866', // Replace with your App Store ID
-      android: 'market://details?id=com.mangaverse', // Replace with your package name
+      android: 'market://details?id=com.cosmic.markcon', // Replace with your package name
       default: '',
     });
 
@@ -319,7 +319,7 @@ export const RatingProvider: React.FC<RatingProviderProps> = ({ children }) => {
         console.error('[RatingContext] ❌ Failed to open store:', error);
         // Fallback to web URL for Android
         if (Platform.OS === 'android') {
-          Linking.openURL('https://play.google.com/store/apps/details?id=com.mangaverse');
+          Linking.openURL('https://play.google.com/store/apps/details?id=com.cosmic.markcon');
         }
       });
     }

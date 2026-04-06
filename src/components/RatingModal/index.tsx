@@ -744,7 +744,7 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 20},
     shadowOpacity: 0.5,
     shadowRadius: 40,
-    elevation: 24,
+    // elevation: 24,
   },
   modalContainerGlow: {
     borderColor: 'rgba(238, 223, 155, 0.2)',

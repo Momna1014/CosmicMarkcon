@@ -60,13 +60,13 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Manga Verse needs access to your camera to take photos.</string>
+	<string>Cosmic needs access to your camera to take photos.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Cosmic needs access to your location to provide location-based features.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Manga Verse needs permission to save images to your photo library.</string>
+	<string>Cosmic needs permission to save images to your photo library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Manga Verse needs access to your photo library to let you select and upload images.</string>
+	<string>Cosmic needs access to your photo library to let you select and upload images.</string>
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>Cosmic would like to send you notifications about important updates and messages.</string>
 	<key>NSUserTrackingUsageDescription</key>

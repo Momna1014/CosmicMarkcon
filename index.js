@@ -91,7 +91,15 @@ setupFCM();
 messaging().setBackgroundMessageHandler(async remoteMessage => {
   console.log('[index.js] 📬 Background message received:', JSON.stringify(remoteMessage, null, 2));
 
-  // Ensure default channel exists for Android
+  // IMPORTANT: If the message has a "notification" payload, the system already
+  // auto-displays it in the tray. Only display via Notifee for data-only messages
+  // to avoid duplicate notifications.
+  if (remoteMessage.notification) {
+    console.log('[index.js] ℹ️ Notification payload present - system will auto-display, skipping Notifee');
+    return;
+  }
+
+  // Data-only message — we must display it ourselves
   await notifee.createChannel({
     id: 'default',
     name: 'Default Notifications',
@@ -99,64 +107,31 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
     sound: 'default',
   });
 
-  // Display the notification using Notifee
-  if (remoteMessage.notification) {
-    await notifee.displayNotification({
-      title: remoteMessage.notification.title,
-      body: remoteMessage.notification.body,
-      data: remoteMessage.data,
-      android: {
-        channelId: 'default',
-        smallIcon: 'ic_launcher',
-        pressAction: {
-          id: 'default',
-        },
+  const title = remoteMessage.data?.title || 'New Notification';
+  const body = remoteMessage.data?.body || '';
+
+  await notifee.displayNotification({
+    title,
+    body,
+    data: remoteMessage.data,
+    android: {
+      channelId: 'default',
+      smallIcon: 'ic_launcher',
+      pressAction: {
+        id: 'default',
       },
-      ios: {
-        sound: 'default',
-      },
-    });
-    console.log('[index.js] ✅ Background notification displayed');
-  }
+    },
+    ios: {
+      sound: 'default',
+    },
+  });
+  console.log('[index.js] ✅ Data-only background notification displayed');
 });
 
 /**
- * Foreground message handler - for when app is open
+ * Foreground message handler is handled by PushNotificationService.setupMessageHandlers()
+ * Do NOT add another onMessage handler here - it causes duplicate notifications
  */
-messaging().onMessage(async remoteMessage => {
-  console.log('[index.js] 📬 FOREGROUND message received:', JSON.stringify(remoteMessage, null, 2));
-  
-  // Ensure channel exists (Android)
-  await notifee.createChannel({
-    id: 'default',
-    name: 'Default Notifications',
-    importance: AndroidImportance.HIGH,
-    sound: 'default',
-  });
-  
-  // Display notification
-  if (remoteMessage.notification) {
-    await notifee.displayNotification({
-      title: remoteMessage.notification.title,
-      body: remoteMessage.notification.body,
-      data: remoteMessage.data,
-      android: {
-        channelId: 'default',
-        smallIcon: 'ic_launcher',
-        pressAction: { id: 'default' },
-      },
-      ios: {
-        sound: 'default',
-        foregroundPresentationOptions: {
-          alert: true,
-          badge: true,
-          sound: true,
-        },
-      },
-    });
-    console.log('[index.js] ✅ Foreground notification displayed');
-  }
-});
 
 /**
  * Handle notification events when app is in background/quit state
