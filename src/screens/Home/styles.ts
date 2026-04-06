@@ -86,16 +86,16 @@ export const styles = StyleSheet.create({
   // Daily Energy Card
   dailyEnergyCard: {
     borderRadius: radiusScale(36),
-    overflow: 'hidden',
+    // overflow: 'hidden',
     marginBottom: verticalScale(24),
     borderWidth:1,
     borderColor:'#C2D1F333'
 
   },
   dailyEnergyBackground: {
-    width: '100%',
-    borderRadius: radiusScale(36),
-    overflow: 'hidden',
+    // width: '100%',
+    // borderRadius: radiusScale(36),
+    // overflow: 'hidden',
     // backgroundColor:'red'
 
   },

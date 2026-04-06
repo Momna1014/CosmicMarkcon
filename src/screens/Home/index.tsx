@@ -1,5 +1,5 @@
 import React, {useCallback, useMemo, useEffect} from 'react';
-import {View, StatusBar, ImageBackground, ScrollView, RefreshControl} from 'react-native';
+import {View, StatusBar, ImageBackground, ScrollView, RefreshControl, InteractionManager} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSelector} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
@@ -25,6 +25,10 @@ import {useCosmicData} from '../../hooks/useCosmicData';
 
 // Notifications
 import {useNotifications} from '../../contexts/NotificationContext';
+
+// Rating
+import {useRating} from '../../contexts/RatingContext';
+import RatingModal from '../../components/RatingModal';
 
 // Cosmic Loader
 import CosmicLoader from '../../components/CosmicLoader';
@@ -56,17 +60,64 @@ const HomeScreen: React.FC = () => {
   const {data: cosmicData, loading: cosmicLoading, refreshing, refresh} = useCosmicData();
 
   // Notifications - request permission on first landing
-  const {permissionStatus, hasShownFirstPrompt, requestPermission, markFirstPromptShown} = useNotifications();
+  const {permissionStatus, hasShownFirstPrompt, requestPermission, markFirstPromptShown, isLoading: isNotificationLoading} = useNotifications();
 
   useEffect(() => {
-    const askNotificationPermission = async () => {
-      if (!hasShownFirstPrompt && permissionStatus === 'not-determined') {
-        await markFirstPromptShown();
-        await requestPermission();
+    if (cosmicLoading || isNotificationLoading) {
+      return;
+    }
+    if (!hasShownFirstPrompt && permissionStatus === 'not-determined') {
+      const task = InteractionManager.runAfterInteractions(() => {
+        setTimeout(async () => {
+          await markFirstPromptShown();
+          await requestPermission();
+        }, 2000);
+      });
+      return () => task.cancel();
+    }
+  }, [cosmicLoading, isNotificationLoading, hasShownFirstPrompt, permissionStatus, requestPermission, markFirstPromptShown]);
+
+  // Rating - show modal after content loads
+  const {
+    isRatingModalVisible,
+    isLoading: isRatingLoading,
+    showRatingModal,
+    hideRatingModal,
+    submitRating,
+    checkShouldShowRating,
+    incrementSessionCount,
+  } = useRating();
+
+  // Increment session count on mount
+  useEffect(() => {
+    if (!isRatingLoading) {
+      incrementSessionCount();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRatingLoading]);
+
+  // Show rating modal after data loads + notification flow completes
+  useEffect(() => {
+    if (cosmicLoading || isRatingLoading || isNotificationLoading) {
+      return;
+    }
+    // Don't show rating if notification prompt is pending
+    if (!hasShownFirstPrompt && permissionStatus === 'not-determined') {
+      return;
+    }
+    const checkRating = async () => {
+      const shouldShow = await checkShouldShowRating();
+      if (shouldShow) {
+        const task = InteractionManager.runAfterInteractions(() => {
+          setTimeout(() => {
+            showRatingModal();
+          }, 4000);
+        });
+        return () => task.cancel();
       }
     };
-    askNotificationPermission();
-  }, [hasShownFirstPrompt, permissionStatus, requestPermission, markFirstPromptShown]);
+    checkRating();
+  }, [cosmicLoading, isRatingLoading, isNotificationLoading, hasShownFirstPrompt, permissionStatus, checkShouldShowRating, showRatingModal]);
 
   // Memoized user name - prevents recalculation on every render
   const userName = useMemo(() => {
@@ -182,6 +233,13 @@ const HomeScreen: React.FC = () => {
           </ScrollView>
         </SafeAreaView>
       </ImageBackground>
+
+      {/* Rating Modal */}
+      <RatingModal
+        visible={isRatingModalVisible}
+        onClose={hideRatingModal}
+        onSubmitRating={submitRating}
+      />
     </View>
   );
 };
