@@ -1,9 +1,13 @@
 import React, {memo} from 'react';
 import HoroscopeContent from './HoroscopeContent';
-import {WEEKLY_HOROSCOPE} from '../../components/mock/mockData';
+import {HoroscopeData} from '../../services/ConversationService';
 
-const WeeklyTab: React.FC = memo(() => {
-  return <HoroscopeContent data={WEEKLY_HOROSCOPE} />;
+type Props = {
+  data: HoroscopeData;
+};
+
+const WeeklyTab: React.FC<Props> = memo(({data}) => {
+  return <HoroscopeContent data={data} />;
 });
 
 export default WeeklyTab;

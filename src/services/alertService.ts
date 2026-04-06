@@ -14,6 +14,7 @@ export interface AlertOptions {
   buttons?: CustomAlertButton[];
   autoHide?: boolean;
   autoHideDuration?: number;
+  hideIcon?: boolean;
 }
 
 type AlertListener = (options: AlertOptions | null) => void;

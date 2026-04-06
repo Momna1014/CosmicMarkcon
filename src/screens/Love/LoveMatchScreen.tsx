@@ -1,4 +1,4 @@
-import React, {memo, useEffect, useRef, useMemo, useCallback, useState} from 'react';
+import React, {memo, useEffect, useRef, useCallback, useState} from 'react';
 import {
   View,
   Text,
@@ -22,7 +22,8 @@ import {
   moderateScale,
 } from '../../theme';
 import GradientText from '../../components/GradientText';
-import {generateLoveMatchData, LoveMatchData, CompatibilityMetric} from './loveMatchMockData';
+import {LoveMatchData, CompatibilityMetric} from './loveMatchMockData';
+import {conversationService, LoveMatchResult} from '../../services/ConversationService';
 import CosmicLoader from '../../components/CosmicLoader';
 
 // Analytics
@@ -406,14 +407,70 @@ const oracleStyles = StyleSheet.create({
 
 const LoveMatchScreen: React.FC<Props> = ({route}) => {
   const {yourSign, theirSign} = route.params;
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const [isLoading, setIsLoading] = useState(true);
+  const [matchData, setMatchData] = useState<LoveMatchData | null>(null);
 
-  // Generate match data based on signs
-  const matchData: LoveMatchData = useMemo(
-    () => generateLoveMatchData(yourSign, theirSign),
+  // Build LoveMatchData from ChatGPT result
+  const buildMatchData = useCallback(
+    (result: LoveMatchResult): LoveMatchData => ({
+      overallScore: result.overallScore,
+      yourSign,
+      theirSign,
+      alignmentText: result.alignmentText,
+      metrics: [
+        {
+          id: 'love',
+          label: 'LOVE & ROMANCE',
+          percentage: result.lovePercentage,
+          iconColor: 'rgba(243, 98, 180, 1)',
+          gradientColors: ['#F5265D', '#F362B4'],
+        },
+        {
+          id: 'communication',
+          label: 'COMMUNICATION',
+          percentage: result.communicationPercentage,
+          iconColor: 'rgba(98, 173, 243, 1)',
+          gradientColors: ['#2656F5', '#62ADF3'],
+        },
+        {
+          id: 'passion',
+          label: 'PASSION & ENERGY',
+          percentage: result.passionPercentage,
+          iconColor: 'rgba(245, 135, 38, 1)',
+          gradientColors: ['#F58726', '#F3AB62'],
+        },
+      ],
+      cosmicInsight: result.cosmicInsight,
+    }),
     [yourSign, theirSign],
   );
+
+  // Fetch love match data from ChatGPT
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchData = async () => {
+      try {
+        const result = await conversationService.getLoveMatchData(yourSign, theirSign);
+        if (!cancelled) {
+          setMatchData(buildMatchData(result));
+          setIsLoading(false);
+        }
+      } catch (err: any) {
+        console.warn('⚠️ [LoveMatch] ChatGPT failed, using fallback:', err.message);
+        if (!cancelled) {
+          // Fallback to basic mock data
+          const {generateLoveMatchData} = require('./loveMatchMockData');
+          setMatchData(generateLoveMatchData(yourSign, theirSign));
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchData();
+    return () => { cancelled = true; };
+  }, [yourSign, theirSign, buildMatchData]);
 
   // Analytics - Screen View
   useScreenView('LoveMatch', {
@@ -424,18 +481,11 @@ const LoveMatchScreen: React.FC<Props> = ({route}) => {
 
   // Analytics - Track screen view on mount
   useEffect(() => {
-    trackLoveMatchView(yourSign, theirSign, matchData.overallScore);
+    if (matchData) {
+      trackLoveMatchView(yourSign, theirSign, matchData.overallScore);
+    }
     firebaseService.logScreenView('LoveMatch', 'LoveMatchScreen');
-  }, [yourSign, theirSign, matchData.overallScore]);
-
-  // Show loader for 4 seconds then show content
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 4000);
-
-    return () => clearTimeout(timer);
-  }, []);
+  }, [yourSign, theirSign, matchData]);
 
   const handleClose = useCallback(() => {
     trackLoveMatchDismiss(yourSign, theirSign);
@@ -444,11 +494,19 @@ const LoveMatchScreen: React.FC<Props> = ({route}) => {
 
   const handleAskOracle = useCallback(() => {
     trackLoveMatchAskOracleTap(yourSign, theirSign);
-    navigation.navigate('Chat' as never);
-  }, [navigation, yourSign, theirSign]);
+    const summary = matchData
+      ? `My sign: ${yourSign}\nPartner's sign: ${theirSign}\nOverall compatibility: ${matchData.overallScore}%\nAlignment: ${matchData.alignmentText}\n${matchData.metrics.map(m => `${m.label}: ${m.percentage}%`).join('\n')}\nCosmic Insight: ${matchData.cosmicInsight.description}`
+      : `My sign: ${yourSign}, Partner's sign: ${theirSign}`;
+    navigation.navigate('Chat', {
+      source: 'love',
+      yourSign,
+      theirSign,
+      loveMatchSummary: summary,
+    });
+  }, [navigation, yourSign, theirSign, matchData]);
 
   // Show loader while loading
-  if (isLoading) {
+  if (isLoading || !matchData) {
     return (
       <View style={styles.backgroundFallback}>
         <ImageBackground

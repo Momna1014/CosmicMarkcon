@@ -604,3 +604,30 @@ export const trackProfileTermsTap = async () => {
     screen_name: 'profile',
   });
 };
+
+/**
+ * ====================
+ * HOROSCOPE CHAT SCREEN
+ * ====================
+ */
+
+/**
+ * Track when user views Horoscope Chat screen
+ */
+export const trackHoroscopeChatView = async (zodiacSign: string) => {
+  await logEvent('horoscope_chat_screen_view', {
+    screen_name: 'horoscope_chat',
+    screen_category: 'main',
+    zodiac_sign: zodiacSign,
+  });
+};
+
+/**
+ * Track when user taps Start Chat button
+ */
+export const trackHoroscopeChatStartTap = async (zodiacSign: string) => {
+  await logEvent('horoscope_chat_start_tap', {
+    screen_name: 'horoscope_chat',
+    zodiac_sign: zodiacSign,
+  });
+};

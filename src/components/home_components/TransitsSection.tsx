@@ -1,4 +1,4 @@
-import React, {memo, useCallback, useState} from 'react';
+import React, {memo, useCallback, useState, useMemo} from 'react';
 import {View, ScrollView, Text, TouchableOpacity} from 'react-native';
 import Animated, {
   FadeInDown,
@@ -11,11 +11,13 @@ import {styles} from '../../screens/Home/styles';
 import {TransitData} from './types';
 import {moderateScale} from '../../theme';
 import TransitDetailModal from './TransitDetailModal';
+import {TransitResponse} from '../../services/ConversationService';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 interface TransitsSectionProps {
   transits: TransitData[];
+  dynamicTransits?: TransitResponse[];
 }
 
 interface TransitItemProps {
@@ -66,9 +68,25 @@ const TransitItem = memo(({item, index, onPress}: TransitItemProps) => {
 
 TransitItem.displayName = 'TransitItem';
 
-const TransitsSection: React.FC<TransitsSectionProps> = memo(({transits}) => {
+const TransitsSection: React.FC<TransitsSectionProps> = memo(({transits, dynamicTransits}) => {
   const [selectedTransit, setSelectedTransit] = useState<TransitData | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+
+  // Merge dynamic ChatGPT transit data with static icon data
+  const mergedTransits = useMemo(() => {
+    if (!dynamicTransits || dynamicTransits.length === 0) return transits;
+    return transits.map(staticItem => {
+      const dynamic = dynamicTransits.find(d => d.id === staticItem.id);
+      if (dynamic) {
+        return {
+          ...staticItem,
+          subtext: dynamic.subtext,
+          description: dynamic.description,
+        };
+      }
+      return staticItem;
+    });
+  }, [transits, dynamicTransits]);
 
   const handleTransitPress = useCallback((transit: TransitData) => {
     setSelectedTransit(transit);
@@ -92,7 +110,7 @@ const TransitsSection: React.FC<TransitsSectionProps> = memo(({transits}) => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.transitsContainer}
         style={styles.transitsScrollView}>
-        {transits.map((item, index) => (
+        {mergedTransits.map((item, index) => (
           <TransitItem
             key={item.id}
             item={item}

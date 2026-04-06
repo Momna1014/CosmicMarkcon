@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   ScrollView,
   Animated,
+  Switch,
+  AppState,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSelector, useDispatch} from 'react-redux';
@@ -24,12 +26,21 @@ import {
   trackProfileSubscriptionTap,
 } from '../../utils/mainScreenAnalytics';
 
+// Notifications
+import {useNotifications} from '../../contexts/NotificationContext';
+
 // Icons
 import StarIcon from '../../assets/icons/home_icons/welcome_star.svg';
+
+// Chat Header (same as Chat screen)
+import {ChatHeader} from '../Chat/components';
 import {
   selectOnboardingState,
   saveOnboardingData,
 } from '../../redux/slices/onboardingSlice';
+import {clearCosmicData} from '../../redux/slices/cosmicDataSlice';
+import {clearHoroscopeBundle} from '../../redux/slices/horoscopeSlice';
+import {useAlert} from '../../contexts/AlertContext';
 import {AppDispatch} from '../../redux/store';
 import {DatePicker} from '../../components/DatePicker';
 import {
@@ -51,6 +62,13 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
   const dispatch = useDispatch<AppDispatch>();
   const onboardingData = useSelector(selectOnboardingState);
   const {isPremium} = useApp();
+  const {showAlert} = useAlert();
+  const {
+    notificationsEnabled,
+    permissionStatus,
+    openNotificationSettings,
+    checkPermissionStatus,
+  } = useNotifications();
 
   // Form state
   const [name, setName] = useState('');
@@ -121,6 +139,16 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
     ]).start();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Re-check notification permission when returning from Settings
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      if (nextState === 'active') {
+        checkPermissionStatus();
+      }
+    });
+    return () => subscription.remove();
+  }, [checkPermissionStatus]);
 
   // Picker visibility
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -202,7 +230,10 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
     if (timeValue && formatTimeForStorage(timeValue) !== onboardingData.birthTime) changedFields.push('birthTime');
     if (selectedCity?.name !== onboardingData.city) changedFields.push('city');
     if (selectedCountry?.name !== onboardingData.country) changedFields.push('country');
-    
+
+    const signChanged = calculatedZodiacSign !== onboardingData.zodiacSign;
+    if (signChanged) changedFields.push('zodiacSign');
+
     trackProfileSave(changedFields);
 
     dispatch(
@@ -216,7 +247,34 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
         zodiacSign: calculatedZodiacSign || undefined, // Use calculated zodiac sign
       }),
     );
+
+    // Clear cached data so Home & Horoscope refetch with updated profile
+    if (changedFields.length > 0) {
+      dispatch(clearCosmicData());
+      dispatch(clearHoroscopeBundle());
+    }
+
     setShowProfileCard(true);
+
+    // Show appropriate alert
+    if (signChanged) {
+      showAlert({
+        type: 'info',
+        title: 'Zodiac Sign Changed ✨',
+        message: `Your sign updated to ${calculatedZodiacSign}. Your cosmic readings will refresh with your new celestial identity.`,
+        buttons: [{text: 'OK', style: 'default'}],
+        hideIcon: true,
+      });
+    } else if (changedFields.length > 0) {
+      showAlert({
+        type: 'success',
+        title: 'Identity Saved ✅',
+        message: 'Your profile has been updated. Cosmic readings will refresh with your new details.',
+        buttons: [{text: 'OK', style: 'default'}],
+        hideIcon: true,
+      });
+    }
+
     console.log('✅ Identity saved! Zodiac:', calculatedZodiacSign);
   };
 
@@ -353,7 +411,7 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
                 ]}>
                 {selectedCity?.name || 'Select City'}
               </Text>
-              <Text style={styles.inputIcon}>🏙️</Text>
+              {/* <Text style={styles.inputIcon}>🏙️</Text> */}
             </TouchableOpacity>
           </View>
         )}
@@ -433,26 +491,40 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
             backgroundColor="transparent"
             translucent
           />
+          <ChatHeader title="Profile" subtitle="Your Celestial Identity" />
           <ScrollView
             style={styles.scrollView}
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled">
-            {/* Header */}
-            <Animated.View style={[
-              styles.header,
-              {
-                opacity: headerFadeAnim,
-                transform: [{translateY: headerSlideAnim}],
-              }
-            ]}>
-              <Text style={styles.title}>Profile</Text>
-              <Text style={styles.subtitle}>Your Celestial Identity</Text>
-            </Animated.View>
 
             {/* Form or Profile Card */}
             <View>
               {showProfileCard ? renderProfileCard() : renderForm()}
+            </View>
+
+            {/* Notification Toggle Card */}
+            <View style={styles.notificationCard}>
+              <View style={styles.glassOverlay} />
+              <View style={styles.notificationContent}>
+                <View style={styles.notificationIconContainer}>
+                  <Text style={styles.notificationIconText}>🔔</Text>
+                </View>
+                <View style={styles.notificationTextContainer}>
+                  <Text style={styles.notificationTitle}>Notifications</Text>
+                  <Text style={styles.notificationSubtitle}>
+                    {notificationsEnabled
+                      ? 'Daily horoscope at 8:00 PM'
+                      : 'Enable for cosmic insights'}
+                  </Text>
+                </View>
+                <Switch
+                  value={notificationsEnabled}
+                  onValueChange={openNotificationSettings}
+                  trackColor={{false: 'rgba(255,255,255,0.15)', true: 'rgba(221, 197, 96, 0.4)'}}
+                  thumbColor={notificationsEnabled ? '#D4AF37' : '#888'}
+                />
+              </View>
             </View>
 
             {/* Premium Card */}

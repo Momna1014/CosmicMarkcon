@@ -19,7 +19,7 @@ import React, {
   useCallback,
   ReactNode,
 } from 'react';
-import { Platform, Linking, Alert } from 'react-native';
+import { Platform, Linking, Alert, PermissionsAndroid } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 import notifee, { AuthorizationStatus } from '@notifee/react-native';
@@ -83,6 +83,27 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     try {
       console.log('[NotificationContext] 🔍 Checking system permission status...');
       
+      // Android 13+ (API 33+) - Check POST_NOTIFICATIONS permission directly
+      if (Platform.OS === 'android' && Platform.Version >= 33) {
+        const hasPermission = await PermissionsAndroid.check(
+          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+        );
+        console.log('[NotificationContext] 📱 Android 13+ POST_NOTIFICATIONS check:', hasPermission);
+        
+        if (hasPermission) {
+          return 'granted';
+        }
+        
+        // Check if we've asked before (if we have stored a status, user has seen the prompt)
+        const storedStatus = await AsyncStorage.getItem(NOTIFICATION_PERMISSION_KEY);
+        if (storedStatus === 'denied') {
+          return 'denied';
+        }
+        
+        return 'not-determined';
+      }
+      
+      // iOS and older Android - use FCM/Notifee
       // Check FCM permission
       const fcmStatus = await messaging().hasPermission();
       console.log('[NotificationContext] 📱 FCM permission status:', fcmStatus);
@@ -178,8 +199,8 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
 
       // Schedule new daily notification at 8:00 PM (20:00)
       const notificationId = await notificationService.scheduleDailyNotification(
-        '📚 Time to Read!',
-        'Your favorite manga is waiting for you. Take a break and enjoy some reading!',
+        '� Your Evening Horoscope Awaits',
+        'The stars have aligned with a message for you. Check your cosmic insights before the day ends!',
         20, // Hour: 8 PM
         0,  // Minute: 00
         { type: 'daily_reminder' }
@@ -227,6 +248,23 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
   }, []);
 
   /**
+   * Show welcome notification when permissions are granted
+   */
+  const showWelcomeNotification = useCallback(async (): Promise<void> => {
+    try {
+      console.log('[NotificationContext] 🎉 Showing welcome notification...');
+      await notificationService.displayNotification(
+        '✨ Welcome to the Cosmos!',
+        'You\'ll now receive daily horoscope insights and cosmic guidance at 8 PM.',
+        { type: 'welcome' }
+      );
+      console.log('[NotificationContext] ✅ Welcome notification displayed');
+    } catch (error) {
+      console.error('[NotificationContext] ❌ Failed to show welcome notification:', error);
+    }
+  }, []);
+
+  /**
    * Request notification permission
    * Returns true if granted, false otherwise
    */
@@ -235,19 +273,39 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
       console.log('[NotificationContext] 🔔 Requesting notification permission...');
       setIsRequestingPermission(true);
 
-      // Request FCM permission
-      const fcmStatus = await messaging().requestPermission();
-      console.log('[NotificationContext] 📱 FCM permission result:', fcmStatus);
+      let isGranted = false;
 
-      // Also request Notifee permission
-      const notifeeStatus = await notifee.requestPermission();
-      console.log('[NotificationContext] 📱 Notifee permission result:', notifeeStatus.authorizationStatus);
+      // Android 13+ (API 33+) requires POST_NOTIFICATIONS permission
+      if (Platform.OS === 'android' && Platform.Version >= 33) {
+        console.log('[NotificationContext] 📱 Android 13+: Requesting POST_NOTIFICATIONS permission...');
+        const androidPermission = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+          {
+            title: 'Notification Permission',
+            message: 'CosmicMarkcon needs notification permission to send you daily horoscope insights and cosmic updates.',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          }
+        );
+        console.log('[NotificationContext] 📱 Android permission result:', androidPermission);
+        isGranted = androidPermission === PermissionsAndroid.RESULTS.GRANTED;
+      } else {
+        // iOS and older Android versions
+        // Request FCM permission
+        const fcmStatus = await messaging().requestPermission();
+        console.log('[NotificationContext] 📱 FCM permission result:', fcmStatus);
 
-      // Check if granted
-      const isGranted =
-        fcmStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        fcmStatus === messaging.AuthorizationStatus.PROVISIONAL ||
-        notifeeStatus.authorizationStatus === AuthorizationStatus.AUTHORIZED;
+        // Also request Notifee permission
+        const notifeeStatus = await notifee.requestPermission();
+        console.log('[NotificationContext] 📱 Notifee permission result:', notifeeStatus.authorizationStatus);
+
+        // Check if granted
+        isGranted =
+          fcmStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+          fcmStatus === messaging.AuthorizationStatus.PROVISIONAL ||
+          notifeeStatus.authorizationStatus === AuthorizationStatus.AUTHORIZED;
+      }
 
       // Update state
       const newStatus: PermissionStatus = isGranted ? 'granted' : 'denied';
@@ -275,6 +333,9 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
         
         // Schedule daily notification
         await scheduleDailyNotification();
+
+        // Show welcome notification
+        await showWelcomeNotification();
       } else {
         // Permission denied
         setNotificationsEnabled(false);
@@ -289,7 +350,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
       setIsRequestingPermission(false);
       return false;
     }
-  }, [initializeNotificationServices, scheduleDailyNotification]);
+  }, [initializeNotificationServices, scheduleDailyNotification, showWelcomeNotification]);
 
   /**
    * Toggle notifications on/off
@@ -310,7 +371,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
           console.log('[NotificationContext] ⚠️ Permission denied, need to open settings');
           Alert.alert(
             'Notifications Disabled',
-            'To enable notifications, please go to Settings and allow notifications for MangaVerse.',
+            'To enable notifications, please go to Settings and allow notifications for CosmicMarkcon.',
             [
               { text: 'Cancel', style: 'cancel' },
               { text: 'Open Settings', onPress: () => openNotificationSettings() },
@@ -331,6 +392,9 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
           // Initialize services and schedule notification
           await initializeNotificationServices();
           await scheduleDailyNotification();
+          
+          // Show welcome notification when enabled from settings
+          await showWelcomeNotification();
           return true;
         }
       } else {
@@ -354,16 +418,47 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     initializeNotificationServices,
     scheduleDailyNotification,
     cancelDailyNotification,
+    showWelcomeNotification,
   ]);
 
   /**
    * Check permission status (public method)
+   * Also syncs the notificationsEnabled state with the actual permission status
+   * Handles case when user enables permission from system settings
    */
   const checkPermissionStatus = useCallback(async (): Promise<PermissionStatus> => {
     const status = await checkSystemPermissionStatus();
+    const previousStatus = permissionStatus;
     setPermissionStatus(status);
+    
+    console.log('[NotificationContext] 🔄 checkPermissionStatus:', { previousStatus, status, notificationsEnabled });
+    
+    // Sync notificationsEnabled state based on system permission
+    if (status === 'granted') {
+      // Permission is now granted
+      // If it was previously not granted (user enabled from settings), enable notifications
+      if (!notificationsEnabled && previousStatus !== 'granted') {
+        console.log('[NotificationContext] 🎉 Permission granted from settings, enabling notifications');
+        setNotificationsEnabled(true);
+        await AsyncStorage.setItem(NOTIFICATION_ENABLED_KEY, JSON.stringify(true));
+        await AsyncStorage.setItem(NOTIFICATION_PERMISSION_KEY, 'granted');
+        
+        // Initialize services and show welcome notification
+        await initializeNotificationServices();
+        await scheduleDailyNotification();
+        await showWelcomeNotification();
+      }
+    } else {
+      // Permission is denied/not-determined, notifications should be off
+      if (notificationsEnabled) {
+        console.log('[NotificationContext] 🔄 Permission not granted, disabling notifications');
+        setNotificationsEnabled(false);
+        await AsyncStorage.setItem(NOTIFICATION_ENABLED_KEY, JSON.stringify(false));
+      }
+    }
+    
     return status;
-  }, [checkSystemPermissionStatus]);
+  }, [checkSystemPermissionStatus, notificationsEnabled, permissionStatus, initializeNotificationServices, scheduleDailyNotification, showWelcomeNotification]);
 
   /**
    * Mark first prompt as shown

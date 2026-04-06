@@ -125,6 +125,7 @@ export const Colors = {
   warning: '#665600',
   error: '#FF0000',
   info: '#354764',
+    background: '#2C2C90',
 
   // Onboarding colors
   progressBarBackground: '#0E0E0E57',
@@ -132,10 +133,8 @@ export const Colors = {
   subHeading: '#C2D1F3',
   cosmicBackground: '#08142A', // Deep cosmic blue for fallback backgrounds
 
-  // Light theme colors
-  light: {
+
     primary: '#03AA82',
-    background: '#FFFFFF',
     card: '#F5F5F5',
     text: '#000000',
     textSecondary: '#666666',
@@ -144,21 +143,34 @@ export const Colors = {
     notification: '#03AA82',
     shadow: '#000000',
     overlay: 'rgba(0, 0, 0, 0.5)',
-  },
+
+  // Light theme colors
+  // light: {
+  //   primary: '#03AA82',
+  //   background: '#2C2C90',
+  //   card: '#F5F5F5',
+  //   text: '#000000',
+  //   textSecondary: '#666666',
+  //   textTertiary: '#999999',
+  //   border: '#E0E0E0',
+  //   notification: '#03AA82',
+  //   shadow: '#000000',
+  //   overlay: 'rgba(0, 0, 0, 0.5)',
+  // },
 
   // Dark theme colors
-  dark: {
- primary: '#03AA82',
-    background: '#FFFFFF',
-    card: '#F5F5F5',
-    text: '#000000',
-    textSecondary: '#666666',
-    textTertiary: '#999999',
-    border: '#E0E0E0',
-    notification: '#03AA82',
-    shadow: '#000000',
-    overlay: 'rgba(0, 0, 0, 0.5)',
-  },
+//   dark: {
+//  primary: '#03AA82',
+//     background: '#2C2C90',
+//     card: '#F5F5F5',
+//     text: '#000000',
+//     textSecondary: '#666666',
+//     textTertiary: '#999999',
+//     border: '#E0E0E0',
+//     notification: '#03AA82',
+//     shadow: '#000000',
+//     overlay: 'rgba(0, 0, 0, 0.5)',
+//   },
 } as const;
 
 // Typography
@@ -310,22 +322,22 @@ export const lightTheme: AppTheme = {
   dark: false,
   colors: {
     // Navigation theme colors (required by React Navigation)
-    primary: Colors.light.primary,
-    background: Colors.light.background,
-    card: Colors.light.card,
-    text: Colors.light.text,
-    border: Colors.light.border,
-    notification: Colors.light.notification,
+    primary: Colors.primary,
+     background: Colors.background,
+    card: Colors.card,
+    text: Colors.text,
+    border: Colors.border,
+    notification: Colors.notification,
     
     // Custom semantic colors
     secondary: Colors.info,
-    textPrimary: Colors.light.text,
-    textSecondary: Colors.light.textSecondary,
-    textTertiary: Colors.light.textTertiary,
-    backgroundPrimary: Colors.light.background,
-    backgroundSecondary: Colors.light.card,
-    overlay: Colors.light.overlay,
-    shadow: Colors.light.shadow,
+    textPrimary: Colors.text,
+    textSecondary: Colors.textSecondary,
+    textTertiary: Colors.textTertiary,
+    backgroundPrimary: Colors.background,
+    backgroundSecondary: Colors.card,
+    overlay: Colors.overlay,
+    shadow: Colors.shadow,
     
     // Status colors
     success: Colors.success,
@@ -352,22 +364,22 @@ export const darkTheme: AppTheme = {
   dark: true,
   colors: {
     // Navigation theme colors (required by React Navigation)
-    primary: Colors.dark.primary,
-    background: Colors.dark.background,
-    card: Colors.dark.card,
-    text: Colors.dark.text,
-    border: Colors.dark.border,
-    notification: Colors.dark.notification,
+    primary: Colors.primary,
+    background: Colors.background,
+    card: Colors.card,
+    text: Colors.text,
+    border: Colors.border,
+    notification: Colors.notification,
     
     // Custom semantic colors
     secondary: Colors.info,
-    textPrimary: Colors.dark.text,
-    textSecondary: Colors.dark.textSecondary,
-    textTertiary: Colors.dark.textTertiary,
-    backgroundPrimary: Colors.dark.background,
-    backgroundSecondary: Colors.dark.card,
-    overlay: Colors.dark.overlay,
-    shadow: Colors.dark.shadow,
+    textPrimary: Colors.text,
+    textSecondary: Colors.textSecondary,
+    textTertiary: Colors.textTertiary,
+    backgroundPrimary: Colors.background,
+    backgroundSecondary: Colors.card,
+    overlay: Colors.overlay,
+    shadow: Colors.shadow,
     
     // Status colors
     success: Colors.success,

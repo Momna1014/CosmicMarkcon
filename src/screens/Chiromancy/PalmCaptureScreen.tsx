@@ -431,8 +431,8 @@ const PalmCaptureScreen: React.FC = memo(() => {
                     <Text style={styles.instructionsTitle}>Position Your {handLabel} Hand</Text>
                     <Text style={styles.instructionsText}>
                       {handType === 'leftHand' 
-                        ? 'Place your LEFT palm facing the camera with thumb on the LEFT side'
-                        : 'Place your RIGHT palm facing the camera with thumb on the RIGHT side'}
+                        ? 'Hold your LEFT palm open, facing the camera, with fingers spread apart'
+                        : 'Hold your RIGHT palm open, facing the camera, with fingers spread apart'}
                     </Text>
                   </Animated.View>
 

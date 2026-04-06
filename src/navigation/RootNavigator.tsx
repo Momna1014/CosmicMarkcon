@@ -137,6 +137,7 @@ function RootNavigatorContent() {
       ref={navigationRef}
       linking={linking as any}
       onReady={handleNavigationReady}
+
     >
       <StackNavigator />
     </NavigationContainer>

@@ -31,7 +31,7 @@ import {
 } from '../../theme';
 
 // Components
-import {ChatHeader, MessageBubble, QuickReplyChips, ChatInput, ImagePreviewModal} from './components';
+import {ChatHeader, MessageBubble, ChatInput, ImagePreviewModal, TypingIndicator, PalmLineTabs} from './components';
 
 // Icons
 const ArrowDownIcon = require('../../assets/icons/chat_icons/arrow.png');
@@ -39,12 +39,16 @@ const ArrowDownIcon = require('../../assets/icons/chat_icons/arrow.png');
 // Data
 import {
   ChatMessage,
-  QuickReply,
-  MOCK_MESSAGES,
-  DEFAULT_QUICK_REPLIES,
   createUserMessage,
-  createAIResponse,
+  createAIMessage,
+  createPalmReadingMessage,
 } from './chatMockData';
+
+// Chat AI Service
+import {
+  chatConversationService,
+  OracleChatMessage,
+} from '../../services/ChatConversationService';
 
 // Utils
 import {
@@ -60,10 +64,13 @@ import firebaseService from '../../services/firebase/FirebaseService';
 import {
   trackChatView,
   trackChatMessageSend,
-  trackChatQuickReplyTap,
 } from '../../utils/mainScreenAnalytics';
 
 const BackgroundImage = require('../../assets/icons/bottomtab_icons/main_screen_background.png');
+
+// Palm diagram assets
+const LeftHandDiagram = require('../../assets/icons/chat_icons/left_hand.png');
+const RightHandDiagram = require('../../assets/icons/chat_icons/right_hand.png');
 
 type ChatRouteParams = {
   Chat: {
@@ -72,6 +79,7 @@ type ChatRouteParams = {
     handType?: 'leftHand' | 'rightHand';
     yourSign?: string;
     theirSign?: string;
+    loveMatchSummary?: string;
   };
 };
 
@@ -89,7 +97,7 @@ interface AttachedImage {
 const ChatScreen: React.FC<Props> = () => {
   // Get route params
   const route = useRoute<RouteProp<ChatRouteParams, 'Chat'>>();
-  const {source, imageUri, handType, yourSign, theirSign} = route.params || {};
+  const {source, imageUri, handType, yourSign, theirSign, loveMatchSummary} = route.params || {};
   
   // State
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -99,6 +107,9 @@ const ChatScreen: React.FC<Props> = () => {
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [attachedImage, setAttachedImage] = useState<AttachedImage | null>(null);
   const [hasHandledInitialMessage, setHasHandledInitialMessage] = useState(false);
+
+  // Conversation history for API (system + user + assistant)
+  const conversationRef = useRef<OracleChatMessage[]>([]);
   
   // Refs
   const flatListRef = useRef<FlatList>(null);
@@ -109,14 +120,31 @@ const ChatScreen: React.FC<Props> = () => {
   const scrollOffset = useRef(0);
   const layoutHeight = useRef(0);
 
-  // Load mock messages on mount
+  // Initialize conversation with system prompt + welcome message
   useEffect(() => {
-    setMessages(MOCK_MESSAGES);
-    // Scroll to bottom after initial load
+    const systemPrompt = chatConversationService.buildSystemPrompt(source, yourSign, theirSign, handType);
+    conversationRef.current = [{role: 'system', content: systemPrompt}];
+
+    // Determine welcome message based on source
+    let welcomeText: string;
+    if (source === 'palm' && handType) {
+      welcomeText = chatConversationService.getPalmWelcomeMessage(handType);
+    } else if (source === 'love' && yourSign && theirSign) {
+      welcomeText = chatConversationService.getLoveWelcomeMessage(yourSign, theirSign);
+    } else {
+      welcomeText = chatConversationService.getWelcomeMessage();
+    }
+
+    const welcomeMsg = createAIMessage(welcomeText);
+    setMessages([welcomeMsg]);
+
+    // Add to conversation history
+    conversationRef.current.push({role: 'assistant', content: welcomeText});
+
     setTimeout(() => {
-      flatListRef.current?.scrollToEnd({animated: false});
       isInitialLoad.current = false;
     }, 100);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Analytics - Screen View
@@ -136,47 +164,64 @@ const ChatScreen: React.FC<Props> = () => {
     if (hasHandledInitialMessage) return;
     
     if (source === 'palm' && imageUri && handType) {
-      // Send palm reading request
+      // Send palm reading request with image — validate hand first
       const handLabel = handType === 'leftHand' ? 'left' : 'right';
-      const message = `I've just scanned my ${handLabel} palm. Can you give me a reading based on this image?`;
+      const message = `I've just scanned my ${handLabel} palm. Can you give me a detailed reading based on this image?`;
       
-      setTimeout(() => {
+      setTimeout(async () => {
         const userMessage = createUserMessage(message, imageUri);
         setMessages(prev => [...prev, userMessage]);
         setHasHandledInitialMessage(true);
-        
-        // Simulate AI response
+        flatListRef.current?.scrollToEnd({animated: true});
+
+        // Step 1: Validate the hand image before reading
         setIsTyping(true);
         setTimeout(() => {
-          const aiResponse = createAIResponse(userMessage);
-          setMessages(prev => [...prev, aiResponse]);
-          setIsTyping(false);
           flatListRef.current?.scrollToEnd({animated: true});
-        }, 1500 + Math.random() * 1000);
-        
-        flatListRef.current?.scrollToEnd({animated: true});
+        }, 100);
+
+        try {
+          const validation = await chatConversationService.validateHandImage(imageUri, handType);
+
+          if (!validation.isHand || (validation.detectedHand !== 'unknown' && validation.detectedHand !== handLabel)) {
+            // Validation failed — show rejection message, don't do reading
+            setIsTyping(false);
+            const rejectMsg = createAIMessage(
+              validation.message || `Please share a clear photo of your ${handLabel} palm for an accurate reading.`,
+            );
+            setMessages(prev => [...prev, rejectMsg]);
+            conversationRef.current.push({role: 'assistant', content: rejectMsg.content || ''});
+            return;
+          }
+
+          // Step 2: Validation passed — proceed with reading (include hand diagram in response)
+          setIsTyping(false);
+          const diagram = handType === 'leftHand' ? LeftHandDiagram : RightHandDiagram;
+          sendToOracle(message, imageUri, diagram);
+        } catch {
+          // If validation errors out, proceed with reading anyway
+          setIsTyping(false);
+          const diagram = handType === 'leftHand' ? LeftHandDiagram : RightHandDiagram;
+          sendToOracle(message, imageUri, diagram);
+        }
       }, 500);
     } else if (source === 'love' && yourSign && theirSign) {
-      // Send love compatibility request
-      const message = `Can you tell me about the love compatibility between ${yourSign} and ${theirSign}?`;
+      // Send love compatibility request with the summary data as user's first message
+      const message = loveMatchSummary
+        ? `Here are my love compatibility results:\n\n${loveMatchSummary}\n\nCan you give me deeper insight into our compatibility?`
+        : `My sign is ${yourSign} and my partner's sign is ${theirSign}. Can you tell me about our love compatibility?`;
       
       setTimeout(() => {
         const userMessage = createUserMessage(message);
         setMessages(prev => [...prev, userMessage]);
         setHasHandledInitialMessage(true);
-        
-        // Simulate AI response
-        setIsTyping(true);
-        setTimeout(() => {
-          const aiResponse = createAIResponse(userMessage);
-          setMessages(prev => [...prev, aiResponse]);
-          setIsTyping(false);
-          flatListRef.current?.scrollToEnd({animated: true});
-        }, 1500 + Math.random() * 1000);
-        
         flatListRef.current?.scrollToEnd({animated: true});
+        
+        // Send to AI
+        sendToOracle(message);
       }, 500);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [source, imageUri, handType, yourSign, theirSign, hasHandledInitialMessage]);
 
   // Handle keyboard events
@@ -229,7 +274,7 @@ const ChatScreen: React.FC<Props> = () => {
     flatListRef.current?.scrollToEnd({animated: true});
   }, []);
 
-  // Add new message
+  // Add new message to UI
   const addMessage = useCallback(
     (message: ChatMessage) => {
       setMessages((prev) => [...prev, message]);
@@ -241,31 +286,133 @@ const ChatScreen: React.FC<Props> = () => {
     [],
   );
 
-  // Simulate AI typing and response
-  const simulateAIResponse = useCallback(
-    (userMessage: ChatMessage) => {
+  // Send a message to the Oracle API
+  const sendToOracle = useCallback(
+    async (text: string, imgUri?: string, palmDiagram?: number) => {
+      // Add user message to conversation history
+      conversationRef.current.push({role: 'user', content: text});
+
       setIsTyping(true);
-      
+      // Scroll to show typing indicator
       setTimeout(() => {
-        const aiResponse = createAIResponse(userMessage);
-        addMessage(aiResponse);
+        flatListRef.current?.scrollToEnd({animated: true});
+      }, 100);
+      try {
+        const reply = await chatConversationService.sendMessage(
+          conversationRef.current,
+          imgUri,
+        );
+
+        // Add assistant reply to conversation history
+        conversationRef.current.push({role: 'assistant', content: reply});
+
+        // Add to UI — if palmDiagram is provided, show hand diagram above the reading
+        const aiMessage = palmDiagram
+          ? createPalmReadingMessage(palmDiagram, reply)
+          : createAIMessage(reply);
+        addMessage(aiMessage);
+      } catch (error: any) {
+        console.error('❌ [Chat] Oracle error:', error.message);
+        const errorMsg = createAIMessage(
+          'The cosmic connection flickered for a moment ✨ Please try sending your message again.',
+        );
+        addMessage(errorMsg);
+      } finally {
         setIsTyping(false);
-      }, 1500 + Math.random() * 1000);
+      }
     },
     [addMessage],
   );
 
   // Send text message (with optional image)
   const handleSendMessage = useCallback(
-    (text: string, attachedImageUri?: string) => {
+    async (text: string, attachedImageUri?: string) => {
       trackChatMessageSend(text.length);
       const userMessage = createUserMessage(text, attachedImageUri);
       addMessage(userMessage);
-      simulateAIResponse(userMessage);
-      // Clear attached image after sending
+
+      // Clear attached image immediately so preview disappears right away
       setAttachedImage(null);
+
+      if (attachedImageUri && source === 'palm' && handType) {
+        // User is in a palm reading session and sent a new image (from camera/gallery)
+        // Validate it against the expected hand — same behavior as initial flow
+        setIsTyping(true);
+        setTimeout(() => {
+          flatListRef.current?.scrollToEnd({animated: true});
+        }, 100);
+
+        try {
+          const validation = await chatConversationService.validateHandImage(attachedImageUri, handType);
+          const handLabel = handType === 'leftHand' ? 'left' : 'right';
+
+          if (!validation.isHand || (validation.detectedHand !== 'unknown' && validation.detectedHand !== handLabel)) {
+            // Wrong hand or not a hand — reject
+            setIsTyping(false);
+            const rejectMsg = createAIMessage(
+              validation.message || `Please share a clear photo of your ${handLabel} palm for an accurate reading.`,
+            );
+            setMessages(prev => [...prev, rejectMsg]);
+            conversationRef.current.push({role: 'assistant', content: rejectMsg.content || ''});
+            return;
+          }
+
+          // Correct hand — proceed with reading (include hand diagram in response)
+          setIsTyping(false);
+          const diagram = handType === 'leftHand' ? LeftHandDiagram : RightHandDiagram;
+          sendToOracle(text, attachedImageUri, diagram);
+        } catch {
+          setIsTyping(false);
+          const diagram = handType === 'leftHand' ? LeftHandDiagram : RightHandDiagram;
+          sendToOracle(text, attachedImageUri, diagram);
+        }
+      } else if (attachedImageUri && source !== 'palm') {
+        // User attached an image in general/love chat — detect if it's a palm
+        setIsTyping(true);
+        setTimeout(() => {
+          flatListRef.current?.scrollToEnd({animated: true});
+        }, 100);
+
+        try {
+          const detection = await chatConversationService.detectPalmInChatImage(attachedImageUri);
+          if (detection.isPalm && detection.detectedHand !== 'unknown') {
+            // Prepend palm context so the AI knows which hand
+            const augmented = `[Palm image detected: ${detection.detectedHand.toUpperCase()} hand]\n\n${text}`;
+            setIsTyping(false);
+            const diagram = detection.detectedHand === 'left' ? LeftHandDiagram : RightHandDiagram;
+            sendToOracle(augmented, attachedImageUri, diagram);
+          } else if (detection.isPalm) {
+            // It's a palm but hand unknown — let AI figure it out
+            const augmented = `[Palm image detected — hand could not be determined]\n\n${text}`;
+            setIsTyping(false);
+            sendToOracle(augmented, attachedImageUri);
+          } else {
+            // Not a palm — send normally
+            setIsTyping(false);
+            sendToOracle(text, attachedImageUri);
+          }
+        } catch {
+          // Detection failed — just send normally
+          setIsTyping(false);
+          sendToOracle(text, attachedImageUri);
+        }
+      } else {
+        sendToOracle(text, attachedImageUri);
+      }
     },
-    [addMessage, simulateAIResponse],
+    [addMessage, sendToOracle, source, handType],
+  );
+
+  // Handle palm line tab press — ask Oracle about a specific line
+  const handlePalmLinePress = useCallback(
+    (lineName: string) => {
+      const handLabel = handType === 'leftHand' ? 'left' : 'right';
+      const text = `Tell me about my ${lineName} on my ${handLabel} palm.`;
+      const userMessage = createUserMessage(text);
+      addMessage(userMessage);
+      sendToOracle(text, imageUri);
+    },
+    [addMessage, sendToOracle, handType, imageUri],
   );
 
   // Attach image (from picker) - doesn't send immediately
@@ -311,15 +458,15 @@ const ChatScreen: React.FC<Props> = () => {
     );
   }, [handleAttachImage]);
 
-  // Quick reply press handler
-  const handleQuickReplyPress = useCallback(
-    (reply: QuickReply) => {
-      trackChatQuickReplyTap(reply.label);
-      const messageText = `Tell me about my ${reply.label}`;
-      handleSendMessage(messageText);
-    },
-    [handleSendMessage],
-  );
+  // Quick reply press handler (reserved for future use)
+  // const handleQuickReplyPress = useCallback(
+  //   (reply: QuickReply) => {
+  //     trackChatQuickReplyTap(reply.label);
+  //     const messageText = `Tell me about my ${reply.label}`;
+  //     handleSendMessage(messageText);
+  //   },
+  //   [handleSendMessage],
+  // );
 
   // Image press handler - opens modal
   const handleImagePress = useCallback((imageUrl: string) => {
@@ -349,8 +496,8 @@ const ChatScreen: React.FC<Props> = () => {
   // Key extractor
   const keyExtractor = useCallback((item: ChatMessage) => item.id, []);
 
-  // Memoized quick replies
-  const quickReplies = useMemo(() => DEFAULT_QUICK_REPLIES, []);
+  // Memoized quick replies (reserved for future use)
+  // const quickReplies = useMemo(() => DEFAULT_QUICK_REPLIES, []);
 
   // Scroll button animation styles
   const scrollButtonStyle = useMemo(
@@ -388,7 +535,22 @@ const ChatScreen: React.FC<Props> = () => {
           />
 
           {/* Header */}
-          <ChatHeader title="Palm Reader" subtitle="AI READER" />
+          <ChatHeader
+            title={
+              source === 'palm'
+                ? 'Palm Reader'
+                : source === 'love'
+                ? 'Love Oracle'
+                : 'Cosmic Oracle'
+            }
+            subtitle={
+              source === 'palm'
+                ? 'AI PALMISTRY'
+                : source === 'love'
+                ? 'AI COMPATIBILITY'
+                : 'AI ASTROLOGER'
+            }
+          />
 
           {/* Keyboard Avoiding View */}
           <KeyboardAvoidingView
@@ -415,6 +577,7 @@ const ChatScreen: React.FC<Props> = () => {
                 maxToRenderPerBatch={15}
                 windowSize={10}
                 initialNumToRender={20}
+                ListFooterComponent={isTyping ? <TypingIndicator /> : null}
                 maintainVisibleContentPosition={{
                   minIndexForVisible: 0,
                   autoscrollToTopThreshold: 10,
@@ -443,6 +606,12 @@ const ChatScreen: React.FC<Props> = () => {
 
             {/* Input Area */}
             <SafeAreaView edges={['bottom']} style={styles.inputSafeArea}>
+              {source === 'palm' && (
+                <PalmLineTabs
+                  onLinePress={handlePalmLinePress}
+                  disabled={isTyping}
+                />
+              )}
               <ChatInput
                 onSendMessage={handleSendMessage}
                 onCameraPress={handleCameraPress}

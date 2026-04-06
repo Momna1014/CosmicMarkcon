@@ -38,6 +38,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: verticalScale(8),
+    justifyContent: 'space-between',
   },
   welcomeIcon: {
     width: horizontalScale(16),
@@ -65,6 +66,10 @@ export const styles = StyleSheet.create({
     fontWeight:'bold',
     marginLeft: horizontalScale(4),
   },
+  profileButton: {
+    marginLeft: 'auto',
+    padding: moderateScale(4),
+  },
 
   // Title Section
   titleSection: {
@@ -81,16 +86,16 @@ export const styles = StyleSheet.create({
   // Daily Energy Card
   dailyEnergyCard: {
     borderRadius: radiusScale(36),
-    overflow: 'hidden',
+    // overflow: 'hidden',
     marginBottom: verticalScale(24),
     borderWidth:1,
     borderColor:'#C2D1F333'
 
   },
   dailyEnergyBackground: {
-    width: '100%',
-    borderRadius: radiusScale(36),
-    overflow: 'hidden',
+    // width: '100%',
+    // borderRadius: radiusScale(36),
+    // overflow: 'hidden',
     // backgroundColor:'red'
 
   },

@@ -19,7 +19,7 @@ import HomeScreen from '../screens/Home';
 import HoroscopeScreen from '../screens/Horoscope';
 import LoveScreen from '../screens/Love';
 import ChiromancyScreen from '../screens/Chiromancy';
-import ProfileScreen from '../screens/Profile';
+import HoroscopeChatScreen from '../screens/HoroscopeChat';
 
 // Types
 import {MainTabParamList} from './deepLinking';
@@ -116,11 +116,11 @@ const TabNavigatorCore: React.FC = () => {
         }}
       />
       <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
+        name="Chat"
+        component={HoroscopeChatScreen}
         options={{
-          tabBarLabel: 'Profile',
-          title: 'Profile',
+          tabBarLabel: 'Chat',
+          title: 'Chat',
         }}
       />
     </Tab.Navigator>

@@ -71,6 +71,7 @@ const ChatInput: React.FC<ChatInputProps> = memo(
       if (hasMessage || hasImage) {
         onSendMessage(trimmedMessage, attachedImage?.uri);
         setMessage('');
+        inputRef.current?.clear();
         Keyboard.dismiss();
       }
     }, [message, attachedImage, onSendMessage]);

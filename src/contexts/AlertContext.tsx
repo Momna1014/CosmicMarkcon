@@ -111,6 +111,7 @@ export const AlertProvider: React.FC<AlertProviderProps> = ({ children }) => {
         buttons={alertState.buttons}
         autoHide={alertState.autoHide}
         autoHideDuration={alertState.autoHideDuration}
+        hideIcon={alertState.hideIcon}
         onDismiss={hideAlert}
       />
     </AlertContext.Provider>
