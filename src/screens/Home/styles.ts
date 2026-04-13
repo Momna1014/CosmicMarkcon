@@ -69,6 +69,7 @@ export const styles = StyleSheet.create({
   profileButton: {
     marginLeft: 'auto',
     padding: moderateScale(4),
+    // backgroundColor:'red'
   },
 
   // Title Section

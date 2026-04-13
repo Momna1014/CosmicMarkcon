@@ -363,6 +363,15 @@ const LoveScreen: React.FC<Props> = ({navigation}) => {
     );
   }, [dispatch, showWarningAlert]);
 
+  const handlePartnerPress = useCallback((partner: Partner) => {
+    hapticLight();
+    trackLoveMatchNowTap(onboardingData?.zodiacSign || 'Aries', partner.zodiacSign);
+    navigation.navigate('LoveMatch', {
+      yourSign: onboardingData?.zodiacSign || 'Aries',
+      theirSign: partner.zodiacSign,
+    });
+  }, [navigation, onboardingData?.zodiacSign]);
+
   return (
     <View style={styles.backgroundFallback}>
       <ImageBackground
@@ -493,7 +502,11 @@ const LoveScreen: React.FC<Props> = ({navigation}) => {
                   /* Partner Cards */
                   <View style={styles.partnersList}>
                     {partners.map((partner) => (
-                      <View key={partner.id} style={styles.partnerCard}>
+                      <TouchableOpacity
+                        key={partner.id}
+                        style={styles.partnerCard}
+                        onPress={() => handlePartnerPress(partner)}
+                        activeOpacity={0.7}>
                         <View style={styles.partnerAvatar}>
                           <Text style={styles.partnerAvatarText}>
                             {partner.name.charAt(0).toUpperCase()}
@@ -503,13 +516,22 @@ const LoveScreen: React.FC<Props> = ({navigation}) => {
                           <Text style={styles.partnerName}>{partner.name}</Text>
                           <Text style={styles.partnerSign}>{partner.zodiacSign.toUpperCase()}</Text>
                         </View>
-                        <TouchableOpacity
-                          style={styles.deleteButton}
-                          onPress={() => handleDeletePartner(partner)}
-                          activeOpacity={0.7}>
-                          <DeleteIcon width={22} height={22} />
-                        </TouchableOpacity>
-                      </View>
+                        <View style={styles.partnerActions}>
+                          <TouchableOpacity
+                            style={styles.matchButton}
+                            onPress={() => handlePartnerPress(partner)}
+                            activeOpacity={0.7}>
+                            <HeartIcon width={moderateScale(16)} height={moderateScale(16)} />
+                            <Text style={styles.matchButtonText}>Match</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={styles.deleteButton}
+                            onPress={() => handleDeletePartner(partner)}
+                            activeOpacity={0.7}>
+                            <DeleteIcon width={22} height={22} />
+                          </TouchableOpacity>
+                        </View>
+                      </TouchableOpacity>
                     ))}
                   </View>
                 )}
@@ -757,6 +779,28 @@ const styles = StyleSheet.create({
     fontSize: fontScale(12),
     color: 'rgba(221, 197, 96, 1)',
     letterSpacing: 0.5,
+  },
+  partnerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: horizontalScale(8),
+  },
+  matchButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: horizontalScale(4),
+    backgroundColor: 'rgba(221, 197, 96, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(221, 197, 96, 0.4)',
+    borderRadius: radiusScale(20),
+    paddingVertical: verticalScale(6),
+    paddingHorizontal: horizontalScale(12),
+  },
+  matchButtonText: {
+    fontFamily: FontFamilies.interMedium,
+    fontSize: fontScale(12),
+    color: 'rgba(221, 197, 96, 1)',
+    fontWeight: '600',
   },
   deleteButton: {
     padding: moderateScale(8),

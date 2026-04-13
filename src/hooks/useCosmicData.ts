@@ -6,6 +6,21 @@ import {
   conversationService,
 } from '../services/ConversationService';
 
+/** Detect OpenAI quota / rate-limit errors */
+function isQuotaOrRateLimitError(err: any): boolean {
+  const msg = (err?.message || '').toLowerCase();
+  const code = err?.response?.data?.error?.code || err?.response?.data?.error?.type || '';
+  const status = err?.response?.status;
+  return (
+    status === 429 ||
+    msg.includes('429') ||
+    msg.includes('quota') ||
+    msg.includes('rate limit') ||
+    code === 'insufficient_quota' ||
+    code === 'rate_limit_exceeded'
+  );
+}
+
 /**
  * Hook that fetches daily energy + transits from ChatGPT
  * when the user lands on Home screen.
@@ -21,6 +36,7 @@ export function useCosmicData() {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isQuotaError, setIsQuotaError] = useState(false);
 
   const cached = useSelector((s: RootState) => s.cosmicData);
   const keysLoaded = useSelector((s: RootState) => s.keys.isLoaded);
@@ -35,10 +51,13 @@ export function useCosmicData() {
       setLoading(true);
     }
     setError(null);
+    setIsQuotaError(false);
     try {
       const result = await conversationService.getCosmicHomeData();
       dispatch(setCosmicData(result));
     } catch (err: any) {
+      const quota = isQuotaOrRateLimitError(err);
+      setIsQuotaError(quota);
       setError(err.message || 'Failed to load cosmic data');
     } finally {
       setLoading(false);
@@ -58,5 +77,5 @@ export function useCosmicData() {
     fetchData(true);
   }, [fetchData]);
 
-  return {data: cached.data, loading: loading && needsFetch, refreshing, error, refresh};
+  return {data: cached.data, loading: loading && needsFetch, refreshing, error, isQuotaError, refresh};
 }
