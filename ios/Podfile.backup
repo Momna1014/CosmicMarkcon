@@ -45,6 +45,7 @@ target 'CosmicMarkcon' do
   # ========================================
   # AppLovin Mediation Adapters
   # ========================================
+  # Temporarily disabled Facebook adapter due to iOS build issues
   # pod 'AppLovinMediationFacebookAdapter'
   pod 'AppLovinMediationGoogleAdapter'
   pod 'AppLovinMediationUnityAdsAdapter'

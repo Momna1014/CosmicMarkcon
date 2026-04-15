@@ -1,24 +1,24 @@
 /**
  * Deep Linking Configuration
- * 
+ *
  * Configure deep linking for the app
  * Supports: App links, Universal links, Custom URL schemes
  */
 
-import {LinkingOptions} from '@react-navigation/native';
+import { LinkingOptions } from '@react-navigation/native';
 
 export type RootStackParamList = {
   // Auth/Onboarding
   Onboarding: undefined;
-  
+
   // Paywall
-  Paywall: {source?: string; offeringIdentifier?: string} | undefined;
-  
+  Paywall: { source?: string; offeringIdentifier?: string } | undefined;
+
   // Main App
   MainApp: undefined;
 
   // Cosmic Guide Screens (Stack screens without tabs)
-  CosmicGuideDetail: {guideId: string};
+  CosmicGuideDetail: { guideId: string };
   LessonDetail: {
     guideId: string;
     lessonId: string;
@@ -38,14 +38,16 @@ export type RootStackParamList = {
   Profile: undefined;
 
   // Chat Screen (Stack screen without tabs)
-  Chat: {
-    source?: 'palm' | 'love';
-    imageUri?: string;
-    handType?: 'leftHand' | 'rightHand';
-    yourSign?: string;
-    theirSign?: string;
-    loveMatchSummary?: string;
-  } | undefined;
+  Chat:
+    | {
+        source?: 'palm' | 'love';
+        imageUri?: string;
+        handType?: 'leftHand' | 'rightHand';
+        yourSign?: string;
+        theirSign?: string;
+        loveMatchSummary?: string;
+      }
+    | undefined;
 
   // Palm Capture Screen (Stack screen without tabs)
   PalmCapture: {
@@ -59,6 +61,7 @@ export type MainTabParamList = {
   Love: undefined;
   Chiromancy: undefined;
   Chat: undefined;
+  Video: undefined;
 };
 
 /**
@@ -89,7 +92,7 @@ export const linking: LinkingOptions<RootStackParamList> = {
 
 /**
  * Example deep link URLs:
- * 
+ *
  * - templateapp://home
  * - templateapp://horoscope
  * - templateapp://love

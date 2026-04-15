@@ -3190,11 +3190,6 @@
   resolved "https://registry.yarnpkg.com/@ungap/structured-clone/-/structured-clone-1.3.0.tgz#d06bbb384ebcf6c505fde1c3d0ed4ddffe0aaff8"
   integrity sha512-WmoN8qaIAo7WTYWbAZuG8PYEhn5fkz7dZrqTBZ7dtt//lL2Gwms1IcnQ5yHqjDfX8Ft5j4YzDM23f87zBfDe9g==
 
-"@usercentrics/react-native-sdk@^2.24.0":
-  version "2.26.1"
-  resolved "https://registry.yarnpkg.com/@usercentrics/react-native-sdk/-/react-native-sdk-2.26.1.tgz#2581bc1dfb67f28c1eb64f007c76c7e427142311"
-  integrity sha512-2kqpUZgivLd/Db3QyFC1WwDT/hwB6A+VVTdTFX1s96JzdVNIG2tL21xtomRwCaJ/mlb9Uk0Ojk3e05X3vRBynA==
-
 "@vscode/sudo-prompt@^9.0.0":
   version "9.3.2"
   resolved "https://registry.yarnpkg.com/@vscode/sudo-prompt/-/sudo-prompt-9.3.2.tgz#692ba38df40bd3502ccc4e9f099fbbaedbd5f04e"
@@ -7822,16 +7817,6 @@ react-is@^19.1.0, react-is@^19.1.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-19.2.5.tgz#7e7b54143e9313fed787b23fd4295d5a23872ad9"
   integrity sha512-Dn0t8IQhCmeIT3wu+Apm1/YVsJXsGWi6k4sPdnBIdqMVtHtv0IGi6dcpNpNkNac0zB2uUAqNX3MHzN8c+z2rwQ==
 
-react-native-applovin-max@^9.4.1:
-  version "9.5.1"
-  resolved "https://registry.yarnpkg.com/react-native-applovin-max/-/react-native-applovin-max-9.5.1.tgz#88f78be2f46907f716502cb60fb4ffa82333cfeb"
-  integrity sha512-+yFiVry9sJA7tWvMN+dY+JR8UsCzeyLbz4f4esX0pJUCYUcltvKlDyZkyGZALfU40/1TOS0VfpMMhHGBj6rrlQ==
-
-react-native-appsflyer@^6.17.7:
-  version "6.17.9"
-  resolved "https://registry.yarnpkg.com/react-native-appsflyer/-/react-native-appsflyer-6.17.9.tgz#18c520b774166db491de7e26e3c89536840f2e85"
-  integrity sha512-oEddwSsVL8D3ki8ayWZV34GyORAxvL1BXq3mL1xB8Hdfg+xxLyjAXSvWbj0t3E3NJ2KrgLRf/hbTlsPltfo/Uw==
-
 react-native-blob-util@^0.24.6:
   version "0.24.7"
   resolved "https://registry.yarnpkg.com/react-native-blob-util/-/react-native-blob-util-0.24.7.tgz#889e3626e3b20f9b10bb265ea91d9ae44ce65ecf"
@@ -7900,11 +7885,6 @@ react-native-fast-image@^8.6.3:
   resolved "https://registry.yarnpkg.com/react-native-fast-image/-/react-native-fast-image-8.6.3.tgz#6edc3f9190092a909d636d93eecbcc54a8822255"
   integrity sha512-Sdw4ESidXCXOmQ9EcYguNY2swyoWmx53kym2zRsvi+VeFCHEdkO+WG1DK+6W81juot40bbfLNhkc63QnWtesNg==
 
-react-native-fbsdk-next@^13.4.1:
-  version "13.4.3"
-  resolved "https://registry.yarnpkg.com/react-native-fbsdk-next/-/react-native-fbsdk-next-13.4.3.tgz#efdbe47690c7addf5b14970e565814149b00a2d5"
-  integrity sha512-xGymFmocik7/159i6x/bGx4AHuEk3MFMkVl4MlW7JDuN8LIpbGU76WljEOO+Ucdn248nDlo1EG//CXHMGxZTMg==
-
 react-native-fetch-api@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/react-native-fetch-api/-/react-native-fetch-api-3.0.0.tgz#81e1bb6562c292521bc4eca52fe1097f4c1ebab5"
@@ -7945,7 +7925,7 @@ react-native-in-app-review@^4.4.2:
   resolved "https://registry.yarnpkg.com/react-native-in-app-review/-/react-native-in-app-review-4.4.2.tgz#eaa908cdc7adee26158903a0e6f22ca6af415f7b"
   integrity sha512-iUoZnP4cgpbiNMLpqPgK40AcT7xluJhlwEPKFEfcCZsWT4MzGygS8p1dxf6e1NH/LUgUEtjsZQ8ka/SbF1pE8Q==
 
-react-native-is-edge-to-edge@^1.2.1, react-native-is-edge-to-edge@^1.3.1:
+react-native-is-edge-to-edge@^1.2.1:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/react-native-is-edge-to-edge/-/react-native-is-edge-to-edge-1.3.1.tgz#feb9a6a8faf0874298947edd556e5af22044e139"
   integrity sha512-NIXU/iT5+ORyCc7p0z2nnlkouYKX425vuU1OEm6bMMtWWR9yvb+Xg5AZmImTKoF9abxCPqrKC3rOZsKzUYgYZA==
@@ -7997,14 +7977,6 @@ react-native-purchases@^9.7.6:
   dependencies:
     "@revenuecat/purchases-js-hybrid-mappings" "17.55.1"
     "@revenuecat/purchases-typescript-internal" "17.55.1"
-
-react-native-reanimated@^4.2.1:
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-4.3.0.tgz#e5284cebb85bed12d672134b39d0a1370460ae50"
-  integrity sha512-HOTTPdKtddXTOsmQxDASXEwLS3lqEHrKERD3XOgzSqWJ7L3x81Pnx7mTcKx1FKdkgomMug/XSmm1C6Z7GIowxA==
-  dependencies:
-    react-native-is-edge-to-edge "^1.3.1"
-    semver "^7.7.3"
 
 react-native-safe-area-context@^5.6.2:
   version "5.7.0"
@@ -8070,6 +8042,11 @@ react-native-vector-icons@^10.3.0:
   dependencies:
     prop-types "^15.7.2"
     yargs "^16.1.1"
+
+react-native-video@^6.19.1:
+  version "6.19.1"
+  resolved "https://registry.yarnpkg.com/react-native-video/-/react-native-video-6.19.1.tgz#0f404f8d483252c5d3b353940d48513ca920e6d3"
+  integrity sha512-Tbiyt0JMirVHc4XzGIANjs3SaNjFXQO2qe+buvY7xMJjlyCekkDjJqD9YtlaEloJD2PGWhoPytEXB6gVT7T6lw==
 
 react-native-worklets@^0.8.0:
   version "0.8.1"

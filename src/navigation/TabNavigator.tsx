@@ -1,6 +1,6 @@
 /**
  * TabNavigator
- * 
+ *
  * Bottom tab navigation for main app screens
  * Supports conditional tab bar visibility
  * Configurable via NavigationConfig
@@ -8,7 +8,10 @@
 
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import {createBottomTabNavigator, BottomTabBarProps} from '@react-navigation/bottom-tabs';
+import {
+  createBottomTabNavigator,
+  BottomTabBarProps,
+} from '@react-navigation/bottom-tabs';
 import NavigationConfig from './NavigationConfig';
 import BannerAdComponent from '../components/ads/BannerAdComponent';
 import { BannerAdSize } from '../services/AppLovinService';
@@ -20,8 +23,9 @@ import HoroscopeScreen from '../screens/Horoscope';
 import LoveScreen from '../screens/Love';
 import ChiromancyScreen from '../screens/Chiromancy';
 import HoroscopeChatScreen from '../screens/HoroscopeChat';
+import VideoScreen from '../screens/Video';
 // Types
-import {MainTabParamList} from './deepLinking';
+import { MainTabParamList } from './deepLinking';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -35,13 +39,10 @@ export const HIDDEN_TABS_SCREENS = NavigationConfig.hiddenTabScreens;
  * Custom Tab Bar with Banner Ad Above
  * Renders the banner ad directly above the bottom tab bar
  */
-const CustomTabBar: React.FC<BottomTabBarProps> = (props) => {
+const CustomTabBar: React.FC<BottomTabBarProps> = props => {
   return (
     <View style={customTabBarStyles.container}>
-      <BannerAdComponent 
-        size={BannerAdSize.BANNER}
-        visible={true}
-      />
+      <BannerAdComponent size={BannerAdSize.BANNER} visible={true} />
       <BottomTabBar {...props} />
     </View>
   );
@@ -59,26 +60,27 @@ const customTabBarStyles = StyleSheet.create({
 /**
  * Tab Navigator Component
  * Tabs are configured via NavigationConfig.tabs
- * 
+ *
  * Note: When inside a drawer, the drawer shows the header with hamburger icon.
  * When standalone, tabs don't show a header (bottom tabs only).
  */
 const TabNavigatorCore: React.FC = () => {
   const config = NavigationConfig.tabs;
-  
+
   // Hide header when tabs are standalone
   // Drawer will show its own header with menu icon when drawer is enabled
   const shouldShowHeader = false;
-  
+
   return (
     <Tab.Navigator
-      tabBar={(props) => <CustomTabBar {...props} />}
-      screenOptions={({route}) => ({
+      tabBar={props => <CustomTabBar {...props} />}
+      screenOptions={({ route }) => ({
         // Dynamically hide tab bar on specific screens
         tabBarStyle: getTabBarStyle(route.name),
         headerShown: shouldShowHeader,
         tabBarBackground: () => null, // Transparent background for blur effect
-      })}>
+      })}
+    >
       {config.showHome && (
         <Tab.Screen
           name="Home"
@@ -122,6 +124,14 @@ const TabNavigatorCore: React.FC = () => {
           title: 'Chat',
         }}
       />
+      <Tab.Screen
+        name="Video"
+        component={VideoScreen}
+        options={{
+          tabBarLabel: 'Video',
+          title: 'Video',
+        }}
+      />
     </Tab.Navigator>
   );
 };
@@ -139,7 +149,7 @@ export const TabNavigator: React.FC = () => {
  */
 function getTabBarStyle(routeName: string) {
   if (HIDDEN_TABS_SCREENS.includes(routeName)) {
-    return {display: 'none' as const};
+    return { display: 'none' as const };
   }
   return undefined;
 }
