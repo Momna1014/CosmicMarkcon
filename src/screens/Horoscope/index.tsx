@@ -21,6 +21,7 @@ import TomorrowTab from './TomorrowTab';
 import WeeklyTab from './WeeklyTab';
 import StarfieldAnimation from '../../components/home_components/StarfieldAnimation';
 import CosmicLoader from '../../components/CosmicLoader';
+import CosmicAlert from '../../components/CosmicAlert';
 import {useHoroscopeData} from '../../hooks/useHoroscopeData';
 
 // Analytics
@@ -100,8 +101,16 @@ type Props = {
 
 const HoroscopeScreen: React.FC<Props> = () => {
   const [activeTab, setActiveTab] = useState<TabType>('today');
+  const [showQuotaAlert, setShowQuotaAlert] = useState(false);
   const onboardingData = useSelector(selectOnboardingState);
-  const {todayData, tomorrowData, weeklyData, loading} = useHoroscopeData();
+  const {todayData, tomorrowData, weeklyData, loading, isQuotaError} = useHoroscopeData();
+
+  // Show quota alert when API limit is hit
+  useEffect(() => {
+    if (isQuotaError) {
+      setShowQuotaAlert(true);
+    }
+  }, [isQuotaError]);
 
   // Entrance animations
   const dateBadgeFadeAnim = useRef(new Animated.Value(0)).current;
@@ -375,6 +384,15 @@ const HoroscopeScreen: React.FC<Props> = () => {
           </ScrollView>
         </SafeAreaView>
       </ImageBackground>
+
+      {/* Quota Error Alert */}
+      <CosmicAlert
+        visible={showQuotaAlert}
+        title="Cosmic Signals Busy"
+        message="The stars are overloaded right now. You're seeing cached readings — fresh insights will return shortly."
+        buttonText="Got It"
+        onDismiss={() => setShowQuotaAlert(false)}
+      />
     </View>
   );
 };

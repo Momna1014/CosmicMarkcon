@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo, useEffect} from 'react';
+import React, {useCallback, useMemo, useEffect, useState} from 'react';
 import {View, StatusBar, ImageBackground, ScrollView, RefreshControl, InteractionManager} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSelector} from 'react-redux';
@@ -33,6 +33,9 @@ import RatingModal from '../../components/RatingModal';
 // Cosmic Loader
 import CosmicLoader from '../../components/CosmicLoader';
 
+// Cosmic Alert
+import CosmicAlert from '../../components/CosmicAlert';
+
 // Home Components
 import {
   HeaderSection,
@@ -57,7 +60,15 @@ const HomeScreen: React.FC = () => {
   const onboardingData = useSelector(selectOnboardingState);
 
   // Fetch dynamic cosmic data from ChatGPT
-  const {data: cosmicData, loading: cosmicLoading, refreshing, refresh} = useCosmicData();
+  const {data: cosmicData, loading: cosmicLoading, refreshing, isQuotaError, refresh} = useCosmicData();
+  const [showQuotaAlert, setShowQuotaAlert] = useState(false);
+
+  // Show quota alert when API limit is hit
+  useEffect(() => {
+    if (isQuotaError) {
+      setShowQuotaAlert(true);
+    }
+  }, [isQuotaError]);
 
   // Notifications - request permission on first landing
   const {permissionStatus, hasShownFirstPrompt, requestPermission, markFirstPromptShown, isLoading: isNotificationLoading} = useNotifications();
@@ -239,6 +250,15 @@ const HomeScreen: React.FC = () => {
         visible={isRatingModalVisible}
         onClose={hideRatingModal}
         onSubmitRating={submitRating}
+      />
+
+      {/* Quota Error Alert */}
+      <CosmicAlert
+        visible={showQuotaAlert}
+        title="Cosmic Signals Busy"
+        message="The stars are overloaded right now. You're seeing cached readings — fresh insights will return shortly."
+        buttonText="Got It"
+        onDismiss={() => setShowQuotaAlert(false)}
       />
     </View>
   );

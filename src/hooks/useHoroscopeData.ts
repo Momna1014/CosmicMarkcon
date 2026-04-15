@@ -12,6 +12,21 @@ import {
   WEEKLY_HOROSCOPE,
 } from '../components/mock/mockData';
 
+/** Detect OpenAI quota / rate-limit errors */
+function isQuotaOrRateLimitError(err: any): boolean {
+  const msg = (err?.message || '').toLowerCase();
+  const code = err?.response?.data?.error?.code || err?.response?.data?.error?.type || '';
+  const status = err?.response?.status;
+  return (
+    status === 429 ||
+    msg.includes('429') ||
+    msg.includes('quota') ||
+    msg.includes('rate limit') ||
+    code === 'insufficient_quota' ||
+    code === 'rate_limit_exceeded'
+  );
+}
+
 const MAX_RETRIES = 2;
 
 /**
@@ -34,6 +49,7 @@ function isBundleFresh(days: Record<string, HoroscopeData>): boolean {
 export function useHoroscopeData() {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const [isQuotaError, setIsQuotaError] = useState(false);
   const bundle = useSelector((s: RootState) => s.horoscope.bundle);
   const keysLoaded = useSelector((s: RootState) => s.keys.isLoaded);
 
@@ -55,6 +71,7 @@ export function useHoroscopeData() {
 
     const fetchBundle = async () => {
       setLoading(true);
+      setIsQuotaError(false);
       let lastError: any;
 
       for (let attempt = 1; attempt <= MAX_RETRIES + 1; attempt++) {
@@ -80,6 +97,9 @@ export function useHoroscopeData() {
       console.warn('⚠️ [useHoroscopeData] All retries exhausted, using fallback');
       if (lastError) {
         console.error('Last error:', lastError.message);
+        if (!cancelled && isQuotaOrRateLimitError(lastError)) {
+          setIsQuotaError(true);
+        }
       }
     };
 
@@ -98,5 +118,5 @@ export function useHoroscopeData() {
   const tomorrowData: HoroscopeData = bundle?.days?.[tomorrowKey] || TOMORROW_HOROSCOPE;
   const weeklyData: HoroscopeData = bundle?.weekly || WEEKLY_HOROSCOPE;
 
-  return {todayData, tomorrowData, weeklyData, loading};
+  return {todayData, tomorrowData, weeklyData, loading, isQuotaError};
 }

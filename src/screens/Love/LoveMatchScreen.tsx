@@ -25,6 +25,7 @@ import GradientText from '../../components/GradientText';
 import {LoveMatchData, CompatibilityMetric} from './loveMatchMockData';
 import {conversationService, LoveMatchResult} from '../../services/ConversationService';
 import CosmicLoader from '../../components/CosmicLoader';
+import CosmicAlert from '../../components/CosmicAlert';
 
 // Analytics
 import {useScreenView} from '../../hooks/useFacebookAnalytics';
@@ -410,6 +411,7 @@ const LoveMatchScreen: React.FC<Props> = ({route}) => {
   const navigation = useNavigation<any>();
   const [isLoading, setIsLoading] = useState(true);
   const [matchData, setMatchData] = useState<LoveMatchData | null>(null);
+  const [showQuotaAlert, setShowQuotaAlert] = useState(false);
 
   // Build LoveMatchData from ChatGPT result
   const buildMatchData = useCallback(
@@ -460,6 +462,14 @@ const LoveMatchScreen: React.FC<Props> = ({route}) => {
       } catch (err: any) {
         console.warn('⚠️ [LoveMatch] ChatGPT failed, using fallback:', err.message);
         if (!cancelled) {
+          // Detect quota/rate-limit errors
+          const msg = (err?.message || '').toLowerCase();
+          const code = err?.response?.data?.error?.code || '';
+          const status = err?.response?.status;
+          const isQuota = status === 429 || msg.includes('429') || msg.includes('quota') || code === 'insufficient_quota';
+          if (isQuota) {
+            setShowQuotaAlert(true);
+          }
           // Fallback to basic mock data
           const {generateLoveMatchData} = require('./loveMatchMockData');
           setMatchData(generateLoveMatchData(yourSign, theirSign));
@@ -577,6 +587,15 @@ const LoveMatchScreen: React.FC<Props> = ({route}) => {
           </ScrollView>
         </SafeAreaView>
       </ImageBackground>
+
+      {/* Quota Error Alert */}
+      <CosmicAlert
+        visible={showQuotaAlert}
+        title="Cosmic Signals Busy"
+        message="The love oracle is overwhelmed with cosmic energy right now. You're seeing estimated compatibility — a personalized reading will be available shortly."
+        buttonText="Got It"
+        onDismiss={() => setShowQuotaAlert(false)}
+      />
     </View>
   );
 };

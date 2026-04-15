@@ -65,6 +65,7 @@ import {
   trackChatView,
   trackChatMessageSend,
 } from '../../utils/mainScreenAnalytics';
+import CosmicAlert from '../../components/CosmicAlert';
 
 const BackgroundImage = require('../../assets/icons/bottomtab_icons/main_screen_background.png');
 
@@ -107,6 +108,7 @@ const ChatScreen: React.FC<Props> = () => {
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [attachedImage, setAttachedImage] = useState<AttachedImage | null>(null);
   const [hasHandledInitialMessage, setHasHandledInitialMessage] = useState(false);
+  const [showQuotaAlert, setShowQuotaAlert] = useState(false);
 
   // Conversation history for API (system + user + assistant)
   const conversationRef = useRef<OracleChatMessage[]>([]);
@@ -313,8 +315,17 @@ const ChatScreen: React.FC<Props> = () => {
         addMessage(aiMessage);
       } catch (error: any) {
         console.error('❌ [Chat] Oracle error:', error.message);
+        const msg = (error?.message || '').toLowerCase();
+        const code = error?.response?.data?.error?.code || '';
+        const status = error?.response?.status;
+        const isQuota = status === 429 || msg.includes('429') || msg.includes('quota') || code === 'insufficient_quota';
+        if (isQuota) {
+          setShowQuotaAlert(true);
+        }
         const errorMsg = createAIMessage(
-          'The cosmic connection flickered for a moment ✨ Please try sending your message again.',
+          isQuota
+            ? 'The cosmic channels are temporarily overloaded ✨ Please try again in a moment.'
+            : 'The cosmic connection flickered for a moment ✨ Please try sending your message again.',
         );
         addMessage(errorMsg);
       } finally {
@@ -630,6 +641,15 @@ const ChatScreen: React.FC<Props> = () => {
         visible={isImageModalVisible}
         imageUrl={previewImage}
         onClose={handleCloseImageModal}
+      />
+
+      {/* Quota Error Alert */}
+      <CosmicAlert
+        visible={showQuotaAlert}
+        title="Cosmic Channels Busy"
+        message="The oracle is receiving too many cosmic transmissions right now. Please try again in a moment."
+        buttonText="Got It"
+        onDismiss={() => setShowQuotaAlert(false)}
       />
     </View>
   );

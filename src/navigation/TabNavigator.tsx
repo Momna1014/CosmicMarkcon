@@ -20,7 +20,6 @@ import HoroscopeScreen from '../screens/Horoscope';
 import LoveScreen from '../screens/Love';
 import ChiromancyScreen from '../screens/Chiromancy';
 import HoroscopeChatScreen from '../screens/HoroscopeChat';
-
 // Types
 import {MainTabParamList} from './deepLinking';
 

@@ -37,7 +37,8 @@ const HeaderSection: React.FC<HeaderSectionProps> = memo(({userName, title = 'AS
             onPress={onProfilePress}
             activeOpacity={0.7}
             style={styles.profileButton}
-            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+            hitSlop={{top: 30, bottom: 30, left: 30, right: 30}}
+            >
             <ProfileIcon width={moderateScale(32)} height={moderateScale(32)} />
           </TouchableOpacity>
         )}
