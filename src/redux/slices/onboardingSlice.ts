@@ -26,8 +26,11 @@ export type AlignmentOption = 'in-my-flow' | 'figuring-it-out' | 'totally-lost' 
 export interface OnboardingState {
   // Screen 1: Life alignment
   alignment: AlignmentOption;
+
+  // Screen 2: What are you seeking
+  seeking: string[];
   
-  // Screen 2: User's name
+  // Screen 2 (old) / Screen 3 (new): User's name
   name: string;
   
   // Screen 3: Birthday (stored as ISO string for serialization)
@@ -55,6 +58,7 @@ export interface OnboardingState {
  */
 const initialState: OnboardingState = {
   alignment: null,
+  seeking: [],
   name: '',
   birthday: null,
   zodiacSign: null,
@@ -92,6 +96,14 @@ const onboardingSlice = createSlice({
     setAlignment: (state, action: PayloadAction<AlignmentOption>) => {
       state.alignment = action.payload;
       console.log('📊 [Redux] Alignment set:', action.payload);
+    },
+
+    /**
+     * Set seeking choices (Screen 2)
+     */
+    setSeeking: (state, action: PayloadAction<string[]>) => {
+      state.seeking = action.payload;
+      console.log('📊 [Redux] Seeking set:', action.payload);
     },
 
     /**
@@ -186,6 +198,7 @@ const onboardingSlice = createSlice({
 // Export actions
 export const {
   setAlignment,
+  setSeeking,
   setName,
   setBirthday,
   setBirthTime,
@@ -235,6 +248,11 @@ export const selectBirthLocation = (state: RootState) => ({
  * Select user's alignment
  */
 export const selectAlignment = (state: RootState) => state.onboarding.alignment;
+
+/**
+ * Select user's seeking choices
+ */
+export const selectSeeking = (state: RootState) => state.onboarding.seeking;
 
 /**
  * Check if onboarding data is saved

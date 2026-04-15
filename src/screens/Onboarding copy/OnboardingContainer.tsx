@@ -28,7 +28,6 @@ export type {AlignmentOption};
 
 export interface OnboardingData {
   alignment: AlignmentOption;
-  seeking: string[];
   name: string;
   birthday: Date | null;
   zodiacSign: string | null;
@@ -43,7 +42,6 @@ export const OnboardingContainer: React.FC = () => {
   const [currentScreen, setCurrentScreen] = useState(1);
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
     alignment: null,
-    seeking: [],
     name: '',
     birthday: null,
     zodiacSign: null,
@@ -52,29 +50,23 @@ export const OnboardingContainer: React.FC = () => {
     country: '',
   });
 
-  const handleScreen1Continue = () => {
-    console.log('\n\ud83d\udd35 [Screen 1] Continue pressed - navigating to Screen 2');
+  const handleScreen1Continue = (alignment: AlignmentOption) => {
+    console.log('\n🔵 [Screen 1] Life Alignment Selected:', alignment);
+    setOnboardingData(prev => {
+      const updated = {...prev, alignment};
+      console.log('📦 [OnboardingData] Current state:', JSON.stringify(updated, null, 2));
+      return updated;
+    });
     setCurrentScreen(2);
   };
 
-  const handleGoBack = () => {
-    if (currentScreen > 1) {
-      console.log(`\n\ud83d\udd35 [Screen ${currentScreen}] Going back to Screen ${currentScreen - 1}`);
-      setCurrentScreen(currentScreen - 1);
-    }
-  };
-
-  const handleScreen2Next = (seeking: string[]) => {
-    if (seeking.length > 0) {
-      console.log('\n\ud83d\udd35 [Screen 2] Seeking Selected:', seeking);
-      setOnboardingData(prev => {
-        const updated = {...prev, seeking};
-        console.log('\ud83d\udce6 [OnboardingData] Current state:', JSON.stringify(updated, null, 2));
-        return updated;
-      });
-    } else {
-      console.log('\n\ud83d\udd35 [Screen 2] No seeking selected - moving forward');
-    }
+  const handleScreen2Next = (name: string) => {
+    console.log('\n🔵 [Screen 2] Name Entered:', name);
+    setOnboardingData(prev => {
+      const updated = {...prev, name};
+      console.log('📦 [OnboardingData] Current state:', JSON.stringify(updated, null, 2));
+      return updated;
+    });
     setCurrentScreen(3);
   };
 
@@ -181,7 +173,7 @@ export const OnboardingContainer: React.FC = () => {
         return (
           <OnboardingScreen2
             onNext={handleScreen2Next}
-            onGoBack={handleGoBack}
+            alignment={onboardingData.alignment}
           />
         );
       case 3:
