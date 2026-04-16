@@ -7817,6 +7817,11 @@ react-is@^19.1.0, react-is@^19.1.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-19.2.5.tgz#7e7b54143e9313fed787b23fd4295d5a23872ad9"
   integrity sha512-Dn0t8IQhCmeIT3wu+Apm1/YVsJXsGWi6k4sPdnBIdqMVtHtv0IGi6dcpNpNkNac0zB2uUAqNX3MHzN8c+z2rwQ==
 
+react-native-applovin-max@^9.4.1:
+  version "9.5.1"
+  resolved "https://registry.yarnpkg.com/react-native-applovin-max/-/react-native-applovin-max-9.5.1.tgz#88f78be2f46907f716502cb60fb4ffa82333cfeb"
+  integrity sha512-+yFiVry9sJA7tWvMN+dY+JR8UsCzeyLbz4f4esX0pJUCYUcltvKlDyZkyGZALfU40/1TOS0VfpMMhHGBj6rrlQ==
+
 react-native-blob-util@^0.24.6:
   version "0.24.7"
   resolved "https://registry.yarnpkg.com/react-native-blob-util/-/react-native-blob-util-0.24.7.tgz#889e3626e3b20f9b10bb265ea91d9ae44ce65ecf"

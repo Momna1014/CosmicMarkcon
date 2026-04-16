@@ -9,6 +9,26 @@ PODS:
     - GoogleUtilities/Environment (~> 8.0)
     - GoogleUtilities/UserDefaults (~> 8.0)
     - PromisesObjC (~> 2.4)
+  - AppLovinMediationFyberAdapter (8.4.6.0):
+    - AppLovinSDK (>= 13.0.0)
+    - Fyber_Marketplace_SDK (= 8.4.6)
+  - AppLovinMediationGoogleAdapter (13.2.0.0):
+    - AppLovinSDK (>= 13.0.0)
+    - Google-Mobile-Ads-SDK (= 13.2.0)
+  - AppLovinMediationIronSourceAdapter (9.4.0.0.0):
+    - AppLovinSDK (>= 13.0.0)
+    - IronSourceSDK/Ads (= 9.4.0.0)
+  - AppLovinMediationMintegralAdapter (8.1.1.0.0):
+    - AppLovinSDK (>= 13.0.0)
+    - MintegralAdSDK (= 8.1.1)
+    - MintegralAdSDK/BidSplashAd (= 8.1.1)
+  - AppLovinMediationUnityAdsAdapter (4.17.0.0):
+    - AppLovinSDK (>= 13.0.0)
+    - UnityAds (= 4.17.0)
+  - AppLovinMediationVungleAdapter (7.7.2.0):
+    - AppLovinSDK (>= 13.0.0)
+    - VungleAds (= 7.7.2)
+  - AppLovinSDK (13.6.1)
   - boost (1.84.0)
   - BVLinearGradient (2.8.3):
     - React-Core
@@ -111,7 +131,10 @@ PODS:
     - PromisesSwift (~> 2.1)
   - FirebaseSharedSwift (12.10.0)
   - fmt (11.0.2)
+  - Fyber_Marketplace_SDK (8.4.6)
   - glog (0.3.5)
+  - Google-Mobile-Ads-SDK (13.2.0):
+    - GoogleUserMessagingPlatform (>= 1.1)
   - GoogleAppMeasurement/Core (12.10.0):
     - GoogleUtilities/AppDelegateSwizzler (~> 8.1)
     - GoogleUtilities/MethodSwizzler (~> 8.1)
@@ -133,6 +156,7 @@ PODS:
     - AppCheckCore (~> 11.0)
     - GTMAppAuth (~> 5.0)
     - GTMSessionFetcher/Core (~> 3.3)
+  - GoogleUserMessagingPlatform (3.1.0)
   - GoogleUtilities (8.1.0):
     - GoogleUtilities/AppDelegateSwizzler (= 8.1.0)
     - GoogleUtilities/Environment (= 8.1.0)
@@ -180,6 +204,7 @@ PODS:
   - hermes-engine (0.82.1):
     - hermes-engine/Pre-built (= 0.82.1)
   - hermes-engine/Pre-built (0.82.1)
+  - IronSourceSDK/Ads (9.4.0.0)
   - libwebp (1.5.0):
     - libwebp/demux (= 1.5.0)
     - libwebp/mux (= 1.5.0)
@@ -222,6 +247,46 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
+  - MintegralAdSDK (8.1.1):
+    - MintegralAdSDK/BannerAd (= 8.1.1)
+    - MintegralAdSDK/BidBannerAd (= 8.1.1)
+    - MintegralAdSDK/BidInterstitialVideoAd (= 8.1.1)
+    - MintegralAdSDK/BidNativeAd (= 8.1.1)
+    - MintegralAdSDK/BidNewInterstitialAd (= 8.1.1)
+    - MintegralAdSDK/BidRewardVideoAd (= 8.1.1)
+    - MintegralAdSDK/InterstitialVideoAd (= 8.1.1)
+    - MintegralAdSDK/NativeAd (= 8.1.1)
+    - MintegralAdSDK/NewInterstitialAd (= 8.1.1)
+    - MintegralAdSDK/RewardVideoAd (= 8.1.1)
+  - MintegralAdSDK/BannerAd (8.1.1):
+    - MintegralAdSDK/NativeAd
+  - MintegralAdSDK/BidBannerAd (8.1.1):
+    - MintegralAdSDK/BannerAd
+    - MintegralAdSDK/BidNativeAd
+  - MintegralAdSDK/BidInterstitialVideoAd (8.1.1):
+    - MintegralAdSDK/BidNativeAd
+    - MintegralAdSDK/InterstitialVideoAd
+  - MintegralAdSDK/BidNativeAd (8.1.1):
+    - MintegralAdSDK/NativeAd
+  - MintegralAdSDK/BidNewInterstitialAd (8.1.1):
+    - MintegralAdSDK/BidNativeAd
+    - MintegralAdSDK/NewInterstitialAd
+  - MintegralAdSDK/BidRewardVideoAd (8.1.1):
+    - MintegralAdSDK/BidNativeAd
+    - MintegralAdSDK/RewardVideoAd
+  - MintegralAdSDK/BidSplashAd (8.1.1):
+    - MintegralAdSDK/BidNativeAd
+    - MintegralAdSDK/SplashAd
+  - MintegralAdSDK/InterstitialVideoAd (8.1.1):
+    - MintegralAdSDK/NativeAd
+  - MintegralAdSDK/NativeAd (8.1.1)
+  - MintegralAdSDK/NewInterstitialAd (8.1.1):
+    - MintegralAdSDK/InterstitialVideoAd
+    - MintegralAdSDK/NativeAd
+  - MintegralAdSDK/RewardVideoAd (8.1.1):
+    - MintegralAdSDK/NativeAd
+  - MintegralAdSDK/SplashAd (8.1.1):
+    - MintegralAdSDK/NativeAd
   - MMKVCore (2.4.0)
   - nanopb (3.30910.0):
     - nanopb/decode (= 3.30910.0)
@@ -2070,6 +2135,35 @@ PODS:
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
     - SocketRocket
+  - react-native-applovin-max (9.5.1):
+    - AppLovinSDK (= 13.6.1)
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - Yoga
   - react-native-blob-util (0.24.7):
     - boost
     - DoubleConversion
@@ -3745,9 +3839,17 @@ PODS:
     - Sentry/Core (= 9.8.0)
   - Sentry/Core (9.8.0)
   - SocketRocket (0.7.1)
+  - UnityAds (4.17.0)
+  - VungleAds (7.7.2)
   - Yoga (0.0.0)
 
 DEPENDENCIES:
+  - AppLovinMediationFyberAdapter
+  - AppLovinMediationGoogleAdapter
+  - AppLovinMediationIronSourceAdapter
+  - AppLovinMediationMintegralAdapter
+  - AppLovinMediationUnityAdsAdapter
+  - AppLovinMediationVungleAdapter
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - BVLinearGradient (from `../node_modules/react-native-linear-gradient`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
@@ -3803,6 +3905,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
+  - react-native-applovin-max (from `../node_modules/react-native-applovin-max`)
   - react-native-blob-util (from `../node_modules/react-native-blob-util`)
   - "react-native-blur (from `../node_modules/@react-native-community/blur`)"
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
@@ -3881,6 +3984,13 @@ SPEC REPOS:
   trunk:
     - AppAuth
     - AppCheckCore
+    - AppLovinMediationFyberAdapter
+    - AppLovinMediationGoogleAdapter
+    - AppLovinMediationIronSourceAdapter
+    - AppLovinMediationMintegralAdapter
+    - AppLovinMediationUnityAdsAdapter
+    - AppLovinMediationVungleAdapter
+    - AppLovinSDK
     - Firebase
     - FirebaseABTesting
     - FirebaseAnalytics
@@ -3897,14 +4007,19 @@ SPEC REPOS:
     - FirebaseRemoteConfigInterop
     - FirebaseSessions
     - FirebaseSharedSwift
+    - Fyber_Marketplace_SDK
+    - Google-Mobile-Ads-SDK
     - GoogleAppMeasurement
     - GoogleDataTransport
     - GoogleSignIn
+    - GoogleUserMessagingPlatform
     - GoogleUtilities
     - GTMAppAuth
     - GTMSessionFetcher
+    - IronSourceSDK
     - libwebp
     - lottie-ios
+    - MintegralAdSDK
     - MMKVCore
     - nanopb
     - PromisesObjC
@@ -3918,6 +4033,8 @@ SPEC REPOS:
     - SDWebImageWebPCoder
     - Sentry
     - SocketRocket
+    - UnityAds
+    - VungleAds
 
 EXTERNAL SOURCES:
   boost:
@@ -4009,6 +4126,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   React-microtasksnativemodule:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
+  react-native-applovin-max:
+    :path: "../node_modules/react-native-applovin-max"
   react-native-blob-util:
     :path: "../node_modules/react-native-blob-util"
   react-native-blur:
@@ -4155,6 +4274,13 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   AppAuth: 1c1a8afa7e12f2ec3a294d9882dfa5ab7d3cb063
   AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
+  AppLovinMediationFyberAdapter: 654a51e36f046038125e21b284b57388a60ab979
+  AppLovinMediationGoogleAdapter: fea0cb088ca9795d299b899453d926f1b6dc3d48
+  AppLovinMediationIronSourceAdapter: 9acfc9a05f9025ce45670591b3dd37a24a7e7d7e
+  AppLovinMediationMintegralAdapter: 2e481d894423ffdc6e47cae2f3f76ae780d723fc
+  AppLovinMediationUnityAdsAdapter: 23afa95da0fc9c02c868f583a682d95811447bf4
+  AppLovinMediationVungleAdapter: 011a0800a048ec20e66f2f82aa1e2d319b0ef3a4
+  AppLovinSDK: fb0795377cc861aa8813019ddc5d05fbd998c527
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
   BVLinearGradient: cb006ba232a1f3e4f341bb62c42d1098c284da70
   DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb
@@ -4177,17 +4303,22 @@ SPEC CHECKSUMS:
   FirebaseSessions: dba7635960740ad77cc2f3387d90ff22a7942f82
   FirebaseSharedSwift: 3d1e448b7202e36821a492941c84592d1308ea14
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
+  Fyber_Marketplace_SDK: cedfa90cc2da9e549de1b8134965abb63bb8cf67
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
+  Google-Mobile-Ads-SDK: f0365e190d66539c65cea8ded43e2c367abb5477
   GoogleAppMeasurement: 57270ccc2b77472d7e85c4cbe45972564eff78bb
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleSignIn: fcee2257188d5eda57a5e2b6a715550ffff9206d
+  GoogleUserMessagingPlatform: befe603da6501006420c206222acd449bba45a9c
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   GTMAppAuth: 217a876b249c3c585a54fd6f73e6b58c4f5c4238
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
   hermes-engine: 273e30e7fb618279934b0b95ffab60ecedb7acf5
+  IronSourceSDK: 8112211f22915d2633a2a152d327b184fe80bf05
   libwebp: 02b23773aedb6ff1fd38cec7a77b81414c6842a8
   lottie-ios: 8f959969761e9c45d70353667d00af0e5b9cadb3
   lottie-react-native: e542fe4b6e8eddcf893d5a8cef9f8b5c6d2f7331
+  MintegralAdSDK: 4325769f93ef336237799b5fb455335985fbc8b7
   MMKVCore: 3d16ce9f7d411e135020915fde98a056859a1efa
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   NitroMmkv: 473645d604aa4975981a158403c6291c329695a6
@@ -4229,6 +4360,7 @@ SPEC CHECKSUMS:
   React-logger: 500f2fa5697d224e63c33d913c8a4765319e19bf
   React-Mapbuffer: 4c50cf6af44286015a20a5995d5321f625c93459
   React-microtasksnativemodule: a84b9331106616ab1fa36de9ae555718d4bbdcf5
+  react-native-applovin-max: a50f12aa818bb6aaf81790064203ddfc36435bae
   react-native-blob-util: 573f119564b0cf1d498e0c25ef94084292a52cd2
   react-native-blur: b83ffbc5380d8bd2f06804b4b0e848be3507e65c
   react-native-image-picker: 6051cfd030121b880a58f1cc0e5e33e9887804e4
@@ -4306,8 +4438,10 @@ SPEC CHECKSUMS:
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   Sentry: 88746bf877eff714bc45315a39ad1d1efea2cdda
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
+  UnityAds: adbe0d522fd14b8298c5e159164fc43396165843
+  VungleAds: 03d93126f39d6056055a8b9edca701c6a3391d8b
   Yoga: 526f25666395d30c297d53154398ffd249eaf9e1
 
-PODFILE CHECKSUM: 0c2149045d54c1867130caa7344640270c80e047
+PODFILE CHECKSUM: 5601998dc8b343e2b6b570de89118c2e011be4e2
 
 COCOAPODS: 1.16.2
