@@ -1,8 +1,6 @@
 /**
- * OnboardingScreen6 - Cosmic Layers Analysis Screen
- *
- * Shows three unlock cards with cosmic layers
- * and a "Deepen my analysis" button
+ * Onboarding Screen 6
+ * Cosmic Profile Taking Shape screen
  */
 
 import React, {useEffect} from 'react';
@@ -10,25 +8,20 @@ import {
   View,
   Text,
   StyleSheet,
-  ImageBackground,
-  Dimensions,
   TouchableOpacity,
   StatusBar,
+  ImageBackground,
+  Dimensions,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {useTranslation} from 'react-i18next';
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withRepeat,
-  withSequence,
-  Easing,
   FadeIn,
   FadeInDown,
   FadeInUp,
-  withDelay,
 } from 'react-native-reanimated';
+import LinearGradient from 'react-native-linear-gradient';
+import MaskedView from '@react-native-masked-view/masked-view';
+import {BlurView} from '@react-native-community/blur';
 import {
   Colors,
   FontFamilies,
@@ -36,224 +29,116 @@ import {
   horizontalScale,
   verticalScale,
   radiusScale,
+  moderateScale,
 } from '../../theme';
-import UnlockAnalysisIcon from '../../assets/icons/onboarding_icons/unlock_analysis.svg';
 import {hapticLight} from '../../utils/haptics';
-import {
-  trackOnboarding6View,
-  trackOnboarding6DeepenAnalysisClicked,
-} from '../../utils/onboardingAnalytics';
 import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
+import {OnboardingButton} from '../../components/OnboardingButton';
+import {useSelector} from 'react-redux';
+import {selectGender} from '../../redux/slices/onboardingSlice';
+import type {RootState} from '../../redux/store';
+
+// Icons
+import BackArrowIcon from '../../assets/icons/new_onboarding/back_arrow.svg';
+import StartCosmicProfileIcon from '../../assets/icons/new_onboarding/start_cosmic_profile.svg';
+import EndCosmicProfileIcon from '../../assets/icons/new_onboarding/end_cosmic_profile.svg';
+import HeartIcon from '../../assets/icons/new_onboarding/heart.svg';
+import MoonIcon from '../../assets/icons/new_onboarding/moon.svg';
+import StarIcon from '../../assets/icons/new_onboarding/star.svg';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
+const HORIZONTAL_PADDING = horizontalScale(16);
 
-// Background image - same as other onboarding screens
-const BackgroundImageSource = require('../../assets/icons/onboarding_icons/background_image.png');
-
-// Card background images
-const Card1Background = require('../../assets/icons/onboarding_icons/1st analysis.png');
-const Card2Background = require('../../assets/icons/onboarding_icons/2nd_analysis.png');
-const Card3Background = require('../../assets/icons/onboarding_icons/3rd_analysis.png');
+// Background images
+const GirlBackgroundImage = require('../../assets/icons/new_onboarding/girl_gender_backimage.png');
+const BoyBackgroundImage = require('../../assets/icons/new_onboarding/boy_gender.png');
+const NotToSayBackgroundImage = require('../../assets/icons/new_onboarding/not_say.png');
 
 // Animated TouchableOpacity
-const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
-interface TwinklingStarProps {
-  size: number;
-  top: number;
-  left: number;
-  delay: number;
-  intensity: 'low' | 'medium' | 'high';
-}
-
-const TwinklingStar: React.FC<TwinklingStarProps> = ({
-  size,
-  top,
-  left,
-  delay,
-  intensity,
-}) => {
-  const opacity = useSharedValue(0.3);
-  const scale = useSharedValue(0.8);
-
-  const opacityRange = {
-    low: {min: 0.2, max: 0.5},
-    medium: {min: 0.3, max: 0.7},
-    high: {min: 0.4, max: 1.0},
-  };
-
-  const scaleRange = {
-    low: {min: 0.8, max: 1.0},
-    medium: {min: 0.7, max: 1.1},
-    high: {min: 0.6, max: 1.2},
-  };
-
-  const durationRange = {
-    low: 3000,
-    medium: 2500,
-    high: 2000,
-  };
-
-  useEffect(() => {
-    const range = opacityRange[intensity];
-    const scaleR = scaleRange[intensity];
-    const duration = durationRange[intensity];
-
-    opacity.value = withDelay(
-      delay,
-      withRepeat(
-        withSequence(
-          withTiming(range.max, {duration, easing: Easing.inOut(Easing.ease)}),
-          withTiming(range.min, {duration, easing: Easing.inOut(Easing.ease)}),
-        ),
-        -1,
-        true,
-      ),
-    );
-
-    scale.value = withDelay(
-      delay,
-      withRepeat(
-        withSequence(
-          withTiming(scaleR.max, {
-            duration: duration * 0.8,
-            easing: Easing.inOut(Easing.ease),
-          }),
-          withTiming(scaleR.min, {
-            duration: duration * 0.8,
-            easing: Easing.inOut(Easing.ease),
-          }),
-        ),
-        -1,
-        true,
-      ),
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{scale: scale.value}],
-  }));
-
-  return (
-    <Animated.View
-      style={[
-        styles.star,
-        {
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          top,
-          left,
-          shadowColor: Colors.white,
-          shadowOffset: {width: 0, height: 0},
-          shadowOpacity: 0.8,
-          shadowRadius: size,
-        },
-        animatedStyle,
-      ]}
-    />
-  );
-};
 
 interface OnboardingScreen6Props {
   onNext?: () => void;
+  onGoBack?: () => void;
 }
+
+// Gradient Text Component
+const GradientText: React.FC<{text: string; style?: any}> = ({text, style}) => {
+  return (
+    <MaskedView
+      maskElement={
+        <Text style={[styles.gradientTextMask, style]}>{text}</Text>
+      }>
+      <LinearGradient
+        colors={['#FFFFFF', '#FFAEAE']}
+        start={{x: 0, y: 0.5}}
+        end={{x: 1, y: 0.5}}
+        locations={[0.2037, 1]}>
+        <Text style={[styles.gradientTextMask, style, {opacity: 0}]}>{text}</Text>
+      </LinearGradient>
+    </MaskedView>
+  );
+};
+
+// Blur Tab Component with icon and label
+const BlurTab: React.FC<{icon: React.ReactNode; label: string; delay: number}> = ({icon, label, delay}) => {
+  return (
+    <Animated.View
+      entering={FadeInUp.delay(delay).duration(500).springify()}
+      style={styles.blurTabWrapper}>
+      <View style={styles.blurTab}>
+        <BlurView
+          style={StyleSheet.absoluteFill}
+          blurType="dark"
+          blurAmount={35}
+          reducedTransparencyFallbackColor="rgba(255, 255, 255, 0.1)"
+        />
+        <View style={styles.blurTabContent}>
+          {icon}
+          <Text style={styles.blurTabLabel}>{label}</Text>
+        </View>
+      </View>
+    </Animated.View>
+  );
+};
 
 export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
   onNext,
+  onGoBack,
 }) => {
-  const {t} = useTranslation();
+  const gender = useSelector((state: RootState) => selectGender(state));
+  const backgroundImage =
+    gender === 'he_him'
+      ? BoyBackgroundImage
+      : gender === 'she_her'
+      ? GirlBackgroundImage
+      : NotToSayBackgroundImage;
 
-  // ===== Analytics: Track screen view =====
   useScreenView('OnboardingScreen6', {
     screen_category: 'onboarding',
     step: 6,
-    total_steps: 11,
+    total_steps: 9,
   });
 
-  // Progress bar animation - start from previous screen's value (45%)
-  const progressWidth = useSharedValue(45);
-
-  // Button scale animation
-  const buttonScale = useSharedValue(1);
-
   useEffect(() => {
-    // Track screen view
-    trackOnboarding6View();
-    
-    // Firebase screen view logging
     firebaseService.logScreenView('OnboardingScreen6', 'OnboardingScreen6');
-    
-    // Animate progress bar on mount - Screen 6 of 11 (55%)
-    progressWidth.value = withDelay(
-      300,
-      withTiming(55, {duration: 800, easing: Easing.out(Easing.cubic)}),
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const progressAnimatedStyle = useAnimatedStyle(() => ({
-    width: `${progressWidth.value}%`,
-  }));
-
-  const handleNext = () => {
-    hapticLight();
-    // Track deepen analysis clicked
-    trackOnboarding6DeepenAnalysisClicked();
-    // Button pulse animation
-    buttonScale.value = withSequence(
-      withTiming(1.02, {duration: 100}),
-      withTiming(1, {duration: 100}),
-    );
-    setTimeout(() => {
-      onNext?.();
-    }, 150);
+  const handleContinue = () => {
+    onNext?.();
   };
 
-  const buttonAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{scale: buttonScale.value}],
-  }));
-
-  // Twinkling stars configuration - same as other onboarding screens
-  const stars = [
-    {size: 6, top: SCREEN_HEIGHT * 0.08, left: SCREEN_WIDTH * 0.15, delay: 0, intensity: 'high' as const},
-    {size: 4, top: SCREEN_HEIGHT * 0.12, left: SCREEN_WIDTH * 0.75, delay: 300, intensity: 'medium' as const},
-    {size: 8, top: SCREEN_HEIGHT * 0.05, left: SCREEN_WIDTH * 0.5, delay: 600, intensity: 'high' as const},
-    {size: 3, top: SCREEN_HEIGHT * 0.1, left: SCREEN_WIDTH * 0.9, delay: 150, intensity: 'low' as const},
-    {size: 5, top: SCREEN_HEIGHT * 0.15, left: SCREEN_WIDTH * 0.3, delay: 450, intensity: 'medium' as const},
-    {size: 7, top: SCREEN_HEIGHT * 0.2, left: SCREEN_WIDTH * 0.85, delay: 200, intensity: 'high' as const},
-    {size: 4, top: SCREEN_HEIGHT * 0.22, left: SCREEN_WIDTH * 0.1, delay: 800, intensity: 'medium' as const},
-    {size: 6, top: SCREEN_HEIGHT * 0.25, left: SCREEN_WIDTH * 0.6, delay: 100, intensity: 'high' as const},
-    {size: 3, top: SCREEN_HEIGHT * 0.18, left: SCREEN_WIDTH * 0.45, delay: 550, intensity: 'low' as const},
-    {size: 5, top: SCREEN_HEIGHT * 0.32, left: SCREEN_WIDTH * 0.08, delay: 700, intensity: 'medium' as const},
-    {size: 8, top: SCREEN_HEIGHT * 0.35, left: SCREEN_WIDTH * 0.92, delay: 50, intensity: 'high' as const},
-    {size: 4, top: SCREEN_HEIGHT * 0.38, left: SCREEN_WIDTH * 0.25, delay: 400, intensity: 'medium' as const},
-    {size: 6, top: SCREEN_HEIGHT * 0.33, left: SCREEN_WIDTH * 0.7, delay: 250, intensity: 'high' as const},
-    {size: 5, top: SCREEN_HEIGHT * 0.55, left: SCREEN_WIDTH * 0.12, delay: 350, intensity: 'medium' as const},
-    {size: 7, top: SCREEN_HEIGHT * 0.58, left: SCREEN_WIDTH * 0.88, delay: 100, intensity: 'high' as const},
-    {size: 3, top: SCREEN_HEIGHT * 0.62, left: SCREEN_WIDTH * 0.55, delay: 650, intensity: 'low' as const},
-    {size: 4, top: SCREEN_HEIGHT * 0.65, left: SCREEN_WIDTH * 0.35, delay: 500, intensity: 'medium' as const},
-    {size: 4, top: SCREEN_HEIGHT * 0.75, left: SCREEN_WIDTH * 0.2, delay: 300, intensity: 'medium' as const},
-    {size: 6, top: SCREEN_HEIGHT * 0.78, left: SCREEN_WIDTH * 0.65, delay: 100, intensity: 'high' as const},
-    {size: 5, top: SCREEN_HEIGHT * 0.82, left: SCREEN_WIDTH * 0.9, delay: 550, intensity: 'medium' as const},
-    {size: 7, top: SCREEN_HEIGHT * 0.85, left: SCREEN_WIDTH * 0.4, delay: 200, intensity: 'high' as const},
-  ];
-
-  // Unlock cards data with background images
-  const unlockCards = [
-    {id: 1, delay: 500, bgImage: Card1Background},
-    {id: 2, delay: 600, bgImage: Card2Background},
-    {id: 3, delay: 700, bgImage: Card3Background},
-  ];
+  const handleBack = () => {
+    hapticLight();
+    onGoBack?.();
+  };
 
   return (
-    <View style={styles.backgroundFallback}>
+    <View style={styles.container}>
       <ImageBackground
-        source={BackgroundImageSource}
-        style={styles.container}
+        source={backgroundImage}
+        style={styles.backgroundImage}
         resizeMode="cover">
         <SafeAreaView style={styles.safeArea}>
           <StatusBar
@@ -261,81 +146,89 @@ export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
             backgroundColor="transparent"
             translucent
           />
-          {/* Twinkling Stars Overlay */}
-          {stars.map((star, index) => (
-            <TwinklingStar
-              key={index}
-              size={star.size}
-              top={star.top}
-              left={star.left}
-              delay={star.delay}
-              intensity={star.intensity}
-            />
-          ))}
 
-          {/* Content */}
-          <View style={styles.contentContainer}>
-            {/* Progress Bar */}
+          <View style={styles.content}>
+            {/* Header: Back button only */}
             <Animated.View
               entering={FadeIn.delay(100).duration(400)}
-              style={styles.progressBarContainer}>
-              <View style={styles.progressBarBackground}>
-                <Animated.View
-                  style={[styles.progressBarFilled, progressAnimatedStyle]}
+              style={styles.header}>
+              <TouchableOpacity
+                style={styles.backButton}
+                onPress={handleBack}
+                activeOpacity={0.7}
+                hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+                <BackArrowIcon width={moderateScale(24)} height={moderateScale(24)} />
+              </TouchableOpacity>
+            </Animated.View>
+
+            {/* Push everything to bottom */}
+            <View style={styles.topSpacer} />
+
+            {/* Bottom Content Block */}
+            <View style={styles.bottomContent}>
+              {/* Cosmic Profile Section */}
+              <Animated.View
+                entering={FadeInDown.delay(300).duration(600).springify()}
+                style={styles.cosmicProfileSection}>
+                <View style={styles.cosmicProfileRow}>
+                  <StartCosmicProfileIcon
+                    width={moderateScale(46)}
+                    height={moderateScale(81)}
+                  />
+                  <View style={styles.cosmicProfileTextContainer}>
+                    <Text style={styles.cosmicProfileText}>
+                      Your cosmic profile{'\n'}is taking shape
+                    </Text>
+                  </View>
+                  <EndCosmicProfileIcon
+                    width={moderateScale(48)}
+                    height={moderateScale(81)}
+                  />
+                </View>
+              </Animated.View>
+
+              {/* Main Text Section */}
+              <Animated.View
+                entering={FadeInDown.delay(500).duration(600).springify()}
+                style={styles.textSection}>
+                <GradientText
+                  text="You feel more than you usually show."
+                  style={styles.mainText}
+                />
+                <Text style={styles.subText}>
+                  Your intuitions picks up what others miss.
+                </Text>
+              </Animated.View>
+
+              {/* Three Tabs */}
+              <View style={styles.tabsContainer}>
+                <BlurTab
+                  icon={<HeartIcon width={moderateScale(18)} height={moderateScale(17)} />}
+                  label="Emotional Depth"
+                  delay={700}
+                />
+                <BlurTab
+                  icon={<MoonIcon width={moderateScale(18)} height={moderateScale(18)} />}
+                  label="Intuitive Energy"
+                  delay={800}
+                />
+                <BlurTab
+                  icon={<StarIcon width={moderateScale(18)} height={moderateScale(18)} />}
+                  label="Love Sensitivity"
+                  delay={900}
                 />
               </View>
-            </Animated.View>
 
-            {/* Main Heading - at top like OnboardingScreen1 */}
-            <Animated.Text
-              entering={FadeInDown.delay(200).duration(600).springify()}
-              style={styles.mainHeading}>
-              {t('onboarding.screen6.heading')}
-            </Animated.Text>
-
-            {/* Sub Heading - just below heading like OnboardingScreen1 */}
-            <Animated.Text
-              entering={FadeInDown.delay(350).duration(600).springify()}
-              style={styles.subHeading}>
-              {t('onboarding.screen6.subheading')}
-            </Animated.Text>
-
-            {/* Spacer */}
-            <View style={styles.spacer} />
-
-            {/* Unlock Cards */}
-            <View style={styles.cardsContainer}>
-              {unlockCards.map((card) => (
-                <Animated.View
-                  key={card.id}
-                  entering={FadeInUp.delay(card.delay).duration(500).springify()}
-                  style={styles.unlockCardWrapper}>
-                  <ImageBackground
-                    source={card.bgImage}
-                    style={styles.unlockCard}
-                    imageStyle={styles.cardImageStyle}
-                    resizeMode="cover">
-                    {/* Centered Content */}
-                    <View style={styles.cardContent}>
-                      <UnlockAnalysisIcon width={52} height={52} />
-                      <Text style={styles.unlockCardText}>{t('onboarding.screen6.buttonUnlock')}</Text>
-                    </View>
-                  </ImageBackground>
-                </Animated.View>
-              ))}
+              {/* Unlock Profile Button */}
+              <Animated.View
+                entering={FadeInUp.delay(1000).duration(500)}
+                style={styles.bottomSection}>
+                <OnboardingButton
+                  text="Unlock Profile"
+                  onPress={handleContinue}
+                />
+              </Animated.View>
             </View>
-
-            {/* Bottom Section */}
-            <Animated.View
-              entering={FadeInUp.delay(800).duration(500)}
-              style={styles.bottomSection}>
-              <AnimatedTouchable
-                style={[styles.nextButton, buttonAnimatedStyle]}
-                onPress={handleNext}
-                activeOpacity={0.8}>
-                <Text style={styles.nextButtonText}>{t('onboarding.screen6.buttonDeepen')}</Text>
-              </AnimatedTouchable>
-            </Animated.View>
           </View>
         </SafeAreaView>
       </ImageBackground>
@@ -344,11 +237,11 @@ export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
 };
 
 const styles = StyleSheet.create({
-  backgroundFallback: {
-    flex: 1,
-    backgroundColor: Colors.cosmicBackground,
-  },
   container: {
+    flex: 1,
+    backgroundColor: Colors.newOnboardingBg,
+  },
+  backgroundImage: {
     flex: 1,
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
@@ -356,95 +249,121 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
-  star: {
-    position: 'absolute',
-    backgroundColor: Colors.white,
-    elevation: 8,
-  },
-  contentContainer: {
+  content: {
     flex: 1,
-    paddingHorizontal: horizontalScale(24),
+    paddingHorizontal: HORIZONTAL_PADDING,
   },
-  progressBarContainer: {
-    marginBottom: verticalScale(32),
+  // Header
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingTop: verticalScale(10),
   },
-  progressBarBackground: {
-    height: verticalScale(8),
-    backgroundColor: Colors.progressBarBackground,
-    borderRadius: radiusScale(8),
-    overflow: 'hidden',
+  backButton: {
+    padding: horizontalScale(4),
   },
-  progressBarFilled: {
-    width: '60%',
-    height: '100%',
-    backgroundColor: Colors.progressBarFilled,
-    borderRadius: radiusScale(2),
-  },
-  mainHeading: {
-    fontFamily: FontFamilies.sunlightDreams,
-    fontWeight: '400',
-    fontSize: fontScale(36),
-    lineHeight: fontScale(43),
-    color: Colors.white,
-    marginBottom: verticalScale(18),
-  },
-  subHeading: {
-    fontFamily: FontFamilies.interSemiBold,
-    fontWeight: '600',
-    fontSize: fontScale(16),
-    lineHeight: fontScale(16),
-    color: Colors.subHeading,
-  },
-  spacer: {
+  // Push content to bottom
+  topSpacer: {
     flex: 1,
   },
-  cardsContainer: {
-    width: '100%',
-    gap: verticalScale(12),
-    marginBottom: verticalScale(50),
+  // Bottom content block
+  bottomContent: {
+    alignItems: 'center',
   },
-  unlockCardWrapper: {
-    borderRadius: radiusScale(8),
-    overflow: 'hidden',
+  // Cosmic Profile Section
+  cosmicProfileSection: {
+    alignItems: 'center',
+    marginBottom: verticalScale(20),
   },
-  unlockCard: {
-    paddingVertical: verticalScale(10),
-    // paddingHorizontal: horizontalScale(16),
-  },
-  cardImageStyle: {
-    borderRadius: radiusScale(8),
-  },
-  cardContent: {
-    flexDirection: 'column',
+  cosmicProfileRow: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: horizontalScale(3),
   },
-  unlockCardText: {
+  cosmicProfileTextContainer: {
+    marginHorizontal: horizontalScale(8),
+  },
+  cosmicProfileText: {
+    fontFamily: FontFamilies.sunlightDreams,
+    fontWeight: '400',
+    fontSize: fontScale(28),
+    // lineHeight: fontScale(20),
+    color: Colors.white,
+    textAlign: 'center',
+    opacity: 0.8,
+  },
+  // Text Section
+  textSection: {
+    alignItems: 'center',
+    marginBottom: verticalScale(20),
+  },
+  gradientTextMask: {
+    fontFamily: FontFamilies.sunlightDreams,
+    fontWeight: '700',
+    fontSize: fontScale(18),
+    lineHeight: fontScale(34),
+    textAlign: 'center',
+  },
+  mainText: {
+    marginBottom: verticalScale(0),
+  },
+  subText: {
     fontFamily: FontFamilies.interRegular,
     fontWeight: '400',
-    fontSize: fontScale(16),
+    fontSize: fontScale(14),
+    lineHeight: fontScale(22),
     color: Colors.white,
-    opacity: 0.9,
+    textAlign: 'center',
   },
-  bottomSection: {
-    paddingBottom: verticalScale(10),
+  // Tabs
+  tabsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: horizontalScale(8),
+    marginBottom: verticalScale(24),
   },
-  nextButton: {
-    backgroundColor: Colors.white,
-    borderRadius: radiusScale(16),
-    paddingVertical: verticalScale(21),
+  blurTabWrapper: {
+    borderRadius: radiusScale(12),
+    overflow: 'hidden',
+    // inset box-shadow: 0px 4px 35px 0px #FFFFFF3D
+    shadowColor: '#FFFFFF',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.24,
+    shadowRadius: 35,
+    elevation: 8,
+  },
+  blurTab: {
+    height: verticalScale(40),
+    borderRadius: radiusScale(12),
+    overflow: 'hidden',
+    backgroundColor: '#b8bed0f4',
+    // borderWidth: 1,
+    // borderColor: 'rgba(255, 255, 255, 0.12)',
+  },
+  blurTabContent: {
+    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: verticalScale(16),
+    paddingHorizontal: horizontalScale(14),
+    gap: horizontalScale(4),
   },
-  nextButtonText: {
-    fontFamily: FontFamilies.interSemiBold,
-    fontWeight: '600',
-    fontSize: fontScale(18),
-    color: Colors.black,
+  blurTabLabel: {
+    fontFamily: FontFamilies.interRegular,
+    fontWeight: '400',
+    fontSize: fontScale(10),
+    color: Colors.white,
   },
+  // Bottom
+  bottomSection: {
+    paddingTop: verticalScale(10),
+    paddingBottom: verticalScale(20),
+    // backgroundColor:'red',
+    // flex:1
+    width:"100%"
+  },
+
 });
 
 export default OnboardingScreen6;

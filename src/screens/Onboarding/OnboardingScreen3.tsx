@@ -1,6 +1,6 @@
 /**
  * Onboarding Screen 3
- * Birthday input with zodiac card display
+ * "Where do you seek the most clarity?" - 3x3 grid selection
  */
 
 import React, {useState, useEffect} from 'react';
@@ -9,19 +9,16 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ImageBackground,
-  Dimensions,
   StatusBar,
+  Image,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {useTranslation} from 'react-i18next';
+import {useDispatch} from 'react-redux';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
   withDelay,
-  withRepeat,
-  withSequence,
   Easing,
   FadeIn,
   FadeInDown,
@@ -34,154 +31,121 @@ import {
   horizontalScale,
   verticalScale,
   radiusScale,
+  moderateScale,
 } from '../../theme';
-import {DatePicker} from '../../components/DatePicker';
-import {ZodiacCard} from '../../components/ZodiacCard';
 import {hapticLight} from '../../utils/haptics';
-import {getZodiacSign} from '../../components/mock/zodiacMockData';
-import {
-  trackOnboarding3View,
-  trackOnboarding3BirthdaySelected,
-  trackOnboarding3Continue,
-} from '../../utils/onboardingAnalytics';
 import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
+import {setClarity} from '../../redux/slices/onboardingSlice';
+import type {AppDispatch} from '../../redux/store';
+import {OnboardingButton} from '../../components/OnboardingButton';
 
-const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
-const BackgroundImageSource = require('../../assets/icons/onboarding_icons/background_image.png');
+// Icons
+import BackArrowIcon from '../../assets/icons/new_onboarding/back_arrow.svg';
+const LoveImg = require('../../assets/icons/new_onboarding/true_love.png');
+const CareerImg = require('../../assets/icons/new_onboarding/career.png');
+const HealthImg = require('../../assets/icons/new_onboarding/health.png');
+const InnerPeaceImg = require('../../assets/icons/new_onboarding/inner_peace.png');
+const ConfidenceImg = require('../../assets/icons/new_onboarding/confidence.png');
+const WealthImg = require('../../assets/icons/new_onboarding/wealth.png');
+const RelationshipsImg = require('../../assets/icons/new_onboarding/relationship.png');
+const DestinyImg = require('../../assets/icons/new_onboarding/destiny.png');
+const GrowthImg = require('../../assets/icons/new_onboarding/growth.png');
 
-// Animated TouchableOpacity
-const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+const HORIZONTAL_PADDING = horizontalScale(16);
+const ICON_SIZE = horizontalScale(65);
 
 interface OnboardingScreen3Props {
-  onNext?: (birthday: Date) => void;
-  name?: string;
+  onNext?: (clarity: string[]) => void;
+  onGoBack?: () => void;
 }
 
-// Twinkling Star Component with smooth glow animation
-const TwinklingStar: React.FC<{
-  size: number;
-  top: number;
-  left: number;
-  delay: number;
-  intensity?: 'low' | 'medium' | 'high';
-}> = ({size, top, left, delay, intensity = 'medium'}) => {
-  const opacity = useSharedValue(0.3);
-  const scale = useSharedValue(0.8);
+const CLARITY_OPTIONS = [
+  {id: 'love', label: 'Love', image: LoveImg},
+  {id: 'career', label: 'Career', image: CareerImg},
+  {id: 'health', label: 'Health', image: HealthImg},
+  {id: 'inner_peace', label: 'Inner Peace', image: InnerPeaceImg},
+  {id: 'confidence', label: 'Confidence', image: ConfidenceImg},
+  {id: 'wealth', label: 'Wealth', image: WealthImg},
+  {id: 'relationships', label: 'Relationships', image: RelationshipsImg},
+  {id: 'destiny', label: 'Destiny', image: DestinyImg},
+  {id: 'growth', label: 'Growth', image: GrowthImg},
+];
 
-  const opacityRange = {
-    low: {min: 0.2, max: 0.5},
-    medium: {min: 0.3, max: 0.7},
-    high: {min: 0.4, max: 1.0},
+// Grid Option Component
+interface GridOptionProps {
+  option: {id: string; label: string; image: any};
+  isSelected: boolean;
+  onPress: () => void;
+  index: number;
+}
+
+const GridOption: React.FC<GridOptionProps> = ({
+  option,
+  isSelected,
+  onPress,
+  index,
+}) => {
+  const handlePress = () => {
+    hapticLight();
+    onPress();
   };
 
-  const scaleRange = {
-    low: {min: 0.8, max: 1.0},
-    medium: {min: 0.7, max: 1.1},
-    high: {min: 0.6, max: 1.2},
-  };
-
-  const durationRange = {
-    low: 3000,
-    medium: 2500,
-    high: 2000,
-  };
-
-  useEffect(() => {
-    const range = opacityRange[intensity];
-    const scaleR = scaleRange[intensity];
-    const duration = durationRange[intensity];
-
-    opacity.value = withDelay(
-      delay,
-      withRepeat(
-        withSequence(
-          withTiming(range.max, {duration, easing: Easing.inOut(Easing.ease)}),
-          withTiming(range.min, {duration, easing: Easing.inOut(Easing.ease)}),
-        ),
-        -1,
-        true,
-      ),
-    );
-
-    scale.value = withDelay(
-      delay,
-      withRepeat(
-        withSequence(
-          withTiming(scaleR.max, {
-            duration: duration * 0.8,
-            easing: Easing.inOut(Easing.ease),
-          }),
-          withTiming(scaleR.min, {
-            duration: duration * 0.8,
-            easing: Easing.inOut(Easing.ease),
-          }),
-        ),
-        -1,
-        true,
-      ),
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{scale: scale.value}],
-  }));
+  // Calculate row and column for staggered animation
+  const row = Math.floor(index / 3);
+  const col = index % 3;
+  const delay = 400 + (row * 100) + (col * 50);
 
   return (
     <Animated.View
-      style={[
-        styles.star,
-        {
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          top,
-          left,
-          shadowColor: Colors.white,
-          shadowOffset: {width: 0, height: 0},
-          shadowOpacity: 0.8,
-          shadowRadius: size,
-        },
-        animatedStyle,
-      ]}
-    />
+      entering={FadeInUp.delay(delay).duration(400).springify()}
+      style={styles.gridItemWrapper}>
+      <TouchableOpacity
+        style={[
+          styles.gridItem,
+          isSelected && styles.gridItemSelected,
+        ]}
+        onPress={handlePress}
+        activeOpacity={0.7}>
+        <Image
+          source={option.image}
+          style={styles.gridIcon}
+          resizeMode="contain"
+        />
+        <Text
+          style={[
+            styles.gridLabel,
+            isSelected && styles.gridLabelSelected,
+          ]}>
+          {option.label}
+        </Text>
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
 export const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
   onNext,
-  name: _name,
+  onGoBack,
 }) => {
-  const {t} = useTranslation();
-  const [birthday, setBirthday] = useState<Date | null>(null);
-  const [hasTrackedBirthday, setHasTrackedBirthday] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
 
-  // ===== Analytics: Track screen view =====
   useScreenView('OnboardingScreen3', {
     screen_category: 'onboarding',
     step: 3,
-    total_steps: 11,
+    total_steps: 9,
   });
 
-  // Progress bar animation - start from previous screen's value (18%)
-  const progressWidth = useSharedValue(18);
-
-  // Button scale animation
-  const buttonScale = useSharedValue(1);
+  const progressWidth = useSharedValue(11.1);
 
   useEffect(() => {
-    // Track screen view
-    trackOnboarding3View();
-    
-    // Firebase screen view logging
     firebaseService.logScreenView('OnboardingScreen3', 'OnboardingScreen3');
-    
-    // Animate progress bar on mount - Screen 3 of 11 (27%)
+
+    // Animate progress bar - Screen 2 of 9 (22.2%)
     progressWidth.value = withDelay(
       300,
-      withTiming(27, {duration: 800, easing: Easing.out(Easing.cubic)}),
+      withTiming(22.2, {duration: 800, easing: Easing.out(Easing.cubic)}),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -190,281 +154,225 @@ export const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
     width: `${progressWidth.value}%`,
   }));
 
-  const handleNext = () => {
-    if (birthday) {
-      hapticLight();
-      const zodiacSign = getZodiacSign(birthday);
-      // Track continue with zodiac sign name
-      trackOnboarding3Continue(zodiacSign.name);
-      // Subtle pulse animation on button
-      buttonScale.value = withSequence(
-        withTiming(1.02, {duration: 100}),
-        withTiming(1, {duration: 100}),
-      );
-      // Small delay to let animation play before navigating
-      setTimeout(() => {
-        onNext?.(birthday);
-      }, 150);
-    }
+  const handleOptionToggle = (optionId: string) => {
+    setSelectedOptions(prev =>
+      prev.includes(optionId)
+        ? prev.filter(id => id !== optionId)
+        : [...prev, optionId],
+    );
   };
 
-  const handleBirthdayChange = (date: Date | null) => {
-    setBirthday(date);
-    // Track birthday selection (only once)
-    if (date && !hasTrackedBirthday) {
-      setHasTrackedBirthday(true);
-      const zodiacSign = getZodiacSign(date);
-      trackOnboarding3BirthdaySelected(zodiacSign.name);
+  const handleContinue = () => {
+    if (selectedOptions.length > 0) {
+      dispatch(setClarity(selectedOptions));
     }
+    onNext?.(selectedOptions);
   };
 
-  const buttonAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{scale: buttonScale.value}],
-  }));
-
-  // Calculate max date (December 31, 2016)
-  const maxDate = new Date(2016, 11, 31); // Month is 0-indexed, so 11 = December
-
-  // Calculate min date (oldest possible age ~120 years)
-  const minDate = new Date();
-  minDate.setFullYear(minDate.getFullYear() - 120);
-
-  // Twinkling stars configuration - same as other screens
-  const stars = [
-    // Top region - scattered bright stars
-    {size: 6, top: SCREEN_HEIGHT * 0.08, left: SCREEN_WIDTH * 0.15, delay: 0, intensity: 'high' as const},
-    {size: 4, top: SCREEN_HEIGHT * 0.12, left: SCREEN_WIDTH * 0.75, delay: 300, intensity: 'medium' as const},
-    {size: 8, top: SCREEN_HEIGHT * 0.05, left: SCREEN_WIDTH * 0.5, delay: 600, intensity: 'high' as const},
-    {size: 3, top: SCREEN_HEIGHT * 0.1, left: SCREEN_WIDTH * 0.9, delay: 150, intensity: 'low' as const},
-    {size: 5, top: SCREEN_HEIGHT * 0.15, left: SCREEN_WIDTH * 0.3, delay: 450, intensity: 'medium' as const},
-    
-    // Upper-middle region
-    {size: 7, top: SCREEN_HEIGHT * 0.2, left: SCREEN_WIDTH * 0.85, delay: 200, intensity: 'high' as const},
-    {size: 4, top: SCREEN_HEIGHT * 0.22, left: SCREEN_WIDTH * 0.1, delay: 800, intensity: 'medium' as const},
-    {size: 6, top: SCREEN_HEIGHT * 0.25, left: SCREEN_WIDTH * 0.6, delay: 100, intensity: 'high' as const},
-    {size: 3, top: SCREEN_HEIGHT * 0.18, left: SCREEN_WIDTH * 0.45, delay: 550, intensity: 'low' as const},
-    
-    // Middle region
-    {size: 5, top: SCREEN_HEIGHT * 0.32, left: SCREEN_WIDTH * 0.08, delay: 700, intensity: 'medium' as const},
-    {size: 8, top: SCREEN_HEIGHT * 0.35, left: SCREEN_WIDTH * 0.92, delay: 50, intensity: 'high' as const},
-    {size: 4, top: SCREEN_HEIGHT * 0.38, left: SCREEN_WIDTH * 0.25, delay: 400, intensity: 'medium' as const},
-    {size: 6, top: SCREEN_HEIGHT * 0.33, left: SCREEN_WIDTH * 0.7, delay: 250, intensity: 'high' as const},
-    
-    // Lower-middle region
-    {size: 5, top: SCREEN_HEIGHT * 0.45, left: SCREEN_WIDTH * 0.12, delay: 350, intensity: 'medium' as const},
-    {size: 7, top: SCREEN_HEIGHT * 0.48, left: SCREEN_WIDTH * 0.88, delay: 100, intensity: 'high' as const},
-    {size: 3, top: SCREEN_HEIGHT * 0.42, left: SCREEN_WIDTH * 0.55, delay: 650, intensity: 'low' as const},
-    {size: 4, top: SCREEN_HEIGHT * 0.5, left: SCREEN_WIDTH * 0.35, delay: 500, intensity: 'medium' as const},
-    
-    // Bottom region
-    {size: 4, top: SCREEN_HEIGHT * 0.7, left: SCREEN_WIDTH * 0.2, delay: 300, intensity: 'medium' as const},
-    {size: 6, top: SCREEN_HEIGHT * 0.72, left: SCREEN_WIDTH * 0.65, delay: 100, intensity: 'high' as const},
-    {size: 5, top: SCREEN_HEIGHT * 0.75, left: SCREEN_WIDTH * 0.9, delay: 550, intensity: 'medium' as const},
-    {size: 7, top: SCREEN_HEIGHT * 0.68, left: SCREEN_WIDTH * 0.4, delay: 200, intensity: 'high' as const},
-  ];
+  const handleBack = () => {
+    hapticLight();
+    onGoBack?.();
+  };
 
   return (
-    <View style={styles.backgroundFallback}>
-      <ImageBackground
-        source={BackgroundImageSource}
-        style={styles.container}
-        resizeMode="cover">
-        <SafeAreaView style={styles.safeArea}>
-          <StatusBar
-            barStyle="light-content"
-            backgroundColor="transparent"
-            translucent
-          />
-          {/* Twinkling Stars Overlay */}
-          {stars.map((star, index) => (
-            <TwinklingStar
-              key={index}
-              size={star.size}
-              top={star.top}
-              left={star.left}
-              delay={star.delay}
-              intensity={star.intensity}
-            />
-          ))}
+    <View style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="transparent"
+          translucent
+        />
 
-          {/* Content */}
-          <View style={styles.contentContainer}>
-            {/* Progress Bar */}
-            <Animated.View
-              entering={FadeIn.delay(100).duration(400)}
-              style={styles.progressBarContainer}>
+        <View style={styles.content}>
+          {/* Header: Back + Progress Bar + Step Counter */}
+          <Animated.View
+            entering={FadeIn.delay(100).duration(400)}
+            style={styles.header}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={handleBack}
+              activeOpacity={0.7}
+              hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+              <BackArrowIcon width={moderateScale(24)} height={moderateScale(24)} />
+            </TouchableOpacity>
+
+            <View style={styles.progressBarContainer}>
               <View style={styles.progressBarBackground}>
                 <Animated.View
                   style={[styles.progressBarFilled, progressAnimatedStyle]}
                 />
               </View>
-            </Animated.View>
-
-            {/* Main Heading */}
-            <Animated.Text
-              entering={FadeInDown.delay(200).duration(600).springify()}
-              style={styles.mainHeading}>
-              {t('onboarding.screen3.heading')}
-            </Animated.Text>
-
-            {/* Sub Heading */}
-            <Animated.Text
-              entering={FadeInDown.delay(350).duration(600).springify()}
-              style={styles.subHeading}>
-              {t('onboarding.screen3.subheading')}
-            </Animated.Text>
-
-            {/* Center Section - Zodiac Card (when date selected) */}
-            <View style={styles.centerSection}>
-              {birthday && (
-                <View style={styles.zodiacSection}>
-                  <ZodiacCard birthday={birthday} />
-                </View>
-              )}
             </View>
 
-            {/* Date Input Section */}
-            <Animated.View
-              entering={FadeInUp.delay(500).duration(500).springify()}
-              style={styles.inputSection}>
-              <DatePicker
-                value={birthday}
-                onChange={handleBirthdayChange}
-                minimumDate={minDate}
-                maximumDate={maxDate}
-              />
-            </Animated.View>
+            <Text style={styles.stepCounter}>1/9</Text>
+          </Animated.View>
 
-            {/* Bottom Section */}
-            <Animated.View
-              entering={FadeInUp.delay(700).duration(500)}
-              style={styles.bottomSection}>
-              {/* Next Button */}
-              <AnimatedTouchable
-                style={[
-                  styles.nextButton,
-                  !birthday && styles.nextButtonDisabled,
-                  buttonAnimatedStyle,
-                ]}
-                disabled={!birthday}
-                onPress={handleNext}
-                activeOpacity={0.8}>
-                <Text style={styles.nextButtonText}>
-                  {birthday ? t('onboarding.screen3.buttonAnalyze') : t('onboarding.screen3.button')}
-                </Text>
-              </AnimatedTouchable>
+          {/* Main Heading - Centered */}
+          <Animated.Text
+            entering={FadeInDown.delay(200).duration(600).springify()}
+            style={styles.mainHeading}>
+            Where do you seek{'\n'}the most clarity?
+          </Animated.Text>
 
-              {/* Footer Text */}
-              <Text style={styles.footerText}>
-                {t('onboarding.screen3.footerPart1')}
-                <Text style={styles.footerTextHighlight}>
-                  {t('onboarding.screen3.footerHighlight')}
-                </Text>
-                <Text style={styles.footerText}>{t('onboarding.screen3.footerPart2')}</Text>
-              </Text>
-            </Animated.View>
+          {/* Sub Heading - Centered */}
+          <Animated.Text
+            entering={FadeInDown.delay(350).duration(600).springify()}
+            style={styles.subHeading}>
+            Select themes that resonate, and we'll guide{'\n'}your journey. Update anytime.
+          </Animated.Text>
+
+          {/* 3x3 Grid */}
+          <View style={styles.gridContainer}>
+            {[0, 1, 2].map(rowIndex => (
+              <View key={rowIndex} style={styles.gridRow}>
+                {CLARITY_OPTIONS.slice(rowIndex * 3, rowIndex * 3 + 3).map(
+                  (option, colIndex) => (
+                    <GridOption
+                      key={option.id}
+                      option={option}
+                      isSelected={selectedOptions.includes(option.id)}
+                      onPress={() => handleOptionToggle(option.id)}
+                      index={rowIndex * 3 + colIndex}
+                    />
+                  ),
+                )}
+              </View>
+            ))}
           </View>
-        </SafeAreaView>
-      </ImageBackground>
+
+          {/* Continue Button */}
+          <Animated.View
+            entering={FadeInUp.delay(800).duration(500)}
+            style={styles.bottomSection}>
+            <OnboardingButton
+              text="Pick 1 or more to continue"
+              onPress={handleContinue}
+            />
+          </Animated.View>
+        </View>
+      </SafeAreaView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  backgroundFallback: {
-    flex: 1,
-    backgroundColor: Colors.cosmicBackground,
-  },
   container: {
     flex: 1,
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
+    backgroundColor: Colors.newOnboardingBg,
   },
   safeArea: {
     flex: 1,
   },
-  star: {
-    position: 'absolute',
-    backgroundColor: Colors.white,
-    elevation: 8,
-  },
-  contentContainer: {
+  content: {
     flex: 1,
-    paddingHorizontal: horizontalScale(24),
+    paddingHorizontal: HORIZONTAL_PADDING,
+  },
+  // Header
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: verticalScale(10),
+    marginBottom: verticalScale(24),
+  },
+  backButton: {
+    marginRight: horizontalScale(12),
   },
   progressBarContainer: {
-    marginBottom: verticalScale(32),
-    paddingTop: verticalScale(10),
+    flex: 1,
+    marginRight: horizontalScale(12),
   },
   progressBarBackground: {
-    height: verticalScale(8),
-    backgroundColor: Colors.progressBarBackground,
-    borderRadius: radiusScale(8),
+    height: verticalScale(6),
+    backgroundColor: 'rgba(184, 190, 208, 0.2)',
+    borderRadius: radiusScale(6),
     overflow: 'hidden',
   },
   progressBarFilled: {
-    width: '100%',
     height: '100%',
-    backgroundColor: Colors.progressBarFilled,
-    borderRadius: radiusScale(2),
+    backgroundColor: Colors.newOnboardingProgressFilled,
+    borderRadius: radiusScale(6),
   },
+  stepCounter: {
+    fontFamily: FontFamilies.interSemiBold,
+    fontWeight: '600',
+    fontSize: fontScale(14),
+    color: Colors.white,
+  },
+  // Typography - Centered
   mainHeading: {
     fontFamily: FontFamilies.sunlightDreams,
-    fontWeight: '400',
-    fontSize: fontScale(36),
-    lineHeight: fontScale(43),
-    color: Colors.white,
-    marginBottom: verticalScale(18),
+    fontWeight: '700',
+    fontSize: fontScale(32),
+    lineHeight: fontScale(36),
+    color: Colors.newOnboardingHeading,
+    textAlign: 'center',
+    marginBottom: verticalScale(12),
   },
   subHeading: {
-    fontFamily: FontFamilies.interSemiBold,
-    fontWeight: '600',
-    fontSize: fontScale(16),
-    lineHeight: fontScale(16),
-    color: Colors.subHeading,
-  },
-  centerSection: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  zodiacSection: {
-    width: '100%',
-    alignItems: 'center',
-  },
-  inputSection: {
-    marginBottom: verticalScale(20),
-  },
-  bottomSection: {
-    paddingBottom: verticalScale(10),
-  },
-  nextButton: {
-    backgroundColor: Colors.white,
-    borderRadius: radiusScale(16),
-    paddingVertical: verticalScale(21),
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: verticalScale(16),
-  },
-  nextButtonDisabled: {
-    opacity: 0.5,
-  },
-  nextButtonText: {
-    fontFamily: FontFamilies.interSemiBold,
-    fontWeight: '600',
-    fontSize: fontScale(18),
-    color: Colors.black,
-  },
-  footerText: {
     fontFamily: FontFamilies.interRegular,
     fontWeight: '400',
-    fontSize: fontScale(13),
-    color: Colors.subHeading,
+    fontSize: fontScale(16),
+    lineHeight: fontScale(20),
+    color: Colors.newOnboardingSubheading,
     textAlign: 'center',
-    lineHeight: fontScale(18),
+    marginBottom: verticalScale(28),
   },
-  footerTextHighlight: {
-    color: Colors.white,
+  // Grid
+  gridContainer: {
+    flex: 1,
+    // justifyContent: 'center',
+    // paddingVertical: verticalScale(20),
+    // backgroundColor:'blue'
+  },
+  gridRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    // marginBottom: verticalScale(16),
+    // alignItems:'flex-start'
+  },
+  gridItemWrapper: {
+    flex: 1,
+    // alignItems: 'flex-start',
+    // paddingHorizontal: horizontalScale(4),
+    // backgroundColor:'red',
+    // justifyContent:'flex-start'
+    paddingVertical:verticalScale(15),
+    paddingHorizontal:horizontalScale(5)
+  },
+  gridItem: {
+    width: '100%',
+    aspectRatio: 1,
+    backgroundColor: 'transparent',
+    borderRadius: radiusScale(24),
+    alignItems: 'center',
+    justifyContent: 'center',
+    // paddingVertical: verticalScale(12),
+  },
+  gridItemSelected: {
+    backgroundColor: '#090C15',
+    borderWidth: 2,
+    borderColor: '#262D3D',
+  },
+  gridIcon: {
+    width: ICON_SIZE,
+    height: ICON_SIZE,
+    marginBottom: verticalScale(12),
+  },
+  gridLabel: {
+    fontFamily: FontFamilies.sunlightDreams,
+    fontWeight: '400',
+    fontSize: fontScale(15),
+    color: Colors.newOnboardingSubheading,
+    textAlign: 'center',
+    // letterSpacing:1
+  },
+  gridLabelSelected: {
+    color: Colors.newOnboardingHeading,
+  },
+  // Bottom
+  bottomSection: {
+    paddingTop: verticalScale(10),
+    paddingBottom: verticalScale(20),
   },
 });
 

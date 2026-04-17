@@ -26,8 +26,17 @@ export type AlignmentOption = 'in-my-flow' | 'figuring-it-out' | 'totally-lost' 
 export interface OnboardingState {
   // Screen 1: Life alignment
   alignment: AlignmentOption;
+
+  // Screen 2: What are you seeking
+  seeking: string[];
+
+  // Screen 3: Where do you seek clarity
+  clarity: string[];
+
+  // Screen 4: Gender identity
+  gender: string | null;
   
-  // Screen 2: User's name
+  // Screen 2 (old) / Screen 3 (new): User's name
   name: string;
   
   // Screen 3: Birthday (stored as ISO string for serialization)
@@ -55,6 +64,9 @@ export interface OnboardingState {
  */
 const initialState: OnboardingState = {
   alignment: null,
+  seeking: [],
+  clarity: [],
+  gender: null,
   name: '',
   birthday: null,
   zodiacSign: null,
@@ -92,6 +104,30 @@ const onboardingSlice = createSlice({
     setAlignment: (state, action: PayloadAction<AlignmentOption>) => {
       state.alignment = action.payload;
       console.log('📊 [Redux] Alignment set:', action.payload);
+    },
+
+    /**
+     * Set seeking choices (Screen 2)
+     */
+    setSeeking: (state, action: PayloadAction<string[]>) => {
+      state.seeking = action.payload;
+      console.log('📊 [Redux] Seeking set:', action.payload);
+    },
+
+    /**
+     * Set clarity choices (Screen 3)
+     */
+    setClarity: (state, action: PayloadAction<string[]>) => {
+      state.clarity = action.payload;
+      console.log('📊 [Redux] Clarity set:', action.payload);
+    },
+
+    /**
+     * Set gender identity (Screen 4)
+     */
+    setGender: (state, action: PayloadAction<string | null>) => {
+      state.gender = action.payload;
+      console.log('📊 [Redux] Gender set:', action.payload);
     },
 
     /**
@@ -186,6 +222,9 @@ const onboardingSlice = createSlice({
 // Export actions
 export const {
   setAlignment,
+  setSeeking,
+  setClarity,
+  setGender,
   setName,
   setBirthday,
   setBirthTime,
@@ -235,6 +274,21 @@ export const selectBirthLocation = (state: RootState) => ({
  * Select user's alignment
  */
 export const selectAlignment = (state: RootState) => state.onboarding.alignment;
+
+/**
+ * Select user's seeking choices
+ */
+export const selectSeeking = (state: RootState) => state.onboarding.seeking;
+
+/**
+ * Select user's clarity choices
+ */
+export const selectClarity = (state: RootState) => state.onboarding.clarity;
+
+/**
+ * Select user's gender identity
+ */
+export const selectGender = (state: RootState) => state.onboarding.gender;
 
 /**
  * Check if onboarding data is saved

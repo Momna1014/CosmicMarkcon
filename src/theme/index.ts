@@ -133,6 +133,12 @@ export const Colors = {
   subHeading: '#C2D1F3',
   cosmicBackground: '#08142A', // Deep cosmic blue for fallback backgrounds
 
+  // New Onboarding colors
+  newOnboardingBg: '#090C15',
+  newOnboardingProgressFilled: '#B8BED0',
+  newOnboardingHeading: '#F5F2EA',
+  newOnboardingSubheading: '#B8BED0',
+
 
     primary: '#03AA82',
     card: '#F5F5F5',
@@ -144,33 +150,6 @@ export const Colors = {
     shadow: '#000000',
     overlay: 'rgba(0, 0, 0, 0.5)',
 
-  // Light theme colors
-  // light: {
-  //   primary: '#03AA82',
-  //   background: '#2C2C90',
-  //   card: '#F5F5F5',
-  //   text: '#000000',
-  //   textSecondary: '#666666',
-  //   textTertiary: '#999999',
-  //   border: '#E0E0E0',
-  //   notification: '#03AA82',
-  //   shadow: '#000000',
-  //   overlay: 'rgba(0, 0, 0, 0.5)',
-  // },
-
-  // Dark theme colors
-//   dark: {
-//  primary: '#03AA82',
-//     background: '#2C2C90',
-//     card: '#F5F5F5',
-//     text: '#000000',
-//     textSecondary: '#666666',
-//     textTertiary: '#999999',
-//     border: '#E0E0E0',
-//     notification: '#03AA82',
-//     shadow: '#000000',
-//     overlay: 'rgba(0, 0, 0, 0.5)',
-//   },
 } as const;
 
 // Typography
