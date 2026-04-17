@@ -29,6 +29,12 @@ export interface OnboardingState {
 
   // Screen 2: What are you seeking
   seeking: string[];
+
+  // Screen 3: Where do you seek clarity
+  clarity: string[];
+
+  // Screen 4: Gender identity
+  gender: string | null;
   
   // Screen 2 (old) / Screen 3 (new): User's name
   name: string;
@@ -59,6 +65,8 @@ export interface OnboardingState {
 const initialState: OnboardingState = {
   alignment: null,
   seeking: [],
+  clarity: [],
+  gender: null,
   name: '',
   birthday: null,
   zodiacSign: null,
@@ -104,6 +112,22 @@ const onboardingSlice = createSlice({
     setSeeking: (state, action: PayloadAction<string[]>) => {
       state.seeking = action.payload;
       console.log('📊 [Redux] Seeking set:', action.payload);
+    },
+
+    /**
+     * Set clarity choices (Screen 3)
+     */
+    setClarity: (state, action: PayloadAction<string[]>) => {
+      state.clarity = action.payload;
+      console.log('📊 [Redux] Clarity set:', action.payload);
+    },
+
+    /**
+     * Set gender identity (Screen 4)
+     */
+    setGender: (state, action: PayloadAction<string | null>) => {
+      state.gender = action.payload;
+      console.log('📊 [Redux] Gender set:', action.payload);
     },
 
     /**
@@ -199,6 +223,8 @@ const onboardingSlice = createSlice({
 export const {
   setAlignment,
   setSeeking,
+  setClarity,
+  setGender,
   setName,
   setBirthday,
   setBirthTime,
@@ -253,6 +279,16 @@ export const selectAlignment = (state: RootState) => state.onboarding.alignment;
  * Select user's seeking choices
  */
 export const selectSeeking = (state: RootState) => state.onboarding.seeking;
+
+/**
+ * Select user's clarity choices
+ */
+export const selectClarity = (state: RootState) => state.onboarding.clarity;
+
+/**
+ * Select user's gender identity
+ */
+export const selectGender = (state: RootState) => state.onboarding.gender;
 
 /**
  * Check if onboarding data is saved

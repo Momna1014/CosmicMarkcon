@@ -15,7 +15,6 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Animated, {
   FadeInUp,
 } from 'react-native-reanimated';
-import LottieView from 'lottie-react-native';
 import {
   Colors,
   FontFamilies,
@@ -31,6 +30,7 @@ import {
 } from '../../utils/onboardingAnalytics';
 import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
+import LottieView from 'lottie-react-native';
 
 interface OnboardingScreen1Props {
   onContinue?: () => void;
@@ -58,7 +58,7 @@ export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
     hapticLight();
     onContinue?.();
   };
-
+const LoaderAnimation = require('../../assets/lottie/test.json');
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
@@ -68,10 +68,8 @@ export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
           translucent
         />
         <View style={styles.content}>
-          {/* Empty space */}
           <View style={styles.spacer} />
 
-          {/* Continue Button */}
           <Animated.View
             entering={FadeInUp.delay(300).duration(500)}
             style={styles.bottomSection}>
@@ -83,6 +81,18 @@ export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
             </TouchableOpacity>
           </Animated.View>
         </View>
+
+          {/* Continue Button */}
+        {/* <LottieView
+          source={LoaderAnimation}
+          autoPlay
+          loop
+          style={{
+            width: 700,
+            height: 700,
+            alignSelf: 'center',
+          }}
+        /> */}
       </SafeAreaView>
     </View>
   );

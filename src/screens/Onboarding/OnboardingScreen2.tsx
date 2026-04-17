@@ -32,6 +32,7 @@ import {
   horizontalScale,
   verticalScale,
   radiusScale,
+  moderateScale,
 } from '../../theme';
 import {hapticLight} from '../../utils/haptics';
 import {
@@ -41,6 +42,7 @@ import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
 import {setSeeking} from '../../redux/slices/onboardingSlice';
 import type {AppDispatch} from '../../redux/store';
+import {OnboardingButton} from '../../components/OnboardingButton';
 
 // Icons
 import BackArrowIcon from '../../assets/icons/new_onboarding/back_arrow.svg';
@@ -51,9 +53,9 @@ const FuturePathImg = require('../../assets/icons/new_onboarding/future_path.png
 const SelfDiscoveryImg = require('../../assets/icons/new_onboarding/self_discovery.png');
 const UnderstandingPeopleImg = require('../../assets/icons/new_onboarding/understanding_people.png');
 
-const ICON_SIZE = horizontalScale(38);
-const CIRCLE_SIZE = horizontalScale(22);
-const HORIZONTAL_PADDING = horizontalScale(20);
+const ICON_SIZE = horizontalScale(44);
+const CIRCLE_SIZE = horizontalScale(24);
+const HORIZONTAL_PADDING = horizontalScale(16);
 
 interface OnboardingScreen2Props {
   onNext?: (seeking: string[]) => void;
@@ -68,6 +70,64 @@ const SEEKING_OPTIONS = [
   {id: 'self_discovery', label: 'Self Discovery', image: SelfDiscoveryImg},
   {id: 'understanding_people', label: 'Understanding People', image: UnderstandingPeopleImg},
 ];
+
+// Animated Option Row Component - Simple with haptic only
+interface AnimatedOptionRowProps {
+  option: {id: string; label: string; image: any};
+  isSelected: boolean;
+  onPress: () => void;
+  index: number;
+}
+
+const AnimatedOptionRow: React.FC<AnimatedOptionRowProps> = ({
+  option,
+  isSelected,
+  onPress,
+  index,
+}) => {
+  const handlePress = () => {
+    hapticLight();
+    onPress();
+  };
+
+  return (
+    <Animated.View
+      entering={FadeInUp.delay(400 + index * 60).duration(400).springify()}>
+      <TouchableOpacity
+        style={[
+          styles.optionRow,
+          isSelected && styles.optionRowSelected,
+        ]}
+        onPress={handlePress}
+        activeOpacity={0.7}>
+        {/* Radio Circle */}
+        <View
+          style={[
+            styles.radioCircle,
+            isSelected && styles.radioCircleSelected,
+          ]}>
+          {isSelected && <View style={styles.radioCircleInner} />}
+        </View>
+
+        {/* Label */}
+        <Text
+          style={[
+            styles.optionLabel,
+            isSelected && styles.optionLabelSelected,
+          ]}>
+          {option.label}
+        </Text>
+
+        {/* Icon on the right */}
+        <Image
+          source={option.image}
+          style={styles.optionImage}
+          resizeMode="contain"
+        />
+      </TouchableOpacity>
+    </Animated.View>
+  );
+};
 
 export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
   onNext,
@@ -100,7 +160,6 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
   }));
 
   const handleOptionToggle = (optionId: string) => {
-    hapticLight();
     setSelectedOptions(prev =>
       prev.includes(optionId)
         ? prev.filter(id => id !== optionId)
@@ -109,7 +168,6 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
   };
 
   const handleContinue = () => {
-    hapticLight();
     if (selectedOptions.length > 0) {
       dispatch(setSeeking(selectedOptions));
     }
@@ -140,7 +198,7 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
               onPress={handleBack}
               activeOpacity={0.7}
               hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
-              <BackArrowIcon width={horizontalScale(24)} height={verticalScale(24)} />
+              <BackArrowIcon width={moderateScale(24)} height={moderateScale(24)} />
             </TouchableOpacity>
 
             <View style={styles.progressBarContainer}>
@@ -173,61 +231,25 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
             style={styles.scrollView}
             contentContainerStyle={styles.optionsList}
             showsVerticalScrollIndicator={false}>
-            {SEEKING_OPTIONS.map((option, index) => {
-              const isSelected = selectedOptions.includes(option.id);
-              return (
-                <Animated.View
-                  key={option.id}
-                  entering={FadeInUp.delay(400 + index * 60)
-                    .duration(400)
-                    .springify()}>
-                  <TouchableOpacity
-                    style={[
-                      styles.optionRow,
-                      isSelected && styles.optionRowSelected,
-                    ]}
-                    onPress={() => handleOptionToggle(option.id)}
-                    activeOpacity={0.7}>
-                    {/* Radio Circle */}
-                    <View
-                      style={[
-                        styles.radioCircle,
-                        isSelected && styles.radioCircleSelected,
-                      ]}>
-                      {isSelected && <View style={styles.radioCircleInner} />}
-                    </View>
-
-                    {/* Label */}
-                    <Text
-                      style={[
-                        styles.optionLabel,
-                        isSelected && styles.optionLabelSelected,
-                      ]}>
-                      {option.label}
-                    </Text>
-
-                    {/* Icon on the right */}
-                    <Image
-                      source={option.image}
-                      style={styles.optionImage}
-                      resizeMode="contain"
-                    />
-                  </TouchableOpacity>
-                </Animated.View>
-              );
-            })}
+            {SEEKING_OPTIONS.map((option, index) => (
+              <AnimatedOptionRow
+                key={option.id}
+                option={option}
+                isSelected={selectedOptions.includes(option.id)}
+                onPress={() => handleOptionToggle(option.id)}
+                index={index}
+              />
+            ))}
           </ScrollView>
 
           {/* Continue Button */}
           <Animated.View
             entering={FadeInUp.delay(800).duration(500)}
             style={styles.bottomSection}>
-            <TouchableOpacity
-              style={styles.continueButton}
+            <OnboardingButton
+              text="Pick 1 or more to continue"
               onPress={handleContinue}
-              activeOpacity={0.8}>
-              <Text style={styles.continueButtonText}>Pick 1 or more to continue</Text>
-            </TouchableOpacity>
+            />
           </Animated.View>
         </View>
       </SafeAreaView>
@@ -276,13 +298,13 @@ const styles = StyleSheet.create({
     fontFamily: FontFamilies.interSemiBold,
     fontWeight: '600',
     fontSize: fontScale(14),
-    color: Colors.newOnboardingSubheading,
+    color: Colors.white,
   },
   // Typography - Centered
   mainHeading: {
-    fontFamily: FontFamilies.interBold,
+    fontFamily: FontFamilies.sunlightDreams,
     fontWeight: '700',
-    fontSize: fontScale(28),
+    fontSize: fontScale(32),
     lineHeight: fontScale(36),
     color: Colors.newOnboardingHeading,
     textAlign: 'center',
@@ -291,7 +313,7 @@ const styles = StyleSheet.create({
   subHeading: {
     fontFamily: FontFamilies.interRegular,
     fontWeight: '400',
-    fontSize: fontScale(14),
+    fontSize: fontScale(16),
     lineHeight: fontScale(20),
     color: Colors.newOnboardingSubheading,
     textAlign: 'center',
@@ -309,20 +331,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'transparent',
-    borderRadius: radiusScale(16),
-    paddingVertical: verticalScale(16),
+    borderRadius: radiusScale(19),
+    paddingVertical: verticalScale(14),
     paddingHorizontal: horizontalScale(16),
   },
   optionRowSelected: {
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: '#090C15',
+    borderWidth:2,
+    borderColor:'#262D3D',
+    borderRadius:radiusScale(19)
   },
   // Radio Circle
   radioCircle: {
     width: CIRCLE_SIZE,
     height: CIRCLE_SIZE,
     borderRadius: CIRCLE_SIZE / 2,
-    borderWidth: 1.5,
-    borderColor: 'rgba(184, 190, 208, 0.4)',
+    borderWidth: 2,
+    borderColor: '#262D3D',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: horizontalScale(14),
@@ -335,14 +360,14 @@ const styles = StyleSheet.create({
     width: CIRCLE_SIZE * 0.45,
     height: CIRCLE_SIZE * 0.45,
     borderRadius: (CIRCLE_SIZE * 0.45) / 2,
-    backgroundColor: Colors.newOnboardingBg,
+    // backgroundColor: Colors.newOnboardingBg,
   },
   // Label
   optionLabel: {
     flex: 1,
-    fontFamily: FontFamilies.interMedium,
+    fontFamily: FontFamilies.sunlightDreams,
     fontWeight: '500',
-    fontSize: fontScale(16),
+    fontSize: fontScale(17),
     color: Colors.newOnboardingSubheading,
   },
   optionLabelSelected: {
@@ -356,19 +381,6 @@ const styles = StyleSheet.create({
   bottomSection: {
     paddingTop: verticalScale(10),
     paddingBottom: verticalScale(20),
-  },
-  continueButton: {
-    backgroundColor: Colors.white,
-    borderRadius: radiusScale(16),
-    paddingVertical: verticalScale(18),
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  continueButtonText: {
-    fontFamily: FontFamilies.interSemiBold,
-    fontWeight: '600',
-    fontSize: fontScale(16),
-    color: Colors.black,
   },
 });
 
