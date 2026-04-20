@@ -13,7 +13,6 @@ import {
   Image,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {useDispatch} from 'react-redux';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -36,8 +35,6 @@ import {
 import {hapticLight} from '../../utils/haptics';
 import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
-import {setGender} from '../../redux/slices/onboardingSlice';
-import type {AppDispatch} from '../../redux/store';
 import {OnboardingButton} from '../../components/OnboardingButton';
 
 // Icons
@@ -52,6 +49,7 @@ const ICON_SIZE = horizontalScale(120);
 interface OnboardingScreen4Props {
   onNext?: (gender: string | null) => void;
   onGoBack?: () => void;
+  gender?: string | null;
 }
 
 const GENDER_OPTIONS = [
@@ -110,9 +108,9 @@ const GenderOption: React.FC<GenderOptionProps> = ({
 export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
   onNext,
   onGoBack,
+  gender,
 }) => {
-  const dispatch = useDispatch<AppDispatch>();
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [selectedOption, setSelectedOption] = useState<string | null>(gender || null);
 
   useScreenView('OnboardingScreen4', {
     screen_category: 'onboarding',
@@ -120,15 +118,17 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
     total_steps: 9,
   });
 
-  const progressWidth = useSharedValue(22.2);
+  const CURRENT_STEP = 3;
+  const TOTAL_STEPS = 9;
+  const progressWidth = useSharedValue((CURRENT_STEP - 1) / TOTAL_STEPS * 100);
 
   useEffect(() => {
     firebaseService.logScreenView('OnboardingScreen4', 'OnboardingScreen4');
 
-    // Animate progress bar - Screen 3 of 9 (33.3%)
+    const targetProgress = (CURRENT_STEP / TOTAL_STEPS) * 100;
     progressWidth.value = withDelay(
       300,
-      withTiming(33.3, {duration: 800, easing: Easing.out(Easing.cubic)}),
+      withTiming(targetProgress, {duration: 800, easing: Easing.out(Easing.cubic)}),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -142,9 +142,8 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
   };
 
   const handleContinue = () => {
-    if (selectedOption) {
-      dispatch(setGender(selectedOption));
-    }
+    // Pass selection to container (can be null if user doesn't select)
+    // Default to null if no selection - gender is optional
     onNext?.(selectedOption);
   };
 
@@ -183,7 +182,7 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
               </View>
             </View>
 
-            <Text style={styles.stepCounter}>1/9</Text>
+            <Text style={styles.stepCounter}>{CURRENT_STEP}/{TOTAL_STEPS}</Text>
           </Animated.View>
 
           {/* Main Heading - Centered */}

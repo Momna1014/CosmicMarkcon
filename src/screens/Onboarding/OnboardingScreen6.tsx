@@ -35,9 +35,6 @@ import {hapticLight} from '../../utils/haptics';
 import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
 import {OnboardingButton} from '../../components/OnboardingButton';
-import {useSelector} from 'react-redux';
-import {selectGender} from '../../redux/slices/onboardingSlice';
-import type {RootState} from '../../redux/store';
 
 // Icons
 import BackArrowIcon from '../../assets/icons/new_onboarding/back_arrow.svg';
@@ -61,6 +58,7 @@ const NotToSayBackgroundImage = require('../../assets/icons/new_onboarding/not_s
 interface OnboardingScreen6Props {
   onNext?: () => void;
   onGoBack?: () => void;
+  gender?: string | null;
 }
 
 // Gradient Text Component
@@ -106,14 +104,15 @@ const BlurTab: React.FC<{icon: React.ReactNode; label: string; delay: number}> =
 export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
   onNext,
   onGoBack,
+  gender,
 }) => {
-  const gender = useSelector((state: RootState) => selectGender(state));
+  // Get appropriate background image based on gender selection
   const backgroundImage =
     gender === 'he_him'
       ? BoyBackgroundImage
       : gender === 'she_her'
       ? GirlBackgroundImage
-      : NotToSayBackgroundImage;
+      : NotToSayBackgroundImage; // Handles 'prefer_not_to_say' and null
 
   useScreenView('OnboardingScreen6', {
     screen_category: 'onboarding',

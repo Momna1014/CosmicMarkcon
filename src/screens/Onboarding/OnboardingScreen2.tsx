@@ -14,7 +14,6 @@ import {
   Image,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {useDispatch} from 'react-redux';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -40,8 +39,6 @@ import {
 } from '../../utils/onboardingAnalytics';
 import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
-import {setSeeking} from '../../redux/slices/onboardingSlice';
-import type {AppDispatch} from '../../redux/store';
 import {OnboardingButton} from '../../components/OnboardingButton';
 
 // Icons
@@ -133,7 +130,6 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
   onNext,
   onGoBack,
 }) => {
-  const dispatch = useDispatch<AppDispatch>();
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
 
   useScreenView('OnboardingScreen2', {
@@ -142,15 +138,18 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
     total_steps: 11,
   });
 
+  const CURRENT_STEP = 1;
+  const TOTAL_STEPS = 9;
   const progressWidth = useSharedValue(0);
 
   useEffect(() => {
     trackOnboarding2View();
     firebaseService.logScreenView('OnboardingScreen2', 'OnboardingScreen2');
 
+    const targetProgress = (CURRENT_STEP / TOTAL_STEPS) * 100;
     progressWidth.value = withDelay(
       300,
-      withTiming(11.1, {duration: 800, easing: Easing.out(Easing.cubic)}),
+      withTiming(targetProgress, {duration: 800, easing: Easing.out(Easing.cubic)}),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -168,9 +167,7 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
   };
 
   const handleContinue = () => {
-    if (selectedOptions.length > 0) {
-      dispatch(setSeeking(selectedOptions));
-    }
+    // Pass data to container, don't save to Redux yet
     onNext?.(selectedOptions);
   };
 
@@ -209,7 +206,7 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
               </View>
             </View>
 
-            <Text style={styles.stepCounter}>1/9</Text>
+            <Text style={styles.stepCounter}>{CURRENT_STEP}/{TOTAL_STEPS}</Text>
           </Animated.View>
 
           {/* Main Heading - Centered */}

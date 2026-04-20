@@ -65,6 +65,8 @@ export const styles = StyleSheet.create({
     textTransform: 'uppercase',
     fontWeight:'bold',
     marginLeft: horizontalScale(4),
+    maxWidth:moderateScale(170),
+    // backgroundColor:'red'
   },
   profileButton: {
     marginLeft: 'auto',

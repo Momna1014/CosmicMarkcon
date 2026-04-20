@@ -10,6 +10,10 @@ prepare_react_native_project!
 
 # Use static frameworks - required for Firebase Swift pods to generate proper headers
 use_frameworks! :linkage => :static
+$RNFirebaseAsStaticFramework = true
+
+# Fix for AppLovin + react-native-video AVFoundation factory conflict
+install! 'cocoapods', :deterministic_uuids => false
 
 # react-native-permissions configuration
 # Only include the permissions you need to reduce app size
@@ -44,14 +48,26 @@ target 'CosmicMarkcon' do
   # ========================================
   # AppLovin Mediation Adapters
   # ========================================
-  # Temporarily disabled Facebook adapter due to iOS build issues
+  # IMPORTANT: Some adapters are commented out due to conflicts with react-native-video
+  # 
+  # ISSUE: IronSource, Vungle, Mintegral, and Fyber adapters include their own video 
+  # players for video ads. These register AVFoundation component factories that conflict 
+  # with react-native-video, causing this crash at runtime:
+  #   "AddInstanceForFactory: No factory registered for id F8BB1C28-BAE8-11D6-9C31-00039315CD46"
+  #
+  # SAFE ADAPTERS (kept with modular headers isolation):
+  pod 'AppLovinMediationGoogleAdapter', :modular_headers => true  # ✅ Compatible
+  pod 'AppLovinMediationUnityAdsAdapter', :modular_headers => true  # ✅ Compatible
+  
+  # CONFLICTING ADAPTERS (contain video ad players that interfere with react-native-video):
+  # If you need these, test them individually with video playback to verify compatibility
+  # pod 'AppLovinMediationIronSourceAdapter'   # ❌ Contains IronSource video player
+  # pod 'AppLovinMediationVungleAdapter'       # ❌ Video-focused ad network
+  # pod 'AppLovinMediationMintegralAdapter'    # ❌ Heavy video ad components
+  # pod 'AppLovinMediationFyberAdapter'        # ❌ Video ad capabilities
+  
+  # Not currently needed:
   # pod 'AppLovinMediationFacebookAdapter'
-  pod 'AppLovinMediationGoogleAdapter'
-  pod 'AppLovinMediationUnityAdsAdapter'
-  pod 'AppLovinMediationIronSourceAdapter'
-  pod 'AppLovinMediationVungleAdapter'
-  pod 'AppLovinMediationMintegralAdapter'
-  pod 'AppLovinMediationFyberAdapter'
 
   use_react_native!(
     :path => config[:reactNativePath],
@@ -75,6 +91,30 @@ target 'CosmicMarkcon' do
         # Force dSYM generation for all pods
         config.build_settings['DEBUG_INFORMATION_FORMAT'] = 'dwarf-with-dsym'
         config.build_settings['GENERATE_DSYM'] = 'YES'
+        
+        # FIX: Enable modular headers for AppLovin adapters to prevent video factory conflicts
+        if target.name.start_with?('AppLovinMediation') || target.name == 'AppLovinSDK'
+          config.build_settings['DEFINES_MODULE'] = 'YES'
+          config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+          config.build_settings['CLANG_ENABLE_MODULES'] = 'YES'
+        end
+        
+        # FIX: Ensure react-native-video has priority for AVFoundation components
+        if target.name == 'react-native-video'
+          config.build_settings['DEFINES_MODULE'] = 'YES'
+          config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+          config.build_settings['CLANG_ENABLE_MODULES'] = 'YES'
+          # Give video library highest priority
+          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
+          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'RN_VIDEO_HAS_PRIORITY=1'
+        end
+        
+        # Additional isolation for video ad SDKs
+        if target.name.include?('IronSource') || target.name.include?('Vungle') || 
+           target.name.include?('Mintegral') || target.name.include?('Fyber')
+          config.build_settings['CLANG_ENABLE_MODULES'] = 'YES'
+          config.build_settings['DEFINES_MODULE'] = 'YES'
+        end
         
         # Fixes for AppLovin and related frameworks
         if target.name.include?('AppLovin')

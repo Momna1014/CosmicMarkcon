@@ -44,8 +44,6 @@ import {useAlert} from '../../contexts/AlertContext';
 import {AppDispatch} from '../../redux/store';
 import {DatePicker} from '../../components/DatePicker';
 import {
-  TimePickerModal,
-  TimePickerValue,
   CountryPickerModal,
   CityPickerModal,
 } from '../../components/pickers';
@@ -73,12 +71,11 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
   // Form state
   const [name, setName] = useState('');
   const [birthDate, setBirthDate] = useState<Date | null>(null);
-  const [timeValue, setTimeValue] = useState<TimePickerValue | null>(null);
   const [selectedCountry, setSelectedCountry] = useState<ICountry | null>(null);
   const [selectedCity, setSelectedCity] = useState<ICity | null>(null);
   const [countryHasCities, setCountryHasCities] = useState(false);
-  // Show profile card initially if user has completed onboarding (has name)
-  const [showProfileCard, setShowProfileCard] = useState(!!onboardingData.name);
+  // Show profile card initially if user has saved their birthday
+  const [showProfileCard, setShowProfileCard] = useState(!!onboardingData.birthday);
 
   // Entrance animations
   const headerFadeAnim = useRef(new Animated.Value(0)).current;
@@ -151,7 +148,6 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
   }, [checkPermissionStatus]);
 
   // Picker visibility
-  const [showTimePicker, setShowTimePicker] = useState(false);
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [showCityPicker, setShowCityPicker] = useState(false);
 
@@ -171,17 +167,6 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
     }
     if (onboardingData.birthday) {
       setBirthDate(new Date(onboardingData.birthday));
-    }
-    if (onboardingData.birthTime) {
-      // Parse time string like "10:30 AM" back to TimePickerValue
-      const timeParts = onboardingData.birthTime.match(/(\d+):(\d+)\s*(AM|PM)/i);
-      if (timeParts) {
-        setTimeValue({
-          hour: parseInt(timeParts[1], 10),
-          minute: parseInt(timeParts[2], 10),
-          ampm: timeParts[3].toUpperCase() as 'AM' | 'PM',
-        });
-      }
     }
     if (onboardingData.country) {
       // Find country by name
@@ -204,30 +189,14 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Format time value for display
-  const formatTimeDisplay = (time: TimePickerValue | null): string => {
-    if (!time) return '--:-- --';
-    const hourStr = String(time.hour).padStart(2, '0');
-    const minuteStr = String(time.minute).padStart(2, '0');
-    return `${hourStr}:${minuteStr} ${time.ampm}`;
-  };
-
-  // Format time value for storage
-  const formatTimeForStorage = (time: TimePickerValue | null): string => {
-    if (!time) return '';
-    const hourStr = String(time.hour).padStart(2, '0');
-    const minuteStr = String(time.minute).padStart(2, '0');
-    return `${hourStr}:${minuteStr} ${time.ampm}`;
-  };
-
   const handleSaveIdentity = () => {
-    if (!name.trim()) return;
+    // Only require birthDate to save
+    if (!birthDate) return;
 
     // Track which fields changed
     const changedFields: string[] = [];
-    if (name.trim() !== onboardingData.name) changedFields.push('name');
+    if (name.trim() && name.trim() !== onboardingData.name) changedFields.push('name');
     if (birthDate && birthDate.toISOString() !== onboardingData.birthday) changedFields.push('birthday');
-    if (timeValue && formatTimeForStorage(timeValue) !== onboardingData.birthTime) changedFields.push('birthTime');
     if (selectedCity?.name !== onboardingData.city) changedFields.push('city');
     if (selectedCountry?.name !== onboardingData.country) changedFields.push('country');
 
@@ -238,12 +207,10 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
 
     dispatch(
       saveOnboardingData({
-        alignment: onboardingData.alignment,
-        name: name.trim(),
-        birthday: birthDate ? birthDate.toISOString() : onboardingData.birthday,
-        birthTime: formatTimeForStorage(timeValue) || onboardingData.birthTime,
-        city: selectedCity?.name || onboardingData.city,
-        country: selectedCountry?.name || onboardingData.country || '',
+        name: name.trim(), // pass empty string to allow clearing saved name
+        birthday: birthDate.toISOString(),
+        city: selectedCity?.name || undefined,
+        country: selectedCountry?.name || undefined,
         zodiacSign: calculatedZodiacSign || undefined, // Use calculated zodiac sign
       }),
     );
@@ -290,20 +257,6 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
     }
   }, [isPremium, navigation]);
 
-  // Time picker handlers
-  const handleOpenTimePicker = useCallback(() => {
-    setShowTimePicker(true);
-  }, []);
-
-  const handleCloseTimePicker = useCallback(() => {
-    setShowTimePicker(false);
-  }, []);
-
-  const handleTimeConfirm = useCallback((value: TimePickerValue) => {
-    setTimeValue(value);
-    setShowTimePicker(false);
-  }, []);
-
   // Country picker handlers
   const handleOpenCountryPicker = useCallback(() => {
     setShowCountryPicker(true);
@@ -347,7 +300,7 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
       <View style={styles.formContent}>
         {/* Name Field */}
         <View style={styles.fieldContainer}>
-          <Text style={styles.fieldLabel}>NAME</Text>
+          <Text style={styles.fieldLabel}>NAME (OPT)</Text>
           <View style={styles.inputBox}>
             <TextInput
               style={styles.textInput}
@@ -361,7 +314,7 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
 
         {/* Birth Date Field */}
         <View style={styles.fieldContainer}>
-          <Text style={styles.fieldLabel}>BIRTH DATE</Text>
+          <Text style={styles.fieldLabel}>BIRTH DATE *</Text>
           <DatePicker
             value={birthDate}
             onChange={setBirthDate}
@@ -371,23 +324,9 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
           />
         </View>
 
-        {/* Time Field */}
-        <View style={styles.fieldContainer}>
-          <Text style={styles.fieldLabel}>TIME (OPT)</Text>
-          <TouchableOpacity style={styles.inputBox} onPress={handleOpenTimePicker}>
-            <Text
-              style={[
-                styles.inputText,
-                !timeValue && styles.placeholderText,
-              ]}>
-              {formatTimeDisplay(timeValue)}
-            </Text>
-          </TouchableOpacity>
-        </View>
-
         {/* Country Field */}
         <View style={styles.fieldContainer}>
-          <Text style={styles.fieldLabel}>COUNTRY</Text>
+          <Text style={styles.fieldLabel}>COUNTRY (OPT)</Text>
           <TouchableOpacity style={styles.inputBox} onPress={handleOpenCountryPicker}>
             <Text
               style={[
@@ -402,7 +341,7 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
         {/* City Field - Only show when country is selected and has cities */}
         {selectedCountry && countryHasCities && (
           <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>CITY</Text>
+            <Text style={styles.fieldLabel}>CITY (OPT)</Text>
             <TouchableOpacity style={styles.inputBox} onPress={handleOpenCityPicker}>
               <Text
                 style={[
@@ -418,9 +357,9 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
 
         {/* Save Button */}
         <TouchableOpacity
-          style={[styles.saveButton, !name.trim() && styles.saveButtonDisabled]}
+          style={[styles.saveButton, !birthDate && styles.saveButtonDisabled]}
           onPress={handleSaveIdentity}
-          disabled={!name.trim()}>
+          disabled={!birthDate}>
           <Text style={styles.saveButtonText}>Save Identity</Text>
           <Text style={styles.checkIcon}>✓</Text>
         </TouchableOpacity>
@@ -432,6 +371,14 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
     // Get first letter of name for avatar
     const displayName = name || onboardingData.name || '';
     const firstLetter = displayName.charAt(0).toUpperCase();
+    const hasName = !!(name || onboardingData.name);
+    
+    // Format birth date for display
+    const formatBirthDate = () => {
+      const date = birthDate || (onboardingData.birthday ? new Date(onboardingData.birthday) : null);
+      if (!date) return '';
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
     
     return (
       <View style={styles.glassCard}>
@@ -445,34 +392,68 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
         <View style={styles.profileContent}>
           {/* Profile Avatar */}
           <View style={styles.profileIcon}>
-            <Text style={styles.avatarText}>{firstLetter || '?'}</Text>
+            <Text style={styles.avatarText}>{firstLetter || '🌟'}</Text>
           </View>
 
           {/* Profile Info */}
           <View style={styles.profileInfo}>
-            <View style={styles.nameRow}>
-              <Text style={styles.profileName}>{name || onboardingData.name}</Text>
-              {/* Edit Button - in row with name */}
-              <TouchableOpacity 
-                style={styles.editButton} 
-                onPress={handleEditProfile}
-                activeOpacity={0.7}>
-                <Text style={styles.editButtonText}>Edit</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.profileDetails}>
-              <Text style={styles.zodiacBadge}>
-                {calculatedZodiacSign?.toUpperCase() || 'UNKNOWN'}
-              </Text>
-              {(selectedCity?.name || onboardingData.city) && (
-                <>
-                  <View style={styles.dot} />
-                  <Text style={styles.locationText}>
-                    {selectedCity?.name || onboardingData.city}
+            {hasName ? (
+              // Show name-based layout
+              <>
+                <View style={styles.nameRow}>
+                  <Text style={styles.profileName} numberOfLines={1}>{displayName}</Text>
+                  {/* Edit Button - in row with name */}
+                  <TouchableOpacity 
+                    style={styles.editButton} 
+                    onPress={handleEditProfile}
+                    activeOpacity={0.7}>
+                    <Text style={styles.editButtonText}>Edit</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.profileDetails}>
+                  <Text style={styles.zodiacBadge}>
+                    {calculatedZodiacSign?.toUpperCase() || 'UNKNOWN'}
                   </Text>
-                </>
-              )}
-            </View>
+                  {(selectedCity?.name || onboardingData.city) && (
+                    <>
+                      <View style={styles.dot} />
+                      <Text style={styles.locationText}>
+                        {selectedCity?.name || onboardingData.city}
+                      </Text>
+                    </>
+                  )}
+                </View>
+              </>
+            ) : (
+              // Show date/sign layout when no name
+              <>
+                <View style={styles.nameRow}>
+                  <View>
+                    <Text style={styles.profileName}>{formatBirthDate()}</Text>
+                    <View style={styles.profileDetails}>
+                      <Text style={styles.zodiacBadge}>
+                        {calculatedZodiacSign?.toUpperCase() || 'UNKNOWN'}
+                      </Text>
+                      {(selectedCity?.name || onboardingData.city) && (
+                        <>
+                          <View style={styles.dot} />
+                          <Text style={styles.locationText}>
+                            {selectedCity?.name || onboardingData.city}
+                          </Text>
+                        </>
+                      )}
+                    </View>
+                  </View>
+                  {/* Edit Button */}
+                  <TouchableOpacity 
+                    style={styles.editButton} 
+                    onPress={handleEditProfile}
+                    activeOpacity={0.7}>
+                    <Text style={styles.editButtonText}>Edit</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
           </View>
         </View>
       </View>
@@ -563,14 +544,6 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
           </ScrollView>
         </SafeAreaView>
       </ImageBackground>
-
-      {/* Time Picker Modal */}
-      <TimePickerModal
-        visible={showTimePicker}
-        onClose={handleCloseTimePicker}
-        onConfirm={handleTimeConfirm}
-        initialValue={timeValue || undefined}
-      />
 
       {/* Country Picker Modal */}
       <CountryPickerModal
