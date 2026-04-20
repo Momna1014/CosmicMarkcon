@@ -171,6 +171,7 @@ export const styles = StyleSheet.create({
     fontSize: fontScale(18),
     color: '#FFFFFF',
     marginRight: horizontalScale(10),
+    maxWidth:moderateScale(150)
   },
   profileDetails: {
     flexDirection: 'row',

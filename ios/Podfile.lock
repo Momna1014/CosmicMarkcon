@@ -9,25 +9,12 @@ PODS:
     - GoogleUtilities/Environment (~> 8.0)
     - GoogleUtilities/UserDefaults (~> 8.0)
     - PromisesObjC (~> 2.4)
-  - AppLovinMediationFyberAdapter (8.4.6.0):
-    - AppLovinSDK (>= 13.0.0)
-    - Fyber_Marketplace_SDK (= 8.4.6)
   - AppLovinMediationGoogleAdapter (13.2.0.0):
     - AppLovinSDK (>= 13.0.0)
     - Google-Mobile-Ads-SDK (= 13.2.0)
-  - AppLovinMediationIronSourceAdapter (9.4.0.0.0):
-    - AppLovinSDK (>= 13.0.0)
-    - IronSourceSDK/Ads (= 9.4.0.0)
-  - AppLovinMediationMintegralAdapter (8.1.1.0.0):
-    - AppLovinSDK (>= 13.0.0)
-    - MintegralAdSDK (= 8.1.1)
-    - MintegralAdSDK/BidSplashAd (= 8.1.1)
   - AppLovinMediationUnityAdsAdapter (4.17.0.0):
     - AppLovinSDK (>= 13.0.0)
     - UnityAds (= 4.17.0)
-  - AppLovinMediationVungleAdapter (7.7.1.0):
-    - AppLovinSDK (>= 13.0.0)
-    - VungleAds (= 7.7.1)
   - AppLovinSDK (13.6.1)
   - AppsFlyerFramework (6.17.9):
     - AppsFlyerFramework/Main (= 6.17.9)
@@ -148,7 +135,6 @@ PODS:
     - PromisesSwift (~> 2.1)
   - FirebaseSharedSwift (12.10.0)
   - fmt (11.0.2)
-  - Fyber_Marketplace_SDK (8.4.6)
   - glog (0.3.5)
   - Google-Mobile-Ads-SDK (13.2.0):
     - GoogleUserMessagingPlatform (>= 1.1)
@@ -221,7 +207,6 @@ PODS:
   - hermes-engine (0.82.1):
     - hermes-engine/Pre-built (= 0.82.1)
   - hermes-engine/Pre-built (0.82.1)
-  - IronSourceSDK/Ads (9.4.0.0)
   - libwebp (1.5.0):
     - libwebp/demux (= 1.5.0)
     - libwebp/mux (= 1.5.0)
@@ -264,46 +249,6 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - MintegralAdSDK (8.1.1):
-    - MintegralAdSDK/BannerAd (= 8.1.1)
-    - MintegralAdSDK/BidBannerAd (= 8.1.1)
-    - MintegralAdSDK/BidInterstitialVideoAd (= 8.1.1)
-    - MintegralAdSDK/BidNativeAd (= 8.1.1)
-    - MintegralAdSDK/BidNewInterstitialAd (= 8.1.1)
-    - MintegralAdSDK/BidRewardVideoAd (= 8.1.1)
-    - MintegralAdSDK/InterstitialVideoAd (= 8.1.1)
-    - MintegralAdSDK/NativeAd (= 8.1.1)
-    - MintegralAdSDK/NewInterstitialAd (= 8.1.1)
-    - MintegralAdSDK/RewardVideoAd (= 8.1.1)
-  - MintegralAdSDK/BannerAd (8.1.1):
-    - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/BidBannerAd (8.1.1):
-    - MintegralAdSDK/BannerAd
-    - MintegralAdSDK/BidNativeAd
-  - MintegralAdSDK/BidInterstitialVideoAd (8.1.1):
-    - MintegralAdSDK/BidNativeAd
-    - MintegralAdSDK/InterstitialVideoAd
-  - MintegralAdSDK/BidNativeAd (8.1.1):
-    - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/BidNewInterstitialAd (8.1.1):
-    - MintegralAdSDK/BidNativeAd
-    - MintegralAdSDK/NewInterstitialAd
-  - MintegralAdSDK/BidRewardVideoAd (8.1.1):
-    - MintegralAdSDK/BidNativeAd
-    - MintegralAdSDK/RewardVideoAd
-  - MintegralAdSDK/BidSplashAd (8.1.1):
-    - MintegralAdSDK/BidNativeAd
-    - MintegralAdSDK/SplashAd
-  - MintegralAdSDK/InterstitialVideoAd (8.1.1):
-    - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/NativeAd (8.1.1)
-  - MintegralAdSDK/NewInterstitialAd (8.1.1):
-    - MintegralAdSDK/InterstitialVideoAd
-    - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/RewardVideoAd (8.1.1):
-    - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/SplashAd (8.1.1):
-    - MintegralAdSDK/NativeAd
   - MMKVCore (2.4.0)
   - nanopb (3.30910.0):
     - nanopb/decode (= 3.30910.0)
@@ -2487,7 +2432,7 @@ PODS:
     - Yoga
   - react-native-tracking-transparency (0.1.2):
     - React
-  - react-native-usercentrics (2.26.1):
+  - react-native-usercentrics (2.26.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -2514,7 +2459,93 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - SocketRocket
-    - UsercentricsUI (= 2.26.1)
+    - UsercentricsUI (= 2.26.2)
+    - Yoga
+  - react-native-video (6.19.1):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - react-native-video/Video (= 6.19.1)
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - Yoga
+  - react-native-video/Fabric (6.19.1):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - Yoga
+  - react-native-video/Video (6.19.1):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - react-native-video/Fabric
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
     - Yoga
   - React-NativeModulesApple (0.82.1):
     - boost
@@ -3173,6 +3204,34 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
+  - RNDateTimePicker (9.1.0):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - Yoga
   - RNDeviceInfo (15.0.2):
     - React-Core
   - RNFastImage (8.6.3):
@@ -3667,7 +3726,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNSentry (8.7.0):
+  - RNSentry (8.8.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3694,7 +3753,7 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - Sentry (= 9.8.0)
+    - Sentry (= 9.10.0)
     - SocketRocket
     - Yoga
   - RNShare (12.2.6):
@@ -3905,24 +3964,19 @@ PODS:
   - SDWebImageWebPCoder (0.8.5):
     - libwebp (~> 1.0)
     - SDWebImage/Core (~> 5.10)
-  - Sentry (9.8.0):
-    - Sentry/Core (= 9.8.0)
-  - Sentry/Core (9.8.0)
+  - Sentry (9.10.0):
+    - Sentry/Core (= 9.10.0)
+  - Sentry/Core (9.10.0)
   - SocketRocket (0.7.1)
   - UnityAds (4.17.0)
-  - Usercentrics (2.26.1)
-  - UsercentricsUI (2.26.1):
-    - Usercentrics (= 2.26.1)
-  - VungleAds (7.7.1)
+  - Usercentrics (2.26.2)
+  - UsercentricsUI (2.26.2):
+    - Usercentrics (= 2.26.2)
   - Yoga (0.0.0)
 
 DEPENDENCIES:
-  - AppLovinMediationFyberAdapter
   - AppLovinMediationGoogleAdapter
-  - AppLovinMediationIronSourceAdapter
-  - AppLovinMediationMintegralAdapter
   - AppLovinMediationUnityAdsAdapter
-  - AppLovinMediationVungleAdapter
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - BVLinearGradient (from `../node_modules/react-native-linear-gradient`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
@@ -3991,6 +4045,7 @@ DEPENDENCIES:
   - "react-native-slider (from `../node_modules/@react-native-community/slider`)"
   - react-native-tracking-transparency (from `../node_modules/react-native-tracking-transparency`)
   - "react-native-usercentrics (from `../node_modules/@usercentrics/react-native-sdk`)"
+  - react-native-video (from `../node_modules/react-native-video`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-oscompat (from `../node_modules/react-native/ReactCommon/oscompat`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -4029,6 +4084,7 @@ DEPENDENCIES:
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCClipboard (from `../node_modules/@react-native-clipboard/clipboard`)"
   - "RNCMaskedView (from `../node_modules/@react-native-masked-view/masked-view`)"
+  - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNFastImage (from `../node_modules/react-native-fast-image`)
   - "RNFBAnalytics (from `../node_modules/@react-native-firebase/analytics`)"
@@ -4060,12 +4116,8 @@ SPEC REPOS:
   trunk:
     - AppAuth
     - AppCheckCore
-    - AppLovinMediationFyberAdapter
     - AppLovinMediationGoogleAdapter
-    - AppLovinMediationIronSourceAdapter
-    - AppLovinMediationMintegralAdapter
     - AppLovinMediationUnityAdsAdapter
-    - AppLovinMediationVungleAdapter
     - AppLovinSDK
     - AppsFlyerFramework
     - FBAEMKit
@@ -4090,7 +4142,6 @@ SPEC REPOS:
     - FirebaseRemoteConfigInterop
     - FirebaseSessions
     - FirebaseSharedSwift
-    - Fyber_Marketplace_SDK
     - Google-Mobile-Ads-SDK
     - GoogleAppMeasurement
     - GoogleDataTransport
@@ -4099,10 +4150,8 @@ SPEC REPOS:
     - GoogleUtilities
     - GTMAppAuth
     - GTMSessionFetcher
-    - IronSourceSDK
     - libwebp
     - lottie-ios
-    - MintegralAdSDK
     - MMKVCore
     - nanopb
     - PromisesObjC
@@ -4119,7 +4168,6 @@ SPEC REPOS:
     - UnityAds
     - Usercentrics
     - UsercentricsUI
-    - VungleAds
 
 EXTERNAL SOURCES:
   boost:
@@ -4237,6 +4285,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-tracking-transparency"
   react-native-usercentrics:
     :path: "../node_modules/@usercentrics/react-native-sdk"
+  react-native-video:
+    :path: "../node_modules/react-native-video"
   React-NativeModulesApple:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios"
   React-oscompat:
@@ -4311,6 +4361,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-clipboard/clipboard"
   RNCMaskedView:
     :path: "../node_modules/@react-native-masked-view/masked-view"
+  RNDateTimePicker:
+    :path: "../node_modules/@react-native-community/datetimepicker"
   RNDeviceInfo:
     :path: "../node_modules/react-native-device-info"
   RNFastImage:
@@ -4365,12 +4417,8 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   AppAuth: 1c1a8afa7e12f2ec3a294d9882dfa5ab7d3cb063
   AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
-  AppLovinMediationFyberAdapter: 654a51e36f046038125e21b284b57388a60ab979
   AppLovinMediationGoogleAdapter: fea0cb088ca9795d299b899453d926f1b6dc3d48
-  AppLovinMediationIronSourceAdapter: 9acfc9a05f9025ce45670591b3dd37a24a7e7d7e
-  AppLovinMediationMintegralAdapter: 2e481d894423ffdc6e47cae2f3f76ae780d723fc
   AppLovinMediationUnityAdsAdapter: 23afa95da0fc9c02c868f583a682d95811447bf4
-  AppLovinMediationVungleAdapter: fc35519fbe9b3860d3d46ec69b0f0a090ff593a8
   AppLovinSDK: fb0795377cc861aa8813019ddc5d05fbd998c527
   AppsFlyerFramework: 4f9a8237d40e9093941aef760cd77d606238aedd
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
@@ -4401,7 +4449,6 @@ SPEC CHECKSUMS:
   FirebaseSessions: dba7635960740ad77cc2f3387d90ff22a7942f82
   FirebaseSharedSwift: 3d1e448b7202e36821a492941c84592d1308ea14
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
-  Fyber_Marketplace_SDK: cedfa90cc2da9e549de1b8134965abb63bb8cf67
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   Google-Mobile-Ads-SDK: f0365e190d66539c65cea8ded43e2c367abb5477
   GoogleAppMeasurement: 57270ccc2b77472d7e85c4cbe45972564eff78bb
@@ -4412,11 +4459,9 @@ SPEC CHECKSUMS:
   GTMAppAuth: 217a876b249c3c585a54fd6f73e6b58c4f5c4238
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
   hermes-engine: 273e30e7fb618279934b0b95ffab60ecedb7acf5
-  IronSourceSDK: 8112211f22915d2633a2a152d327b184fe80bf05
   libwebp: 02b23773aedb6ff1fd38cec7a77b81414c6842a8
   lottie-ios: 8f959969761e9c45d70353667d00af0e5b9cadb3
   lottie-react-native: e542fe4b6e8eddcf893d5a8cef9f8b5c6d2f7331
-  MintegralAdSDK: 4325769f93ef336237799b5fb455335985fbc8b7
   MMKVCore: 3d16ce9f7d411e135020915fde98a056859a1efa
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   NitroMmkv: 473645d604aa4975981a158403c6291c329695a6
@@ -4470,7 +4515,8 @@ SPEC CHECKSUMS:
   react-native-safe-area-context: eda63a662750758c1fdd7e719c9f1026c8d161cb
   react-native-slider: 205c30f4f19af8469c1c24bd4e3ec74038576a67
   react-native-tracking-transparency: 15eb319f2b982070eb9831582af27d87badfa624
-  react-native-usercentrics: 8796ab5716207ea606815e43bce260b2c73b40b5
+  react-native-usercentrics: 14eb286f5a9ce2139840b558ed48e1c8fc986040
+  react-native-video: e6d6557fe7d997e7ceeb60c995d1e1da7a4120c2
   React-NativeModulesApple: efd0906463c79d9b86197dbcf0d58358dff8c5ed
   React-oscompat: 95875e81f5d4b3c7b2c888d5bd2c9d83450d8bdb
   React-perflogger: 2e229bf33e42c094fd64516d89ec1187a2b79b5b
@@ -4511,14 +4557,15 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: fd44f4b03e007e642e98df6726737bc66e9ba609
   RNCClipboard: e560338bf6cc4656a09ff90610b62ddc0dbdad65
   RNCMaskedView: d707a83784c67099b54b37d056ababb2767ce15e
+  RNDateTimePicker: ea25d20659754bfe1014e0d5905d21dbc18ff705
   RNDeviceInfo: 4c852998208b60dc192ae3529e5867817719ad1e
   RNFastImage: 462a183c4b0b6b26fdfd639e1ed6ba37536c3b87
-  RNFBAnalytics: e7367b7cd0c1d1d6629d9f38de760ad6ae510a7b
-  RNFBApp: 66e966d59c12c1cad8822b69b4ac1be42e7c4964
-  RNFBAuth: 22fc2c67a731a481a2f91d786f761860c80f9363
-  RNFBCrashlytics: dd5ecf4ebfecd49a8f288d05fd2687069618de54
-  RNFBMessaging: 4052eb5e3f12cf31db9e2e7d7f565963eab9757a
-  RNFBRemoteConfig: 3a7ac2dc6fafa576f006f2511dae5e25adf7ab84
+  RNFBAnalytics: 8f676c267a135e69e1b815c197d1175a1ebd1792
+  RNFBApp: 3f43568008b1abdef6b743ecb62829ff9fb27b0d
+  RNFBAuth: 43305aadcbd625111a62b2c54dc0b60604f9b480
+  RNFBCrashlytics: 11f5d651f74e66d9b7ac3d4ce93b246d1378521d
+  RNFBMessaging: dff0aeb50318ffdd93d4e36f955103b169bdef16
+  RNFBRemoteConfig: fe16838345a0a2a614d0112f0a502f6aa42033cd
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
   RNGestureHandler: de4375c25168dc88d886f75613bec94999b12e9a
   RNGoogleSignin: 32eac25be182674a2838c8bf6908c0296fe3bb5d
@@ -4530,21 +4577,20 @@ SPEC CHECKSUMS:
   RNReactNativeHapticFeedback: b9623bdeb59a778ca905e97035d5cc73a15d00f3
   RNReanimated: ecf18b922b76ec41a859143671a7841f68f899fd
   RNScreens: e902eba58a27d3ad399a495d578e8aba3ea0f490
-  RNSentry: 67d50593363789905dde212b2fcab30a4f8b1846
+  RNSentry: 264c4577c15cf790476b0e8846abd67421d10bbe
   RNShare: 046ed18f676242d46dad6186524dbfee3edb49bd
   RNSVG: c1938943ce78bfcda88009518b33547676f48886
   RNVectorIcons: e355dd0998d6b9020e560922a66614eb9636501b
   RNWorklets: 9fe22307fb611f506096f854caace756c20aecb4
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
-  Sentry: 88746bf877eff714bc45315a39ad1d1efea2cdda
+  Sentry: 4e85b40e4b0235853f40f959d315a6b28e3148d8
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   UnityAds: adbe0d522fd14b8298c5e159164fc43396165843
-  Usercentrics: add954fa1e0a1cfde768e350f895252b72bc6c1f
-  UsercentricsUI: c1491664512f56c68425da2d270d94ba48a470f9
-  VungleAds: c1f0dd0d8531b200b9f6a3f78e292ded75540eae
+  Usercentrics: 26f9f31e4e83cc0de49c3913577c6a819ba172f8
+  UsercentricsUI: 3ed95d8cae63a71e67c28402e8fe7367e2b14179
   Yoga: 526f25666395d30c297d53154398ffd249eaf9e1
 
-PODFILE CHECKSUM: 39a4f441c37646c2b6dca2cf46dd4494c714ed97
+PODFILE CHECKSUM: 9c53963b365050e7862913cca4519dde0e83a9e7
 
 COCOAPODS: 1.16.2

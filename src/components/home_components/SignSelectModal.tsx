@@ -45,16 +45,16 @@ export interface ZodiacSignItem {
 
 // Zodiac signs data
 const ZODIAC_SIGNS: ZodiacSignItem[] = [
-  {id: 'gemini', name: 'Gemini', displayName: 'Geminis'},
-  {id: 'taurus', name: 'Taurus', displayName: 'Tauro'},
+  {id: 'gemini', name: 'Gemini', displayName: 'Gemini'},
+  {id: 'taurus', name: 'Taurus', displayName: 'Taurus'},
   {id: 'aries', name: 'Aries', displayName: 'Aries'},
   {id: 'cancer', name: 'Cancer', displayName: 'Cancer'},
-  {id: 'capricorn', name: 'Capricorn', displayName: 'Capricornio'},
+  {id: 'capricorn', name: 'Capricorn', displayName: 'Capricorn'},
   {id: 'virgo', name: 'Virgo', displayName: 'Virgo'},
-  {id: 'pisces', name: 'Pisces', displayName: 'Piscis'},
-  {id: 'aquarius', name: 'Aquarius', displayName: 'Acuario'},
-  {id: 'scorpio', name: 'Scorpio', displayName: 'Escorpio'},
-  {id: 'sagittarius', name: 'Sagittarius', displayName: 'Sagitario'},
+  {id: 'pisces', name: 'Pisces', displayName: 'Pisces'},
+  {id: 'aquarius', name: 'Aquarius', displayName: 'Aquarius'},
+  {id: 'scorpio', name: 'Scorpio', displayName: 'Scorpio'},
+  {id: 'sagittarius', name: 'Sagittarius', displayName: 'Sagittarius'},
   {id: 'leo', name: 'Leo', displayName: 'Leo'},
   {id: 'libra', name: 'Libra', displayName: 'Libra'},
 ];

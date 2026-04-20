@@ -4,51 +4,37 @@ import {RootState} from '../rootReducer';
 /**
  * Onboarding Data Slice
  * 
- * Stores all user data collected during onboarding:
- * - Life alignment selection
- * - Name
- * - Birthday and zodiac sign
- * - Birth time
- * - Birth location (city, country)
+ * Stores essential user data collected during onboarding:
+ * - Gender identity (optional)
+ * - Name (optional)
+ * - Birthday and zodiac sign (REQUIRED - main field)
+ * - Birth location (city, country) (optional)
  * 
  * This data is persisted and used throughout the app for:
  * - Horoscope calculations
  * - Personalized readings
  * - User profile display
+ * 
+ * Note: Only birthday is required. All other fields are optional.
  */
-
-// Alignment options from Screen 1
-export type AlignmentOption = 'in-my-flow' | 'figuring-it-out' | 'totally-lost' | null;
 
 /**
  * Onboarding State Interface
  */
 export interface OnboardingState {
-  // Screen 1: Life alignment
-  alignment: AlignmentOption;
-
-  // Screen 2: What are you seeking
-  seeking: string[];
-
-  // Screen 3: Where do you seek clarity
-  clarity: string[];
-
-  // Screen 4: Gender identity
+  // Screen 4: Gender identity (optional)
   gender: string | null;
   
-  // Screen 2 (old) / Screen 3 (new): User's name
+  // Screen 5: User's name (optional)
   name: string;
   
-  // Screen 3: Birthday (stored as ISO string for serialization)
+  // Screen 7: Birthday (stored as ISO string for serialization) - REQUIRED
   birthday: string | null;
   
   // Derived from birthday
   zodiacSign: string | null;
   
-  // Screen 9: Birth time
-  birthTime: string;
-  
-  // Screen 9: Birth location
+  // Screen 8: Birth location (optional)
   city: string;
   country: string;
   
@@ -63,14 +49,10 @@ export interface OnboardingState {
  * Initial State
  */
 const initialState: OnboardingState = {
-  alignment: null,
-  seeking: [],
-  clarity: [],
   gender: null,
   name: '',
   birthday: null,
   zodiacSign: null,
-  birthTime: '',
   city: '',
   country: '',
   completedAt: null,
@@ -80,14 +62,14 @@ const initialState: OnboardingState = {
 /**
  * Payload for saving complete onboarding data
  * Note: birthday should be passed as ISO string to avoid non-serializable warning
+ * Only birthday is required, all other fields are optional
  */
 export interface SaveOnboardingDataPayload {
-  alignment: AlignmentOption;
-  name: string;
-  birthday: string | null; // ISO string format
-  birthTime: string;
-  city: string;
-  country: string;
+  gender?: string | null;
+  name?: string;
+  birthday: string | null; // ISO string format - REQUIRED
+  city?: string;
+  country?: string;
   zodiacSign?: string;
 }
 
@@ -99,31 +81,7 @@ const onboardingSlice = createSlice({
   initialState,
   reducers: {
     /**
-     * Set life alignment selection (Screen 1)
-     */
-    setAlignment: (state, action: PayloadAction<AlignmentOption>) => {
-      state.alignment = action.payload;
-      console.log('📊 [Redux] Alignment set:', action.payload);
-    },
-
-    /**
-     * Set seeking choices (Screen 2)
-     */
-    setSeeking: (state, action: PayloadAction<string[]>) => {
-      state.seeking = action.payload;
-      console.log('📊 [Redux] Seeking set:', action.payload);
-    },
-
-    /**
-     * Set clarity choices (Screen 3)
-     */
-    setClarity: (state, action: PayloadAction<string[]>) => {
-      state.clarity = action.payload;
-      console.log('📊 [Redux] Clarity set:', action.payload);
-    },
-
-    /**
-     * Set gender identity (Screen 4)
+     * Set gender identity (Screen 4) - Optional
      */
     setGender: (state, action: PayloadAction<string | null>) => {
       state.gender = action.payload;
@@ -131,7 +89,7 @@ const onboardingSlice = createSlice({
     },
 
     /**
-     * Set user's name (Screen 2)
+     * Set user's name (Screen 5) - Optional
      */
     setName: (state, action: PayloadAction<string>) => {
       state.name = action.payload;
@@ -139,25 +97,18 @@ const onboardingSlice = createSlice({
     },
 
     /**
-     * Set birthday and zodiac sign (Screen 3)
+     * Set birthday and zodiac sign (Screen 7) - REQUIRED
+     * Note: birthday should be passed as ISO string to avoid serialization warnings
      */
-    setBirthday: (state, action: PayloadAction<{birthday: Date; zodiacSign: string}>) => {
-      state.birthday = action.payload.birthday.toISOString();
+    setBirthday: (state, action: PayloadAction<{birthday: string; zodiacSign: string}>) => {
+      state.birthday = action.payload.birthday;
       state.zodiacSign = action.payload.zodiacSign;
-      console.log('📊 [Redux] Birthday set:', action.payload.birthday.toISOString());
+      console.log('📊 [Redux] Birthday set:', action.payload.birthday);
       console.log('📊 [Redux] Zodiac sign:', action.payload.zodiacSign);
     },
 
     /**
-     * Set birth time (Screen 9)
-     */
-    setBirthTime: (state, action: PayloadAction<string>) => {
-      state.birthTime = action.payload;
-      console.log('📊 [Redux] Birth time set:', action.payload);
-    },
-
-    /**
-     * Set birth location (Screen 9)
+     * Set birth location (Screen 8) - Optional
      */
     setBirthLocation: (state, action: PayloadAction<{city: string; country: string}>) => {
       state.city = action.payload.city;
@@ -166,25 +117,21 @@ const onboardingSlice = createSlice({
     },
 
     /**
-     * Save all onboarding data at once (Screen 10)
-     * Called when progress bar completes
+     * Save all onboarding data at once (Screen 9 - "Explore Insights" button)
+     * Called when user completes onboarding
+     * Only birthday is required, all other fields are optional
      */
     saveOnboardingData: (state, action: PayloadAction<SaveOnboardingDataPayload>) => {
-      const {alignment, name, birthday, birthTime, city, country, zodiacSign} = action.payload;
+      const {gender, name, birthday, city, country, zodiacSign} = action.payload;
       
       console.log('\n========================================');
-      console.log('🎯 [Redux] SAVING COMPLETE ONBOARDING DATA');
+      console.log('🎯 [Redux] SAVING ONBOARDING DATA');
       console.log('========================================');
       
-      state.alignment = alignment;
-      console.log('📊 Alignment:', alignment);
-      
-      state.name = name;
-      console.log('📊 Name:', name);
-      
+      // Birthday is required
       if (birthday) {
-        state.birthday = birthday; // Already an ISO string
-        console.log('📊 Birthday:', birthday);
+        state.birthday = birthday;
+        console.log('📊 Birthday (REQUIRED):', birthday);
       }
       
       if (zodiacSign) {
@@ -192,12 +139,26 @@ const onboardingSlice = createSlice({
         console.log('📊 Zodiac Sign:', zodiacSign);
       }
       
-      state.birthTime = birthTime;
-      console.log('📊 Birth Time:', birthTime);
+      // Optional fields
+      if (gender !== undefined && gender !== null) {
+        state.gender = gender;
+        console.log('📊 Gender (optional):', gender);
+      }
       
-      state.city = city;
-      state.country = country;
-      console.log('📊 Birth Location:', city, ',', country);
+      if (name !== undefined) {
+        state.name = name; // empty string clears the name
+        console.log('📊 Name (optional):', name || '(cleared)');
+      }
+      
+      if (city) {
+        state.city = city;
+        console.log('📊 City (optional):', city);
+      }
+      
+      if (country) {
+        state.country = country;
+        console.log('📊 Country (optional):', country);
+      }
       
       state.completedAt = new Date().toISOString();
       state.isDataSaved = true;
@@ -221,13 +182,9 @@ const onboardingSlice = createSlice({
 
 // Export actions
 export const {
-  setAlignment,
-  setSeeking,
-  setClarity,
   setGender,
   setName,
   setBirthday,
-  setBirthTime,
   setBirthLocation,
   saveOnboardingData,
   clearOnboardingData,
@@ -258,32 +215,12 @@ export const selectBirthday = (state: RootState) => {
 };
 
 /**
- * Select user's birth time
- */
-export const selectBirthTime = (state: RootState) => state.onboarding.birthTime;
-
-/**
  * Select user's birth location
  */
 export const selectBirthLocation = (state: RootState) => ({
   city: state.onboarding.city,
   country: state.onboarding.country,
 });
-
-/**
- * Select user's alignment
- */
-export const selectAlignment = (state: RootState) => state.onboarding.alignment;
-
-/**
- * Select user's seeking choices
- */
-export const selectSeeking = (state: RootState) => state.onboarding.seeking;
-
-/**
- * Select user's clarity choices
- */
-export const selectClarity = (state: RootState) => state.onboarding.clarity;
 
 /**
  * Select user's gender identity

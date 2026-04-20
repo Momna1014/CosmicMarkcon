@@ -18,7 +18,6 @@ import {
   Image,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {useDispatch, useSelector} from 'react-redux';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -41,8 +40,6 @@ import {
 import {hapticLight} from '../../utils/haptics';
 import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
-import {setName, selectGender} from '../../redux/slices/onboardingSlice';
-import type {AppDispatch, RootState} from '../../redux/store';
 import {OnboardingButton} from '../../components/OnboardingButton';
 
 // Icons
@@ -57,14 +54,14 @@ const ICON_SIZE = horizontalScale(200);
 interface OnboardingScreen5Props {
   onNext?: (name: string) => void;
   onGoBack?: () => void;
+  gender?: string | null; // Passed from container
 }
 
 export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
   onNext,
   onGoBack,
+  gender,
 }) => {
-  const dispatch = useDispatch<AppDispatch>();
-  const gender = useSelector((state: RootState) => selectGender(state));
   const [name, setNameState] = useState('');
 
   useScreenView('OnboardingScreen5', {
@@ -73,15 +70,17 @@ export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
     total_steps: 9,
   });
 
-  const progressWidth = useSharedValue(33.3);
+  const CURRENT_STEP = 4;
+  const TOTAL_STEPS = 9;
+  const progressWidth = useSharedValue((CURRENT_STEP - 1) / TOTAL_STEPS * 100);
 
   useEffect(() => {
     firebaseService.logScreenView('OnboardingScreen5', 'OnboardingScreen5');
 
-    // Animate progress bar - Screen 4 of 9 (44.4%)
+    const targetProgress = (CURRENT_STEP / TOTAL_STEPS) * 100;
     progressWidth.value = withDelay(
       300,
-      withTiming(44.4, {duration: 800, easing: Easing.out(Easing.cubic)}),
+      withTiming(targetProgress, {duration: 800, easing: Easing.out(Easing.cubic)}),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -97,6 +96,7 @@ export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
         return HimImg;
       case 'she_her':
         return HerImg;
+      case 'prefer_not_to_say':
       default:
         return NotToSayImg;
     }
@@ -104,9 +104,7 @@ export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
 
   const handleContinue = () => {
     const trimmedName = name.trim();
-    if (trimmedName) {
-      dispatch(setName(trimmedName));
-    }
+    // Pass name to container, don't save to Redux yet (name is optional)
     onNext?.(trimmedName);
   };
 
@@ -150,7 +148,7 @@ export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
                   </View>
                 </View>
 
-                <Text style={styles.stepCounter}>1/9</Text>
+                <Text style={styles.stepCounter}>{CURRENT_STEP}/{TOTAL_STEPS}</Text>
               </Animated.View>
 
               {/* Gender Icon - Centered */}

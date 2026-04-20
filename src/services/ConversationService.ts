@@ -74,12 +74,11 @@ export interface LoveMatchResult {
  * User profile data extracted from onboarding
  */
 interface UserProfile {
-  name: string;
-  birthday: string;
-  zodiacSign: string;
-  birthTime: string;
-  city: string;
-  country: string;
+  name?: string;
+  birthday: string; // Required
+  zodiacSign: string; // Required
+  city?: string;
+  country?: string;
 }
 
 /**
@@ -103,12 +102,11 @@ class ConversationService {
     const state = store.getState();
     const onboarding = state.onboarding;
     return {
-      name: onboarding.name || 'User',
+      name: onboarding.name,
       birthday: onboarding.birthday || '',
       zodiacSign: onboarding.zodiacSign || 'Aries',
-      birthTime: onboarding.birthTime || '',
-      city: onboarding.city || '',
-      country: onboarding.country || '',
+      city: onboarding.city,
+      country: onboarding.country,
     };
   }
 
@@ -165,18 +163,18 @@ class ConversationService {
 
     console.log('🌌 [ConversationService] Fetching cosmic home data...');
     console.log('📅 Date:', today);
-    console.log('👤 User:', user.name, '| Sign:', user.zodiacSign);
+    console.log('👤 User:', user.name || 'Anonymous', '| Sign:', user.zodiacSign);
 
     const systemPrompt = `You are an expert astrologer AI. You provide accurate, personalized daily horoscope readings and real-time planetary transit information. Always respond in valid JSON format.`;
+
+    // Build optional profile details
+    const locationInfo = user.city && user.country ? `\n- Birth Location: ${user.city}, ${user.country}` : '';
 
     const userPrompt = `Today is ${today}.
 
 User Profile:
-- Name: ${user.name}
 - Birthday: ${user.birthday}
-- Zodiac Sign: ${user.zodiacSign}
-- Birth Time: ${user.birthTime}
-- Birth City: ${user.city}, ${user.country}
+- Zodiac Sign: ${user.zodiacSign}${locationInfo}
 
 Provide the following in JSON format:
 
@@ -244,13 +242,18 @@ Return ONLY valid JSON with keys "dailyEnergy" and "transits".`;
 
     console.log('🔮 [ConversationService] Fetching horoscope bundle...');
     console.log('📅 Today:', todayKey, '| Tomorrow:', tomorrowKey);
-    console.log('👤 User:', user.name, '| Sign:', user.zodiacSign);
+    console.log('👤 User:', user.name || 'Anonymous', '| Sign:', user.zodiacSign);
 
     const systemPrompt = `You are an expert astrologer AI. Provide accurate, sign-specific horoscope readings. Respond in valid JSON only.`;
 
+    // Build optional profile details
+    const locationInfo = user.city && user.country ? ` from ${user.city}, ${user.country}` : '';
+
     const userPrompt = `Today is ${todayLabel}. Tomorrow is ${tomorrowLabel}.
 
-User: ${user.name}, ${user.zodiacSign}, born ${user.birthday} at ${user.birthTime} in ${user.city}, ${user.country}.
+User Profile:
+- Zodiac Sign: ${user.zodiacSign}
+- Birthday: ${user.birthday}${locationInfo}
 
 Return JSON with keys "days" and "weekly".
 

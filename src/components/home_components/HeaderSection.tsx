@@ -29,8 +29,14 @@ const HeaderSection: React.FC<HeaderSectionProps> = memo(({userName, title = 'AS
           style={styles.welcomeIcon}
         />
         <View style={styles.welcomeTextContainer}>
-          <Text style={styles.welcomeLabel}>WELCOME,</Text>
-          <Text style={styles.welcomeName}>{userName}</Text>
+          {userName ? (
+            <>
+              <Text style={styles.welcomeLabel}>WELCOME,</Text>
+              <Text style={styles.welcomeName} numberOfLines={1}  >{userName}</Text>
+            </>
+          ) : (
+            <Text style={styles.welcomeLabel}>WELCOME</Text>
+          )}
         </View>
         {onProfilePress && (
           <TouchableOpacity

@@ -1052,9 +1052,9 @@
     "@types/hammerjs" "^2.0.36"
 
 "@emnapi/runtime@^1.7.0":
-  version "1.9.2"
-  resolved "https://registry.yarnpkg.com/@emnapi/runtime/-/runtime-1.9.2.tgz#8b469a3db160817cadb1de9050211a9d1ea84fa2"
-  integrity sha512-3U4+MIWHImeyu1wnmVygh5WlgfYDtyf0k8AbLhMFxOipihf6nrWC4syIm/SwEeec0mNSafiiNnMJwbza/Is6Lw==
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/@emnapi/runtime/-/runtime-1.10.0.tgz#4b260c0d3534204e98c6110b8db1a987d26ec87c"
+  integrity sha512-ewvYlk86xUoGI0zQRNq/mC+16R1QeDlKQy21Ki3oSYXNgLb45GV1P6A0M+/s6nyCuNDqe5VpaY84BzXGwVbwFA==
   dependencies:
     tslib "^2.4.0"
 
@@ -2321,6 +2321,13 @@
     prompts "^2.4.2"
     semver "^7.5.2"
 
+"@react-native-community/datetimepicker@^9.1.0":
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/@react-native-community/datetimepicker/-/datetimepicker-9.1.0.tgz#98359c2107fa900315e123a682a5f56f56d68339"
+  integrity sha512-eadbnk+I2vxvW30iTAsm/qlCnMMAadkifIMYNEB2lzhxN/SvlKc7S2V4k5DyrwjdCbqdcMk3t9K6fnUMcAV34w==
+  dependencies:
+    invariant "^2.2.4"
+
 "@react-native-community/netinfo@^12.0.1":
   version "12.0.1"
   resolved "https://registry.yarnpkg.com/@react-native-community/netinfo/-/netinfo-12.0.1.tgz#fec75f4093c27778479d8927b4f51f133b8a13a4"
@@ -2684,51 +2691,51 @@
   resolved "https://registry.yarnpkg.com/@revenuecat/purchases-typescript-internal/-/purchases-typescript-internal-17.55.1.tgz#addd7cb6ae98b13b35973e3656dc8acae5b95da1"
   integrity sha512-t49IP5hdlLEi+csqH8J8fo+DvCucWBwDnv+bVQca1Ogdry6VnY0HVdH1z743h9F4vKwFGTJ3XK5TUcahlK+U3Q==
 
-"@sentry-internal/browser-utils@10.47.0":
-  version "10.47.0"
-  resolved "https://registry.yarnpkg.com/@sentry-internal/browser-utils/-/browser-utils-10.47.0.tgz#452320155e241c4fec44bccfe698effb453d31b4"
-  integrity sha512-bVFRAeJWMBcBCvJKIFCMJ1/yQToL4vPGqfmlnDZeypcxkqUDKQ/Y3ziLHXoDL2sx0lagcgU2vH1QhCQ67Aujjw==
+"@sentry-internal/browser-utils@10.48.0":
+  version "10.48.0"
+  resolved "https://registry.yarnpkg.com/@sentry-internal/browser-utils/-/browser-utils-10.48.0.tgz#e3901479410580a5eaf117232da2191edcb7ea38"
+  integrity sha512-SCiTLBXzugFKxev6NoKYBIhQoDk0gUh0AVVVepCBqfCJiWBG01Zvv0R5tCVohr4cWRllkQ8mlBdNQd/I7s9tdA==
   dependencies:
-    "@sentry/core" "10.47.0"
+    "@sentry/core" "10.48.0"
 
-"@sentry-internal/feedback@10.47.0":
-  version "10.47.0"
-  resolved "https://registry.yarnpkg.com/@sentry-internal/feedback/-/feedback-10.47.0.tgz#2a847b821f60802c4ed3d0da980ef57f593afb26"
-  integrity sha512-pdvMmi4dQpX5S/vAAzrhHPIw3T3HjUgDNgUiCBrlp7N9/6zGO2gNPhUnNekP+CjgI/z0rvf49RLqlDenpNrMOg==
+"@sentry-internal/feedback@10.48.0":
+  version "10.48.0"
+  resolved "https://registry.yarnpkg.com/@sentry-internal/feedback/-/feedback-10.48.0.tgz#9c34bf39a41fad49f88a8f4d33009df019b9d609"
+  integrity sha512-tGkEyOM1HDS9qebDphUMEnyk3qq/50AnuTBiFmMJyjNzowylVGmRRk0sr3xkmbVHCDXQCiYnDmSVlJ2x4SDMrQ==
   dependencies:
-    "@sentry/core" "10.47.0"
+    "@sentry/core" "10.48.0"
 
-"@sentry-internal/replay-canvas@10.47.0":
-  version "10.47.0"
-  resolved "https://registry.yarnpkg.com/@sentry-internal/replay-canvas/-/replay-canvas-10.47.0.tgz#157256195f71592cd462fe5a57e71ddbd66e9cff"
-  integrity sha512-A5OY8friSe6g8WAK4L8IeOPiEd9D3Ps40DzRH5j2f6SUja0t90mKMvHRcRf8zq0d4BkdB+JM7tjOkwxpuv8heA==
+"@sentry-internal/replay-canvas@10.48.0":
+  version "10.48.0"
+  resolved "https://registry.yarnpkg.com/@sentry-internal/replay-canvas/-/replay-canvas-10.48.0.tgz#5156b40f9df7e520eb1cef789725ef30d46246d4"
+  integrity sha512-9nWuN2z4O+iwbTfuYV5ZmngBgJU/ZxfOo47A5RJP3Nu/kl59aJ1lUhILYOKyeNOIC/JyeERmpIcTxnlPXQzZ3Q==
   dependencies:
-    "@sentry-internal/replay" "10.47.0"
-    "@sentry/core" "10.47.0"
+    "@sentry-internal/replay" "10.48.0"
+    "@sentry/core" "10.48.0"
 
-"@sentry-internal/replay@10.47.0":
-  version "10.47.0"
-  resolved "https://registry.yarnpkg.com/@sentry-internal/replay/-/replay-10.47.0.tgz#33bb78457ee9731056d2b5a4805328e922b28886"
-  integrity sha512-ScdovxP7hJxgMt70+7hFvwT02GIaIUAxdEM/YPsayZBeCoAukPW8WiwztJfoKtsfPyKJ5A6f0H3PIxTPcA9Row==
+"@sentry-internal/replay@10.48.0":
+  version "10.48.0"
+  resolved "https://registry.yarnpkg.com/@sentry-internal/replay/-/replay-10.48.0.tgz#09794a7a6b1127829fae02cad58428b547d14131"
+  integrity sha512-sevRTePfuk4PNuz9KAKpmTZEomAU0aLXyIhOwA0OnUDdxPhkY8kq5lwDbuxTHv6DQUjUX3YgFbY45VH1JEqHKA==
   dependencies:
-    "@sentry-internal/browser-utils" "10.47.0"
-    "@sentry/core" "10.47.0"
+    "@sentry-internal/browser-utils" "10.48.0"
+    "@sentry/core" "10.48.0"
 
-"@sentry/babel-plugin-component-annotate@5.1.1":
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/@sentry/babel-plugin-component-annotate/-/babel-plugin-component-annotate-5.1.1.tgz#9eeef63099011155691a5ee59b0f796c141e8f85"
-  integrity sha512-x2wEpBHwsTyTF2rWsLKJlzrRF1TTIGOfX+ngdE+Yd5DBkoS58HwQv824QOviPGQRla4/ypISqAXzjdDPL/zalg==
+"@sentry/babel-plugin-component-annotate@5.2.0":
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/@sentry/babel-plugin-component-annotate/-/babel-plugin-component-annotate-5.2.0.tgz#6d6f3c47d7f795f5dfbb9b59abef6ab33e5e7f2d"
+  integrity sha512-8LbOI5Kzb5F0+7LVQPi2+zGz1iPiRRFhM+7uZ/ZQ33L9BmDOYNIy3xWxCfMw2JCuMXXaxF47XCjGmR22/B0WPg==
 
-"@sentry/browser@10.47.0":
-  version "10.47.0"
-  resolved "https://registry.yarnpkg.com/@sentry/browser/-/browser-10.47.0.tgz#286f5051ca82706c03e7a499b9464453225f3648"
-  integrity sha512-rC0agZdxKA5XWfL4VwPOr/rJMogXDqZgnVzr93YWpFn9DMZT/7LzxSJVPIJwRUjx3bFEby3PcTa3YaX7pxm1AA==
+"@sentry/browser@10.48.0":
+  version "10.48.0"
+  resolved "https://registry.yarnpkg.com/@sentry/browser/-/browser-10.48.0.tgz#45896eb9176ad0ad0a0281674db3db994f614bee"
+  integrity sha512-4jt2zX2ExgFcNe2x+W+/k81fmDUsOrquGtt028CiGuDuma6kEsWBI4JbooT1jhj2T+eeUxe3YGbM23Zhh7Ghhw==
   dependencies:
-    "@sentry-internal/browser-utils" "10.47.0"
-    "@sentry-internal/feedback" "10.47.0"
-    "@sentry-internal/replay" "10.47.0"
-    "@sentry-internal/replay-canvas" "10.47.0"
-    "@sentry/core" "10.47.0"
+    "@sentry-internal/browser-utils" "10.48.0"
+    "@sentry-internal/feedback" "10.48.0"
+    "@sentry-internal/replay" "10.48.0"
+    "@sentry-internal/replay-canvas" "10.48.0"
+    "@sentry/core" "10.48.0"
 
 "@sentry/cli-darwin@3.3.5":
   version "3.3.5"
@@ -2789,37 +2796,37 @@
     "@sentry/cli-win32-i686" "3.3.5"
     "@sentry/cli-win32-x64" "3.3.5"
 
-"@sentry/core@10.47.0":
-  version "10.47.0"
-  resolved "https://registry.yarnpkg.com/@sentry/core/-/core-10.47.0.tgz#175d1865f0d762ebe7be3b2a6ec3ece4e5a76a5a"
-  integrity sha512-nsYRAx3EWezDut+Zl+UwwP07thh9uY7CfSAi2whTdcJl5hu1nSp2z8bba7Vq/MGbNLnazkd3A+GITBEML924JA==
+"@sentry/core@10.48.0":
+  version "10.48.0"
+  resolved "https://registry.yarnpkg.com/@sentry/core/-/core-10.48.0.tgz#ee5ab1aa5bbc3f96fe675af3b929c9446d1ee298"
+  integrity sha512-h8F+fXVwYC9ro5ZaO8V+v3vqc0awlXHGblEAuVxSGgh4IV/oFX+QVzXeDTTrFOFS6v/Vn5vAyu240eJrJAS6/g==
 
 "@sentry/react-native@^8.3.0":
-  version "8.7.0"
-  resolved "https://registry.yarnpkg.com/@sentry/react-native/-/react-native-8.7.0.tgz#2a195347fd1667a136a2758762420e168bf89509"
-  integrity sha512-15c7L/DW+Po2/6jmwEB+9A1F6SEKOjfUsKZ3wW059Qsksk2gkCS0eeOlkYs20L4ucnstDdDtQD846tZsaeGf7Q==
+  version "8.8.0"
+  resolved "https://registry.yarnpkg.com/@sentry/react-native/-/react-native-8.8.0.tgz#379b0fc155b1c903a9482e87a4f2bd1ae90b953b"
+  integrity sha512-Qsb/Bnuf6mOeDEtM56jZYzvENMDPX3btCVNHt9MG4LDLKr4iQfRPmUX9+WwnAmEoAlJkBQJlFQLCXApXEB1LEA==
   dependencies:
-    "@sentry/babel-plugin-component-annotate" "5.1.1"
-    "@sentry/browser" "10.47.0"
+    "@sentry/babel-plugin-component-annotate" "5.2.0"
+    "@sentry/browser" "10.48.0"
     "@sentry/cli" "3.3.5"
-    "@sentry/core" "10.47.0"
-    "@sentry/react" "10.47.0"
-    "@sentry/types" "10.47.0"
+    "@sentry/core" "10.48.0"
+    "@sentry/react" "10.48.0"
+    "@sentry/types" "10.48.0"
 
-"@sentry/react@10.47.0":
-  version "10.47.0"
-  resolved "https://registry.yarnpkg.com/@sentry/react/-/react-10.47.0.tgz#2896eb5cd7608d4a63d1b6a08761f736f58f474f"
-  integrity sha512-ZtJV6xxF8jUVE9e3YQUG3Do0XapG1GjniyLyqMPgN6cNvs/HaRJODf7m60By+VGqcl5XArEjEPTvx8CdPUXDfA==
+"@sentry/react@10.48.0":
+  version "10.48.0"
+  resolved "https://registry.yarnpkg.com/@sentry/react/-/react-10.48.0.tgz#31eae868d4ec86c73a2f9ac4316f8a168aa2c194"
+  integrity sha512-uc93vKjmu6gNns+JAX4qquuxWpAMit0uGPA1TYlMjct9NG1uX3TkDPJAr9Pgd1lOXx8mKqCmj5fK33QeExMpPw==
   dependencies:
-    "@sentry/browser" "10.47.0"
-    "@sentry/core" "10.47.0"
+    "@sentry/browser" "10.48.0"
+    "@sentry/core" "10.48.0"
 
-"@sentry/types@10.47.0":
-  version "10.47.0"
-  resolved "https://registry.yarnpkg.com/@sentry/types/-/types-10.47.0.tgz#9cec3d258b974c61c9622f36c3fa276ee2458f7b"
-  integrity sha512-WhV/ZO/a+3pU00rjXtb6WeZFZYn0Kz3JTc8Xvp7cx/D+kQJBm6b942TGb32UvnsglALLBxRyIBG+QO2u5r6cXw==
+"@sentry/types@10.48.0":
+  version "10.48.0"
+  resolved "https://registry.yarnpkg.com/@sentry/types/-/types-10.48.0.tgz#37366367baeace6b665d7d3aea4bab2aa27ec03f"
+  integrity sha512-HiguzLr+vlor1ky0rpWHmZoravFsnx65kXqB94yqYMo7V3QgSOPzWrOjv518a2yZc/1boufQ3LINq6ZDhO2l1g==
   dependencies:
-    "@sentry/core" "10.47.0"
+    "@sentry/core" "10.48.0"
 
 "@sideway/address@^4.1.5":
   version "4.1.5"
@@ -3191,9 +3198,9 @@
   integrity sha512-WmoN8qaIAo7WTYWbAZuG8PYEhn5fkz7dZrqTBZ7dtt//lL2Gwms1IcnQ5yHqjDfX8Ft5j4YzDM23f87zBfDe9g==
 
 "@usercentrics/react-native-sdk@^2.24.0":
-  version "2.26.1"
-  resolved "https://registry.yarnpkg.com/@usercentrics/react-native-sdk/-/react-native-sdk-2.26.1.tgz#2581bc1dfb67f28c1eb64f007c76c7e427142311"
-  integrity sha512-2kqpUZgivLd/Db3QyFC1WwDT/hwB6A+VVTdTFX1s96JzdVNIG2tL21xtomRwCaJ/mlb9Uk0Ojk3e05X3vRBynA==
+  version "2.26.2"
+  resolved "https://registry.yarnpkg.com/@usercentrics/react-native-sdk/-/react-native-sdk-2.26.2.tgz#d1f6e5d773835740eac7376eea4fd2316cfa5916"
+  integrity sha512-2g+isJuzr7YWnH190gtoo3mkSAGOyaycWM5ZjQ8D9zY4X67GzP1gKYQrwX1NDPOYcIL0RaDJ5jWQHeUij3iKnQ==
 
 "@vscode/sudo-prompt@^9.0.0":
   version "9.3.2"
@@ -3632,9 +3639,9 @@ bare-events@^2.5.4, bare-events@^2.7.0:
   integrity sha512-riJjyv1/mHLIPX4RwiK+oW9/4c3TEUeORHKefKAKnZ5kyslbN+HXowtbaVEqt4IMUB7OXlfixcs6gsFeo/jhiQ==
 
 bare-fs@^4.0.1, bare-fs@^4.5.5:
-  version "4.7.0"
-  resolved "https://registry.yarnpkg.com/bare-fs/-/bare-fs-4.7.0.tgz#01efd92b14a6c93825e8992ac1e42fdd6237de71"
-  integrity sha512-xzqKsCFxAek9aezYhjJuJRXBIaYlg/0OGDTZp+T8eYmYMlm66cs6cYko02drIyjN2CBbi+I6L7YfXyqpqtKRXA==
+  version "4.7.1"
+  resolved "https://registry.yarnpkg.com/bare-fs/-/bare-fs-4.7.1.tgz#6e81f784761102867c13f0823aa48c942d160f00"
+  integrity sha512-WDRsyVN52eAx/lBamKD6uyw8H4228h/x0sGGGegOamM2cd7Pag88GfMQalobXI+HaEUxpCkbKQUDOQqt9wawRw==
   dependencies:
     bare-events "^2.5.4"
     bare-path "^3.0.0"
@@ -4523,9 +4530,9 @@ ee-first@1.1.1:
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
 electron-to-chromium@^1.5.328:
-  version "1.5.336"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.336.tgz#d7c25c0827b8c5e2885b2c91ac6cdcf3e5a1386e"
-  integrity sha512-AbH9q9J455r/nLmdNZes0G0ZKcRX73FicwowalLs6ijwOmCJSRRrLX63lcAlzy9ux3dWK1w1+1nsBJEWN11hcQ==
+  version "1.5.339"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.339.tgz#d797bf5f222a7f6241a42b43a97bf52ff43947f1"
+  integrity sha512-Is+0BBHJ4NrdpAYiperrmp53pLywG/yV/6lIMTAnhxvzj/Cmn5Q/ogSHC6AKe7X+8kPLxxFk0cs5oc/3j/fxIg==
 
 emittery@^0.13.1:
   version "0.13.1"
@@ -8070,6 +8077,11 @@ react-native-vector-icons@^10.3.0:
   dependencies:
     prop-types "^15.7.2"
     yargs "^16.1.1"
+
+react-native-video@^6.19.1:
+  version "6.19.1"
+  resolved "https://registry.yarnpkg.com/react-native-video/-/react-native-video-6.19.1.tgz#0f404f8d483252c5d3b353940d48513ca920e6d3"
+  integrity sha512-Tbiyt0JMirVHc4XzGIANjs3SaNjFXQO2qe+buvY7xMJjlyCekkDjJqD9YtlaEloJD2PGWhoPytEXB6gVT7T6lw==
 
 react-native-worklets@^0.8.0:
   version "0.8.1"

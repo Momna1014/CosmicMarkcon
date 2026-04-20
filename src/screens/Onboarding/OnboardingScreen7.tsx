@@ -1,33 +1,37 @@
 /**
- * OnboardingScreen7 - Eastern Astrology Screen
- *
- * Shows Eastern/Chinese zodiac animal sign based on birth year
- * Combined with Western zodiac for a unique cosmic pattern
+ * Onboarding Screen 7
+ * Birthday input with animated zodiac half wheel
  */
 
-import React, {useEffect, useMemo} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ImageBackground,
-  Dimensions,
   TouchableOpacity,
   StatusBar,
+  Dimensions,
+  Platform,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {useTranslation} from 'react-i18next';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import Svg, {
+  Circle,
+  Defs,
+  LinearGradient as SvgLinearGradient,
+  Path,
+  Stop,
+} from 'react-native-svg';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
-  withRepeat,
-  withSequence,
+  withDelay,
   Easing,
   FadeIn,
   FadeInDown,
   FadeInUp,
-  withDelay,
+  SharedValue,
 } from 'react-native-reanimated';
 import {
   Colors,
@@ -36,993 +40,699 @@ import {
   horizontalScale,
   verticalScale,
   radiusScale,
+  moderateScale,
 } from '../../theme';
-import {
-  getZodiacSign,
-  getEasternZodiacSign,
-  getCombinationPercentage,
-} from '../../components/mock/zodiacMockData';
-import {OnboardingData} from './OnboardingContainer';
 import {hapticLight} from '../../utils/haptics';
-import {
-  trackOnboarding7View,
-  trackOnboarding7Continue,
-} from '../../utils/onboardingAnalytics';
 import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
+import {
+  trackOnboarding3View,
+  trackOnboarding3BirthdaySelected,
+  trackOnboarding3Continue,
+} from '../../utils/onboardingAnalytics';
+import {OnboardingButton} from '../../components/OnboardingButton';
+import {getZodiacSign} from '../../components/mock/zodiacMockData';
 
-const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
+import BackArrowIcon from '../../assets/icons/new_onboarding/back_arrow.svg';
+import AriesIcon from '../../assets/icons/new_onboarding/zodix_signs/aries.svg';
+import TaurusIcon from '../../assets/icons/new_onboarding/zodix_signs/taurus.svg';
+import GeminiIcon from '../../assets/icons/new_onboarding/zodix_signs/gemini.svg';
+import CancerIcon from '../../assets/icons/new_onboarding/zodix_signs/cancer.svg';
+import LeoIcon from '../../assets/icons/new_onboarding/zodix_signs/leo.svg';
+import VirgoIcon from '../../assets/icons/new_onboarding/zodix_signs/virgo.svg';
+import LibraIcon from '../../assets/icons/new_onboarding/zodix_signs/libra.svg';
+import ScorpioIcon from '../../assets/icons/new_onboarding/zodix_signs/scorpio.svg';
+import SagittariusIcon from '../../assets/icons/new_onboarding/zodix_signs/sagittarius.svg';
+import CapricornIcon from '../../assets/icons/new_onboarding/zodix_signs/capricon.svg';
+import AquariusIcon from '../../assets/icons/new_onboarding/zodix_signs/aquarius.svg';
+import PiscesIcon from '../../assets/icons/new_onboarding/zodix_signs/pisces.svg';
 
-// Background image - same as other onboarding screens
-const BackgroundImageSource = require('../../assets/icons/onboarding_icons/background_image.png');
+const HORIZONTAL_PADDING = horizontalScale(16);
+const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
-// Animated TouchableOpacity
-const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+type ZodiacSignKey =
+  | 'aries'
+  | 'taurus'
+  | 'gemini'
+  | 'cancer'
+  | 'leo'
+  | 'virgo'
+  | 'libra'
+  | 'scorpio'
+  | 'sagittarius'
+  | 'capricorn'
+  | 'aquarius'
+  | 'pisces';
 
-interface TwinklingStarProps {
-  size: number;
-  top: number;
-  left: number;
-  delay: number;
-  intensity: 'low' | 'medium' | 'high';
+type SignItem = {
+  key: ZodiacSignKey;
+  label: string;
+  glyph: string;
+};
+
+type SegmentItem = {
+  sign: SignItem;
+  start: number;
+  path: string;
+  glyphX: number;
+  glyphY: number;
+};
+
+const SIGNS: SignItem[] = [
+  {key: 'aries', label: 'Aries', glyph: '♈'},
+  {key: 'taurus', label: 'Taurus', glyph: '♉'},
+  {key: 'gemini', label: 'Gemini', glyph: '♊'},
+  {key: 'cancer', label: 'Cancer', glyph: '♋'},
+  {key: 'leo', label: 'Leo', glyph: '♌'},
+  {key: 'virgo', label: 'Virgo', glyph: '♍'},
+  {key: 'libra', label: 'Libra', glyph: '♎'},
+  {key: 'scorpio', label: 'Scorpio', glyph: '♏'},
+  {key: 'sagittarius', label: 'Sagittarius', glyph: '♐'},
+  {key: 'capricorn', label: 'Capricorn', glyph: '♑'},
+  {key: 'aquarius', label: 'Aquarius', glyph: '♒'},
+  {key: 'pisces', label: 'Pisces', glyph: '♓'},
+];
+
+const ZODIAC_ICON_MAP: Record<ZodiacSignKey, React.FC<any>> = {
+  aries: AriesIcon,
+  taurus: TaurusIcon,
+  gemini: GeminiIcon,
+  cancer: CancerIcon,
+  leo: LeoIcon,
+  virgo: VirgoIcon,
+  libra: LibraIcon,
+  scorpio: ScorpioIcon,
+  sagittarius: SagittariusIcon,
+  capricorn: CapricornIcon,
+  aquarius: AquariusIcon,
+  pisces: PiscesIcon,
+};
+
+const SIGN_INDEX: Record<ZodiacSignKey, number> = {
+  aries: 0,
+  taurus: 1,
+  gemini: 2,
+  cancer: 3,
+  leo: 4,
+  virgo: 5,
+  libra: 6,
+  scorpio: 7,
+  sagittarius: 8,
+  capricorn: 9,
+  aquarius: 10,
+  pisces: 11,
+};
+
+const ZODIAC_NAME_MAP: Record<string, ZodiacSignKey> = {
+  Aries: 'aries',
+  Taurus: 'taurus',
+  Gemini: 'gemini',
+  Cancer: 'cancer',
+  Leo: 'leo',
+  Virgo: 'virgo',
+  Libra: 'libra',
+  Scorpio: 'scorpio',
+  Sagittarius: 'sagittarius',
+  Capricorn: 'capricorn',
+  Aquarius: 'aquarius',
+  Pisces: 'pisces',
+};
+
+const WHEEL_SIZE = moderateScale(320);
+const CENTER = WHEEL_SIZE / 2;
+const OUTER_RADIUS = moderateScale(148);
+const INNER_RADIUS = moderateScale(92);
+const GLYPH_RADIUS = moderateScale(121);
+const SEGMENT_DEG = 30;
+
+// Use current date as default
+const INITIAL_BIRTHDAY = (() => {
+  const today = new Date();
+  // Set to a reasonable default age (e.g., 25 years old)
+  const defaultDate = new Date();
+  defaultDate.setFullYear(today.getFullYear() - 25);
+  return defaultDate;
+})();
+
+interface OnboardingScreen7Props {
+  onNext?: (birthday: Date) => void;
+  onGoBack?: () => void;
 }
 
-const TwinklingStar: React.FC<TwinklingStarProps> = ({
-  size,
-  top,
-  left,
-  delay,
-  intensity,
-}) => {
-  const opacity = useSharedValue(0.3);
-  const scale = useSharedValue(0.8);
+const degToRad = (deg: number): number => (deg * Math.PI) / 180;
 
-  const opacityRange = {
-    low: {min: 0.2, max: 0.5},
-    medium: {min: 0.3, max: 0.7},
-    high: {min: 0.4, max: 1.0},
+const polarToCartesian = (
+  cx: number,
+  cy: number,
+  r: number,
+  angleDeg: number,
+) => {
+  const rad = degToRad(angleDeg - 90);
+  return {
+    x: cx + r * Math.cos(rad),
+    y: cy + r * Math.sin(rad),
   };
+};
 
-  const scaleRange = {
-    low: {min: 0.8, max: 1.0},
-    medium: {min: 0.7, max: 1.1},
-    high: {min: 0.6, max: 1.2},
-  };
+const createDonutSegmentPath = (
+  cx: number,
+  cy: number,
+  outerR: number,
+  innerR: number,
+  startAngle: number,
+  endAngle: number,
+) => {
+  const startOuter = polarToCartesian(cx, cy, outerR, startAngle);
+  const endOuter = polarToCartesian(cx, cy, outerR, endAngle);
+  const startInner = polarToCartesian(cx, cy, innerR, startAngle);
+  const endInner = polarToCartesian(cx, cy, innerR, endAngle);
+  const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
 
-  const durationRange = {
-    low: 3000,
-    medium: 2500,
-    high: 2000,
-  };
+  return [
+    `M ${startOuter.x} ${startOuter.y}`,
+    `A ${outerR} ${outerR} 0 ${largeArcFlag} 1 ${endOuter.x} ${endOuter.y}`,
+    `L ${endInner.x} ${endInner.y}`,
+    `A ${innerR} ${innerR} 0 ${largeArcFlag} 0 ${startInner.x} ${startInner.y}`,
+    'Z',
+  ].join(' ');
+};
 
-  useEffect(() => {
-    const range = opacityRange[intensity];
-    const scaleR = scaleRange[intensity];
-    const duration = durationRange[intensity];
+const toZodiacKey = (name: string): ZodiacSignKey => ZODIAC_NAME_MAP[name] || 'aries';
 
-    opacity.value = withDelay(
-      delay,
-      withRepeat(
-        withSequence(
-          withTiming(range.max, {duration, easing: Easing.inOut(Easing.ease)}),
-          withTiming(range.min, {duration, easing: Easing.inOut(Easing.ease)}),
-        ),
-        -1,
-        true,
-      ),
-    );
+const getTargetRotation = (sign: ZodiacSignKey): number => {
+  const index = SIGN_INDEX[sign];
+  const signCenterAngle = index * SEGMENT_DEG + SEGMENT_DEG / 2;
+  return -signCenterAngle;
+};
 
-    scale.value = withDelay(
-      delay,
-      withRepeat(
-        withSequence(
-          withTiming(scaleR.max, {
-            duration: duration * 0.8,
-            easing: Easing.inOut(Easing.ease),
-          }),
-          withTiming(scaleR.min, {
-            duration: duration * 0.8,
-            easing: Easing.inOut(Easing.ease),
-          }),
-        ),
-        -1,
-        true,
-      ),
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+const ZodiacIcon: React.FC<{
+  item: SegmentItem;
+  selectedSign: ZodiacSignKey;
+  rotation: SharedValue<number>;
+}> = ({item, selectedSign, rotation}) => {
+  const isActive = item.sign.key === selectedSign;
+  const IconComponent = ZODIAC_ICON_MAP[item.sign.key];
+  const iconSize = isActive ? moderateScale(28) : moderateScale(24);
+  const iconOpacity = isActive ? 1 : 0.72;
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{scale: scale.value}],
+  // Counter-rotate to keep icons upright
+  const iconAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{rotate: `${-rotation.value}deg`}],
   }));
 
   return (
     <Animated.View
       style={[
-        styles.star,
         {
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          top,
-          left,
-          shadowColor: Colors.white,
-          shadowOffset: {width: 0, height: 0},
-          shadowOpacity: 0.8,
-          shadowRadius: size,
+          position: 'absolute',
+          left: item.glyphX - iconSize / 2,
+          top: item.glyphY - iconSize / 2,
+          width: iconSize,
+          height: iconSize,
+          opacity: iconOpacity,
         },
-        animatedStyle,
-      ]}
-    />
+        iconAnimatedStyle,
+      ]}>
+      <IconComponent width={iconSize} height={iconSize} />
+    </Animated.View>
   );
 };
 
-interface OnboardingScreen7Props {
-  onNext?: () => void;
-  onboardingData: OnboardingData;
-}
+const ZodiacWheelSvg: React.FC<{
+  selectedSign: ZodiacSignKey;
+  rotation: SharedValue<number>;
+}> = ({selectedSign, rotation}) => {
+  const segments = useMemo(() => {
+    return SIGNS.map((sign, index) => {
+      const start = index * SEGMENT_DEG;
+      const end = start + SEGMENT_DEG;
+      const middle = start + SEGMENT_DEG / 2;
+      const glyphPos = polarToCartesian(CENTER, CENTER, GLYPH_RADIUS, middle);
+
+      return {
+        sign,
+        start,
+        path: createDonutSegmentPath(
+          CENTER,
+          CENTER,
+          OUTER_RADIUS,
+          INNER_RADIUS,
+          start,
+          end,
+        ),
+        glyphX: glyphPos.x,
+        glyphY: glyphPos.y,
+      };
+    });
+  }, []);
+
+  return (
+    <View style={{width: WHEEL_SIZE, height: WHEEL_SIZE}}>
+      <Svg width={WHEEL_SIZE} height={WHEEL_SIZE} viewBox={`0 0 ${WHEEL_SIZE} ${WHEEL_SIZE}`}>
+        <Defs>
+        <SvgLinearGradient id="segmentGrad" x1="0" y1="0" x2="1" y2="1">
+          <Stop offset="0%" stopColor="#3A4152" />
+          <Stop offset="48%" stopColor="#202635" />
+          <Stop offset="100%" stopColor="#0E1220" />
+        </SvgLinearGradient>
+        <SvgLinearGradient id="activeSegmentGrad" x1="0" y1="0" x2="1" y2="1">
+          <Stop offset="0%" stopColor="#5A6278" />
+          <Stop offset="45%" stopColor="#343C52" />
+          <Stop offset="100%" stopColor="#1D2334" />
+
+        </SvgLinearGradient>
+        <SvgLinearGradient id="rimGrad" x1="0" y1="0" x2="0" y2="1">
+          <Stop offset="0%" stopColor="rgba(255,255,255,0.55)" />
+          <Stop offset="100%" stopColor="rgba(255,255,255,0.02)" />
+        </SvgLinearGradient>
+      </Defs>
+
+      <Circle
+        cx={CENTER}
+        cy={CENTER}
+        r={OUTER_RADIUS}
+        fill="none"
+        stroke="rgba(255, 255, 255, 0.26)"
+        strokeWidth={4}
+      />
+
+      {segments.map((item, index) => {
+        const isActive = item.sign.key === selectedSign;
+
+        return (
+          <Path
+            key={item.sign.key}
+            d={item.path}
+            fill={isActive ? 'url(#activeSegmentGrad)' : 'url(#segmentGrad)'}
+            opacity={isActive ? 0.96 : index % 2 === 0 ? 0.92 : 0.8}
+            stroke="rgba(255,255,255,0.04)"
+            strokeWidth={1}
+          />
+        );
+      })}
+
+      {segments.map(item => {
+        const outer = polarToCartesian(CENTER, CENTER, OUTER_RADIUS, item.start);
+        const inner = polarToCartesian(CENTER, CENTER, INNER_RADIUS, item.start);
+
+        return (
+          <Path
+            key={`${item.sign.key}-divider`}
+            d={`M ${outer.x} ${outer.y} L ${inner.x} ${inner.y}`}
+            stroke="rgba(255,255,255,0.1)"
+            strokeWidth={1}
+          />
+        );
+      })}
+
+      <Path
+          d={createDonutSegmentPath(
+            CENTER,
+            CENTER,
+            OUTER_RADIUS + 2,
+            OUTER_RADIUS - 5,
+            0,
+            360,
+          )}
+          fill="url(#rimGrad)"
+          opacity={0.5}
+        />
+      </Svg>
+      
+      {segments.map(item => (
+        <ZodiacIcon
+          key={`${item.sign.key}-icon`}
+          item={item}
+          selectedSign={selectedSign}
+          rotation={rotation}
+        />
+      ))}
+    </View>
+  );
+};
 
 export const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({
   onNext,
-  onboardingData,
+  onGoBack,
 }) => {
-  const {t} = useTranslation();
+  const [birthday, setBirthdayState] = useState<Date>(INITIAL_BIRTHDAY);
+  const [hasTrackedBirthday, setHasTrackedBirthday] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(Platform.OS === 'ios');
 
-  // ===== Analytics: Track screen view =====
   useScreenView('OnboardingScreen7', {
     screen_category: 'onboarding',
     step: 7,
-    total_steps: 11,
+    total_steps: 9,
   });
 
-  // Get Western zodiac sign based on date and month
-  const westernZodiac = useMemo(() => {
-    if (!onboardingData.birthday) return null;
-    return getZodiacSign(onboardingData.birthday);
-  }, [onboardingData.birthday]);
+  const CURRENT_STEP = 6;
+  const TOTAL_STEPS = 9;
+  const progressWidth = useSharedValue((CURRENT_STEP - 1) / TOTAL_STEPS * 100);
 
-  // Get Eastern zodiac sign based on year
-  const easternZodiac = useMemo(() => {
-    if (!onboardingData.birthday) return null;
-    const year = onboardingData.birthday.getFullYear();
-    return getEasternZodiacSign(year);
-  }, [onboardingData.birthday]);
+  const selectedZodiac = useMemo(() => getZodiacSign(birthday), [birthday]);
+  const selectedSignKey = useMemo(
+    () => toZodiacKey(selectedZodiac.name),
+    [selectedZodiac.name],
+  );
 
-  // Get combination percentage
-  const combinationPercentage = useMemo(() => {
-    if (!westernZodiac || !easternZodiac) return 4;
-    return getCombinationPercentage(westernZodiac.name, easternZodiac.name);
-  }, [westernZodiac, easternZodiac]);
-
-  // Log all onboarding data to console
-  useEffect(() => {
-    console.log('=== ONBOARDING DATA SUMMARY ===');
-    console.log('All User Selections:', {
-      alignment: onboardingData.alignment,
-      name: onboardingData.name,
-      birthday: onboardingData.birthday?.toISOString(),
-      birthYear: onboardingData.birthday?.getFullYear(),
-      birthMonth: onboardingData.birthday ? onboardingData.birthday.getMonth() + 1 : null,
-      birthDay: onboardingData.birthday?.getDate(),
-      westernZodiac: westernZodiac?.name,
-      westernElement: westernZodiac?.element,
-      easternZodiac: easternZodiac?.name,
-      easternTrait: easternZodiac?.trait,
-      combinationPercentage: `${combinationPercentage}%`,
-    });
-    console.log('=================================');
-  }, [onboardingData, westernZodiac, easternZodiac, combinationPercentage]);
-
-  // Progress bar animation - start from previous screen's value (55%)
-  const progressWidth = useSharedValue(55);
-
-  // Button scale animation
-  const buttonScale = useSharedValue(1);
+  const wheelRotation = useSharedValue(getTargetRotation(selectedSignKey));
 
   useEffect(() => {
-    // Track screen view with zodiac data
-    if (westernZodiac && easternZodiac) {
-      trackOnboarding7View(
-        westernZodiac.name,
-        easternZodiac.name,
-        combinationPercentage
-      );
-    }
-    
-    // Firebase screen view logging
+    trackOnboarding3View();
     firebaseService.logScreenView('OnboardingScreen7', 'OnboardingScreen7');
-    
-    // Animate progress bar on mount - Screen 7 of 11 (64%)
+
+    const targetProgress = (CURRENT_STEP / TOTAL_STEPS) * 100;
     progressWidth.value = withDelay(
       300,
-      withTiming(64, {duration: 800, easing: Easing.out(Easing.cubic)}),
+      withTiming(targetProgress, {duration: 800, easing: Easing.out(Easing.cubic)}),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    wheelRotation.value = withTiming(getTargetRotation(selectedSignKey), {
+      duration: 650,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, [selectedSignKey, wheelRotation]);
 
   const progressAnimatedStyle = useAnimatedStyle(() => ({
     width: `${progressWidth.value}%`,
   }));
 
-  const handleNext = () => {
-    hapticLight();
-    // Track continue with zodiac data
-    if (westernZodiac && easternZodiac) {
-      trackOnboarding7Continue(westernZodiac.name, easternZodiac.name);
-    }
-    // Button pulse animation
-    buttonScale.value = withSequence(
-      withTiming(1.02, {duration: 100}),
-      withTiming(1, {duration: 100}),
-    );
-    setTimeout(() => {
-      onNext?.();
-    }, 150);
-  };
-
-  const buttonAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{scale: buttonScale.value}],
+  const wheelAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{rotate: `${wheelRotation.value}deg`}],
   }));
 
-  // Twinkling stars configuration - same as other onboarding screens
-  const stars = [
-    {size: 6, top: SCREEN_HEIGHT * 0.08, left: SCREEN_WIDTH * 0.15, delay: 0, intensity: 'high' as const},
-    {size: 4, top: SCREEN_HEIGHT * 0.12, left: SCREEN_WIDTH * 0.75, delay: 300, intensity: 'medium' as const},
-    {size: 8, top: SCREEN_HEIGHT * 0.05, left: SCREEN_WIDTH * 0.5, delay: 600, intensity: 'high' as const},
-    {size: 3, top: SCREEN_HEIGHT * 0.1, left: SCREEN_WIDTH * 0.9, delay: 150, intensity: 'low' as const},
-    {size: 5, top: SCREEN_HEIGHT * 0.15, left: SCREEN_WIDTH * 0.3, delay: 450, intensity: 'medium' as const},
-    {size: 7, top: SCREEN_HEIGHT * 0.2, left: SCREEN_WIDTH * 0.85, delay: 200, intensity: 'high' as const},
-    {size: 4, top: SCREEN_HEIGHT * 0.22, left: SCREEN_WIDTH * 0.1, delay: 800, intensity: 'medium' as const},
-    {size: 6, top: SCREEN_HEIGHT * 0.25, left: SCREEN_WIDTH * 0.6, delay: 100, intensity: 'high' as const},
-    {size: 3, top: SCREEN_HEIGHT * 0.18, left: SCREEN_WIDTH * 0.45, delay: 550, intensity: 'low' as const},
-    {size: 5, top: SCREEN_HEIGHT * 0.32, left: SCREEN_WIDTH * 0.08, delay: 700, intensity: 'medium' as const},
-    {size: 8, top: SCREEN_HEIGHT * 0.35, left: SCREEN_WIDTH * 0.92, delay: 50, intensity: 'high' as const},
-    {size: 4, top: SCREEN_HEIGHT * 0.38, left: SCREEN_WIDTH * 0.25, delay: 400, intensity: 'medium' as const},
-    {size: 6, top: SCREEN_HEIGHT * 0.33, left: SCREEN_WIDTH * 0.7, delay: 250, intensity: 'high' as const},
-    {size: 5, top: SCREEN_HEIGHT * 0.55, left: SCREEN_WIDTH * 0.12, delay: 350, intensity: 'medium' as const},
-    {size: 7, top: SCREEN_HEIGHT * 0.58, left: SCREEN_WIDTH * 0.88, delay: 100, intensity: 'high' as const},
-    {size: 3, top: SCREEN_HEIGHT * 0.62, left: SCREEN_WIDTH * 0.55, delay: 650, intensity: 'low' as const},
-    {size: 4, top: SCREEN_HEIGHT * 0.65, left: SCREEN_WIDTH * 0.35, delay: 500, intensity: 'medium' as const},
-    {size: 4, top: SCREEN_HEIGHT * 0.75, left: SCREEN_WIDTH * 0.2, delay: 300, intensity: 'medium' as const},
-    {size: 6, top: SCREEN_HEIGHT * 0.78, left: SCREEN_WIDTH * 0.65, delay: 100, intensity: 'high' as const},
-    {size: 5, top: SCREEN_HEIGHT * 0.82, left: SCREEN_WIDTH * 0.9, delay: 550, intensity: 'medium' as const},
-    {size: 7, top: SCREEN_HEIGHT * 0.85, left: SCREEN_WIDTH * 0.4, delay: 200, intensity: 'high' as const},
-  ];
+  const handleDateChange = (_event: any, date?: Date) => {
+    // On Android, hide picker after selection or cancel
+    if (Platform.OS === 'android') {
+      setShowDatePicker(false);
+    }
+    
+    if (date) {
+      setBirthdayState(date);
+
+      if (!hasTrackedBirthday) {
+        setHasTrackedBirthday(true);
+        const zodiac = getZodiacSign(date);
+        trackOnboarding3BirthdaySelected(zodiac.name);
+      }
+    }
+  };
+
+  const handleOpenDatePicker = () => {
+    if (Platform.OS === 'android') {
+      setShowDatePicker(true);
+    }
+  };
+
+  const handleBack = () => {
+    hapticLight();
+    onGoBack?.();
+  };
+
+  const handleContinue = () => {
+    const zodiac = getZodiacSign(birthday);
+    
+    // Track birthday selection if not already tracked
+    if (!hasTrackedBirthday) {
+      setHasTrackedBirthday(true);
+      trackOnboarding3BirthdaySelected(zodiac.name);
+    }
+    
+    // Track continue event
+    trackOnboarding3Continue(zodiac.name);
+    
+    // Pass birthday to container, don't save to Redux yet
+    onNext?.(birthday);
+  };
+
+  const minDate = useMemo(() => {
+    const date = new Date();
+    date.setFullYear(date.getFullYear() - 120);
+    return date;
+  }, []);
+
+  const maxDate = useMemo(() => new Date(), []);
 
   return (
-    <View style={styles.backgroundFallback}>
-      <ImageBackground
-        source={BackgroundImageSource}
-        style={styles.container}
-        resizeMode="cover">
-        <SafeAreaView style={styles.safeArea}>
-          <StatusBar
-            barStyle="light-content"
-            backgroundColor="transparent"
-            translucent
-          />
-          {/* Twinkling Stars Overlay */}
-          {stars.map((star, index) => (
-            <TwinklingStar
-              key={index}
-              size={star.size}
-              top={star.top}
-              left={star.left}
-              delay={star.delay}
-              intensity={star.intensity}
-            />
-          ))}
+    <View style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="transparent"
+          translucent
+        />
 
-          {/* Content */}
-          <View style={styles.contentContainer}>
-            {/* Progress Bar */}
-            <Animated.View
-              entering={FadeIn.delay(100).duration(400)}
-              style={styles.progressBarContainer}>
+        <View style={styles.content}>
+          <Animated.View
+            entering={FadeIn.delay(100).duration(400)}
+            style={styles.header}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={handleBack}
+              activeOpacity={0.7}
+              hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+              <BackArrowIcon
+                width={moderateScale(24)}
+                height={moderateScale(24)}
+              />
+            </TouchableOpacity>
+
+            <View style={styles.progressBarContainer}>
               <View style={styles.progressBarBackground}>
                 <Animated.View
                   style={[styles.progressBarFilled, progressAnimatedStyle]}
                 />
               </View>
+            </View>
+
+            <Text style={styles.stepCounter}>{CURRENT_STEP}/{TOTAL_STEPS}</Text>
+          </Animated.View>
+
+          <Animated.Text
+            entering={FadeInDown.delay(220).duration(600).springify()}
+            style={styles.mainHeading}>
+            Your birth date reveals{"\n"}your true self and{"\n"}connections.
+          </Animated.Text>
+
+          <Animated.View
+            entering={FadeInDown.delay(330).duration(650).springify()}
+            style={styles.wheelViewport}>
+            <Animated.View style={[styles.wheelAbsolute, wheelAnimatedStyle]}>
+              <ZodiacWheelSvg selectedSign={selectedSignKey} rotation={wheelRotation} />
             </Animated.View>
 
-            {/* Main Heading */}
-            <Animated.Text
-              entering={FadeInDown.delay(200).duration(600).springify()}
-              style={styles.mainHeading}>
-              {t('onboarding.screen7.heading')}
-            </Animated.Text>
+            <View pointerEvents="none" style={styles.pointerWrap}>
+              <View style={styles.pointerTriangle} />
+              {/* <View style={styles.pointerGlow} /> */}
+            </View>
+          </Animated.View>
 
-            {/* Spacer */}
-            <View style={styles.spacer} />
+          <Animated.View
+            entering={FadeInUp.delay(450).duration(520).springify()}
+            style={styles.pickerSection}>
+            <View style={styles.datePickerWrapper}>
+              {/* <View pointerEvents="none" style={styles.datePickerHighlight} /> */}
 
-            {/* Eastern Zodiac Card */}
-            <Animated.View
-              entering={FadeInUp.delay(400).duration(600).springify()}
-              style={styles.easternCard}>
-              <View style={styles.easternCardContent}>
-                <View style={styles.easternTextContainer}>
-                  <Text style={styles.easternAnimalName}>
-                    {t(`zodiac.eastern.${(easternZodiac?.name || 'Dragon').toLowerCase()}.name`)}
-                  </Text>
-                  <Text style={styles.easternCardTrait}>
-                    {t('onboarding.screen7.knownFor', {trait: t(`zodiac.eastern.${(easternZodiac?.name || 'Dragon').toLowerCase()}.trait`)})}
-                  </Text>
-                </View>
-                <View style={styles.symbolCircle}>
-                  <Text style={styles.easternAnimalSymbol}>
-                    {easternZodiac?.symbol || '🐉'}
-                  </Text>
-                </View>
-              </View>
-            </Animated.View>
+              {Platform.OS === 'ios' ? (
+                <DateTimePicker
+                  value={birthday}
+                  onChange={handleDateChange}
+                  mode="date"
+                  display="spinner"
+                  maximumDate={maxDate}
+                  minimumDate={minDate}
+                  textColor={Colors.newOnboardingHeading}
+                  themeVariant="dark"
+                  style={styles.datePicker}
+                />
+              ) : (
+                <>
+                  <TouchableOpacity
+                    onPress={handleOpenDatePicker}
+                    style={styles.androidDateButton}
+                    activeOpacity={0.7}>
+                    <Text style={styles.androidDateText}>
+                      {birthday.toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
+                    </Text>
+                  </TouchableOpacity>
+                  {showDatePicker && (
+                    <DateTimePicker
+                      value={birthday}
+                      onChange={handleDateChange}
+                      mode="date"
+                      display="default"
+                      maximumDate={maxDate}
+                      minimumDate={minDate}
+                    />
+                  )}
+                </>
+              )}
+            </View>
+          </Animated.View>
 
-            {/* Combination Card */}
-            <Animated.View
-              entering={FadeInUp.delay(500).duration(600).springify()}
-              style={styles.combinationCard}>
-              <Text style={styles.combinationText}>
-                {t('onboarding.screen7.combinationPrefix', {
-                  western: t(`zodiac.western.${(westernZodiac?.name || 'Gemini').toLowerCase()}`),
-                  eastern: t(`zodiac.eastern.${(easternZodiac?.name || 'Dragon').toLowerCase()}.name`)
-                })}
-              </Text>
-              <View style={styles.rarityContainer}>
-                <Text style={styles.sparkleEmoji}>✨</Text>
-                <Text style={styles.rarityText}>
-                  {t('onboarding.screen7.rarityText', {percentage: combinationPercentage})}
-                </Text>
-              </View>
-            </Animated.View>
-
-            {/* Bottom Section */}
-            <Animated.View
-              entering={FadeInUp.delay(600).duration(500)}
-              style={styles.bottomSection}>
-              <AnimatedTouchable
-                style={[styles.nextButton, buttonAnimatedStyle]}
-                onPress={handleNext}
-                activeOpacity={0.8}>
-                <Text style={styles.nextButtonText}>{t('onboarding.screen7.button')}</Text>
-              </AnimatedTouchable>
-            </Animated.View>
-          </View>
-        </SafeAreaView>
-      </ImageBackground>
+          <Animated.View
+            entering={FadeInUp.delay(620).duration(500)}
+            style={styles.bottomSection}>
+            <OnboardingButton text="Continue" onPress={handleContinue} />
+          </Animated.View>
+        </View>
+      </SafeAreaView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  backgroundFallback: {
-    flex: 1,
-    backgroundColor: Colors.cosmicBackground,
-  },
   container: {
     flex: 1,
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
+    backgroundColor: Colors.newOnboardingBg,
   },
   safeArea: {
     flex: 1,
   },
-  star: {
-    position: 'absolute',
-    backgroundColor: Colors.white,
-    elevation: 8,
-  },
-  contentContainer: {
+  content: {
     flex: 1,
-    paddingHorizontal: horizontalScale(24),
+    paddingHorizontal: HORIZONTAL_PADDING,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: verticalScale(10),
+    marginBottom: verticalScale(24),
+  },
+  backButton: {
+    marginRight: horizontalScale(12),
   },
   progressBarContainer: {
-    marginBottom: verticalScale(32),
-    paddingTop: verticalScale(10),
+    flex: 1,
+    marginRight: horizontalScale(12),
   },
   progressBarBackground: {
-    height: verticalScale(8),
-    backgroundColor: Colors.progressBarBackground,
-    borderRadius: radiusScale(8),
+    height: verticalScale(6),
+    backgroundColor: 'rgba(184, 190, 208, 0.2)',
+    borderRadius: radiusScale(6),
     overflow: 'hidden',
   },
   progressBarFilled: {
-    width: '70%',
     height: '100%',
-    backgroundColor: Colors.progressBarFilled,
-    borderRadius: radiusScale(2),
+    backgroundColor: Colors.newOnboardingProgressFilled,
+    borderRadius: radiusScale(6),
+  },
+  stepCounter: {
+    fontFamily: FontFamilies.interSemiBold,
+    fontWeight: '600',
+    fontSize: fontScale(14),
+    color: Colors.white,
   },
   mainHeading: {
     fontFamily: FontFamilies.sunlightDreams,
-    fontWeight: '400',
-    fontSize: fontScale(36),
-    lineHeight: fontScale(43),
-    color: Colors.white,
-    marginBottom: verticalScale(18),
-  },
-  spacer: {
-    flex: 1,
-  },
-  easternCard: {
-  backgroundColor: 'rgba(255, 255, 255, 0.12)',
-    borderRadius: radiusScale(24),
-    paddingVertical: verticalScale(20),
-    paddingHorizontal: horizontalScale(20),
-    marginBottom: verticalScale(20),
-    borderWidth:1,
-    borderColor:Colors.white
-  },
-  easternCardContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  easternTextContainer: {
-    flex: 1,
-  },
-  easternAnimalName: {
-    fontFamily: FontFamilies.interSemiBold,
     fontWeight: '700',
-    fontSize: fontScale(28),
-    color: Colors.white,
-    marginBottom: verticalScale(6),
-  },
-  symbolCircle: {
-    width: horizontalScale(60),
-    height: horizontalScale(60),
-    borderRadius: horizontalScale(30),
-    backgroundColor: '#b8aa3e7a',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: horizontalScale(12),
-    
-  },
-  easternAnimalSymbol: {
-    fontSize: fontScale(45),
-  },
-  easternCardTrait: {
-    fontFamily: FontFamilies.interRegular,
-    fontWeight: '600',
-    fontSize: fontScale(14),
-    color: '#C2D1F3',
-  },
-  combinationCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
-    borderRadius: radiusScale(24),
-    paddingVertical: verticalScale(16),
-    paddingHorizontal: horizontalScale(16),
+    fontSize: fontScale(32),
+    lineHeight: fontScale(38),
+    color: Colors.newOnboardingHeading,
+    textAlign: 'center',
     marginBottom: verticalScale(30),
-     borderColor:Colors.white,
-     borderWidth:1,
+    marginHorizontal: horizontalScale(6),
   },
-  combinationText: {
-    fontFamily: FontFamilies.interRegular,
-    fontWeight: '400',
-    fontSize: fontScale(14),
-    lineHeight: fontScale(20),
-    color: Colors.white,
-    marginBottom: verticalScale(12),
-  },
-  highlightText: {
-    fontFamily: FontFamilies.interSemiBold,
-    fontWeight: '800',
-    color: '#C2D1F3',
-  },
-  rarityContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: horizontalScale(5),
-  },
-  sparkleEmoji: {
-    fontSize: fontScale(18),
-  },
-  rarityText: {
-    flex: 1,
-    fontFamily: FontFamilies.interRegular,
-    fontWeight: '400',
-    fontSize: fontScale(14),
-    lineHeight: fontScale(18),
-    color: '#eac805', // Gold/yellow color
-  },
-  rarityHighlight: {
-    fontFamily: FontFamilies.interSemiBold,
-    fontWeight: '600',
-  },
-  bottomSection: {
-    paddingBottom: verticalScale(10),
-  },
-  nextButton: {
-    backgroundColor: Colors.white,
-    borderRadius: radiusScale(16),
-    paddingVertical: verticalScale(21),
+  wheelViewport: {
+    width: '100%',
+    height: verticalScale(220),
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+    overflow: 'hidden',
     marginBottom: verticalScale(16),
   },
-  nextButtonText: {
+  wheelAbsolute: {
+    width: WHEEL_SIZE,
+    height: WHEEL_SIZE,
+    position: 'absolute',
+    top: verticalScale(11),
+  },
+  pointerWrap: {
+    position: 'absolute',
+    top: verticalScale(25),
+    alignItems: 'center',
+    zIndex: moderateScale(10),
+  },
+  pointerTriangle: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: horizontalScale(33),
+    borderRightWidth: horizontalScale(33),
+    borderTopWidth: verticalScale(195),
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderTopColor: 'rgba(255, 255, 255, 0.04)',
+  },
+  pointerGlow: {
+    position: 'absolute',
+    top: 0,
+    width: horizontalScale(72),
+    height: verticalScale(104),
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderBottomLeftRadius: radiusScale(54),
+    borderBottomRightRadius: radiusScale(54),
+  },
+  pickerSection: {
+    marginBottom: verticalScale(24),
+    alignItems: 'center',
+    // backgroundColor:"red",
+    flex:1,
+    justifyContent:'center'
+    
+  },
+  datePickerWrapper: {
+    width: '100%',
+    height: verticalScale(190),
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  datePickerHighlight: {
+    position: 'absolute',
+    left: horizontalScale(2),
+    right: horizontalScale(2),
+    top: '50%',
+    height: verticalScale(44),
+    marginTop: -verticalScale(22),
+    borderRadius: radiusScale(10),
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  datePicker: {
+    width: SCREEN_WIDTH - (HORIZONTAL_PADDING * 2),
+    height: verticalScale(220),
+    backgroundColor: 'transparent',
+  },
+  androidDateButton: {
+    width: '80%',
+    paddingVertical: verticalScale(16),
+    paddingHorizontal: horizontalScale(24),
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: radiusScale(16),
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  androidDateText: {
     fontFamily: FontFamilies.interSemiBold,
     fontWeight: '600',
     fontSize: fontScale(18),
-    color: Colors.black,
+    color: Colors.newOnboardingHeading,
+    textAlign: 'center',
+  },
+  bottomSection: {
+    marginTop: 'auto',
+    paddingBottom: verticalScale(22),
   },
 });
 
 export default OnboardingScreen7;
-
-
-// import React, { useEffect, useMemo, useState } from 'react';
-// import {
-//   SafeAreaView,
-//   StyleSheet,
-//   Text,
-//   View,
-// } from 'react-native';
-// import { Calendar } from 'react-native-calendars';
-// import Svg, {
-//   Defs,
-//   Path,
-//   Stop,
-//   LinearGradient,
-//   Text as SvgText,
-//   Circle,
-// } from 'react-native-svg';
-// import Animated, {
-//   useAnimatedStyle,
-//   useSharedValue,
-//   withTiming,
-// } from 'react-native-reanimated';
-
-// type ZodiacSign =
-//   | 'aries'
-//   | 'taurus'
-//   | 'gemini'
-//   | 'cancer'
-//   | 'leo'
-//   | 'virgo'
-//   | 'libra'
-//   | 'scorpio'
-//   | 'sagittarius'
-//   | 'capricorn'
-//   | 'aquarius'
-//   | 'pisces';
-
-// type SignItem = {
-//   key: ZodiacSign;
-//   label: string;
-//   glyph: string;
-//   startMonth: number;
-//   startDay: number;
-//   endMonth: number;
-//   endDay: number;
-// };
-
-// const SIGNS: SignItem[] = [
-//   { key: 'aries', label: 'Aries', glyph: '♈', startMonth: 3, startDay: 21, endMonth: 4, endDay: 19 },
-//   { key: 'taurus', label: 'Taurus', glyph: '♉', startMonth: 4, startDay: 20, endMonth: 5, endDay: 20 },
-//   { key: 'gemini', label: 'Gemini', glyph: '♊', startMonth: 5, startDay: 21, endMonth: 6, endDay: 20 },
-//   { key: 'cancer', label: 'Cancer', glyph: '♋', startMonth: 6, startDay: 21, endMonth: 7, endDay: 22 },
-//   { key: 'leo', label: 'Leo', glyph: '♌', startMonth: 7, startDay: 23, endMonth: 8, endDay: 22 },
-//   { key: 'virgo', label: 'Virgo', glyph: '♍', startMonth: 8, startDay: 23, endMonth: 9, endDay: 22 },
-//   { key: 'libra', label: 'Libra', glyph: '♎', startMonth: 9, startDay: 23, endMonth: 10, endDay: 22 },
-//   { key: 'scorpio', label: 'Scorpio', glyph: '♏', startMonth: 10, startDay: 23, endMonth: 11, endDay: 21 },
-//   { key: 'sagittarius', label: 'Sagittarius', glyph: '♐', startMonth: 11, startDay: 22, endMonth: 12, endDay: 21 },
-//   { key: 'capricorn', label: 'Capricorn', glyph: '♑', startMonth: 12, startDay: 22, endMonth: 1, endDay: 19 },
-//   { key: 'aquarius', label: 'Aquarius', glyph: '♒', startMonth: 1, startDay: 20, endMonth: 2, endDay: 18 },
-//   { key: 'pisces', label: 'Pisces', glyph: '♓', startMonth: 2, startDay: 19, endMonth: 3, endDay: 20 },
-// ];
-
-// const SIGN_INDEX: Record<ZodiacSign, number> = {
-//   aries: 0,
-//   taurus: 1,
-//   gemini: 2,
-//   cancer: 3,
-//   leo: 4,
-//   virgo: 5,
-//   libra: 6,
-//   scorpio: 7,
-//   sagittarius: 8,
-//   capricorn: 9,
-//   aquarius: 10,
-//   pisces: 11,
-// };
-
-// const WHEEL_SIZE = 320;
-// const CENTER = WHEEL_SIZE / 2;
-// const OUTER_RADIUS = 150;
-// const INNER_RADIUS = 92;
-// const GLYPH_RADIUS = 120;
-// const SEGMENT_DEG = 30;
-// const ART_OFFSET = 0;
-
-// function degToRad(deg: number) {
-//   return (deg * Math.PI) / 180;
-// }
-
-// function polarToCartesian(
-//   cx: number,
-//   cy: number,
-//   r: number,
-//   angleDeg: number,
-// ) {
-//   const rad = degToRad(angleDeg - 90);
-//   return {
-//     x: cx + r * Math.cos(rad),
-//     y: cy + r * Math.sin(rad),
-//   };
-// }
-
-// function createDonutSegmentPath(
-//   cx: number,
-//   cy: number,
-//   outerR: number,
-//   innerR: number,
-//   startAngle: number,
-//   endAngle: number,
-// ) {
-//   const startOuter = polarToCartesian(cx, cy, outerR, startAngle);
-//   const endOuter = polarToCartesian(cx, cy, outerR, endAngle);
-//   const startInner = polarToCartesian(cx, cy, innerR, startAngle);
-//   const endInner = polarToCartesian(cx, cy, innerR, endAngle);
-//   const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
-
-//   return [
-//     `M ${startOuter.x} ${startOuter.y}`,
-//     `A ${outerR} ${outerR} 0 ${largeArcFlag} 1 ${endOuter.x} ${endOuter.y}`,
-//     `L ${endInner.x} ${endInner.y}`,
-//     `A ${innerR} ${innerR} 0 ${largeArcFlag} 0 ${startInner.x} ${startInner.y}`,
-//     'Z',
-//   ].join(' ');
-// }
-
-// function getZodiacSign(date: Date): ZodiacSign {
-//   const month = date.getMonth() + 1;
-//   const day = date.getDate();
-
-//   if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return 'aries';
-//   if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return 'taurus';
-//   if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) return 'gemini';
-//   if ((month === 6 && day >= 21) || (month === 7 && day <= 22)) return 'cancer';
-//   if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return 'leo';
-//   if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return 'virgo';
-//   if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) return 'libra';
-//   if ((month === 10 && day >= 23) || (month === 11 && day <= 21)) return 'scorpio';
-//   if ((month === 11 && day >= 22) || (month === 12 && day <= 21)) return 'sagittarius';
-//   if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return 'capricorn';
-//   if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return 'aquarius';
-//   return 'pisces';
-// }
-
-// function getTargetRotation(sign: ZodiacSign) {
-//   const index = SIGN_INDEX[sign];
-//   const signCenterAngle = index * SEGMENT_DEG + SEGMENT_DEG / 2;
-//   return -(signCenterAngle - ART_OFFSET);
-// }
-
-// function getSignMeta(sign: ZodiacSign) {
-//   return SIGNS.find(s => s.key === sign)!;
-// }
-
-// function formatRange(sign: SignItem) {
-//   const months = [
-//     '',
-//     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-//     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-//   ];
-
-//   return `${sign.startDay} ${months[sign.startMonth]} - ${sign.endDay} ${months[sign.endMonth]}`;
-// }
-
-// function toDateString(date: Date) {
-//   return date.toISOString().split('T')[0];
-// }
-
-// function fromDateString(dateString: string) {
-//   const [year, month, day] = dateString.split('-').map(Number);
-//   return new Date(year, month - 1, day);
-// }
-
-// function ZodiacWheelSvg() {
-//   const segments = useMemo(() => {
-//     return SIGNS.map((sign, index) => {
-//       const start = index * SEGMENT_DEG;
-//       const end = start + SEGMENT_DEG;
-//       const middle = start + SEGMENT_DEG / 2;
-
-//       const glyphPos = polarToCartesian(CENTER, CENTER, GLYPH_RADIUS, middle);
-
-//       return {
-//         sign,
-//         start,
-//         path: createDonutSegmentPath(
-//           CENTER,
-//           CENTER,
-//           OUTER_RADIUS,
-//           INNER_RADIUS,
-//           start,
-//           end,
-//         ),
-//         glyphX: glyphPos.x,
-//         glyphY: glyphPos.y,
-//       };
-//     });
-//   }, []);
-
-//   return (
-//     <Svg width={WHEEL_SIZE} height={WHEEL_SIZE} viewBox={`0 0 ${WHEEL_SIZE} ${WHEEL_SIZE}`}>
-//       <Defs>
-//         <LinearGradient id="segmentGrad" x1="0" y1="0" x2="1" y2="1">
-//           <Stop offset="0%" stopColor="#3A4152" />
-//           <Stop offset="50%" stopColor="#202635" />
-//           <Stop offset="100%" stopColor="#111522" />
-//         </LinearGradient>
-//         <LinearGradient id="rimGrad" x1="0" y1="0" x2="0" y2="1">
-//           <Stop offset="0%" stopColor="rgba(255,255,255,0.55)" />
-//           <Stop offset="100%" stopColor="rgba(255,255,255,0.05)" />
-//         </LinearGradient>
-//       </Defs>
-
-//       <Circle
-//         cx={CENTER}
-//         cy={CENTER}
-//         r={OUTER_RADIUS}
-//         fill="none"
-//         stroke="rgba(255,255,255,0.10)"
-//         strokeWidth={2}
-//       />
-
-//       {segments.map((item, index) => (
-//         <Path
-//           key={item.sign.key}
-//           d={item.path}
-//           fill="url(#segmentGrad)"
-//           opacity={index % 2 === 0 ? 0.95 : 0.82}
-//           stroke="rgba(255,255,255,0.04)"
-//           strokeWidth={1}
-//         />
-//       ))}
-
-//       {segments.map(item => {
-//         const outer = polarToCartesian(CENTER, CENTER, OUTER_RADIUS, item.start);
-//         const inner = polarToCartesian(CENTER, CENTER, INNER_RADIUS, item.start);
-
-//         return (
-//           <Path
-//             key={`${item.sign.key}-divider`}
-//             d={`M ${outer.x} ${outer.y} L ${inner.x} ${inner.y}`}
-//             stroke="rgba(255,255,255,0.08)"
-//             strokeWidth={1}
-//           />
-//         );
-//       })}
-
-//       {segments.map(item => (
-//         <SvgText
-//           key={`${item.sign.key}-glyph`}
-//           x={item.glyphX}
-//           y={item.glyphY}
-//           fontSize={28}
-//           fill="rgba(232,236,255,0.82)"
-//           textAnchor="middle"
-//           alignmentBaseline="middle"
-//         >
-//           {item.sign.glyph}
-//         </SvgText>
-//       ))}
-
-//       <Path
-//         d={createDonutSegmentPath(
-//           CENTER,
-//           CENTER,
-//           OUTER_RADIUS + 2,
-//           OUTER_RADIUS - 4,
-//           0,
-//           360,
-//         )}
-//         fill="url(#rimGrad)"
-//         opacity={0.4}
-//       />
-//     </Svg>
-//   );
-// }
-
-// export default function HoroscopeWheelWithCalendar() {
-//   const [selectedDateString, setSelectedDateString] = useState('2026-04-25');
-
-//   const selectedDate = useMemo(
-//     () => fromDateString(selectedDateString),
-//     [selectedDateString],
-//   );
-
-//   const selectedSign = useMemo(
-//     () => getZodiacSign(selectedDate),
-//     [selectedDate],
-//   );
-
-//   const signMeta = useMemo(
-//     () => getSignMeta(selectedSign),
-//     [selectedSign],
-//   );
-
-//   const rotation = useSharedValue(getTargetRotation(selectedSign));
-
-//   useEffect(() => {
-//     rotation.value = withTiming(getTargetRotation(selectedSign), {
-//       duration: 650,
-//     });
-//   }, [selectedSign, rotation]);
-
-//   const wheelAnimatedStyle = useAnimatedStyle(() => {
-//     return {
-//       transform: [{ rotate: `${rotation.value}deg` }],
-//     };
-//   });
-
-//   return (
-//     <SafeAreaView style={styles.safe}>
-//       <View style={styles.screen}>
-//         <Text style={styles.title}>Horoscope Wheel</Text>
-//         <Text style={styles.subtitle}>
-//           Tap a date below. The wheel rotates to that zodiac sign.
-//         </Text>
-
-//         <View style={styles.wheelViewport}>
-//           <Animated.View style={[styles.wheelAbsolute, wheelAnimatedStyle]}>
-//             <ZodiacWheelSvg />
-//           </Animated.View>
-
-//           <View pointerEvents="none" style={styles.pointerWrap}>
-//             <View style={styles.pointerTriangle} />
-//             <View style={styles.pointerGlow} />
-//           </View>
-//         </View>
-
-//         <View style={styles.infoCard}>
-//           <Text style={styles.signGlyph}>{signMeta.glyph}</Text>
-//           <Text style={styles.signName}>{signMeta.label}</Text>
-//           <Text style={styles.signRange}>{formatRange(signMeta)}</Text>
-//           <Text style={styles.selectedDateText}>
-//             Selected date: {selectedDateString}
-//           </Text>
-//         </View>
-
-//         <View style={styles.calendarWrap}>
-//           <Calendar
-//             current={selectedDateString}
-//             onDayPress={day => {
-//               setSelectedDateString(day.dateString);
-//             }}
-//             markedDates={{
-//               [selectedDateString]: {
-//                 selected: true,
-//                 selectedColor: '#FFFFFF',
-//                 selectedTextColor: '#07101F',
-//               },
-//             }}
-//             theme={{
-//               backgroundColor: '#081121',
-//               calendarBackground: '#081121',
-//               textSectionTitleColor: 'rgba(220,228,255,0.7)',
-//               selectedDayBackgroundColor: '#FFFFFF',
-//               selectedDayTextColor: '#07101F',
-//               todayTextColor: '#8FB6FF',
-//               dayTextColor: '#F2F5FF',
-//               textDisabledColor: 'rgba(255,255,255,0.22)',
-//               monthTextColor: '#F2F5FF',
-//               arrowColor: '#F2F5FF',
-//             }}
-//             style={styles.calendar}
-//           />
-//         </View>
-//       </View>
-//     </SafeAreaView>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   safe: {
-//     flex: 1,
-//     backgroundColor: '#030A1A',
-//   },
-//   screen: {
-//     flex: 1,
-//     backgroundColor: '#030A1A',
-//     alignItems: 'center',
-//     paddingHorizontal: 16,
-//     paddingTop: 10,
-//   },
-//   title: {
-//     color: '#F2F5FF',
-//     fontSize: 24,
-//     fontWeight: '700',
-//     marginTop: 8,
-//   },
-//   subtitle: {
-//     color: 'rgba(220,228,255,0.70)',
-//     fontSize: 14,
-//     textAlign: 'center',
-//     marginTop: 8,
-//     maxWidth: 320,
-//     lineHeight: 20,
-//   },
-//   wheelViewport: {
-//     width: 340,
-//     height: 210,
-//     marginTop: 22,
-//     overflow: 'hidden',
-//     alignItems: 'center',
-//     justifyContent: 'flex-start',
-//   },
-//   wheelAbsolute: {
-//     width: WHEEL_SIZE,
-//     height: WHEEL_SIZE,
-//     position: 'absolute',
-//     top: 8,
-//   },
-//   pointerWrap: {
-//     position: 'absolute',
-//     top: 0,
-//     alignItems: 'center',
-//     zIndex: 10,
-//   },
-//   pointerTriangle: {
-//     width: 0,
-//     height: 0,
-//     borderLeftWidth: 18,
-//     borderRightWidth: 18,
-//     borderBottomWidth: 95,
-//     borderLeftColor: 'transparent',
-//     borderRightColor: 'transparent',
-//     borderBottomColor: 'rgba(255,255,255,0.10)',
-//   },
-//   pointerGlow: {
-//     position: 'absolute',
-//     top: 0,
-//     width: 72,
-//     height: 120,
-//     backgroundColor: 'rgba(255,255,255,0.03)',
-//     borderBottomLeftRadius: 60,
-//     borderBottomRightRadius: 60,
-//   },
-//   infoCard: {
-//     width: '100%',
-//     maxWidth: 340,
-//     backgroundColor: 'rgba(255,255,255,0.05)',
-//     borderColor: 'rgba(255,255,255,0.08)',
-//     borderWidth: 1,
-//     borderRadius: 18,
-//     paddingVertical: 18,
-//     paddingHorizontal: 16,
-//     alignItems: 'center',
-//     marginTop: 10,
-//   },
-//   signGlyph: {
-//     color: '#F2F5FF',
-//     fontSize: 30,
-//     marginBottom: 6,
-//   },
-//   signName: {
-//     color: '#F2F5FF',
-//     fontSize: 22,
-//     fontWeight: '700',
-//   },
-//   signRange: {
-//     color: 'rgba(220,228,255,0.75)',
-//     fontSize: 14,
-//     marginTop: 4,
-//   },
-//   selectedDateText: {
-//     color: 'rgba(220,228,255,0.92)',
-//     fontSize: 14,
-//     marginTop: 10,
-//   },
-//   calendarWrap: {
-//     width: '100%',
-//     marginTop: 14,
-//     borderRadius: 18,
-//     overflow: 'hidden',
-//   },
-//   calendar: {
-//     borderRadius: 18,
-//     paddingBottom: 8,
-//   },
-// });

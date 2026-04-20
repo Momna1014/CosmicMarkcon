@@ -1,5 +1,5 @@
 /**
- * Onboarding Screen 10
+ * Onboarding Screen 12
  * Fullscreen welcome video that auto-advances to next screen on completion
  */
 
@@ -9,23 +9,23 @@ import Video from 'react-native-video';
 import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
 
-interface OnboardingScreen10Props {
+interface OnboardingScreen12Props {
   onContinue?: () => void;
 }
 
-const welcomeVideo = require('../../assets/Videos/love_match.mp4');
+const welcomeVideo = require('../../assets/Videos/chat_ai.mp4');
 
-export const OnboardingScreen10: React.FC<OnboardingScreen10Props> = ({
+export const OnboardingScreen12: React.FC<OnboardingScreen12Props> = ({
   onContinue,
 }) => {
-  useScreenView('OnboardingScreen10', {
+  useScreenView('OnboardingScreen12', {
     screen_category: 'onboarding',
-    step: 10,
+    step: 12,
     total_steps: 12,
   });
 
   useEffect(() => {
-    firebaseService.logScreenView('OnboardingScreen10', 'OnboardingScreen10');
+    firebaseService.logScreenView('OnboardingScreen12', 'OnboardingScreen12');
   }, []);
 
   const handleVideoEnd = useCallback(() => {
@@ -62,4 +62,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default OnboardingScreen10;
+export default OnboardingScreen12;

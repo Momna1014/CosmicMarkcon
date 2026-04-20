@@ -41,12 +41,11 @@ class ChatConversationService {
     const state = store.getState();
     const ob = state.onboarding;
     return {
-      name: ob.name || 'User',
+      name: ob.name,
       birthday: ob.birthday || '',
       zodiacSign: ob.zodiacSign || 'Aries',
-      birthTime: ob.birthTime || '',
-      city: ob.city || '',
-      country: ob.country || '',
+      city: ob.city,
+      country: ob.country,
     };
   }
 
@@ -294,16 +293,12 @@ The user is asking about romantic compatibility between ${yourSign || 'their sig
 Today's Date: ${today}
 
 User Profile:
-- Name: ${user.name}
 - Birthday: ${user.birthday}
-- Zodiac Sign: ${user.zodiacSign}
-- Birth Time: ${user.birthTime}
-- Birth Location: ${user.city}, ${user.country}${partnerBlock}${lovePartnerBlock}
+- Zodiac Sign: ${user.zodiacSign}${user.name ? `\n- Name: ${user.name}` : ''}${user.city && user.country ? `\n- Birth Location: ${user.city}, ${user.country}` : ''}${partnerBlock}${lovePartnerBlock}
 
 PERSONALITY & TONE:
 - Warm, wise, and mystical — like a trusted celestial guide.
-- Use SIMPLE, easy-to-understand words. Avoid heavy, complicated, or academic vocabulary. Write like you're talking to a friend — clear, warm, and down-to-earth.
-- Address the user by name occasionally.
+- Use SIMPLE, easy-to-understand words. Avoid heavy, complicated, or academic vocabulary. Write like you're talking to a friend — clear, warm, and down-to-earth.${user.name ? `\n- Address the user by name (${user.name}) occasionally.` : '\n- Use friendly, warm language when addressing the user.'}
 - Be empathetic and encouraging.
 
 RESPONSE LENGTH (VERY IMPORTANT):

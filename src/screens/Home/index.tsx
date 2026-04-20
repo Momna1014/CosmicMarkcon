@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo, useEffect, useState} from 'react';
+import React, {useCallback, useMemo, useEffect, useState, useRef} from 'react';
 import {View, StatusBar, ImageBackground, ScrollView, RefreshControl, InteractionManager} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSelector} from 'react-redux';
@@ -99,6 +99,9 @@ const HomeScreen: React.FC = () => {
     incrementSessionCount,
   } = useRating();
 
+  // Track if rating check has been done (only once per app session)
+  const hasCheckedRating = useRef(false);
+
   // Increment session count on mount
   useEffect(() => {
     if (!isRatingLoading) {
@@ -108,14 +111,26 @@ const HomeScreen: React.FC = () => {
   }, [isRatingLoading]);
 
   // Show rating modal after data loads + notification flow completes
+  // Only checks ONCE per app session (not on every data refresh)
   useEffect(() => {
+    // Skip if already checked in this session
+    if (hasCheckedRating.current) {
+      return;
+    }
+
+    // Wait for all loading states to complete
     if (cosmicLoading || isRatingLoading || isNotificationLoading) {
       return;
     }
+
     // Don't show rating if notification prompt is pending
     if (!hasShownFirstPrompt && permissionStatus === 'not-determined') {
       return;
     }
+
+    // Mark as checked to prevent re-triggering
+    hasCheckedRating.current = true;
+
     const checkRating = async () => {
       const shouldShow = await checkShouldShowRating();
       if (shouldShow) {
@@ -131,8 +146,9 @@ const HomeScreen: React.FC = () => {
   }, [cosmicLoading, isRatingLoading, isNotificationLoading, hasShownFirstPrompt, permissionStatus, checkShouldShowRating, showRatingModal]);
 
   // Memoized user name - prevents recalculation on every render
+  // Returns empty string if no name (to show only "Welcome" without name)
   const userName = useMemo(() => {
-    return onboardingData?.name?.toUpperCase() || 'ALI';
+    return onboardingData?.name?.toUpperCase() || '';
   }, [onboardingData?.name]);
 
   // Memoized zodiac sign - prevents recalculation on every render

@@ -9,6 +9,7 @@ import {View, StyleSheet} from 'react-native';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 import {Colors} from '../../theme';
 import {useApp} from '../../contexts/AppContext';
+import {getZodiacSign} from '../../components/mock/zodiacMockData';
 
 import OnboardingScreen1, {AlignmentOption} from './OnboardingScreen1';
 import OnboardingScreen2 from './OnboardingScreen2';
@@ -21,19 +22,18 @@ import OnboardingScreen8 from './OnboardingScreen8';
 import OnboardingScreen9 from './OnboardingScreen9';
 import OnboardingScreen10 from './OnboardingScreen10';
 import OnboardingScreen11 from './OnboardingScreen11';
+import OnboardingScreen12 from './OnboardingScreen12';
 
 // Re-export for external use
 export type {AlignmentOption};
 
 export interface OnboardingData {
-  alignment: AlignmentOption;
-  seeking: string[];
-  clarity: string[];
+  seeking: string[]; // Collected but not saved to Redux
+  clarity: string[]; // Collected but not saved to Redux
   gender: string | null;
   name: string;
   birthday: Date | null;
   zodiacSign: string | null;
-  birthTime: string;
   city: string;
   country: string;
 }
@@ -43,14 +43,12 @@ export const OnboardingContainer: React.FC = () => {
   const {setOnboardingCompleted, isPremium} = useApp();
   const [currentScreen, setCurrentScreen] = useState(1);
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
-    alignment: null,
     seeking: [],
     clarity: [],
     gender: null,
     name: '',
     birthday: null,
     zodiacSign: null,
-    birthTime: '',
     city: '',
     country: '',
   });
@@ -96,16 +94,12 @@ export const OnboardingContainer: React.FC = () => {
   };
 
   const handleScreen4Next = (gender: string | null) => {
-    if (gender) {
-      console.log('\n\ud83d\udd35 [Screen 4] Gender Selected:', gender);
-      setOnboardingData(prev => {
-        const updated = {...prev, gender};
-        console.log('\ud83d\udce6 [OnboardingData] Current state:', JSON.stringify(updated, null, 2));
-        return updated;
-      });
-    } else {
-      console.log('\n\ud83d\udd35 [Screen 4] No gender selected - moving forward');
-    }
+    console.log('\n🔵 [Screen 4] Gender Selected:', gender);
+    setOnboardingData(prev => {
+      const updated = {...prev, gender};
+      console.log('📦 [OnboardingData] Current state:', JSON.stringify(updated, null, 2));
+      return updated;
+    });
     setCurrentScreen(5);
   };
 
@@ -129,9 +123,15 @@ export const OnboardingContainer: React.FC = () => {
     setCurrentScreen(7);
   };
 
-  const handleScreen7Next = () => {
-    console.log('\n🔵 [Screen 7] Personalized Insights Info Viewed');
-    console.log('📦 [OnboardingData] Passing forward:', JSON.stringify(onboardingData, null, 2));
+  const handleScreen7Next = (birthday: Date) => {
+    const zodiacSign = getZodiacSign(birthday).name;
+    console.log('\n🔵 [Screen 7] Birthday Selected:', birthday.toISOString());
+    console.log('🔮 [Screen 7] Zodiac Sign:', zodiacSign);
+    setOnboardingData(prev => {
+      const updated = {...prev, birthday, zodiacSign};
+      console.log('📦 [OnboardingData] Passing forward:', JSON.stringify(updated, null, 2));
+      return updated;
+    });
     setCurrentScreen(8);
   };
 
@@ -141,28 +141,24 @@ export const OnboardingContainer: React.FC = () => {
     setCurrentScreen(9);
   };
 
-  const handleScreen9Next = (birthTime: string, city: string, country: string) => {
-    console.log('\n🔵 [Screen 9] Birth Details Entered:');
-    console.log('   - Birth Time:', birthTime);
-    console.log('   - City:', city);
-    console.log('   - Country:', country);
-    setOnboardingData(prev => {
-      const updated = {...prev, birthTime, city, country};
-      console.log('📦 [OnboardingData] COMPLETE DATA for Screen 10:', JSON.stringify(updated, null, 2));
-      return updated;
-    });
+  const handleScreen9Next = () => {
+    console.log('\n🔵 [Screen 9] Insights Preview Complete');
     setCurrentScreen(10);
   };
 
-  const handleScreen10Complete = () => {
-    console.log('\n🔵 [Screen 10] Loading Complete - Data Saved to Redux');
-    console.log('📦 [OnboardingData] Final state:', JSON.stringify(onboardingData, null, 2));
+  const handleScreen10Next = () => {
+    console.log('\n🔵 [Screen 10] Video Complete');
     setCurrentScreen(11);
   };
 
-  const handleScreen11Next = async () => {
-    console.log('\n========================================');
-    console.log('🎉 [Screen 11] ONBOARDING COMPLETE!');
+  const handleScreen11Next = () => {
+    console.log('\n🔵 [Screen 11] Video Complete');
+    setCurrentScreen(12);
+  };
+
+  const handleScreen12Next = async () => {
+    console.log('\n========================================')
+    console.log('🎉 [Screen 12] ONBOARDING COMPLETE!');
     console.log('========================================');
     console.log('📦 FINAL ONBOARDING DATA:', JSON.stringify(onboardingData, null, 2));
     console.log('========================================\n');
@@ -216,6 +212,7 @@ export const OnboardingContainer: React.FC = () => {
           <OnboardingScreen4
             onNext={handleScreen4Next}
             onGoBack={handleGoBack}
+            gender={onboardingData.gender}
           />
         );
       case 5:
@@ -223,6 +220,7 @@ export const OnboardingContainer: React.FC = () => {
           <OnboardingScreen5
             onNext={handleScreen5Next}
             onGoBack={handleGoBack}
+            gender={onboardingData.gender}
           />
         );
       case 6:
@@ -230,41 +228,47 @@ export const OnboardingContainer: React.FC = () => {
           <OnboardingScreen6
             onNext={handleScreen6Next}
             onGoBack={handleGoBack}
+            gender={onboardingData.gender}
           />
         );
       case 7:
         return (
           <OnboardingScreen7
             onNext={handleScreen7Next}
-            onboardingData={onboardingData}
+            onGoBack={handleGoBack}
           />
         );
       case 8:
         return (
           <OnboardingScreen8
             onNext={handleScreen8Next}
-            onboardingData={onboardingData}
+            onGoBack={handleGoBack}
           />
         );
       case 9:
         return (
           <OnboardingScreen9
             onNext={handleScreen9Next}
+            onGoBack={handleGoBack}
             onboardingData={onboardingData}
           />
         );
       case 10:
         return (
           <OnboardingScreen10
-            onComplete={handleScreen10Complete}
-            onboardingData={onboardingData}
+            onContinue={handleScreen10Next}
           />
         );
       case 11:
         return (
           <OnboardingScreen11
-            onNext={handleScreen11Next}
-            onboardingData={onboardingData}
+            onContinue={handleScreen11Next}
+          />
+        );
+      case 12:
+        return (
+          <OnboardingScreen12
+            onContinue={handleScreen12Next}
           />
         );
       default:

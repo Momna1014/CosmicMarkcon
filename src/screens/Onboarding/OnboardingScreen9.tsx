@@ -1,35 +1,33 @@
 /**
- * OnboardingScreen9 - Birth Time & Place Screen
+ * OnboardingScreen9 - Personalized Daily Insights Preview
  *
- * Allows user to select birth time (AM/PM) and birth place (City, Country)
- * For calculating Rising sign and exact sky map
- *
- * Optimized for performance with separate memoized components
+ * Shows preview of personalized insights with character and floating cards
  */
 
-import React, {memo, useEffect, useState, useCallback, useMemo} from 'react';
+import React, {useEffect} from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ImageBackground,
-  Dimensions,
   TouchableOpacity,
   StatusBar,
+  Image,
+  Platform,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {useTranslation} from 'react-i18next';
+import {BlurView} from '@react-native-community/blur';
+import {useDispatch} from 'react-redux';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
   withRepeat,
-  withSequence,
+  withDelay,
   Easing,
   FadeIn,
   FadeInDown,
   FadeInUp,
-  withDelay,
+  ZoomIn,
 } from 'react-native-reanimated';
 import {
   Colors,
@@ -38,399 +36,72 @@ import {
   horizontalScale,
   verticalScale,
   radiusScale,
+  moderateScale,
 } from '../../theme';
-import {ICountry, ICity, City} from 'country-state-city';
-import {OnboardingData} from './OnboardingContainer';
-import {
-  TimePickerModal,
-  TimePickerValue,
-  CountryPickerModal,
-  CityPickerModal,
-} from '../../components/pickers';
-
-// SVG Icons
-import WatchIcon from '../../assets/icons/onboarding_icons/watch.svg';
-import PolicyIcon from '../../assets/icons/onboarding_icons/policy.svg';
 import {hapticLight} from '../../utils/haptics';
-import {
-  trackOnboarding9View,
-  trackOnboarding9TimeSelected,
-  trackOnboarding9CountrySelected,
-  trackOnboarding9CitySelected,
-  trackOnboarding9Continue,
-} from '../../utils/onboardingAnalytics';
 import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
+import {saveOnboardingData} from '../../redux/slices/onboardingSlice';
+import {getZodiacSign} from '../../components/mock/zodiacMockData';
+import type {AppDispatch} from '../../redux/store';
+import {OnboardingButton} from '../../components/OnboardingButton';
+import {OnboardingData} from './OnboardingContainer';
 
-const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
+// Icons
+import BackArrowIcon from '../../assets/icons/new_onboarding/back_arrow.svg';
 
-// Background image - same as other onboarding screens
-const BackgroundImageSource = require('../../assets/icons/onboarding_icons/background_image.png');
+// Character and card images
+const CharacterImage = require('../../assets/icons/new_onboarding/character.png');
+const InnerGuidanceImage = require('../../assets/icons/new_onboarding/moneymoney.png');
+const MoneyCareerImage = require('../../assets/icons/new_onboarding/money.png');
+const LoveRomanceImage = require('../../assets/icons/new_onboarding/love&romance.png');
 
-// Animated TouchableOpacity
-const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
-
-// Memoized Twinkling Star Component
-interface TwinklingStarProps {
-  size: number;
-  top: number;
-  left: number;
-  delay: number;
-  intensity: 'low' | 'medium' | 'high';
-}
-
-const TwinklingStar = memo<TwinklingStarProps>(
-  ({size, top, left, delay, intensity}) => {
-    const opacity = useSharedValue(0.3);
-    const scale = useSharedValue(0.8);
-
-    const opacityRange = useMemo(
-      () => ({
-        low: {min: 0.2, max: 0.5},
-        medium: {min: 0.3, max: 0.7},
-        high: {min: 0.4, max: 1.0},
-      }),
-      [],
-    );
-
-    const scaleRange = useMemo(
-      () => ({
-        low: {min: 0.8, max: 1.0},
-        medium: {min: 0.7, max: 1.1},
-        high: {min: 0.6, max: 1.2},
-      }),
-      [],
-    );
-
-    const durationRange = useMemo(
-      () => ({
-        low: 3000,
-        medium: 2500,
-        high: 2000,
-      }),
-      [],
-    );
-
-    useEffect(() => {
-      const range = opacityRange[intensity];
-      const scaleR = scaleRange[intensity];
-      const duration = durationRange[intensity];
-
-      opacity.value = withDelay(
-        delay,
-        withRepeat(
-          withSequence(
-            withTiming(range.max, {
-              duration,
-              easing: Easing.inOut(Easing.ease),
-            }),
-            withTiming(range.min, {
-              duration,
-              easing: Easing.inOut(Easing.ease),
-            }),
-          ),
-          -1,
-          true,
-        ),
-      );
-
-      scale.value = withDelay(
-        delay,
-        withRepeat(
-          withSequence(
-            withTiming(scaleR.max, {
-              duration: duration * 0.8,
-              easing: Easing.inOut(Easing.ease),
-            }),
-            withTiming(scaleR.min, {
-              duration: duration * 0.8,
-              easing: Easing.inOut(Easing.ease),
-            }),
-          ),
-          -1,
-          true,
-        ),
-      );
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const animatedStyle = useAnimatedStyle(() => ({
-      opacity: opacity.value,
-      transform: [{scale: scale.value}],
-    }));
-
-    return (
-      <Animated.View
-        style={[
-          styles.star,
-          {
-            width: size,
-            height: size,
-            borderRadius: size / 2,
-            top,
-            left,
-          },
-          animatedStyle,
-        ]}
-      />
-    );
-  },
-);
-
-// Memoized Birth Time Card
-interface BirthTimeCardProps {
-  timeValue: TimePickerValue | null;
-  onPress: () => void;
-}
-
-const BirthTimeCard = memo<BirthTimeCardProps>(({timeValue, onPress}) => {
-  const {t} = useTranslation();
-
-  const formatTimeDisplay = useCallback(() => {
-    if (!timeValue) {
-      return null;
-    }
-    const hour = String(timeValue.hour).padStart(2, '0');
-    const minute = String(timeValue.minute).padStart(2, '0');
-    return `${hour}:${minute} ${timeValue.ampm}`;
-  }, [timeValue]);
-
-  const displayTime = formatTimeDisplay();
-
-  return (
-    <Animated.View
-      entering={FadeInUp.delay(500).duration(500).springify()}
-      style={styles.card}>
-      <TouchableOpacity
-        style={styles.cardTouchable}
-        onPress={onPress}
-        activeOpacity={0.8}>
-        <View style={styles.cardHeader}>
-          <Text style={styles.cardLabel}>{t('onboarding.screen9.birthTime')}</Text>
-          <WatchIcon width={24} height={24} />
-        </View>
-        <View style={styles.timeDisplayContainer}>
-          {displayTime ? (
-            <Text style={styles.timeDisplay}>{displayTime}</Text>
-          ) : (
-            <Text style={styles.timePlaceholder}>--:-- --</Text>
-          )}
-        </View>
-        <Text style={styles.cardHint}>
-          {t('onboarding.screen9.timeHint')}
-        </Text>
-      </TouchableOpacity>
-    </Animated.View>
-  );
-});
-
-// Memoized Birth Place Card
-interface BirthPlaceCardProps {
-  selectedCountry: ICountry | null;
-  selectedCity: ICity | null;
-  countryHasCities: boolean;
-  onCountryPress: () => void;
-  onCityPress: () => void;
-}
-
-const BirthPlaceCard = memo<BirthPlaceCardProps>(
-  ({selectedCountry, selectedCity, countryHasCities, onCountryPress, onCityPress}) => {
-    const {t} = useTranslation();
-
-    return (
-      <Animated.View
-        entering={FadeInUp.delay(600).duration(500).springify()}
-        style={styles.card}>
-        <Text style={styles.cardLabelPurple}>{t('onboarding.screen9.birthPlace')}</Text>
-
-        {/* Country Picker Button - Always show first */}
-        <TouchableOpacity
-          style={styles.locationPickerButton}
-          onPress={onCountryPress}
-          activeOpacity={0.8}>
-          <Text
-            style={[
-              styles.locationPickerText,
-              !selectedCountry && styles.locationPickerPlaceholder,
-            ]}>
-            {selectedCountry?.name || t('onboarding.screen9.selectCountry')}
-          </Text>
-        </TouchableOpacity>
-
-        {/* City Picker Button - Only show when country is selected AND has cities */}
-        {selectedCountry && countryHasCities && (
-          <TouchableOpacity
-            style={styles.locationPickerButton}
-            onPress={onCityPress}
-            activeOpacity={0.8}>
-            <Text
-              style={[
-                styles.locationPickerText,
-                !selectedCity && styles.locationPickerPlaceholder,
-              ]}>
-              {selectedCity?.name || t('onboarding.screen9.selectCity')}
-            </Text>
-          </TouchableOpacity>
-        )}
-
-        <Text style={styles.cardHintSmall}>
-          {countryHasCities ? t('onboarding.screen9.cardHintWithCity') : t('onboarding.screen9.cardHintNoCity')}
-        </Text>
-      </Animated.View>
-    );
-  },
-);
-
-// Stars configuration - moved outside component to prevent recreation
-const STARS_CONFIG = [
-  {
-    size: 6,
-    top: SCREEN_HEIGHT * 0.08,
-    left: SCREEN_WIDTH * 0.15,
-    delay: 0,
-    intensity: 'high' as const,
-  },
-  {
-    size: 4,
-    top: SCREEN_HEIGHT * 0.12,
-    left: SCREEN_WIDTH * 0.75,
-    delay: 300,
-    intensity: 'medium' as const,
-  },
-  {
-    size: 8,
-    top: SCREEN_HEIGHT * 0.05,
-    left: SCREEN_WIDTH * 0.5,
-    delay: 600,
-    intensity: 'high' as const,
-  },
-  {
-    size: 3,
-    top: SCREEN_HEIGHT * 0.1,
-    left: SCREEN_WIDTH * 0.9,
-    delay: 150,
-    intensity: 'low' as const,
-  },
-  {
-    size: 5,
-    top: SCREEN_HEIGHT * 0.15,
-    left: SCREEN_WIDTH * 0.3,
-    delay: 450,
-    intensity: 'medium' as const,
-  },
-  {
-    size: 7,
-    top: SCREEN_HEIGHT * 0.2,
-    left: SCREEN_WIDTH * 0.85,
-    delay: 200,
-    intensity: 'high' as const,
-  },
-  {
-    size: 4,
-    top: SCREEN_HEIGHT * 0.22,
-    left: SCREEN_WIDTH * 0.1,
-    delay: 800,
-    intensity: 'medium' as const,
-  },
-  {
-    size: 6,
-    top: SCREEN_HEIGHT * 0.25,
-    left: SCREEN_WIDTH * 0.6,
-    delay: 100,
-    intensity: 'high' as const,
-  },
-  {
-    size: 3,
-    top: SCREEN_HEIGHT * 0.18,
-    left: SCREEN_WIDTH * 0.45,
-    delay: 550,
-    intensity: 'low' as const,
-  },
-  {
-    size: 5,
-    top: SCREEN_HEIGHT * 0.75,
-    left: SCREEN_WIDTH * 0.2,
-    delay: 300,
-    intensity: 'medium' as const,
-  },
-  {
-    size: 6,
-    top: SCREEN_HEIGHT * 0.78,
-    left: SCREEN_WIDTH * 0.65,
-    delay: 100,
-    intensity: 'high' as const,
-  },
-  {
-    size: 5,
-    top: SCREEN_HEIGHT * 0.82,
-    left: SCREEN_WIDTH * 0.9,
-    delay: 550,
-    intensity: 'medium' as const,
-  },
-  {
-    size: 7,
-    top: SCREEN_HEIGHT * 0.85,
-    left: SCREEN_WIDTH * 0.4,
-    delay: 200,
-    intensity: 'high' as const,
-  },
-];
+const HORIZONTAL_PADDING = horizontalScale(16);
 
 interface OnboardingScreen9Props {
-  onNext?: (birthTime: string, city: string, country: string) => void;
-  onboardingData: OnboardingData;
+  onNext?: () => void;
+  onGoBack?: () => void;
+  onboardingData?: OnboardingData;
 }
 
 export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
   onNext,
-  onboardingData: _onboardingData,
+  onGoBack,
+  onboardingData,
 }) => {
-  const {t} = useTranslation();
-
-  // ===== Analytics: Track screen view =====
+  const dispatch = useDispatch<AppDispatch>();
+  
   useScreenView('OnboardingScreen9', {
     screen_category: 'onboarding',
     step: 9,
-    total_steps: 11,
+    total_steps: 9,
   });
 
-  // State - Deferred loading for modals
-  const [isReady, setIsReady] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
-  const [timeValue, setTimeValue] = useState<TimePickerValue | null>(null);
+  const CURRENT_STEP = 9;
+  const TOTAL_STEPS = 9;
+  const progressWidth = useSharedValue((CURRENT_STEP - 1) / TOTAL_STEPS * 100);
 
-  const [selectedCountry, setSelectedCountry] = useState<ICountry | null>(null);
-  const [selectedCity, setSelectedCity] = useState<ICity | null>(null);
-  const [countryHasCities, setCountryHasCities] = useState(true);
-  const [showCountryPicker, setShowCountryPicker] = useState(false);
-  const [showCityPicker, setShowCityPicker] = useState(false);
+  // Character bounce animation
+  const bounceY = useSharedValue(0);
 
-  // Progress bar animation - start from previous screen's value (73%)
-  const progressWidth = useSharedValue(73);
-
-  // Button scale animation
-  const buttonScale = useSharedValue(1);
-
-  // Defer heavy operations to after mount using requestAnimationFrame
   useEffect(() => {
-    // Track screen view
-    trackOnboarding9View();
-    
-    // Firebase screen view logging
     firebaseService.logScreenView('OnboardingScreen9', 'OnboardingScreen9');
-    
-    // Use requestAnimationFrame as a lightweight alternative to InteractionManager
-    const frameId = requestAnimationFrame(() => {
-      setIsReady(true);
-    });
 
-    // Animate progress bar on mount - Screen 9 of 11 (82%)
+    const targetProgress = (CURRENT_STEP / TOTAL_STEPS) * 100;
     progressWidth.value = withDelay(
       300,
-      withTiming(82, {duration: 800, easing: Easing.out(Easing.cubic)}),
+      withTiming(targetProgress, {duration: 800, easing: Easing.out(Easing.cubic)}),
     );
 
-    return () => cancelAnimationFrame(frameId);
+    // Smooth continuous bounce animation - up and down
+    bounceY.value = withRepeat(
+      withTiming(12, {
+        duration: 1100,
+        easing: Easing.inOut(Easing.ease),
+      }),
+      -1,
+      true,
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -438,457 +109,433 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
     width: `${progressWidth.value}%`,
   }));
 
-  const buttonAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{scale: buttonScale.value}],
+  const characterAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{translateY: bounceY.value}],
   }));
 
-  // Handlers - memoized to prevent re-renders
-  const handleNext = useCallback(() => {
+  const handleContinue = () => {
     hapticLight();
-    buttonScale.value = withSequence(
-      withTiming(1.02, {duration: 100}),
-      withTiming(1, {duration: 100}),
-    );
-
-    const timeString = timeValue
-      ? `${timeValue.hour}:${String(timeValue.minute).padStart(2, '0')} ${timeValue.ampm}`
-      : '';
-
-    // Track completion with location data
-    trackOnboarding9Continue(
-      Boolean(timeString),
-      Boolean(selectedCountry?.name),
-      Boolean(selectedCity?.name),
-    );
-
-    setTimeout(() => {
-      onNext?.(
-        timeString,
-        selectedCity?.name || '',
-        selectedCountry?.name || '',
-      );
-    }, 150);
-  }, [timeValue, selectedCity, selectedCountry, onNext, buttonScale]);
-
-  const handleOpenTimePicker = useCallback(() => {
-    setShowTimePicker(true);
-  }, []);
-
-  const handleCloseTimePicker = useCallback(() => {
-    setShowTimePicker(false);
-  }, []);
-
-  const handleTimeConfirm = useCallback((value: TimePickerValue) => {
-    setTimeValue(value);
-    setShowTimePicker(false);
-    // Track time selection with AM/PM
-    trackOnboarding9TimeSelected(value.ampm);
-  }, []);
-
-  const handleOpenCountryPicker = useCallback(() => {
-    setShowCountryPicker(true);
-  }, []);
-
-  const handleCloseCountryPicker = useCallback(() => {
-    setShowCountryPicker(false);
-  }, []);
-
-  const handleCountrySelect = useCallback((country: ICountry) => {
-    setSelectedCountry(country);
-    setSelectedCity(null); // Reset city when country changes
     
-    // Track country selection
-    trackOnboarding9CountrySelected(country.name);
-    
-    // Check if country has cities
-    const cities = City.getCitiesOfCountry(country.isoCode) || [];
-    setCountryHasCities(cities.length > 0);
-  }, []);
-
-  const handleOpenCityPicker = useCallback(() => {
-    if (selectedCountry) {
-      setShowCityPicker(true);
+    // Save data to Redux when user clicks "Explore Insights"
+    if (onboardingData) {
+      console.log('\n🎯 [Screen 9] Saving onboarding data to Redux...');
+      console.log('📦 Data to save:', onboardingData);
+      
+      // Prepare data for Redux (only essential fields)
+      const zodiacSign = onboardingData.birthday 
+        ? getZodiacSign(onboardingData.birthday).name 
+        : null;
+      
+      dispatch(saveOnboardingData({
+        gender: onboardingData.gender,
+        name: onboardingData.name,
+        birthday: onboardingData.birthday ? onboardingData.birthday.toISOString() : null,
+        zodiacSign: zodiacSign || undefined,
+        city: onboardingData.city,
+        country: onboardingData.country,
+      }));
+      
+      console.log('✅ [Screen 9] Data saved to Redux');
     }
-  }, [selectedCountry]);
+    
+    onNext?.();
+  };
 
-  const handleCloseCityPicker = useCallback(() => {
-    setShowCityPicker(false);
-  }, []);
-
-  const handleCitySelect = useCallback((city: ICity) => {
-    setSelectedCity(city);
-    // Track city selection
-    trackOnboarding9CitySelected(city.name);
-  }, []);
-
-  // Check if all fields are filled
-  // City is only required if the country has cities
-  const isFormComplete = useMemo(() => {
-    if (!timeValue || !selectedCountry) return false;
-    // If country has cities, require city selection; otherwise just country is enough
-    return countryHasCities ? Boolean(selectedCity) : true;
-  }, [timeValue, selectedCountry, selectedCity, countryHasCities]);
+  const handleBack = () => {
+    hapticLight();
+    onGoBack?.();
+  };
 
   return (
-    <View style={styles.backgroundFallback}>
-      <ImageBackground
-        source={BackgroundImageSource}
-        style={styles.container}
-        resizeMode="cover">
-        <SafeAreaView style={styles.safeArea}>
-          <StatusBar
-            barStyle="light-content"
-            backgroundColor="transparent"
-            translucent
-          />
-          {/* Twinkling Stars Overlay */}
-          {STARS_CONFIG.map((star, index) => (
-            <TwinklingStar
-              key={index}
-              size={star.size}
-              top={star.top}
-              left={star.left}
-              delay={star.delay}
-              intensity={star.intensity}
-            />
-          ))}
+    <View style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="transparent"
+          translucent
+        />
 
-          {/* Content */}
-          <View style={styles.contentContainer}>
-            {/* Progress Bar */}
-            <Animated.View
-              entering={FadeIn.delay(100).duration(400)}
-              style={styles.progressBarContainer}>
+        <View style={styles.content}>
+          {/* Header: Back + Progress Bar + Step Counter */}
+          <Animated.View
+            entering={FadeIn.delay(350).duration(400)}
+            style={styles.header}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={handleBack}
+              activeOpacity={0.7}
+              hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+              <BackArrowIcon width={moderateScale(24)} height={moderateScale(24)} />
+            </TouchableOpacity>
+
+            <View style={styles.progressBarContainer}>
               <View style={styles.progressBarBackground}>
                 <Animated.View
                   style={[styles.progressBarFilled, progressAnimatedStyle]}
                 />
               </View>
-            </Animated.View>
+            </View>
 
-            {/* Main Heading */}
-            <Animated.Text
-              entering={FadeInDown.delay(200).duration(600).springify()}
-              style={styles.mainHeading}>
-              {t('onboarding.screen9.heading')}
-            </Animated.Text>
+            <Text style={styles.stepCounter}>{CURRENT_STEP}/{TOTAL_STEPS}</Text>
+          </Animated.View>
 
-            <Animated.Text
-              entering={FadeInDown.delay(300).duration(600).springify()}
-              style={styles.subHeadingYellow}>
-              {t('onboarding.screen9.emphasis')}
-            </Animated.Text>
+          {/* Main Heading */}
+          <Animated.Text
+            entering={FadeInDown.delay(450).duration(500)}
+            style={styles.mainHeading}>
+            Your Personalized{'\n'}Daily Insights
+          </Animated.Text>
 
-            <Animated.Text
-              entering={FadeInDown.delay(400).duration(600).springify()}
-              style={styles.description}>
-              {t('onboarding.screen9.subheading')}
-            </Animated.Text>
+          {/* Subheading */}
+          <Animated.Text
+            entering={FadeInDown.delay(600).duration(500)}
+            style={styles.subHeading}>
+            Explore tailored guidance. Discover love,{'\n'}career, and personal growth insights.
+          </Animated.Text>
 
-            {/* Birth Time Card */}
-            <BirthTimeCard
-              timeValue={timeValue}
-              onPress={handleOpenTimePicker}
-            />
-
-            {/* Birth Place Card */}
-            <BirthPlaceCard
-              selectedCountry={selectedCountry}
-              selectedCity={selectedCity}
-              countryHasCities={countryHasCities}
-              onCountryPress={handleOpenCountryPicker}
-              onCityPress={handleOpenCityPicker}
-            />
-
-            {/* Privacy Notice */}
-            <Animated.View
-              entering={FadeInUp.delay(700).duration(500)}
-              style={styles.privacyContainer}>
-              <PolicyIcon width={16} height={16} />
-              <Text style={styles.privacyText}>
-                {t('onboarding.screen9.privacy')}
-              </Text>
-            </Animated.View>
-
-            {/* Completion Text - Only visible when form is complete */}
-            {isFormComplete && (
+          {/* Character Image with Bounce Animation */}
+          <View style={styles.characterContainer}>
+            <View style={styles.characterImageWrapper}>
+              {/* Character with bounce animation */}
               <Animated.View
-                entering={FadeIn.duration(400)}
-                style={styles.completionContainer}>
-                <Text style={styles.completionText}>
-                  {t('onboarding.screen9.completionPart1')}
-                  <Text style={styles.completionTextHighlight}>
-                    {t('onboarding.screen9.completionHighlight')}
-                  </Text>
-                  {t('onboarding.screen9.completionPart2')}
-                </Text>
+                entering={FadeIn.delay(50).duration(300)}
+                style={[styles.characterAnimated, characterAnimatedStyle]}>
+                <Image
+                  source={CharacterImage}
+                  style={styles.characterImage}
+                  resizeMode="contain"
+                />
               </Animated.View>
-            )}
 
-            {/* Spacer */}
-            <View style={styles.spacer} />
+              {/* Fixed Floating Cards - Positioned on character but don't move */}
+              {/* Inner Guidance Card - Top Left */}
+              <View style={[styles.floatingCard, styles.card1, styles.cardRotation1]}>
+                <Animated.View entering={ZoomIn.delay(1050).duration(400).springify()}>
+                <View style={styles.glassCardContainer}>
+                  {Platform.OS === 'ios' ? (
+                    <BlurView
+                      style={styles.glassBlur}
+                      blurType="light"
+                      blurAmount={20}
+                      reducedTransparencyFallbackColor="rgba(255, 255, 255, 0.15)"
+                    />
+                  ) : (
+                    <View style={styles.glassBlurAndroid} />
+                  )}
+                  <View style={styles.cardContent}>
+                    <View style={styles.cardRow}>
+                      <Image
+                        source={InnerGuidanceImage}
+                        style={styles.cardIcon}
+                        resizeMode="contain"
+                      />
+                      <Text style={styles.cardLabel}>Inner &{'\n'}Guidance</Text>
+                    </View>
+                    <View style={[styles.cardProgressBarContainer, styles.progressRotation1]}>
+                      <View style={styles.cardProgressBarBackground}>
+                        <View style={[styles.cardProgressBarFill, styles.cardProgress70, styles.cardProgressPink]} />
+                      </View>
+                    </View>
+                  </View>
+                </View>
+                </Animated.View>
+              </View>
 
-            {/* Bottom Section */}
-            <Animated.View
-              entering={FadeInUp.delay(800).duration(500)}
-              style={styles.bottomSection}>
-              <AnimatedTouchable
-                style={[
-                  styles.nextButton,
-                  buttonAnimatedStyle,
-                  !isFormComplete && styles.nextButtonDisabled,
-                ]}
-                onPress={handleNext}
-                activeOpacity={0.8}
-                disabled={!isFormComplete}>
-                <Text
-                  style={[
-                    styles.nextButtonText,
-                    !isFormComplete && styles.nextButtonTextDisabled,
-                  ]}>
-                  {t('onboarding.screen9.button')}
-                </Text>
-              </AnimatedTouchable>
-            </Animated.View>
+              {/* Money & Career Card - Right */}
+              <View style={[styles.floatingCard, styles.card2, styles.cardRotation2]}>
+                <Animated.View entering={ZoomIn.delay(1200).duration(400).springify()}>
+                <View style={styles.glassCardContainer}>
+                  {Platform.OS === 'ios' ? (
+                    <BlurView
+                      style={styles.glassBlur}
+                      blurType="light"
+                      blurAmount={20}
+                      reducedTransparencyFallbackColor="rgba(255, 255, 255, 0.15)"
+                    />
+                  ) : (
+                    <View style={styles.glassBlurAndroid} />
+                  )}
+                  <View style={styles.cardContent}>
+                    <View style={styles.cardRow}>
+                      <Image
+                        source={MoneyCareerImage}
+                        style={styles.cardIcon}
+                        resizeMode="contain"
+                      />
+                      <Text style={styles.cardLabel}>Money &{'\n'}Career</Text>
+                    </View>
+                    <View style={[styles.cardProgressBarContainer, styles.progressRotation2]}>
+                      <View style={styles.cardProgressBarBackground}>
+                        <View style={[styles.cardProgressBarFill, styles.cardProgress50, styles.cardProgressBlue]} />
+                      </View>
+                    </View>
+                  </View>
+                </View>
+                </Animated.View>
+              </View>
+
+              {/* Love & Romance Card - Bottom Left */}
+              <View style={[styles.floatingCard, styles.card3, styles.cardRotation3]}>
+                <Animated.View entering={ZoomIn.delay(1350).duration(400).springify()}>
+                <View style={styles.glassCardContainer}>
+                  {Platform.OS === 'ios' ? (
+                    <BlurView
+                      style={styles.glassBlur}
+                      blurType="light"
+                      blurAmount={20}
+                      reducedTransparencyFallbackColor="rgba(255, 255, 255, 0.15)"
+                    />
+                  ) : (
+                    <View style={styles.glassBlurAndroid} />
+                  )}
+                  <View style={styles.cardContent}>
+                    <View style={styles.cardRow}>
+                      <Image
+                        source={LoveRomanceImage}
+                        style={styles.cardIcon}
+                        resizeMode="contain"
+                      />
+                      <Text style={styles.cardLabel}>Love &{'\n'}Romance</Text>
+                    </View>
+                    <View style={[styles.cardProgressBarContainer, styles.progressRotation3]}>
+                      <View style={styles.cardProgressBarBackground}>
+                        <View style={[styles.cardProgressBarFill, styles.cardProgress60, styles.cardProgressPink]} />
+                      </View>
+                    </View>
+                  </View>
+                </View>
+                </Animated.View>
+              </View>
+            </View>
           </View>
 
-          {/* Modals - Only render when ready to avoid blocking navigation */}
-          {isReady && (
-            <>
-              <TimePickerModal
-                visible={showTimePicker}
-                onClose={handleCloseTimePicker}
-                onConfirm={handleTimeConfirm}
-                initialValue={timeValue || undefined}
-              />
+          {/* Spacer to push button to bottom */}
+          <View style={styles.spacer} />
 
-              <CountryPickerModal
-                visible={showCountryPicker}
-                onClose={handleCloseCountryPicker}
-                onSelect={handleCountrySelect}
-              />
-
-              {selectedCountry && (
-                <CityPickerModal
-                  visible={showCityPicker}
-                  onClose={handleCloseCityPicker}
-                  onSelect={handleCitySelect}
-                  countryCode={selectedCountry.isoCode}
-                  countryName={selectedCountry.name}
-                />
-              )}
-            </>
-          )}
-        </SafeAreaView>
-      </ImageBackground>
+          {/* Explore Insights Button */}
+          <Animated.View
+            entering={FadeInUp.delay(850).duration(500)}
+            style={styles.bottomSection}>
+            <OnboardingButton
+              text="Explore Insights"
+              onPress={handleContinue}
+            />
+          </Animated.View>
+        </View>
+      </SafeAreaView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  backgroundFallback: {
-    flex: 1,
-    backgroundColor: Colors.cosmicBackground,
-  },
   container: {
     flex: 1,
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
+    backgroundColor: Colors.newOnboardingBg,
   },
   safeArea: {
     flex: 1,
   },
-  star: {
-    position: 'absolute',
-    backgroundColor: Colors.white,
-    shadowColor: Colors.white,
-    shadowOffset: {width: 0, height: 0},
-    shadowOpacity: 0.8,
-    shadowRadius: 4,
-    elevation: 8,
-  },
-  contentContainer: {
+  content: {
     flex: 1,
-    paddingHorizontal: horizontalScale(24),
+    paddingHorizontal: HORIZONTAL_PADDING,
+  },
+  // Header
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: verticalScale(10),
+    marginBottom: verticalScale(16),
+  },
+  backButton: {
+    marginRight: horizontalScale(12),
   },
   progressBarContainer: {
-    marginBottom: verticalScale(24),
-    paddingTop: verticalScale(10),
+    flex: 1,
+    marginRight: horizontalScale(12),
   },
   progressBarBackground: {
-    height: verticalScale(8),
-    backgroundColor: Colors.progressBarBackground,
-    borderRadius: radiusScale(8),
+    height: verticalScale(6),
+    backgroundColor: 'rgba(184, 190, 208, 0.2)',
+    borderRadius: radiusScale(6),
     overflow: 'hidden',
   },
   progressBarFilled: {
-    width: '90%',
     height: '100%',
-    backgroundColor: Colors.progressBarFilled,
-    borderRadius: radiusScale(2),
+    backgroundColor: Colors.newOnboardingProgressFilled,
+    borderRadius: radiusScale(6),
   },
+  stepCounter: {
+    fontFamily: FontFamilies.interSemiBold,
+    fontWeight: '600',
+    fontSize: fontScale(14),
+    color: Colors.white,
+  },
+  // Typography
   mainHeading: {
     fontFamily: FontFamilies.sunlightDreams,
-    fontWeight: '400',
-    fontSize: fontScale(36),
-    lineHeight: fontScale(50),
-    color: Colors.white,
+    fontWeight: '700',
+    fontSize: fontScale(32),
+    lineHeight: fontScale(36),
+    color: Colors.newOnboardingHeading,
+    textAlign: 'center',
+    marginBottom: verticalScale(8),
   },
-  subHeadingYellow: {
-    fontFamily: FontFamilies.sunlightDreams,
-    fontWeight: '400',
-    fontSize: fontScale(36),
-    lineHeight: fontScale(43),
-    color: '#C6A6FE',
-    marginBottom: verticalScale(12),
-  },
-  description: {
+  subHeading: {
     fontFamily: FontFamilies.interRegular,
-    fontWeight: '600',
+    fontWeight: '400',
     fontSize: fontScale(16),
     lineHeight: fontScale(20),
-    color: '#C2D1F3',
-    marginBottom: verticalScale(24),
+    color: Colors.newOnboardingSubheading,
+    textAlign: 'center',
+    marginBottom: verticalScale(20),
   },
-  card: {
-    backgroundColor: 'rgba(190, 190, 190, 0.09)',
-    borderRadius: radiusScale(24),
-    padding: horizontalScale(16),
-    marginBottom: verticalScale(16),
+  // Character Container
+  characterContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  characterImageWrapper: {
+    position: 'relative',
+    width: horizontalScale(280),
+    height: verticalScale(400),
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  characterAnimated: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  characterImage: {
+    width: '100%',
+    height: '100%',
+  },
+  // Floating Cards - Glassmorphism
+  floatingCard: {
+    position: 'absolute',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 8},
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 10,
+  },
+  card1: {
+    top: verticalScale(40),
+    left: -horizontalScale(30),
+  },
+  card2: {
+    top: verticalScale(160),
+    right: -horizontalScale(40),
+  },
+  card3: {
+    bottom: verticalScale(-10),
+    left: -horizontalScale(20),
+  },
+  cardRotation1: {
+    transform: [{rotate: '15deg'}],
+  },
+  cardRotation2: {
+    transform: [{rotate: '-5deg'}],
+  },
+  cardRotation3: {
+    transform: [{rotate: '-5deg'}],
+  },
+  // Glass Card Container
+  glassCardContainer: {
+    borderRadius: radiusScale(16),
+    overflow: 'hidden',
     borderWidth: 1,
-    borderColor:'rgba(185, 185, 185, 0.75)',
-    top:verticalScale(60)
-  
-  
-    // flex:1
+    borderColor: 'rgb(255, 255, 255)',
+    minWidth: horizontalScale(110),
   },
-  cardTouchable: {
-    // flex: 1,
+  glassBlur: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
-  cardHeader: {
+  glassBlurAndroid: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(243, 243, 243, 0.5)',
+  },
+  cardContent: {
+    paddingHorizontal: horizontalScale(12),
+    paddingVertical: verticalScale(10),
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  cardRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: verticalScale(8),
+  },
+  cardIcon: {
+    width: moderateScale(35),
+    height: moderateScale(35),
+    marginRight: horizontalScale(8),
   },
   cardLabel: {
-    fontFamily: FontFamilies.interSemiBold,
+    fontFamily: FontFamilies.sunlightDreams,
     fontWeight: '600',
-    fontSize: fontScale(16),
-    color: '#6287FF',
-    letterSpacing: 1,
-  },
-  cardLabelPurple: {
-    fontFamily: FontFamilies.interSemiBold,
-    fontWeight: '600',
-    fontSize: fontScale(16),
-    color: '#6287FF',
-    letterSpacing: 1,
-    marginBottom: verticalScale(12),
-  },
-  timeDisplayContainer: {
-    marginBottom: verticalScale(8),
-  },
-  timeDisplay: {
-    fontFamily: FontFamilies.interRegular,
-    fontWeight: '400',
-    fontSize: fontScale(17),
-    color: Colors.white,
-    // letterSpacing: 2,
-  },
-  timePlaceholder: {
-    fontFamily: FontFamilies.interRegular,
-    fontWeight: '400',
-    fontSize: fontScale(20),
-    color: Colors.white,
-    letterSpacing: 4,
-  },
-  cardHint: {
-    fontFamily: FontFamilies.interRegular,
-    fontWeight: '600',
-    fontSize: fontScale(14),
-    lineHeight: fontScale(16),
-    color: '#C2D1F3',
-  },
-  cardHintSmall: {
-    fontFamily: FontFamilies.interRegular,
-    fontWeight: '400',
     fontSize: fontScale(12),
-    color: '#C2D1F3',
-    marginTop: verticalScale(8),
-    marginStart:horizontalScale(4)
-  },
-  locationPickerButton: {
-    backgroundColor: 'rgba(144, 144, 144, 0.09)',
-    borderRadius: radiusScale(8),
-    paddingHorizontal: horizontalScale(16),
-    paddingVertical: verticalScale(12),
-    marginBottom: verticalScale(8),
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-  },
-  locationPickerText: {
-    fontFamily: FontFamilies.interRegular,
-    fontWeight: '400',
-    fontSize: fontScale(16),
     color: Colors.white,
+    lineHeight: fontScale(12),
   },
-  locationPickerPlaceholder: {
-    color: 'rgba(255, 255, 255, 0.4)',
+  cardProgressBarContainer: {
+    width: horizontalScale(100),
+    // backgroundColor:'red',
+    height: verticalScale(10),
   },
-  privacyContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: horizontalScale(8),
-    marginTop: verticalScale(70),
+  progressRotation1: {
+    // transform: [{rotate: '-3deg'}],
   },
-  privacyText: {
-    fontFamily: FontFamilies.interRegular,
-    fontWeight: '400',
-    fontSize: fontScale(14),
-    color: '#6287FF',
+  progressRotation2: {
+    // transform: [{rotate: '-5deg'}],
   },
-  completionContainer: {
-    marginTop: verticalScale(25),
-    alignItems: 'center',
+  progressRotation3: {
+    // transform: [{rotate: '-5deg'}],
   },
-  completionText: {
-    fontFamily: FontFamilies.interRegular,
-    fontWeight: '400',
-    fontSize: fontScale(16),
-    color: '#C2D1F3',
-    textAlign: 'center',
+  cardProgressBarBackground: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(48, 48, 48, 0.3)',
+    borderRadius: radiusScale(10),
+    overflow: 'hidden',
   },
-  completionTextHighlight: {
-    color: Colors.white,
-    fontWeight: '600',
+  cardProgressBarFill: {
+    height: '100%',
+    borderRadius: radiusScale(10),
   },
+  cardProgress70: {
+    width: '70%',
+  },
+  cardProgress50: {
+    width: '50%',
+  },
+  cardProgress60: {
+    width: '60%',
+  },
+  cardProgressPink: {
+    backgroundColor: '#FF968E',
+  },
+  cardProgressBlue: {
+    backgroundColor: '#9DB4FF',
+  },
+  // Spacer
   spacer: {
-    flex: 1,
+    flex: 0,
   },
+  // Bottom
   bottomSection: {
-    paddingBottom: verticalScale(10),
-  },
-  nextButton: {
-    backgroundColor: Colors.white,
-    borderRadius: radiusScale(16),
-    paddingVertical: verticalScale(21),
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: verticalScale(16),
-  },
-  nextButtonDisabled: {
-    opacity: 0.4,
-  },
-  nextButtonText: {
-    fontFamily: FontFamilies.interSemiBold,
-    fontWeight: '600',
-    fontSize: fontScale(18),
-    color: Colors.black,
-  },
-  nextButtonTextDisabled: {
-    opacity: 0.7,
+    paddingTop: verticalScale(10),
+    paddingBottom: verticalScale(20),
   },
 });
 
