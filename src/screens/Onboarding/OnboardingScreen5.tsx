@@ -40,6 +40,7 @@ import {
 import {hapticLight} from '../../utils/haptics';
 import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
+import {trackOnboarding5NameInputView} from '../../utils/onboardingAnalytics';
 import {OnboardingButton} from '../../components/OnboardingButton';
 
 // Icons
@@ -75,7 +76,8 @@ export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
   const progressWidth = useSharedValue((CURRENT_STEP - 1) / TOTAL_STEPS * 100);
 
   useEffect(() => {
-    firebaseService.logScreenView('OnboardingScreen5', 'OnboardingScreen5');
+    trackOnboarding5NameInputView();
+    firebaseService.logScreenView('onboarding_5_name_input', 'OnboardingScreen5');
 
     const targetProgress = (CURRENT_STEP / TOTAL_STEPS) * 100;
     progressWidth.value = withDelay(

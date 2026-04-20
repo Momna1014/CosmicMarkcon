@@ -8,6 +8,7 @@ import {View, StyleSheet, StatusBar} from 'react-native';
 import Video from 'react-native-video';
 import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
+import {trackOnboarding11AiVideoView} from '../../utils/onboardingAnalytics';
 
 interface OnboardingScreen11Props {
   onContinue?: () => void;
@@ -25,7 +26,8 @@ export const OnboardingScreen11: React.FC<OnboardingScreen11Props> = ({
   });
 
   useEffect(() => {
-    firebaseService.logScreenView('OnboardingScreen11', 'OnboardingScreen11');
+    trackOnboarding11AiVideoView();
+    firebaseService.logScreenView('onboarding_11_ai_chat_video', 'OnboardingScreen11');
   }, []);
 
   const handleVideoEnd = useCallback(() => {

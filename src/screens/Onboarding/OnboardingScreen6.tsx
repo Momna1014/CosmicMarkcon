@@ -34,6 +34,7 @@ import {
 import {hapticLight} from '../../utils/haptics';
 import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
+import {trackOnboarding6CosmicProfileView} from '../../utils/onboardingAnalytics';
 import {OnboardingButton} from '../../components/OnboardingButton';
 
 // Icons
@@ -121,7 +122,8 @@ export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
   });
 
   useEffect(() => {
-    firebaseService.logScreenView('OnboardingScreen6', 'OnboardingScreen6');
+    trackOnboarding6CosmicProfileView();
+    firebaseService.logScreenView('onboarding_6_cosmic_profile', 'OnboardingScreen6');
   }, []);
 
   const handleContinue = () => {

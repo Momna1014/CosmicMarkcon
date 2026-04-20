@@ -33,7 +33,7 @@ export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
   useEffect(() => {
     trackOnboardingStarted();
     trackOnboarding1View();
-    firebaseService.logScreenView('OnboardingScreen1', 'OnboardingScreen1');
+    firebaseService.logScreenView('onboarding_1_welcome_video', 'OnboardingScreen1');
   }, []);
 
   const handleVideoEnd = useCallback(

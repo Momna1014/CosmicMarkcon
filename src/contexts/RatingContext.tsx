@@ -220,8 +220,7 @@ export const RatingProvider: React.FC<RatingProviderProps> = ({ children }) => {
    * Submit rating
    * 
    * LOGIC:
-   * - 1-3 stars: Close modal, don't submit (we want to keep low ratings internal)
-   * - 4-5 stars: Trigger native in-app review
+   * - 1-5 stars: Always trigger native in-app review (redirect to store)
    */
   const submitRating = useCallback(async (rating: number): Promise<void> => {
     console.log('[RatingContext] ⭐ Rating submitted:', rating);
@@ -236,32 +235,18 @@ export const RatingProvider: React.FC<RatingProviderProps> = ({ children }) => {
     // Hide our custom modal first
     setIsRatingModalVisible(false);
 
-    if (rating <= 3) {
-      // LOW RATING: Just close silently
-      // User will not be redirected to store - we don't want low ratings there
-      console.log('[RatingContext] 📉 Low rating - closing silently');
-      
-      // Mark as rated and save the date (so we show again tomorrow, not every time)
-      setHasRatedApp(true);
-      await AsyncStorage.setItem(RATING_COMPLETED_KEY, JSON.stringify(true));
-      await AsyncStorage.setItem(RATING_LAST_RATED_KEY, JSON.stringify(new Date().toISOString()));
-      
-      console.log('[RatingContext] 💬 Low rating saved, will show again tomorrow');
-      
-    } else {
-      // HIGH RATING (4-5 stars): Trigger native in-app review
-      console.log('[RatingContext] 📈 High rating - triggering in-app review');
-      
-      // Mark as completed and save the rating date
-      setHasRatedApp(true);
-      await AsyncStorage.setItem(RATING_COMPLETED_KEY, JSON.stringify(true));
-      await AsyncStorage.setItem(RATING_LAST_RATED_KEY, JSON.stringify(new Date().toISOString()));
-      
-      // Small delay to let our modal close animation complete
-      setTimeout(() => {
-        triggerInAppReview();
-      }, 600);
-    }
+    // ALL RATINGS (1-5 stars): Trigger native in-app review
+    console.log('[RatingContext] ⭐ All ratings redirect to store - triggering in-app review');
+
+    // Mark as completed and save the rating date
+    setHasRatedApp(true);
+    await AsyncStorage.setItem(RATING_COMPLETED_KEY, JSON.stringify(true));
+    await AsyncStorage.setItem(RATING_LAST_RATED_KEY, JSON.stringify(new Date().toISOString()));
+
+    // Small delay to let our modal close animation complete
+    setTimeout(() => {
+      triggerInAppReview();
+    }, 600);
     // triggerInAppReview is defined below but doesn't depend on any state
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

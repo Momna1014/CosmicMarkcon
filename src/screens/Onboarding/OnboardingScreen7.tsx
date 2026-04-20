@@ -45,11 +45,7 @@ import {
 import {hapticLight} from '../../utils/haptics';
 import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
-import {
-  trackOnboarding3View,
-  trackOnboarding3BirthdaySelected,
-  trackOnboarding3Continue,
-} from '../../utils/onboardingAnalytics';
+import {trackOnboarding7BirthdayView} from '../../utils/onboardingAnalytics';
 import {OnboardingButton} from '../../components/OnboardingButton';
 import {getZodiacSign} from '../../components/mock/zodiacMockData';
 
@@ -398,8 +394,8 @@ export const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({
   const wheelRotation = useSharedValue(getTargetRotation(selectedSignKey));
 
   useEffect(() => {
-    trackOnboarding3View();
-    firebaseService.logScreenView('OnboardingScreen7', 'OnboardingScreen7');
+    trackOnboarding7BirthdayView();
+    firebaseService.logScreenView('onboarding_7_birthday_zodiac', 'OnboardingScreen7');
 
     const targetProgress = (CURRENT_STEP / TOTAL_STEPS) * 100;
     progressWidth.value = withDelay(
@@ -435,8 +431,6 @@ export const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({
 
       if (!hasTrackedBirthday) {
         setHasTrackedBirthday(true);
-        const zodiac = getZodiacSign(date);
-        trackOnboarding3BirthdaySelected(zodiac.name);
       }
     }
   };
@@ -454,15 +448,6 @@ export const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({
 
   const handleContinue = () => {
     const zodiac = getZodiacSign(birthday);
-    
-    // Track birthday selection if not already tracked
-    if (!hasTrackedBirthday) {
-      setHasTrackedBirthday(true);
-      trackOnboarding3BirthdaySelected(zodiac.name);
-    }
-    
-    // Track continue event
-    trackOnboarding3Continue(zodiac.name);
     
     // Pass birthday to container, don't save to Redux yet
     onNext?.(birthday);

@@ -144,7 +144,7 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
 
   useEffect(() => {
     trackOnboarding2View();
-    firebaseService.logScreenView('OnboardingScreen2', 'OnboardingScreen2');
+    firebaseService.logScreenView('onboarding_2_seeking_options', 'OnboardingScreen2');
 
     const targetProgress = (CURRENT_STEP / TOTAL_STEPS) * 100;
     progressWidth.value = withDelay(

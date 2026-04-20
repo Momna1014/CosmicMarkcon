@@ -35,6 +35,7 @@ import {
 import {hapticLight} from '../../utils/haptics';
 import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
+import {trackOnboarding3ClarityView} from '../../utils/onboardingAnalytics';
 import {OnboardingButton} from '../../components/OnboardingButton';
 
 // Icons
@@ -138,7 +139,8 @@ export const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
   const progressWidth = useSharedValue((CURRENT_STEP - 1) / TOTAL_STEPS * 100);
 
   useEffect(() => {
-    firebaseService.logScreenView('OnboardingScreen3', 'OnboardingScreen3');
+    trackOnboarding3ClarityView();
+    firebaseService.logScreenView('onboarding_3_clarity_grid', 'OnboardingScreen3');
 
     const targetProgress = (CURRENT_STEP / TOTAL_STEPS) * 100;
     progressWidth.value = withDelay(
