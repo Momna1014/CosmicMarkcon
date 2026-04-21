@@ -231,7 +231,7 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
 
           {/* Continue Button */}
           <Animated.View
-            entering={FadeInUp.delay(600).duration(500)}
+            entering={FadeIn.delay(400).duration(400)}
             style={styles.bottomSection}>
             <OnboardingButton
               text="Continue"
@@ -247,7 +247,7 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.newOnboardingBg,
+    backgroundColor: Colors.new_background,
   },
   safeArea: {
     flex: 1,

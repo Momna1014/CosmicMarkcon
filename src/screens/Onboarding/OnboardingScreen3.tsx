@@ -240,7 +240,7 @@ export const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
 
           {/* Continue Button */}
           <Animated.View
-            entering={FadeInUp.delay(800).duration(500)}
+            entering={FadeIn.delay(500).duration(400)}
             style={styles.bottomSection}>
             <OnboardingButton
               text="Pick 1 or more to continue"
@@ -256,7 +256,7 @@ export const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.newOnboardingBg,
+    backgroundColor: Colors.new_background,
   },
   safeArea: {
     flex: 1,

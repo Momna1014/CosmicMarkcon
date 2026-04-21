@@ -6,6 +6,7 @@
 import React, {useEffect, useCallback} from 'react';
 import {View, StyleSheet, StatusBar} from 'react-native';
 import Video from 'react-native-video';
+import {Colors} from '../../theme';
 import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
 import {trackOnboarding11AiVideoView} from '../../utils/onboardingAnalytics';
@@ -57,7 +58,7 @@ export const OnboardingScreen11: React.FC<OnboardingScreen11Props> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: Colors.new_background,
   },
   video: {
     ...StyleSheet.absoluteFillObject,

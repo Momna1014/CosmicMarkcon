@@ -192,7 +192,7 @@ export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
 
               {/* Continue Button */}
               <Animated.View
-                entering={FadeInUp.delay(600).duration(500)}
+                entering={FadeIn.delay(400).duration(400)}
                 style={styles.bottomSection}>
                 <OnboardingButton
                   text="This is my Name"
@@ -210,7 +210,7 @@ export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.newOnboardingBg,
+    backgroundColor: Colors.new_background,
   },
   keyboardAvoidingView: {
     flex: 1,

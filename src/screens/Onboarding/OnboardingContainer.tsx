@@ -282,7 +282,7 @@ export const OnboardingContainer: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.cosmicBackground,
+    backgroundColor: Colors.new_background,
   },
 });
 

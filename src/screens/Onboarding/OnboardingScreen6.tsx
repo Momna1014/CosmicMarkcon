@@ -222,7 +222,7 @@ export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
 
               {/* Unlock Profile Button */}
               <Animated.View
-                entering={FadeInUp.delay(1000).duration(500)}
+                entering={FadeIn.delay(500).duration(400)}
                 style={styles.bottomSection}>
                 <OnboardingButton
                   text="Unlock Profile"
@@ -240,7 +240,7 @@ export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.newOnboardingBg,
+    backgroundColor: Colors.new_background,
   },
   backgroundImage: {
     flex: 1,

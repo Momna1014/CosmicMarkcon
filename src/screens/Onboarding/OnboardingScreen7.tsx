@@ -563,7 +563,7 @@ export const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({
           </Animated.View>
 
           <Animated.View
-            entering={FadeInUp.delay(620).duration(500)}
+            entering={FadeIn.delay(500).duration(400)}
             style={styles.bottomSection}>
             <OnboardingButton text="Continue" onPress={handleContinue} />
           </Animated.View>
@@ -576,7 +576,7 @@ export const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.newOnboardingBg,
+    backgroundColor: Colors.new_background,
   },
   safeArea: {
     flex: 1,

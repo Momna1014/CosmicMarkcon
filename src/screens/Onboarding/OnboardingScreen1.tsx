@@ -6,6 +6,7 @@
 import React, {useEffect, useCallback} from 'react';
 import {View, StyleSheet, StatusBar} from 'react-native';
 import Video, {OnEndData} from 'react-native-video';
+import {Colors} from '../../theme';
 import {
   trackOnboarding1View,
   trackOnboardingStarted,
@@ -19,7 +20,7 @@ interface OnboardingScreen1Props {
 
 export type AlignmentOption = 'in-my-flow' | 'figuring-it-out' | 'totally-lost' | null;
 
-const welcomeVideo = require('../../assets/Videos/chat_ai.mp4');
+const welcomeVideo = require('../../assets/Videos/palm.mp4');
 
 export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
   onContinue,
@@ -66,7 +67,7 @@ export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: Colors.new_background,
   },
   video: {
     ...StyleSheet.absoluteFillObject,
