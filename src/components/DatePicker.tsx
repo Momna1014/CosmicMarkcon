@@ -136,8 +136,8 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 
   // Calendar theme matching cosmic design
   const calendarTheme = {
-    backgroundColor: Colors.cosmicBackground,
-    calendarBackground: Colors.cosmicBackground,
+    backgroundColor: '#050711',
+    calendarBackground: '#050711',
     textSectionTitleColor: Colors.subHeading,
     selectedDayBackgroundColor: Colors.progressBarFilled,
     selectedDayTextColor: Colors.black,
@@ -318,17 +318,17 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(0, 0, 0, 0.93)',
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: horizontalScale(20),
   },
   calendarContainer: {
-    backgroundColor: Colors.cosmicBackground,
+    backgroundColor: '#050711',
     borderRadius: radiusScale(20),
     overflow: 'hidden',
     width: '100%',
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: 'rgba(255, 255, 255, 0.15)',
   },
   calendarHeader: {
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: horizontalScale(30),
   },
   pickerContainer: {
-    backgroundColor: Colors.cosmicBackground,
+    backgroundColor: '#050711',
     borderRadius: radiusScale(16),
     padding: horizontalScale(20),
     width: '100%',
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.15)',
   },
   yearPickerContainer: {
-    backgroundColor: Colors.cosmicBackground,
+    backgroundColor: '#050711',
     borderRadius: radiusScale(16),
     padding: horizontalScale(20),
     width: '100%',

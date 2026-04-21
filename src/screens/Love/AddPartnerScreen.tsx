@@ -81,23 +81,23 @@ interface AddPartnerScreenProps {
 // Step configuration
 const STEP_CONFIG = {
   name: {
-    heading: 'How are you know to\nthe universe?',
-    subheading: 'Your Celestial identifier',
-    placeholder: 'Your Name',
+    heading: 'What is your\npartner\'s name?',
+    subheading: 'Their celestial identity',
+    placeholder: 'Partner\'s Name',
   },
   birthday: {
-    heading: 'When did your\njourney begin?',
-    subheading: 'The Alignment of your stars',
+    heading: 'When were they\nborn?',
+    subheading: 'Their birth date shapes the stars',
     placeholder: 'MM/DD/YY',
   },
   location: {
-    heading: 'Where did you draw\nyour first breath?',
-    subheading: 'City and Time of arrival (OPYTIONAL)',
+    heading: 'Where were they\nborn?',
+    subheading: 'Location refines their cosmic chart',
     placeholder: 'e.g. New York',
   },
   analyze: {
-    heading: 'Partner Added\nSuccessfully! ✨',
-    subheading: 'Want to discover your cosmic compatibility?',
+    heading: 'Partner Added\nSuccessfully!',
+    subheading: 'Ready to explore your cosmic connection?',
     placeholder: '',
   },
 };

@@ -137,9 +137,9 @@ export const styles = StyleSheet.create({
     width: horizontalScale(52),
     height: horizontalScale(52),
     borderRadius: horizontalScale(26),
-    backgroundColor: 'rgba(221, 197, 96, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderWidth: 1,
-    borderColor: 'rgba(221, 197, 96, 0.4)',
+    borderColor: 'rgba(255, 255, 255, 0.3)',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: horizontalScale(16),
@@ -150,7 +150,7 @@ export const styles = StyleSheet.create({
   avatarText: {
     fontFamily: FontFamilies.sunlightDreams,
     fontSize: fontScale(22),
-    color: 'rgba(221, 197, 96, 1)',
+    color: '#FFFFFF',
     fontWeight: '600',
   },
   profileInfo: {
@@ -176,14 +176,14 @@ export const styles = StyleSheet.create({
   zodiacBadge: {
     fontFamily: FontFamilies.interMedium,
     fontSize: fontScale(11),
-    color: '#D4AF37',
+    color: 'rgba(255, 255, 255, 0.7)',
     letterSpacing: 1.5,
   },
   dot: {
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#D4AF37',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
     marginHorizontal: horizontalScale(10),
   },
   locationText: {
@@ -198,13 +198,13 @@ export const styles = StyleSheet.create({
     paddingVertical: verticalScale(8),
     borderRadius: radiusScale(20),
     borderWidth: 1,
-    borderColor: 'rgba(221, 197, 96, 0.6)',
-    backgroundColor: 'rgba(194, 209, 243, 0.08)',
+    borderColor: 'rgba(255, 255, 255, 0.4)',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
   },
   editButtonText: {
     fontFamily: FontFamilies.interMedium,
     fontSize: fontScale(13),
-    color: 'rgba(221, 197, 96, 1)',
+    color: '#FFFFFF',
     fontWeight: '600',
   },
 
@@ -247,6 +247,7 @@ export const styles = StyleSheet.create({
   },
   notificationIconText: {
     fontSize: fontScale(22),
+    color:'white'
   },
   notificationTextContainer: {
     flex: 1,
@@ -273,8 +274,8 @@ export const styles = StyleSheet.create({
     backgroundColor: 'rgba(194, 209, 243, 0.06)',
   },
   premiumCardActive: {
-    borderColor: 'rgba(221, 197, 96, 0.3)',
-    backgroundColor: 'rgba(221, 197, 96, 0.06)',
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
   },
   premiumContent: {
     flexDirection: 'row',
@@ -294,8 +295,8 @@ export const styles = StyleSheet.create({
     marginRight: horizontalScale(14),
   },
   premiumIconActive: {
-    backgroundColor: 'rgba(221, 197, 96, 0.15)',
-    borderColor: 'rgba(221, 197, 96, 0.3)',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   premiumTextContainer: {
     flex: 1,
@@ -307,7 +308,7 @@ export const styles = StyleSheet.create({
     marginBottom: verticalScale(4),
   },
   premiumTitleActive: {
-    color: 'rgba(221, 197, 96, 1)',
+    color: '#FFFFFF',
   },
   premiumSubtitle: {
     fontFamily: FontFamilies.interRegular,
@@ -329,15 +330,15 @@ export const styles = StyleSheet.create({
     width: horizontalScale(32),
     height: horizontalScale(32),
     borderRadius: horizontalScale(16),
-    backgroundColor: 'rgba(221, 197, 96, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderWidth: 1,
-    borderColor: 'rgba(221, 197, 96, 0.4)',
+    borderColor: 'rgba(255, 255, 255, 0.3)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   premiumBadgeText: {
     fontSize: fontScale(16),
-    color: 'rgba(221, 197, 96, 1)',
+    color: '#FFFFFF',
     fontWeight: '700',
   },
 });

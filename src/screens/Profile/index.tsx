@@ -30,6 +30,8 @@ import {useNotifications} from '../../contexts/NotificationContext';
 
 // Icons
 import StarIcon from '../../assets/icons/home_icons/welcome_star.svg';
+import NotificationBellIcon from '../../assets/icons/horoscope_icons/notification_bell.svg';
+import AvatarDefaultIcon from '../../assets/icons/horoscope_icons/avatar_default.svg';
 
 // Chat Header (same as Chat screen)
 import {ChatHeader} from '../Chat/components';
@@ -389,7 +391,9 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
         <View style={styles.profileContent}>
           {/* Profile Avatar */}
           <View style={styles.profileIcon}>
-            <Text style={styles.avatarText}>{firstLetter || '🌟'}</Text>
+            {firstLetter
+              ? <Text style={styles.avatarText}>{firstLetter}</Text>
+              : <AvatarDefaultIcon width={28} height={28} />}
           </View>
 
           {/* Profile Info */}
@@ -482,7 +486,7 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
               <View style={styles.glassOverlay} />
               <View style={styles.notificationContent}>
                 <View style={styles.notificationIconContainer}>
-                  <Text style={styles.notificationIconText}>🔔</Text>
+                  <NotificationBellIcon width={24} height={24} />
                 </View>
                 <View style={styles.notificationTextContainer}>
                   <Text style={styles.notificationTitle}>Notifications</Text>
@@ -495,8 +499,8 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
                 <Switch
                   value={notificationsEnabled}
                   onValueChange={openNotificationSettings}
-                  trackColor={{false: 'rgba(255,255,255,0.15)', true: 'rgba(221, 197, 96, 0.4)'}}
-                  thumbColor={notificationsEnabled ? '#D4AF37' : '#888'}
+                  trackColor={{false: 'rgba(255,255,255,0.15)', true: 'rgba(255, 255, 255, 0.4)'}}
+                  thumbColor={notificationsEnabled ? '#FFFFFF' : '#888'}
                 />
               </View>
             </View>
