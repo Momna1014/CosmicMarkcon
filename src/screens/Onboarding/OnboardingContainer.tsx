@@ -257,18 +257,21 @@ export const OnboardingContainer: React.FC = () => {
         return (
           <OnboardingScreen10
             onContinue={handleScreen10Next}
+            onGoBack={handleGoBack}
           />
         );
       case 11:
         return (
           <OnboardingScreen11
             onContinue={handleScreen11Next}
+            onGoBack={handleGoBack}
           />
         );
       case 12:
         return (
           <OnboardingScreen12
             onContinue={handleScreen12Next}
+            onGoBack={handleGoBack}
           />
         );
       default:

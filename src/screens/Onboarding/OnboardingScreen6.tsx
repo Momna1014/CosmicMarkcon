@@ -18,6 +18,11 @@ import Animated, {
   FadeIn,
   FadeInDown,
   FadeInUp,
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withDelay,
+  Easing,
 } from 'react-native-reanimated';
 import LinearGradient from 'react-native-linear-gradient';
 import MaskedView from '@react-native-masked-view/masked-view';
@@ -118,13 +123,30 @@ export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
   useScreenView('OnboardingScreen6', {
     screen_category: 'onboarding',
     step: 6,
-    total_steps: 9,
+    total_steps: 12,
   });
+
+  const CURRENT_STEP = 6;
+  const TOTAL_STEPS = 12;
+  const progressWidth = useSharedValue((CURRENT_STEP - 1) / TOTAL_STEPS * 100);
 
   useEffect(() => {
     trackOnboarding6CosmicProfileView();
     firebaseService.logScreenView('onboarding_6_cosmic_profile', 'OnboardingScreen6');
+
+    progressWidth.value = withDelay(
+      300,
+      withTiming((CURRENT_STEP / TOTAL_STEPS) * 100, {
+        duration: 800,
+        easing: Easing.out(Easing.cubic),
+      }),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const progressAnimatedStyle = useAnimatedStyle(() => ({
+    width: `${progressWidth.value}%`,
+  }));
 
   const handleContinue = () => {
     onNext?.();
@@ -149,7 +171,7 @@ export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
           />
 
           <View style={styles.content}>
-            {/* Header: Back button only */}
+            {/* Header: Back + Progress Bar + Step Counter */}
             <Animated.View
               entering={FadeIn.delay(100).duration(400)}
               style={styles.header}>
@@ -160,6 +182,16 @@ export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
                 hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
                 <BackArrowIcon width={moderateScale(24)} height={moderateScale(24)} />
               </TouchableOpacity>
+
+              <View style={styles.progressBarContainer}>
+                <View style={styles.progressBarBackground}>
+                  <Animated.View
+                    style={[styles.progressBarFilled, progressAnimatedStyle]}
+                  />
+                </View>
+              </View>
+
+              <Text style={styles.stepCounter}>{CURRENT_STEP}/{TOTAL_STEPS}</Text>
             </Animated.View>
 
             {/* Push everything to bottom */}
@@ -259,9 +291,31 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingTop: verticalScale(10),
+    marginBottom: verticalScale(8),
   },
   backButton: {
-    padding: horizontalScale(4),
+    marginRight: horizontalScale(12),
+  },
+  progressBarContainer: {
+    flex: 1,
+    marginRight: horizontalScale(12),
+  },
+  progressBarBackground: {
+    height: verticalScale(6),
+    backgroundColor: 'rgba(184, 190, 208, 0.2)',
+    borderRadius: radiusScale(6),
+    overflow: 'hidden',
+  },
+  progressBarFilled: {
+    height: '100%',
+    backgroundColor: Colors.newOnboardingProgressFilled,
+    borderRadius: radiusScale(6),
+  },
+  stepCounter: {
+    fontFamily: FontFamilies.interSemiBold,
+    fontWeight: '600',
+    fontSize: fontScale(14),
+    color: Colors.white,
   },
   // Push content to bottom
   topSpacer: {
@@ -300,7 +354,7 @@ const styles = StyleSheet.create({
   },
   gradientTextMask: {
     fontFamily: FontFamilies.sunlightDreams,
-    fontWeight: '700',
+    fontWeight: '400',
     fontSize: fontScale(18),
     lineHeight: fontScale(34),
     textAlign: 'center',

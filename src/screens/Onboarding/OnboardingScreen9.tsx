@@ -79,7 +79,7 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
   });
 
   const CURRENT_STEP = 9;
-  const TOTAL_STEPS = 9;
+  const TOTAL_STEPS = 12;
   const progressWidth = useSharedValue((CURRENT_STEP - 1) / TOTAL_STEPS * 100);
 
   // Character bounce animation
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
   // Typography
   mainHeading: {
     fontFamily: FontFamilies.sunlightDreams,
-    fontWeight: '700',
+    fontWeight: '400',
     fontSize: fontScale(32),
     lineHeight: fontScale(36),
     color: Colors.newOnboardingHeading,

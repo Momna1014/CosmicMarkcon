@@ -134,8 +134,8 @@ export const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
     total_steps: 9,
   });
 
-  const CURRENT_STEP = 2;
-  const TOTAL_STEPS = 9;
+  const CURRENT_STEP = 3;
+  const TOTAL_STEPS = 12;
   const progressWidth = useSharedValue((CURRENT_STEP - 1) / TOTAL_STEPS * 100);
 
   useEffect(() => {
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
   // Typography - Centered
   mainHeading: {
     fontFamily: FontFamilies.sunlightDreams,
-    fontWeight: '700',
+    fontWeight: '400',
     fontSize: fontScale(32),
     lineHeight: fontScale(36),
     color: Colors.newOnboardingHeading,

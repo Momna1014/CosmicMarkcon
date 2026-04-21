@@ -381,8 +381,8 @@ export const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({
     total_steps: 9,
   });
 
-  const CURRENT_STEP = 6;
-  const TOTAL_STEPS = 9;
+  const CURRENT_STEP = 7;
+  const TOTAL_STEPS = 12;
   const progressWidth = useSharedValue((CURRENT_STEP - 1) / TOTAL_STEPS * 100);
 
   const selectedZodiac = useMemo(() => getZodiacSign(birthday), [birthday]);
@@ -617,7 +617,7 @@ const styles = StyleSheet.create({
   },
   mainHeading: {
     fontFamily: FontFamilies.sunlightDreams,
-    fontWeight: '700',
+    fontWeight: '400',
     fontSize: fontScale(32),
     lineHeight: fontScale(38),
     color: Colors.newOnboardingHeading,

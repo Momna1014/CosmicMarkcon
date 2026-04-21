@@ -71,8 +71,8 @@ export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
     total_steps: 9,
   });
 
-  const CURRENT_STEP = 4;
-  const TOTAL_STEPS = 9;
+  const CURRENT_STEP = 5;
+  const TOTAL_STEPS = 12;
   const progressWidth = useSharedValue((CURRENT_STEP - 1) / TOTAL_STEPS * 100);
 
   useEffect(() => {
