@@ -106,6 +106,7 @@ const ChatScreen: React.FC<Props> = () => {
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [attachedImage, setAttachedImage] = useState<AttachedImage | null>(null);
   const [hasHandledInitialMessage, setHasHandledInitialMessage] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [showQuotaAlert, setShowQuotaAlert] = useState(false);
 
   // Conversation history for API (system + user + assistant)
@@ -226,13 +227,19 @@ const ChatScreen: React.FC<Props> = () => {
 
   // Handle keyboard events
   useEffect(() => {
-    const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+    const showSubscription = Keyboard.addListener('keyboardDidShow', e => {
       isKeyboardVisible.current = true;
+      if (Platform.OS === 'android') {
+        setKeyboardHeight(e.endCoordinates.height);
+      }
       // Only scroll to bottom when keyboard shows
       flatListRef.current?.scrollToEnd({animated: true});
     });
     const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
       isKeyboardVisible.current = false;
+      if (Platform.OS === 'android') {
+        setKeyboardHeight(0);
+      }
     });
 
     return () => {
@@ -559,9 +566,9 @@ const ChatScreen: React.FC<Props> = () => {
 
           {/* Keyboard Avoiding View */}
           <KeyboardAvoidingView
-            style={styles.keyboardAvoid}
+            style={[styles.keyboardAvoid, Platform.OS === 'android' && {paddingBottom: keyboardHeight}]}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}>
+            keyboardVerticalOffset={0}>
             
             {/* Messages List Container */}
             <View style={styles.messagesContainer}>
@@ -610,7 +617,7 @@ const ChatScreen: React.FC<Props> = () => {
             /> */}
 
             {/* Input Area */}
-            <SafeAreaView edges={['bottom']} style={styles.inputSafeArea}>
+            <SafeAreaView edges={Platform.OS === 'ios' ? ['bottom'] : []} style={styles.inputSafeArea}>
               {source === 'palm' && (
                 <PalmLineTabs
                   onLinePress={handlePalmLinePress}

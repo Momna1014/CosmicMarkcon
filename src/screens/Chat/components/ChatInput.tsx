@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: horizontalScale(12),
     paddingVertical: verticalScale(8),
-    paddingBottom: Platform.OS === 'ios' ? verticalScale(5) : verticalScale(12),
+    paddingBottom: Platform.OS === 'ios' ? verticalScale(5) : verticalScale(40),
     backgroundColor:Colors.new_background
   },
   imagePreviewContainer: {
@@ -210,9 +210,9 @@ const styles = StyleSheet.create({
   },
   inputWrapper: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
     backgroundColor: 'Colors.new_background',
-    borderRadius: radiusScale(1000),
+    borderRadius: radiusScale(16),
     borderWidth: 1,
     borderColor: 'rgba(194, 209, 243, 0.2)',
     paddingHorizontal: horizontalScale(13),
@@ -227,6 +227,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: horizontalScale(8),
+    alignSelf: 'flex-start',
   },
   input: {
     flex: 1,
@@ -246,6 +247,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: horizontalScale(8),
+    alignSelf: 'flex-start',
   },
   sendButtonActive: {
     // backgroundColor: 'rgba(125, 211, 252, 0.6)',
