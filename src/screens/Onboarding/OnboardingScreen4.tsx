@@ -10,7 +10,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   StatusBar,
-  Image,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Animated, {
@@ -40,9 +39,9 @@ import {OnboardingButton} from '../../components/OnboardingButton';
 
 // Icons
 import BackArrowIcon from '../../assets/icons/new_onboarding/back_arrow.svg';
-const HimImg = require('../../assets/icons/new_onboarding/him.png');
-const HerImg = require('../../assets/icons/new_onboarding/her.png');
-const NotToSayImg = require('../../assets/icons/new_onboarding/not_to_say.png');
+import HimIcon from '../../assets/icons/new_onboarding/him.svg';
+import HerIcon from '../../assets/icons/new_onboarding/her.svg';
+import NotToSayIcon from '../../assets/icons/new_onboarding/not_to_say.svg';
 
 const HORIZONTAL_PADDING = horizontalScale(16);
 const ICON_SIZE = horizontalScale(120);
@@ -54,14 +53,14 @@ interface OnboardingScreen4Props {
 }
 
 const GENDER_OPTIONS = [
-  {id: 'he_him', label: 'He / Him', image: HimImg},
-  {id: 'she_her', label: 'She / Her', image: HerImg},
-  {id: 'prefer_not_to_say', label: 'prefer not to say', image: NotToSayImg},
+  {id: 'he_him', label: 'He / Him', SvgIcon: HimIcon},
+  {id: 'she_her', label: 'She / Her', SvgIcon: HerIcon},
+  {id: 'prefer_not_to_say', label: 'prefer not to say', SvgIcon: NotToSayIcon},
 ];
 
 // Gender Option Component
 interface GenderOptionProps {
-  option: {id: string; label: string; image: any};
+  option: {id: string; label: string; SvgIcon?: React.FC<{width: number; height: number}>};
   isSelected: boolean;
   onPress: () => void;
   delay: number;
@@ -89,11 +88,7 @@ const GenderOption: React.FC<GenderOptionProps> = ({
         ]}
         onPress={handlePress}
         activeOpacity={0.7}>
-        <Image
-          source={option.image}
-          style={styles.optionIcon}
-          resizeMode="contain"
-        />
+        {option.SvgIcon && <option.SvgIcon width={ICON_SIZE} height={ICON_SIZE} />}
         <Text
           style={[
             styles.optionLabel,
@@ -344,11 +339,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#090C15',
     borderWidth: 2,
     borderColor: '#262D3D',
-  },
-  optionIcon: {
-    width: ICON_SIZE,
-    height: ICON_SIZE,
-    marginBottom: verticalScale(8),
   },
   optionLabel: {
     fontFamily: FontFamilies.sunlightDreams,
