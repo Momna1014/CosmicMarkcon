@@ -16,6 +16,7 @@ import {
   verticalScale,
   radiusScale,
   moderateScale,
+  Colors,
 } from '../../../theme';
 
 // Icons
@@ -174,7 +175,8 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: horizontalScale(12),
     paddingVertical: verticalScale(8),
-    paddingBottom: Platform.OS === 'ios' ? verticalScale(8) : verticalScale(12),
+    paddingBottom: Platform.OS === 'ios' ? verticalScale(5) : verticalScale(12),
+    backgroundColor:Colors.new_background
   },
   imagePreviewContainer: {
     marginBottom: verticalScale(10),
@@ -197,7 +199,7 @@ const styles = StyleSheet.create({
     width: moderateScale(24),
     height: moderateScale(24),
     borderRadius: moderateScale(12),
-    backgroundColor: 'rgba(239, 68, 68, 0.9)',
+    backgroundColor: 'rgba(133, 7, 7, 0.9)',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -209,8 +211,8 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    backgroundColor: 'rgba(194, 209, 243, 0.04)',
-    borderRadius: radiusScale(16),
+    backgroundColor: 'Colors.new_background',
+    borderRadius: radiusScale(1000),
     borderWidth: 1,
     borderColor: 'rgba(194, 209, 243, 0.2)',
     paddingHorizontal: horizontalScale(13),

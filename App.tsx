@@ -299,6 +299,7 @@ import { setKeysConfig } from './src/redux/slices/keysSlice';
 // Import i18n configuration
 import './src/i18n';
 import * as Sentry from '@sentry/react-native';
+import { Colors } from './src/theme';
 
 // Sentry.init({
 //   dsn: 'https://8fcbf2458b61c3fd019c4d3eb7169465@o4509863677329408.ingest.us.sentry.io/4510906320486400',
@@ -444,7 +445,7 @@ const AppContent = (): JSX.Element => {
   }, [appStartTime, initState]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+    <View style={{ flex: 1, backgroundColor: Colors.new_background }}>
       <StatusBar
         barStyle={isDark ? 'light-content' : 'dark-content'}
         backgroundColor={theme.colors.background}

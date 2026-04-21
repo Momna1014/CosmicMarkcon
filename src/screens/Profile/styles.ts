@@ -1,6 +1,7 @@
 import {StyleSheet, Dimensions} from 'react-native';
 import {
   FontFamilies,
+  Colors,
   fontScale,
   horizontalScale,
   verticalScale,
@@ -13,12 +14,7 @@ const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 export const styles = StyleSheet.create({
   backgroundFallback: {
     flex: 1,
-    backgroundColor: '#0A1628',
-  },
-  backgroundImage: {
-    flex: 1,
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
+    backgroundColor: Colors.new_background,
   },
   container: {
     flex: 1,

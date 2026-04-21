@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StatusBar,
-  ImageBackground,
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
@@ -14,7 +13,6 @@ import {useSelector, useDispatch} from 'react-redux';
 import {styles} from './styles';
 import {getGuideById, getLessonById} from './mockData';
 import {moderateScale} from '../../theme';
-import GradientText from '../../components/GradientText';
 import {markLessonCompleted, selectIsLessonCompleted} from '../../redux/slices/cosmicGuidesSlice';
 import {RootState} from '../../redux/rootReducer';
 import CosmicAlert from '../../components/CosmicAlert';
@@ -30,9 +28,6 @@ import {
 
 // Icons
 import CrossIcon from '../../assets/icons/home_icons/cross.svg';
-
-// Background Image
-const BackgroundImage = require('../../assets/icons/bottomtab_icons/main_screen_background.png');
 
 // Check Icon Component
 const CheckIcon = memo(() => (
@@ -109,16 +104,12 @@ const LessonDetail: React.FC<LessonDetailProps> = ({navigation, route}) => {
 
   return (
     <View style={styles.backgroundFallback}>
-      <ImageBackground
-        source={BackgroundImage}
-        style={styles.backgroundImage}
-        resizeMode="cover">
-        <SafeAreaView style={styles.container} edges={['top']}>
-          <StatusBar
-            barStyle="light-content"
-            backgroundColor="transparent"
-            translucent
-          />
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="transparent"
+          translucent
+        />
           
           {/* Header */}
           <View style={styles.header}>
@@ -142,7 +133,8 @@ const LessonDetail: React.FC<LessonDetailProps> = ({navigation, route}) => {
             <Animated.View
               entering={FadeInDown.delay(100).springify()}
               style={styles.titleContainer}>
-              <GradientText style={styles.guideTitle}>{lesson.title}</GradientText>
+              {/* <GradientText style={styles.guideTitle}>{lesson.title}</GradientText> */}
+              <Text style={styles.guideTitle}>{lesson.title}</Text>
               <Text style={styles.subtitleText}>{guide.title.toUpperCase()}</Text>
             </Animated.View>
 
@@ -181,7 +173,6 @@ const LessonDetail: React.FC<LessonDetailProps> = ({navigation, route}) => {
             </Animated.View>
           </ScrollView>
         </SafeAreaView>
-      </ImageBackground>
 
       {/* Completion Alert */}
       <CosmicAlert

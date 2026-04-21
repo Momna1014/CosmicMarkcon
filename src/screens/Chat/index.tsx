@@ -9,7 +9,6 @@ import {
   View,
   StyleSheet,
   StatusBar,
-  ImageBackground,
   FlatList,
   KeyboardAvoidingView,
   Platform,
@@ -28,6 +27,7 @@ import {
   verticalScale,
   horizontalScale,
   moderateScale,
+  Colors,
 } from '../../theme';
 
 // Components
@@ -66,8 +66,6 @@ import {
   trackChatMessageSend,
 } from '../../utils/mainScreenAnalytics';
 import CosmicAlert from '../../components/CosmicAlert';
-
-const BackgroundImage = require('../../assets/icons/bottomtab_icons/main_screen_background.png');
 
 // Palm diagram assets
 const LeftHandDiagram = require('../../assets/icons/chat_icons/left_hand.png');
@@ -534,16 +532,12 @@ const ChatScreen: React.FC<Props> = () => {
 
   return (
     <View style={styles.backgroundFallback}>
-      <ImageBackground
-        source={BackgroundImage}
-        style={styles.backgroundImage}
-        resizeMode="cover">
-        <SafeAreaView style={styles.container} edges={['top']}>
-          <StatusBar
-            barStyle="light-content"
-            backgroundColor="transparent"
-            translucent
-          />
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="transparent"
+          translucent
+        />
 
           {/* Header */}
           <ChatHeader
@@ -634,7 +628,6 @@ const ChatScreen: React.FC<Props> = () => {
             </SafeAreaView>
           </KeyboardAvoidingView>
         </SafeAreaView>
-      </ImageBackground>
 
       {/* Image Preview Modal */}
       <ImagePreviewModal
@@ -658,12 +651,7 @@ const ChatScreen: React.FC<Props> = () => {
 const styles = StyleSheet.create({
   backgroundFallback: {
     flex: 1,
-    backgroundColor: '#0A1628',
-  },
-  backgroundImage: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
+    backgroundColor: Colors.new_background,
   },
   container: {
     flex: 1,
@@ -709,7 +697,7 @@ const styles = StyleSheet.create({
     tintColor: '#FFFFFF',
   },
   inputSafeArea: {
-    backgroundColor: 'rgba(10, 22, 40, 0.8)',
+    backgroundColor: Colors.new_background,
   },
 });
 

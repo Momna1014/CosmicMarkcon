@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StatusBar,
-  ImageBackground,
   TextInput,
   TouchableOpacity,
   ScrollView,
@@ -49,8 +48,6 @@ import {
 } from '../../components/pickers';
 import {getZodiacSign} from '../../components/mock/zodiacMockData';
 import {styles} from './styles';
-
-const BackgroundImage = require('../../assets/icons/bottomtab_icons/main_screen_background.png');
 
 type Props = {
   navigation: any;
@@ -462,17 +459,13 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
 
   return (
     <View style={styles.backgroundFallback}>
-      <ImageBackground
-        source={BackgroundImage}
-        style={styles.backgroundImage}
-        resizeMode="cover">
-        <SafeAreaView style={styles.container} edges={['top']}>
-          <StatusBar
-            barStyle="light-content"
-            backgroundColor="transparent"
-            translucent
-          />
-          <ChatHeader title="Profile" subtitle="Your Celestial Identity" />
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="transparent"
+          translucent
+        />
+        <ChatHeader title="Profile" subtitle="Your Celestial Identity" />
           <ScrollView
             style={styles.scrollView}
             contentContainerStyle={styles.scrollContent}
@@ -543,7 +536,6 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
             </TouchableOpacity>
           </ScrollView>
         </SafeAreaView>
-      </ImageBackground>
 
       {/* Country Picker Modal */}
       <CountryPickerModal

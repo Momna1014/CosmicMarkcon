@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StatusBar,
-  ImageBackground,
   TouchableOpacity,
   Animated,
   Easing,
@@ -27,7 +26,6 @@ import {
 // Icons
 import OracleStarIcon from '../../assets/icons/horoscope_icons/ask_oracle_star.svg';
 
-const BackgroundImage = require('../../assets/icons/bottomtab_icons/main_screen_background.png');
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 // Zodiac symbols
@@ -193,13 +191,9 @@ const HoroscopeChatScreen: React.FC = () => {
 
   return (
     <View style={styles.backgroundFallback}>
-      <ImageBackground
-        source={BackgroundImage}
-        style={styles.backgroundImage}
-        resizeMode="cover">
-        <StarfieldAnimation />
-        <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-          <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StarfieldAnimation />
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+        <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
 
           {/* Header */}
           <Animated.View
@@ -279,7 +273,6 @@ const HoroscopeChatScreen: React.FC = () => {
             </TouchableOpacity>
           </Animated.View>
         </SafeAreaView>
-      </ImageBackground>
     </View>
   );
 };
