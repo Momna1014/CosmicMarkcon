@@ -722,7 +722,7 @@ export const PaywallScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000', // Match paywall background
+    backgroundColor: '#050711', // Match paywall background
   },
   paywall: {
     flex: 1,

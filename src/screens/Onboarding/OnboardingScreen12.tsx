@@ -40,7 +40,7 @@ import {OnboardingButton} from '../../components/OnboardingButton';
 // Icons
 import BackArrowIcon from '../../assets/icons/new_onboarding/back_arrow.svg';
 
-const PalmReadingAnimation = require('../../assets/lottie/test4.json');
+const PalmReadingAnimation = require('../../assets/lottie/ai_chat.json');
 
 const HORIZONTAL_PADDING = horizontalScale(16);
 const CURRENT_STEP = 12;

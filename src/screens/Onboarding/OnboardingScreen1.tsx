@@ -39,7 +39,7 @@ import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
 import {OnboardingButton} from '../../components/OnboardingButton';
 
-const WelcomeAnimation = require('../../assets/lottie/ai_chat_onboarding.json');
+const WelcomeAnimation = require('../../assets/lottie/ai_chat.json');
 
 const HORIZONTAL_PADDING = horizontalScale(16);
 const CURRENT_STEP = 1;
