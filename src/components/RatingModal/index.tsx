@@ -737,7 +737,7 @@ const styles = StyleSheet.create({
     maxWidth: moderateScale(340),
     borderRadius: moderateScale(28),
     overflow: 'hidden',
-    backgroundColor: '#08142a91',
+    backgroundColor: '#040a1591',
     borderWidth: 1,
     borderColor: 'rgba(194, 209, 243, 0.1)',
     shadowColor: '#000000',

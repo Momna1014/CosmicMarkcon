@@ -2,9 +2,9 @@
     <string name="app_name">Cosmic</string>
     
     <!-- Facebook SDK Configuration -->
-    <string name="facebook_app_id">734401465854955</string>
-    <string name="facebook_client_token">c7d8bbed65dacedc0c8c43563010ded1</string>
-    <string name="fb_login_protocol_scheme">fb734401465854955</string>
+    <string name="facebook_app_id">1713793223320140</string>
+    <string name="facebook_client_token">b17cc23beb86c89e4bd75d3cd1ecea89</string>
+    <string name="fb_login_protocol_scheme">fb1713793223320140</string>
     
     <!-- Widget Configuration -->
     <string name="widget_description">Display your todo list on the home screen</string>

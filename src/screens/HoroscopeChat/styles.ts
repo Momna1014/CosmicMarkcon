@@ -1,10 +1,12 @@
 import {StyleSheet, Dimensions} from 'react-native';
 import {
   FontFamilies,
+  Colors,
   fontScale,
   horizontalScale,
   verticalScale,
   radiusScale,
+  moderateScale,
 } from '../../theme';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
@@ -12,30 +14,66 @@ const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 export const styles = StyleSheet.create({
   backgroundFallback: {
     flex: 1,
-    backgroundColor: '#0A1628',
+    backgroundColor: Colors.new_background,
   },
-  backgroundImage: {
-    flex: 1,
+  starsBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
+    opacity: 0.5,
   },
   container: {
     flex: 1,
     justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: horizontalScale(24),
   },
 
-  // Header
-  header: {
+  // Guided by the stars badge
+  badgeContainer: {
+    marginTop: verticalScale(50),
     alignItems: 'center',
-    marginTop: verticalScale(20),
-    paddingHorizontal: horizontalScale(24),
+  },
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: horizontalScale(16),
+    paddingVertical: verticalScale(8),
+    borderRadius: radiusScale(100),
+    backgroundColor: 'rgba(194, 209, 243, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(194, 209, 243, 0.2)',
+  },
+  badgeStarIcon: {
+    width: moderateScale(14),
+    height: moderateScale(14),
+    tintColor: 'rgba(194, 209, 243, 0.8)',
+  },
+  badgeText: {
+    fontFamily: FontFamilies.interMedium,
+    fontSize: fontScale(13),
+    color: 'rgba(194, 209, 243, 0.8)',
+    letterSpacing: 1,
+  },
+
+  // Center content
+  centerContent: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconContainer: {
+    // marginBottom: verticalScale(28),
   },
   title: {
     fontFamily: FontFamilies.sunlightDreams,
     fontSize: fontScale(36),
-    color: '#D4AF37',
-    marginBottom: verticalScale(6),
+    color: '#FFFFFF',
     textAlign: 'center',
+    marginBottom: verticalScale(8),
   },
   subtitle: {
     fontFamily: FontFamilies.interRegular,
@@ -44,115 +82,15 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // Center orb area
-  centerArea: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  orbContainer: {
-    width: SCREEN_WIDTH * 0.8,
-    height: SCREEN_WIDTH * 0.55,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  mainOrb: {
-    width: SCREEN_WIDTH * 0.38,
-    height: SCREEN_WIDTH * 0.38,
-    borderRadius: SCREEN_WIDTH * 0.19,
-    overflow: 'hidden',
-    borderWidth: 1.5,
-    borderColor: 'rgba(221, 197, 96, 0.3)',
-  },
-  orbGradient: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(221, 197, 96, 0.12)',
-  },
-  orbInner: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  zodiacSymbol: {
-    fontFamily: FontFamilies.interLight,
-    fontSize: fontScale(22),
-    color: 'rgba(194, 209, 243, 0.8)',
-    marginTop: verticalScale(4),
-  },
-
-  // Info Card
-  infoCard: {
-    marginHorizontal: horizontalScale(20),
-    borderRadius: radiusScale(20),
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(194, 209, 243, 0.15)',
-    backgroundColor: 'rgba(194, 209, 243, 0.06)',
-    padding: horizontalScale(20),
-    paddingVertical: verticalScale(20),
-  },
-  cardGlassOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(10, 22, 40, 0.3)',
-    borderRadius: radiusScale(20),
-  },
-  cardGreeting: {
-    fontFamily: FontFamilies.interSemiBold,
-    fontSize: fontScale(18),
-    color: '#EEDF9B',
-    marginBottom: verticalScale(8),
-  },
-  cardDescription: {
-    fontFamily: FontFamilies.interRegular,
-    fontSize: fontScale(13),
-    color: 'rgba(255, 255, 255, 0.7)',
-    lineHeight: fontScale(20),
-    marginBottom: verticalScale(14),
-  },
-
-  // Feature pills
-  featurePills: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  pill: {
-    paddingHorizontal: horizontalScale(12),
-    paddingVertical: verticalScale(6),
-    borderRadius: radiusScale(20),
-    borderWidth: 1,
-    borderColor: 'rgba(221, 197, 96, 0.3)',
-    backgroundColor: 'rgba(221, 197, 96, 0.08)',
-  },
-  pillText: {
-    fontFamily: FontFamilies.interMedium,
-    fontSize: fontScale(11),
-    color: '#DDC560',
-    letterSpacing: 0.5,
-  },
-
   // Start Button
   buttonContainer: {
-    paddingHorizontal: horizontalScale(20),
-    paddingBottom: verticalScale(100),
-    paddingTop: verticalScale(16),
+    width: '100%',
+    paddingBottom: verticalScale(90),
   },
   startButton: {
-    borderRadius: radiusScale(16),
+    borderRadius: radiusScale(100),
+    backgroundColor: '#F5F2EA',
     overflow: 'hidden',
-    borderWidth: 1.5,
-    borderColor: '#DDC560',
-    backgroundColor: 'rgba(221, 197, 96, 0.08)',
-    elevation: 8,
-    shadowColor: '#DDC560',
-    shadowOffset: {width: 0, height: 0},
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-  },
-  buttonGlow: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(221, 197, 96, 0.06)',
   },
   buttonInner: {
     flexDirection: 'row',
@@ -161,15 +99,16 @@ export const styles = StyleSheet.create({
     paddingVertical: verticalScale(16),
     gap: 10,
   },
-  buttonText: {
-    fontFamily: FontFamilies.interBold,
-    fontSize: fontScale(16),
-    color: '#DDC560',
-    letterSpacing: 1,
+  buttonStarIcon: {
+    width: moderateScale(18),
+    height: moderateScale(18),
+    tintColor: '#000000',
   },
-  buttonArrow: {
-    fontSize: fontScale(18),
-    color: '#DDC560',
-    marginLeft: 4,
+  buttonText: {
+    fontFamily: FontFamilies.interSemiBold,
+    fontSize: fontScale(16),
+    color: '#000000',
+    letterSpacing: 0.5,
+    fontWeight:'700'
   },
 });

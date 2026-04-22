@@ -16,6 +16,7 @@ import {
   verticalScale,
   radiusScale,
   moderateScale,
+  Colors,
 } from '../../../theme';
 
 // Icons
@@ -174,7 +175,8 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: horizontalScale(12),
     paddingVertical: verticalScale(8),
-    paddingBottom: Platform.OS === 'ios' ? verticalScale(8) : verticalScale(12),
+    paddingBottom: Platform.OS === 'ios' ? verticalScale(5) : verticalScale(40),
+    backgroundColor:Colors.new_background
   },
   imagePreviewContainer: {
     marginBottom: verticalScale(10),
@@ -197,7 +199,7 @@ const styles = StyleSheet.create({
     width: moderateScale(24),
     height: moderateScale(24),
     borderRadius: moderateScale(12),
-    backgroundColor: 'rgba(239, 68, 68, 0.9)',
+    backgroundColor: 'rgba(133, 7, 7, 0.9)',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -208,8 +210,8 @@ const styles = StyleSheet.create({
   },
   inputWrapper: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
-    backgroundColor: 'rgba(194, 209, 243, 0.04)',
+    alignItems: 'flex-start',
+    backgroundColor: 'Colors.new_background',
     borderRadius: radiusScale(16),
     borderWidth: 1,
     borderColor: 'rgba(194, 209, 243, 0.2)',
@@ -225,6 +227,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: horizontalScale(8),
+    alignSelf: 'flex-start',
   },
   input: {
     flex: 1,
@@ -244,6 +247,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: horizontalScale(8),
+    alignSelf: 'flex-start',
   },
   sendButtonActive: {
     // backgroundColor: 'rgba(125, 211, 252, 0.6)',

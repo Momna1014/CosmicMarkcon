@@ -1,6 +1,7 @@
 import {StyleSheet, Dimensions} from 'react-native';
 import {
   FontFamilies,
+  Colors,
   fontScale,
   horizontalScale,
   verticalScale,
@@ -13,12 +14,7 @@ const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 export const styles = StyleSheet.create({
   backgroundFallback: {
     flex: 1,
-    backgroundColor: '#0A1628',
-  },
-  backgroundImage: {
-    flex: 1,
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
+    backgroundColor: Colors.new_background,
   },
   container: {
     flex: 1,
@@ -141,9 +137,9 @@ export const styles = StyleSheet.create({
     width: horizontalScale(52),
     height: horizontalScale(52),
     borderRadius: horizontalScale(26),
-    backgroundColor: 'rgba(221, 197, 96, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderWidth: 1,
-    borderColor: 'rgba(221, 197, 96, 0.4)',
+    borderColor: 'rgba(255, 255, 255, 0.3)',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: horizontalScale(16),
@@ -154,7 +150,7 @@ export const styles = StyleSheet.create({
   avatarText: {
     fontFamily: FontFamilies.sunlightDreams,
     fontSize: fontScale(22),
-    color: 'rgba(221, 197, 96, 1)',
+    color: '#FFFFFF',
     fontWeight: '600',
   },
   profileInfo: {
@@ -180,14 +176,14 @@ export const styles = StyleSheet.create({
   zodiacBadge: {
     fontFamily: FontFamilies.interMedium,
     fontSize: fontScale(11),
-    color: '#D4AF37',
+    color: 'rgba(255, 255, 255, 0.7)',
     letterSpacing: 1.5,
   },
   dot: {
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#D4AF37',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
     marginHorizontal: horizontalScale(10),
   },
   locationText: {
@@ -202,13 +198,13 @@ export const styles = StyleSheet.create({
     paddingVertical: verticalScale(8),
     borderRadius: radiusScale(20),
     borderWidth: 1,
-    borderColor: 'rgba(221, 197, 96, 0.6)',
-    backgroundColor: 'rgba(194, 209, 243, 0.08)',
+    borderColor: 'rgba(255, 255, 255, 0.4)',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
   },
   editButtonText: {
     fontFamily: FontFamilies.interMedium,
     fontSize: fontScale(13),
-    color: 'rgba(221, 197, 96, 1)',
+    color: '#FFFFFF',
     fontWeight: '600',
   },
 
@@ -225,7 +221,6 @@ export const styles = StyleSheet.create({
 
   // Notification Card Styles
   notificationCard: {
-    marginTop: verticalScale(24),
     borderRadius: radiusScale(20),
     overflow: 'hidden',
     borderWidth: 1,
@@ -251,6 +246,7 @@ export const styles = StyleSheet.create({
   },
   notificationIconText: {
     fontSize: fontScale(22),
+    color:'white'
   },
   notificationTextContainer: {
     flex: 1,
@@ -269,7 +265,6 @@ export const styles = StyleSheet.create({
 
   // Premium Card Styles
   premiumCard: {
-    marginTop: verticalScale(16),
     borderRadius: radiusScale(20),
     overflow: 'hidden',
     borderWidth: 1,
@@ -277,8 +272,8 @@ export const styles = StyleSheet.create({
     backgroundColor: 'rgba(194, 209, 243, 0.06)',
   },
   premiumCardActive: {
-    borderColor: 'rgba(221, 197, 96, 0.3)',
-    backgroundColor: 'rgba(221, 197, 96, 0.06)',
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
   },
   premiumContent: {
     flexDirection: 'row',
@@ -298,8 +293,8 @@ export const styles = StyleSheet.create({
     marginRight: horizontalScale(14),
   },
   premiumIconActive: {
-    backgroundColor: 'rgba(221, 197, 96, 0.15)',
-    borderColor: 'rgba(221, 197, 96, 0.3)',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   premiumTextContainer: {
     flex: 1,
@@ -311,7 +306,7 @@ export const styles = StyleSheet.create({
     marginBottom: verticalScale(4),
   },
   premiumTitleActive: {
-    color: 'rgba(221, 197, 96, 1)',
+    color: '#FFFFFF',
   },
   premiumSubtitle: {
     fontFamily: FontFamilies.interRegular,
@@ -333,15 +328,79 @@ export const styles = StyleSheet.create({
     width: horizontalScale(32),
     height: horizontalScale(32),
     borderRadius: horizontalScale(16),
-    backgroundColor: 'rgba(221, 197, 96, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderWidth: 1,
-    borderColor: 'rgba(221, 197, 96, 0.4)',
+    borderColor: 'rgba(255, 255, 255, 0.3)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   premiumBadgeText: {
     fontSize: fontScale(16),
-    color: 'rgba(221, 197, 96, 1)',
+    color: '#FFFFFF',
     fontWeight: '700',
+  },
+
+  // Section Heading
+  sectionHeading: {
+    fontFamily: FontFamilies.interMedium,
+    fontSize: fontScale(13),
+    color: 'rgba(194, 209, 243, 0.55)',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    marginTop: verticalScale(24),
+    marginBottom: verticalScale(10),
+    marginLeft: horizontalScale(4),
+  },
+
+  // Legal Card Styles
+  legalCard: {
+    borderRadius: radiusScale(20),
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(194, 209, 243, 0.2)',
+    backgroundColor: 'rgba(194, 209, 243, 0.06)',
+  },
+  legalRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: horizontalScale(18),
+    paddingVertical: verticalScale(16),
+  },
+  legalRowIconContainer: {
+    width: horizontalScale(40),
+    height: horizontalScale(40),
+    borderRadius: horizontalScale(20),
+    backgroundColor: 'rgba(194, 209, 243, 0.10)',
+    borderWidth: 1,
+    borderColor: 'rgba(194, 209, 243, 0.18)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: horizontalScale(14),
+  },
+  legalRowEmoji: {
+    fontSize: fontScale(18),
+  },
+  legalRowTextContainer: {
+    flex: 1,
+  },
+  legalRowTitle: {
+    fontFamily: FontFamilies.interSemiBold,
+    fontSize: fontScale(15),
+    color: '#FFFFFF',
+    marginBottom: verticalScale(2),
+  },
+  legalRowSubtitle: {
+    fontFamily: FontFamilies.interRegular,
+    fontSize: fontScale(12),
+    color: 'rgba(255, 255, 255, 0.5)',
+  },
+  legalRowArrow: {
+    opacity: 0.5,
+    marginLeft: horizontalScale(8),
+  },
+  legalDivider: {
+    height: 1,
+    marginHorizontal: horizontalScale(18),
+    backgroundColor: 'rgba(194, 209, 243, 0.12)',
   },
 });

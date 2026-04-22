@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
   },
   alertContainer: {
     width: SCREEN_WIDTH - horizontalScale(48),
-    backgroundColor: '#0F1E35',
+    backgroundColor: '#050711',
     borderRadius: radiusScale(24),
     borderWidth: 1,
     borderColor: 'rgba(194, 209, 243, 0.2)',

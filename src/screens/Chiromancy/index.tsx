@@ -4,15 +4,14 @@ import {
   Text,
   StyleSheet,
   StatusBar,
-  ImageBackground,
   TouchableOpacity,
   ScrollView,
   Animated,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import GradientText from '../../components/GradientText';
 import {
   FontFamilies,
+  Colors,
   fontScale,
   horizontalScale,
   verticalScale,
@@ -33,8 +32,6 @@ import {hapticLight} from '../../utils/haptics';
 
 // Import camera icon
 import CameraIcon from '../../assets/icons/chat_icons/camera.svg';
-
-const BackgroundImage = require('../../assets/icons/bottomtab_icons/main_screen_background.png');
 
 type TabType = 'leftHand' | 'rightHand';
 
@@ -272,20 +269,16 @@ const ChiromancyScreen: React.FC<Props> = ({navigation}) => {
 
   return (
     <View style={styles.backgroundFallback}>
-      <ImageBackground
-        source={BackgroundImage}
-        style={styles.backgroundImage}
-        resizeMode="cover">
-        <SafeAreaView style={styles.container} edges={['top']}>
-          <StatusBar
-            barStyle="light-content"
-            backgroundColor="transparent"
-            translucent
-          />
-          <ScrollView
-            style={styles.scrollView}
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}>
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="transparent"
+          translucent
+        />
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}>
             {/* Title */}
             <Animated.View style={[
               styles.titleContainer,
@@ -294,7 +287,8 @@ const ChiromancyScreen: React.FC<Props> = ({navigation}) => {
                 transform: [{translateY: titleSlideAnim}],
               }
             ]}>
-              <GradientText style={styles.mainTitle}>AI Palmistry</GradientText>
+              {/* <GradientText style={styles.mainTitle}>AI Palmistry</GradientText> */}
+              <Text style={styles.mainTitle}>AI Palmistry</Text>
             </Animated.View>
 
             {/* Subtitle */}
@@ -328,7 +322,6 @@ const ChiromancyScreen: React.FC<Props> = ({navigation}) => {
             </Animated.View>
           </ScrollView>
         </SafeAreaView>
-      </ImageBackground>
     </View>
   );
 };
@@ -336,12 +329,7 @@ const ChiromancyScreen: React.FC<Props> = ({navigation}) => {
 const styles = StyleSheet.create({
   backgroundFallback: {
     flex: 1,
-    backgroundColor: '#0A1628',
-  },
-  backgroundImage: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
+    backgroundColor: Colors.new_background,
   },
   container: {
     flex: 1,
@@ -362,6 +350,7 @@ const styles = StyleSheet.create({
     fontSize: fontScale(40),
     fontWeight: '400',
     textAlign: 'center',
+    color:'#F5F2EA'
   },
   subtitle: {
     fontFamily: FontFamilies.interRegular,

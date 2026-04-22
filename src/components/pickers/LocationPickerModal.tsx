@@ -332,7 +332,7 @@ export const CityPickerModal = memo<CityPickerModalProps>(
 const styles = StyleSheet.create({
   fullScreenModal: {
     flex: 1,
-    backgroundColor: '#1E1E2E',
+    backgroundColor: '#050711',
   },
   modalHeader: {
     flexDirection: 'row',

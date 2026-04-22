@@ -311,16 +311,18 @@ export const TimePickerModal = memo<TimePickerModalProps>(
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(0, 0, 0, 0.91)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   timePickerContainer: {
-    backgroundColor: '#1E1E2E',
+    backgroundColor: '#050711',
     borderRadius: radiusScale(20),
     padding: horizontalScale(24),
     width: SCREEN_WIDTH - horizontalScale(48),
     alignItems: 'center',
+    borderWidth:2,
+    borderColor:'#ffffff4b'
   },
   timePickerTitle: {
     fontFamily: FontFamilies.interSemiBold,

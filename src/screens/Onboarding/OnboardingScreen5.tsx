@@ -40,13 +40,14 @@ import {
 import {hapticLight} from '../../utils/haptics';
 import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
+import {trackOnboarding5NameInputView} from '../../utils/onboardingAnalytics';
 import {OnboardingButton} from '../../components/OnboardingButton';
 
 // Icons
 import BackArrowIcon from '../../assets/icons/new_onboarding/back_arrow.svg';
 const HimImg = require('../../assets/icons/new_onboarding/him.png');
 const HerImg = require('../../assets/icons/new_onboarding/her.png');
-const NotToSayImg = require('../../assets/icons/new_onboarding/not_to_say.png');
+const NotToSayImg = require('../../assets/icons/new_onboarding/prefer_not_to_say.png');
 
 const HORIZONTAL_PADDING = horizontalScale(16);
 const ICON_SIZE = horizontalScale(200);
@@ -70,12 +71,13 @@ export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
     total_steps: 9,
   });
 
-  const CURRENT_STEP = 4;
-  const TOTAL_STEPS = 9;
+  const CURRENT_STEP = 5;
+  const TOTAL_STEPS = 12;
   const progressWidth = useSharedValue((CURRENT_STEP - 1) / TOTAL_STEPS * 100);
 
   useEffect(() => {
-    firebaseService.logScreenView('OnboardingScreen5', 'OnboardingScreen5');
+    trackOnboarding5NameInputView();
+    firebaseService.logScreenView('onboarding_5_name_input', 'OnboardingScreen5');
 
     const targetProgress = (CURRENT_STEP / TOTAL_STEPS) * 100;
     progressWidth.value = withDelay(
@@ -190,7 +192,7 @@ export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
 
               {/* Continue Button */}
               <Animated.View
-                entering={FadeInUp.delay(600).duration(500)}
+                entering={FadeIn.delay(400).duration(400)}
                 style={styles.bottomSection}>
                 <OnboardingButton
                   text="This is my Name"
@@ -208,7 +210,7 @@ export const OnboardingScreen5: React.FC<OnboardingScreen5Props> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.newOnboardingBg,
+    backgroundColor: Colors.new_background,
   },
   keyboardAvoidingView: {
     flex: 1,

@@ -9,7 +9,6 @@ import {
   View,
   StyleSheet,
   StatusBar,
-  ImageBackground,
   FlatList,
   KeyboardAvoidingView,
   Platform,
@@ -28,6 +27,7 @@ import {
   verticalScale,
   horizontalScale,
   moderateScale,
+  Colors,
 } from '../../theme';
 
 // Components
@@ -66,8 +66,6 @@ import {
   trackChatMessageSend,
 } from '../../utils/mainScreenAnalytics';
 import CosmicAlert from '../../components/CosmicAlert';
-
-const BackgroundImage = require('../../assets/icons/bottomtab_icons/main_screen_background.png');
 
 // Palm diagram assets
 const LeftHandDiagram = require('../../assets/icons/chat_icons/left_hand.png');
@@ -108,6 +106,7 @@ const ChatScreen: React.FC<Props> = () => {
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [attachedImage, setAttachedImage] = useState<AttachedImage | null>(null);
   const [hasHandledInitialMessage, setHasHandledInitialMessage] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [showQuotaAlert, setShowQuotaAlert] = useState(false);
 
   // Conversation history for API (system + user + assistant)
@@ -228,13 +227,19 @@ const ChatScreen: React.FC<Props> = () => {
 
   // Handle keyboard events
   useEffect(() => {
-    const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+    const showSubscription = Keyboard.addListener('keyboardDidShow', e => {
       isKeyboardVisible.current = true;
+      if (Platform.OS === 'android') {
+        setKeyboardHeight(e.endCoordinates.height);
+      }
       // Only scroll to bottom when keyboard shows
       flatListRef.current?.scrollToEnd({animated: true});
     });
     const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
       isKeyboardVisible.current = false;
+      if (Platform.OS === 'android') {
+        setKeyboardHeight(0);
+      }
     });
 
     return () => {
@@ -534,16 +539,12 @@ const ChatScreen: React.FC<Props> = () => {
 
   return (
     <View style={styles.backgroundFallback}>
-      <ImageBackground
-        source={BackgroundImage}
-        style={styles.backgroundImage}
-        resizeMode="cover">
-        <SafeAreaView style={styles.container} edges={['top']}>
-          <StatusBar
-            barStyle="light-content"
-            backgroundColor="transparent"
-            translucent
-          />
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="transparent"
+          translucent
+        />
 
           {/* Header */}
           <ChatHeader
@@ -565,9 +566,9 @@ const ChatScreen: React.FC<Props> = () => {
 
           {/* Keyboard Avoiding View */}
           <KeyboardAvoidingView
-            style={styles.keyboardAvoid}
+            style={[styles.keyboardAvoid, Platform.OS === 'android' && {paddingBottom: keyboardHeight}]}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}>
+            keyboardVerticalOffset={0}>
             
             {/* Messages List Container */}
             <View style={styles.messagesContainer}>
@@ -616,7 +617,7 @@ const ChatScreen: React.FC<Props> = () => {
             /> */}
 
             {/* Input Area */}
-            <SafeAreaView edges={['bottom']} style={styles.inputSafeArea}>
+            <SafeAreaView edges={Platform.OS === 'ios' ? ['bottom'] : []} style={styles.inputSafeArea}>
               {source === 'palm' && (
                 <PalmLineTabs
                   onLinePress={handlePalmLinePress}
@@ -634,7 +635,6 @@ const ChatScreen: React.FC<Props> = () => {
             </SafeAreaView>
           </KeyboardAvoidingView>
         </SafeAreaView>
-      </ImageBackground>
 
       {/* Image Preview Modal */}
       <ImagePreviewModal
@@ -658,12 +658,7 @@ const ChatScreen: React.FC<Props> = () => {
 const styles = StyleSheet.create({
   backgroundFallback: {
     flex: 1,
-    backgroundColor: '#0A1628',
-  },
-  backgroundImage: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
+    backgroundColor: Colors.new_background,
   },
   container: {
     flex: 1,
@@ -709,7 +704,7 @@ const styles = StyleSheet.create({
     tintColor: '#FFFFFF',
   },
   inputSafeArea: {
-    backgroundColor: 'rgba(10, 22, 40, 0.8)',
+    backgroundColor: Colors.new_background,
   },
 });
 

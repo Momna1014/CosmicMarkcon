@@ -14,6 +14,7 @@ import LottieView from 'lottie-react-native';
 import {useNavigation, useRoute, RouteProp} from '@react-navigation/native';
 import {
   FontFamilies,
+  Colors,
   fontScale,
   horizontalScale,
   verticalScale,
@@ -45,9 +46,7 @@ type PalmCaptureRouteParams = {
   };
 };
 
-const BackgroundImage = require('../../assets/icons/bottomtab_icons/main_screen_background.png');
 const AstrologyLottie = require('../../assets/lottie/Astrology.json');
-import {ImageBackground} from 'react-native';
 
 // Minimalist Scan Frame Component
 const HandGuide = memo(({handType, animValue}: {handType: HandType; animValue: Animated.Value}) => {
@@ -388,11 +387,7 @@ const PalmCaptureScreen: React.FC = memo(() => {
 
   return (
     <View style={styles.container}>
-      <ImageBackground
-        source={BackgroundImage}
-        style={styles.backgroundImage}
-        resizeMode="cover">
-        <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
         
         <Animated.View style={[styles.contentWrapper, {opacity: fadeAnim}]}>
           <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
@@ -505,7 +500,6 @@ const PalmCaptureScreen: React.FC = memo(() => {
           ]}
           onDismiss={handleWrongHandAlertDismiss}
         />
-      </ImageBackground>
     </View>
   );
 });
@@ -513,12 +507,7 @@ const PalmCaptureScreen: React.FC = memo(() => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A1628',
-  },
-  backgroundImage: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
+    backgroundColor: Colors.new_background,
   },
   contentWrapper: {
     flex: 1,

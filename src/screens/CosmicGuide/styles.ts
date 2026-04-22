@@ -1,6 +1,7 @@
 import {StyleSheet} from 'react-native';
 import {
   FontFamilies,
+  Colors,
   fontScale,
   horizontalScale,
   verticalScale,
@@ -12,12 +13,7 @@ export const styles = StyleSheet.create({
   // Background & Container
   backgroundFallback: {
     flex: 1,
-    backgroundColor: '#0A1628',
-  },
-  backgroundImage: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
+    backgroundColor: Colors.new_background,
   },
   container: {
     flex: 1,
@@ -68,6 +64,7 @@ export const styles = StyleSheet.create({
     fontSize: fontScale(32),
     lineHeight: fontScale(38),
     textAlign: 'center',
+    color:'#F5F2EA'
   },
   subtitleText: {
     fontFamily: FontFamilies.interRegular,

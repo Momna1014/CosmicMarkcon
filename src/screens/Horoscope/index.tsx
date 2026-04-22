@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StatusBar,
-  ImageBackground,
   ScrollView,
   TouchableOpacity,
   Animated,
@@ -32,8 +31,6 @@ import {
   trackHoroscopeTabChange,
 } from '../../utils/mainScreenAnalytics';
 import {hapticLight} from '../../utils/haptics';
-
-const BackgroundImage = require('../../assets/icons/bottomtab_icons/main_screen_background.png');
 
 type TabType = 'today' | 'tomorrow' | 'weekly';
 
@@ -271,27 +268,18 @@ const HoroscopeScreen: React.FC<Props> = () => {
   if (loading) {
     return (
       <View style={styles.backgroundFallback}>
-        <ImageBackground
-          source={BackgroundImage}
-          style={styles.backgroundImage}
-          resizeMode="cover">
-          {/* <StarfieldAnimation /> */}
-          <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-            <CosmicLoader visible={true} inline />
-          </View>
-        </ImageBackground>
+        {/* <StarfieldAnimation /> */}
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <CosmicLoader visible={true} inline />
+        </View>
       </View>
     );
   }
 
   return (
     <View style={styles.backgroundFallback}>
-      <ImageBackground
-        source={BackgroundImage}
-        style={styles.backgroundImage}
-        resizeMode="cover">
-        {/* Animated Starfield Background */}
-        {/* <StarfieldAnimation /> */}
+      {/* Animated Starfield Background */}
+      {/* <StarfieldAnimation /> */}
         
         <SafeAreaView style={styles.container} edges={['top']}>
           <StatusBar
@@ -383,7 +371,6 @@ const HoroscopeScreen: React.FC<Props> = () => {
 
           </ScrollView>
         </SafeAreaView>
-      </ImageBackground>
 
       {/* Quota Error Alert */}
       <CosmicAlert

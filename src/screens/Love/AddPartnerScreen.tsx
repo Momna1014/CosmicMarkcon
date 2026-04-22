@@ -13,7 +13,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ImageBackground,
   TextInput,
   Dimensions,
   KeyboardAvoidingView,
@@ -66,7 +65,6 @@ import ClockIcon from '../../assets/icons/onboarding_icons/watch.svg';
 import ArrowRightIcon from '../../assets/icons/home_icons/right_arrow.svg';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
-const BackgroundImageSource = require('../../assets/icons/bottomtab_icons/main_screen_background.png');
 
 // Animated TouchableOpacity
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
@@ -83,23 +81,23 @@ interface AddPartnerScreenProps {
 // Step configuration
 const STEP_CONFIG = {
   name: {
-    heading: 'How are you know to\nthe universe?',
-    subheading: 'Your Celestial identifier',
-    placeholder: 'Your Name',
+    heading: 'What is your\npartner\'s name?',
+    subheading: 'Their celestial identity',
+    placeholder: 'Partner\'s Name',
   },
   birthday: {
-    heading: 'When did your\njourney begin?',
-    subheading: 'The Alignment of your stars',
+    heading: 'When were they\nborn?',
+    subheading: 'Their birth date shapes the stars',
     placeholder: 'MM/DD/YY',
   },
   location: {
-    heading: 'Where did you draw\nyour first breath?',
-    subheading: 'City and Time of arrival (OPYTIONAL)',
+    heading: 'Where were they\nborn?',
+    subheading: 'Location refines their cosmic chart',
     placeholder: 'e.g. New York',
   },
   analyze: {
-    heading: 'Partner Added\nSuccessfully! ✨',
-    subheading: 'Want to discover your cosmic compatibility?',
+    heading: 'Partner Added\nSuccessfully!',
+    subheading: 'Ready to explore your cosmic connection?',
     placeholder: '',
   },
 };
@@ -263,11 +261,7 @@ const AddPartnerScreen: React.FC<AddPartnerScreenProps> = ({navigation}) => {
 
   return (
     <View style={styles.backgroundFallback}>
-      <ImageBackground
-        source={BackgroundImageSource}
-        style={styles.container}
-        resizeMode="cover">
-        <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={styles.safeArea}>
           {/* Twinkling Stars Overlay
           {STARS_CONFIG.map((star, index) => (
             <TwinklingStar
@@ -503,7 +497,6 @@ const AddPartnerScreen: React.FC<AddPartnerScreenProps> = ({navigation}) => {
             </Animated.View>
           </KeyboardAvoidingView>
         </SafeAreaView>
-      </ImageBackground>
 
       {/* Pickers */}
       <CountryPickerModal
@@ -541,7 +534,7 @@ const AddPartnerScreen: React.FC<AddPartnerScreenProps> = ({navigation}) => {
 const styles = StyleSheet.create({
   backgroundFallback: {
     flex: 1,
-    backgroundColor: Colors.cosmicBackground,
+    backgroundColor: Colors.new_background,
   },
   container: {
     flex: 1,

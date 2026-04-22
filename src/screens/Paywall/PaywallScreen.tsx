@@ -315,7 +315,7 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react';
-import {StyleSheet, View, Platform, StatusBar, Alert, Text, TouchableOpacity, ActivityIndicator} from 'react-native';
+import {StyleSheet, View, Platform, StatusBar, Alert, Text, ActivityIndicator} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useApp} from '../../contexts/AppContext';
@@ -326,7 +326,6 @@ import {revenueCatService} from '../../services/RevenueCatService';
 import { useScreenView } from '../../hooks/useFacebookAnalytics';
 import { trackSubscriptionView, trackSubscriptionStarted } from '../../utils/facebookEvents';
 import firebaseService from '../../services/firebase/FirebaseService';
-import { appsFlyerService } from '../../services/AppsFlyerService';
 
 interface PaywallRouteParams {
   source?: string;
@@ -349,9 +348,9 @@ export const PaywallScreen: React.FC = () => {
   // 'loading' = checking offerings, 'available' = paywall ready, 'unavailable' = can't load
   const [billingStatus, setBillingStatus] = useState<'loading' | 'available' | 'unavailable'>('loading');
 
-  // Check if this was opened from within the app (Me screen, settings, etc.)
+  // Check if this was opened from within the app (Profile screen, settings, etc.)
   // These sources need extra top padding on Android
-  const inAppSources = ['settings_upgrade', 'settings_button', 'me_screen', 'drawer', 'home_cta'];
+  const inAppSources = ['settings_upgrade', 'settings_button', 'profile_screen', 'drawer', 'home_cta'];
   const isFromInApp = source && inAppSources.some(s => source.includes(s));
   
   // On Android, when coming from in-app screens, we need to account for status bar
@@ -428,27 +427,24 @@ export const PaywallScreen: React.FC = () => {
     console.log('[PaywallScreen] 🔍 Source:', source, 'isFromInApp:', isFromInApp);
     
     if (isFromInApp) {
-      // From within app (Me screen, drawer, etc.)
-      // Check if we can go back, otherwise navigate to Me tab
-      console.log('[PaywallScreen] ⬅️ From app - navigating back...');
-      
+      // From within app (Profile screen, drawer, etc.)
+      // Profile is a root stack screen — goBack() returns to it directly
+      console.log('[PaywallScreen] ⬅️ From app - navigating back, canGoBack:', navigation.canGoBack());
+
       if (navigation.canGoBack()) {
         navigation.goBack();
       } else {
-        // Fallback: Navigate to MainApp and ensure Me tab is shown
-        console.log('[PaywallScreen] ⚠️ Cannot go back, navigating to MainApp (Me tab)...');
-        navigation.reset({
-          index: 0,
-          routes: [
-            { 
-              name: 'MainApp' as never,
-              state: {
-                routes: [{ name: 'Me' }],
-                index: 0,
-              },
-            }
-          ],
-        });
+        // Stack was reset (edge case) — navigate explicitly to the originating screen
+        if (source === 'profile_screen') {
+          console.log('[PaywallScreen] ⚠️ Cannot go back, navigating to Profile screen...');
+          navigation.navigate('Profile' as never);
+        } else {
+          console.log('[PaywallScreen] ⚠️ Cannot go back, navigating to MainApp...');
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'MainApp' as never }],
+          });
+        }
       }
     } else {
       // From onboarding, initial launch, or unknown - always go to Home

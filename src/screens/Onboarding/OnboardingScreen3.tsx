@@ -10,7 +10,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   StatusBar,
-  Image,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Animated, {
@@ -35,19 +34,20 @@ import {
 import {hapticLight} from '../../utils/haptics';
 import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
+import {trackOnboarding3ClarityView} from '../../utils/onboardingAnalytics';
 import {OnboardingButton} from '../../components/OnboardingButton';
 
 // Icons
 import BackArrowIcon from '../../assets/icons/new_onboarding/back_arrow.svg';
-const LoveImg = require('../../assets/icons/new_onboarding/true_love.png');
-const CareerImg = require('../../assets/icons/new_onboarding/career.png');
-const HealthImg = require('../../assets/icons/new_onboarding/health.png');
-const InnerPeaceImg = require('../../assets/icons/new_onboarding/inner_peace.png');
-const ConfidenceImg = require('../../assets/icons/new_onboarding/confidence.png');
-const WealthImg = require('../../assets/icons/new_onboarding/wealth.png');
-const RelationshipsImg = require('../../assets/icons/new_onboarding/relationship.png');
-const DestinyImg = require('../../assets/icons/new_onboarding/destiny.png');
-const GrowthImg = require('../../assets/icons/new_onboarding/growth.png');
+import LoveIcon from '../../assets/icons/new_onboarding/true_love.svg';
+import CareerIcon from '../../assets/icons/new_onboarding/career.svg';
+import HealthIcon from '../../assets/icons/new_onboarding/health.svg';
+import InnerPeaceIcon from '../../assets/icons/new_onboarding/inner_peace.svg';
+import ConfidenceIcon from '../../assets/icons/new_onboarding/confidence.svg';
+import WealthIcon from '../../assets/icons/new_onboarding/wealth.svg';
+import RelationshipsIcon from '../../assets/icons/new_onboarding/relationship.svg';
+import DestinyIcon from '../../assets/icons/new_onboarding/destiny.svg';
+import GrowthIcon from '../../assets/icons/new_onboarding/growth.svg';
 
 const HORIZONTAL_PADDING = horizontalScale(16);
 const ICON_SIZE = horizontalScale(65);
@@ -58,20 +58,20 @@ interface OnboardingScreen3Props {
 }
 
 const CLARITY_OPTIONS = [
-  {id: 'love', label: 'Love', image: LoveImg},
-  {id: 'career', label: 'Career', image: CareerImg},
-  {id: 'health', label: 'Health', image: HealthImg},
-  {id: 'inner_peace', label: 'Inner Peace', image: InnerPeaceImg},
-  {id: 'confidence', label: 'Confidence', image: ConfidenceImg},
-  {id: 'wealth', label: 'Wealth', image: WealthImg},
-  {id: 'relationships', label: 'Relationships', image: RelationshipsImg},
-  {id: 'destiny', label: 'Destiny', image: DestinyImg},
-  {id: 'growth', label: 'Growth', image: GrowthImg},
+  {id: 'love', label: 'Love', SvgIcon: LoveIcon},
+  {id: 'career', label: 'Career', SvgIcon: CareerIcon},
+  {id: 'health', label: 'Health', SvgIcon: HealthIcon},
+  {id: 'inner_peace', label: 'Inner Peace', SvgIcon: InnerPeaceIcon},
+  {id: 'confidence', label: 'Confidence', SvgIcon: ConfidenceIcon},
+  {id: 'wealth', label: 'Wealth', SvgIcon: WealthIcon},
+  {id: 'relationships', label: 'Relationships', SvgIcon: RelationshipsIcon},
+  {id: 'destiny', label: 'Destiny', SvgIcon: DestinyIcon},
+  {id: 'growth', label: 'Growth', SvgIcon: GrowthIcon},
 ];
 
 // Grid Option Component
 interface GridOptionProps {
-  option: {id: string; label: string; image: any};
+  option: {id: string; label: string; SvgIcon?: React.FC<{width: number; height: number}>};
   isSelected: boolean;
   onPress: () => void;
   index: number;
@@ -104,11 +104,7 @@ const GridOption: React.FC<GridOptionProps> = ({
         ]}
         onPress={handlePress}
         activeOpacity={0.7}>
-        <Image
-          source={option.image}
-          style={styles.gridIcon}
-          resizeMode="contain"
-        />
+        {option.SvgIcon && <option.SvgIcon width={ICON_SIZE} height={ICON_SIZE} />}
         <Text
           style={[
             styles.gridLabel,
@@ -133,12 +129,13 @@ export const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
     total_steps: 9,
   });
 
-  const CURRENT_STEP = 2;
-  const TOTAL_STEPS = 9;
+  const CURRENT_STEP = 3;
+  const TOTAL_STEPS = 12;
   const progressWidth = useSharedValue((CURRENT_STEP - 1) / TOTAL_STEPS * 100);
 
   useEffect(() => {
-    firebaseService.logScreenView('OnboardingScreen3', 'OnboardingScreen3');
+    trackOnboarding3ClarityView();
+    firebaseService.logScreenView('onboarding_3_clarity_grid', 'OnboardingScreen3');
 
     const targetProgress = (CURRENT_STEP / TOTAL_STEPS) * 100;
     progressWidth.value = withDelay(
@@ -238,7 +235,7 @@ export const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
 
           {/* Continue Button */}
           <Animated.View
-            entering={FadeInUp.delay(800).duration(500)}
+            entering={FadeIn.delay(500).duration(400)}
             style={styles.bottomSection}>
             <OnboardingButton
               text="Pick 1 or more to continue"
@@ -254,7 +251,7 @@ export const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.newOnboardingBg,
+    backgroundColor: Colors.new_background,
   },
   safeArea: {
     flex: 1,
@@ -297,7 +294,7 @@ const styles = StyleSheet.create({
   // Typography - Centered
   mainHeading: {
     fontFamily: FontFamilies.sunlightDreams,
-    fontWeight: '700',
+    fontWeight: '400',
     fontSize: fontScale(32),
     lineHeight: fontScale(36),
     color: Colors.newOnboardingHeading,
@@ -348,11 +345,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#090C15',
     borderWidth: 2,
     borderColor: '#262D3D',
-  },
-  gridIcon: {
-    width: ICON_SIZE,
-    height: ICON_SIZE,
-    marginBottom: verticalScale(12),
   },
   gridLabel: {
     fontFamily: FontFamilies.sunlightDreams,

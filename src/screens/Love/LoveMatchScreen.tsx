@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   StatusBar,
-  ImageBackground,
   ScrollView,
   TouchableOpacity,
   Animated,
@@ -15,13 +14,13 @@ import {useNavigation} from '@react-navigation/native';
 import Svg, {Circle, Defs, LinearGradient, Stop} from 'react-native-svg';
 import {
   FontFamilies,
+  Colors,
   fontScale,
   horizontalScale,
   verticalScale,
   radiusScale,
   moderateScale,
 } from '../../theme';
-import GradientText from '../../components/GradientText';
 import {LoveMatchData, CompatibilityMetric} from './loveMatchMockData';
 import {conversationService, LoveMatchResult} from '../../services/ConversationService';
 import CosmicLoader from '../../components/CosmicLoader';
@@ -41,7 +40,6 @@ import CosmicInsightIcon from '../../assets/icons/horoscope_icons/cosmic_insight
 import AskOracleStarIcon from '../../assets/icons/horoscope_icons/ask_oracle_star.svg';
 import CrossIcon from '../../assets/icons/home_icons/cross.svg';
 
-const BackgroundImage = require('../../assets/icons/bottomtab_icons/main_screen_background.png');
 const HeartIcon = require('../../assets/icons/horoscope_icons/heart.png');
 
 type Props = {
@@ -112,9 +110,10 @@ const CircularProgress = memo(
           />
         </Svg>
         <View style={circularStyles.textContainer}>
-          <GradientText style={circularStyles.percentageText}>
+          {/* <GradientText style={circularStyles.percentageText}>
             {`${percentage}%`}
-          </GradientText>
+          </GradientText> */}
+          <Text style={circularStyles.percentageText}>{`${percentage}%`}</Text>
         </View>
       </View>
     );
@@ -135,7 +134,7 @@ const circularStyles = StyleSheet.create({
     fontFamily: FontFamilies.sunlightDreams,
     fontSize: fontScale(47),
     fontWeight: '400',
-    // color:'rgba(221, 197, 96, 1)'
+    color:'#F5F2EA'
   },
 });
 
@@ -519,25 +518,16 @@ const LoveMatchScreen: React.FC<Props> = ({route}) => {
   if (isLoading || !matchData) {
     return (
       <View style={styles.backgroundFallback}>
-        <ImageBackground
-          source={BackgroundImage}
-          style={styles.backgroundImage}
-          resizeMode="cover">
-          <View style={styles.loaderContainer}>
-            <CosmicLoader visible={true} text="Calculating your cosmic compatibility..." inline />
-          </View>
-        </ImageBackground>
+        <View style={styles.loaderContainer}>
+          <CosmicLoader visible={true} text="Calculating your cosmic compatibility..." inline />
+        </View>
       </View>
     );
   }
 
   return (
     <View style={styles.backgroundFallback}>
-      <ImageBackground
-        source={BackgroundImage}
-        style={styles.backgroundImage}
-        resizeMode="cover">
-        <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={styles.container} edges={['top']}>
           <StatusBar
             barStyle="light-content"
             backgroundColor="transparent"
@@ -586,7 +576,6 @@ const LoveMatchScreen: React.FC<Props> = ({route}) => {
             <AskOracleButton onPress={handleAskOracle} />
           </ScrollView>
         </SafeAreaView>
-      </ImageBackground>
 
       {/* Quota Error Alert */}
       <CosmicAlert
@@ -603,12 +592,7 @@ const LoveMatchScreen: React.FC<Props> = ({route}) => {
 const styles = StyleSheet.create({
   backgroundFallback: {
     flex: 1,
-    backgroundColor: '#0A1628',
-  },
-  backgroundImage: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
+    backgroundColor: Colors.new_background,
   },
   loaderContainer: {
     flex: 1,

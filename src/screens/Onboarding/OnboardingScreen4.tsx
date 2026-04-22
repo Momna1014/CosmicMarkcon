@@ -35,13 +35,14 @@ import {
 import {hapticLight} from '../../utils/haptics';
 import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
+import {trackOnboarding4GenderView} from '../../utils/onboardingAnalytics';
 import {OnboardingButton} from '../../components/OnboardingButton';
 
 // Icons
 import BackArrowIcon from '../../assets/icons/new_onboarding/back_arrow.svg';
 const HimImg = require('../../assets/icons/new_onboarding/him.png');
 const HerImg = require('../../assets/icons/new_onboarding/her.png');
-const NotToSayImg = require('../../assets/icons/new_onboarding/not_to_say.png');
+const NotToSayImg = require('../../assets/icons/new_onboarding/prefer_not_to_say.png');
 
 const HORIZONTAL_PADDING = horizontalScale(16);
 const ICON_SIZE = horizontalScale(120);
@@ -60,7 +61,7 @@ const GENDER_OPTIONS = [
 
 // Gender Option Component
 interface GenderOptionProps {
-  option: {id: string; label: string; image: any};
+  option: {id: string; label: string; image?: ReturnType<typeof require>};
   isSelected: boolean;
   onPress: () => void;
   delay: number;
@@ -88,11 +89,13 @@ const GenderOption: React.FC<GenderOptionProps> = ({
         ]}
         onPress={handlePress}
         activeOpacity={0.7}>
-        <Image
-          source={option.image}
-          style={styles.optionIcon}
-          resizeMode="contain"
-        />
+        {option.image && (
+          <Image
+            source={option.image}
+            style={{width: ICON_SIZE, height: ICON_SIZE}}
+            resizeMode="contain"
+          />
+        )}
         <Text
           style={[
             styles.optionLabel,
@@ -118,12 +121,13 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
     total_steps: 9,
   });
 
-  const CURRENT_STEP = 3;
-  const TOTAL_STEPS = 9;
+  const CURRENT_STEP = 4;
+  const TOTAL_STEPS = 12;
   const progressWidth = useSharedValue((CURRENT_STEP - 1) / TOTAL_STEPS * 100);
 
   useEffect(() => {
-    firebaseService.logScreenView('OnboardingScreen4', 'OnboardingScreen4');
+    trackOnboarding4GenderView();
+    firebaseService.logScreenView('onboarding_4_gender_selection', 'OnboardingScreen4');
 
     const targetProgress = (CURRENT_STEP / TOTAL_STEPS) * 100;
     progressWidth.value = withDelay(
@@ -229,7 +233,7 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
 
           {/* Continue Button */}
           <Animated.View
-            entering={FadeInUp.delay(600).duration(500)}
+            entering={FadeIn.delay(400).duration(400)}
             style={styles.bottomSection}>
             <OnboardingButton
               text="Continue"
@@ -245,7 +249,7 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.newOnboardingBg,
+    backgroundColor: Colors.new_background,
   },
   safeArea: {
     flex: 1,
@@ -288,7 +292,7 @@ const styles = StyleSheet.create({
   // Typography - Centered
   mainHeading: {
     fontFamily: FontFamilies.sunlightDreams,
-    fontWeight: '700',
+    fontWeight: '400',
     fontSize: fontScale(32),
     lineHeight: fontScale(36),
     color: Colors.newOnboardingHeading,
@@ -343,17 +347,13 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#262D3D',
   },
-  optionIcon: {
-    width: ICON_SIZE,
-    height: ICON_SIZE,
-    marginBottom: verticalScale(8),
-  },
   optionLabel: {
     fontFamily: FontFamilies.sunlightDreams,
     fontWeight: '400',
     fontSize: fontScale(16),
     color: Colors.newOnboardingSubheading,
     textAlign: 'center',
+    marginTop:verticalScale(15)
   },
   optionLabelSelected: {
     color: Colors.newOnboardingHeading,

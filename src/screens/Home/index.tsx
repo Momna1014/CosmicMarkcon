@@ -1,5 +1,5 @@
 import React, {useCallback, useMemo, useEffect, useState, useRef} from 'react';
-import {View, StatusBar, ImageBackground, ScrollView, RefreshControl, InteractionManager} from 'react-native';
+import {View, StatusBar, ScrollView, RefreshControl, InteractionManager} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSelector} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
@@ -46,9 +46,6 @@ import {
   TRANSITS_DATA,
   COSMIC_GUIDES_DATA,
 } from '../../components/home_components';
-
-// Background Image
-const BackgroundImage = require('../../assets/icons/bottomtab_icons/main_screen_background.png');
 
 type NavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<MainTabParamList, 'Home'>,
@@ -123,8 +120,8 @@ const HomeScreen: React.FC = () => {
       return;
     }
 
-    // Don't show rating if notification prompt is pending
-    if (!hasShownFirstPrompt && permissionStatus === 'not-determined') {
+    // Don't show rating until notification permission flow is fully resolved
+    if (permissionStatus === 'not-determined') {
       return;
     }
 
@@ -197,44 +194,35 @@ const HomeScreen: React.FC = () => {
   if (cosmicLoading) {
     return (
       <View style={styles.backgroundFallback}>
-        <ImageBackground
-          source={BackgroundImage}
-          style={styles.backgroundImage}
-          resizeMode="cover">
-          <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-            <CosmicLoader visible={true} inline />
-          </View>
-        </ImageBackground>
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <CosmicLoader visible={true} inline />
+        </View>
       </View>
     );
   }
 
   return (
     <View style={styles.backgroundFallback}>
-      <ImageBackground
-        source={BackgroundImage}
-        style={styles.backgroundImage}
-        resizeMode="cover">
-        <SafeAreaView style={styles.container} edges={['top']}>
-          <StatusBar
-            barStyle="light-content"
-            backgroundColor="transparent"
-            translucent
-          />
-          <ScrollView
-            style={styles.scrollView}
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={refresh}
-                tintColor="rgba(255,255,255,0.6)"
-                colors={['#7B68EE']}
-              />
-            }>
-            {/* Header Section (Welcome + Title) */}
-            <HeaderSection userName={userName} onProfilePress={handleProfilePress} />
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="transparent"
+          translucent
+        />
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={refresh}
+              tintColor="rgba(255,255,255,0.6)"
+              colors={['#7B68EE']}
+            />
+          }>
+          {/* Header Section (Welcome + Title) */}
+          <HeaderSection userName={userName} onProfilePress={handleProfilePress} />
 
             {/* Daily Energy Card */}
             <DailyEnergyCard
@@ -259,7 +247,6 @@ const HomeScreen: React.FC = () => {
             />
           </ScrollView>
         </SafeAreaView>
-      </ImageBackground>
 
       {/* Rating Modal */}
       <RatingModal

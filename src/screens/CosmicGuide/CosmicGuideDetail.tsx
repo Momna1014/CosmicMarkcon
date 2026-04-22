@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StatusBar,
-  ImageBackground,
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
@@ -19,7 +18,6 @@ import {useSelector} from 'react-redux';
 import {styles} from './styles';
 import {getGuideById, Lesson} from './mockData';
 import {moderateScale} from '../../theme';
-import GradientText from '../../components/GradientText';
 import {selectCompletedLessonsForGuide} from '../../redux/slices/cosmicGuidesSlice';
 import {RootState} from '../../redux/rootReducer';
 
@@ -35,9 +33,6 @@ import {
 import CrossIcon from '../../assets/icons/home_icons/cross.svg';
 import GoRightIcon from '../../assets/icons/home_icons/go_right.svg';
 import ReadDoneIcon from '../../assets/icons/home_icons/read_done.svg';
-
-// Background Image
-const BackgroundImage = require('../../assets/icons/bottomtab_icons/main_screen_background.png');
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -148,16 +143,12 @@ const CosmicGuideDetail: React.FC<CosmicGuideDetailProps> = ({navigation, route}
 
   return (
     <View style={styles.backgroundFallback}>
-      <ImageBackground
-        source={BackgroundImage}
-        style={styles.backgroundImage}
-        resizeMode="cover">
-        <SafeAreaView style={styles.container} edges={['top']}>
-          <StatusBar
-            barStyle="light-content"
-            backgroundColor="transparent"
-            translucent
-          />
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="transparent"
+          translucent
+        />
           
           {/* Header */}
           <View style={styles.header}>
@@ -179,7 +170,9 @@ const CosmicGuideDetail: React.FC<CosmicGuideDetailProps> = ({navigation, route}
             <Animated.View
               entering={FadeInDown.delay(100).springify()}
               style={styles.titleContainer}>
-              <GradientText style={styles.guideTitle}>{guide.title}</GradientText>
+              {/* <GradientText style={styles.guideTitle}>{guide.title}</GradientText> */}
+              <Text style={styles.guideTitle}>{guide.title}</Text>
+
             </Animated.View>
 
             {/* Guide Icon */}
@@ -206,7 +199,6 @@ const CosmicGuideDetail: React.FC<CosmicGuideDetailProps> = ({navigation, route}
             ))}
           </ScrollView>
         </SafeAreaView>
-      </ImageBackground>
     </View>
   );
 };

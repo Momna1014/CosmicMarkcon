@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   StatusBar,
-  ImageBackground,
+
   TouchableOpacity,
   ScrollView,
   Animated,
@@ -14,9 +14,9 @@ import {useSelector, useDispatch} from 'react-redux';
 import {selectOnboardingState} from '../../redux/slices/onboardingSlice';
 import {selectPartners, removePartner, Partner} from '../../redux/slices/partnersSlice';
 import {useAlert} from '../../contexts/AlertContext';
-import GradientText from '../../components/GradientText';
 import {
   FontFamilies,
+  Colors,
   fontScale,
   horizontalScale,
   verticalScale,
@@ -58,8 +58,6 @@ import EscorpioIcon from '../../assets/icons/horoscope_icons/escorpio.svg';
 import SagitarioIcon from '../../assets/icons/horoscope_icons/sagitario.svg';
 import LeoIcon from '../../assets/icons/horoscope_icons/leo.svg';
 import LibraIcon from '../../assets/icons/horoscope_icons/libra.svg';
-
-const BackgroundImage = require('../../assets/icons/bottomtab_icons/main_screen_background.png');
 
 type TabType = 'quickMatch' | 'deepBond';
 
@@ -374,20 +372,16 @@ const LoveScreen: React.FC<Props> = ({navigation}) => {
 
   return (
     <View style={styles.backgroundFallback}>
-      <ImageBackground
-        source={BackgroundImage}
-        style={styles.backgroundImage}
-        resizeMode="cover">
-        <SafeAreaView style={styles.container} edges={['top']}>
-          <StatusBar
-            barStyle="light-content"
-            backgroundColor="transparent"
-            translucent
-          />
-          <ScrollView
-            style={styles.scrollView}
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}>
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="transparent"
+          translucent
+        />
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}>
             {/* Title */}
             <Animated.View style={[
               styles.titleContainer,
@@ -396,7 +390,9 @@ const LoveScreen: React.FC<Props> = ({navigation}) => {
                 transform: [{translateY: titleSlideAnim}],
               }
             ]}>
-              <GradientText style={styles.mainTitle}>Cosmic Synastry</GradientText>
+              {/* <GradientText style={styles.mainTitle}>Cosmic Synastry</GradientText> */}
+              <Text style={styles.mainTitle}>Cosmic Synastry</Text>
+
             </Animated.View>
 
             {/* Tab Bar */}
@@ -539,7 +535,6 @@ const LoveScreen: React.FC<Props> = ({navigation}) => {
             )}
           </ScrollView>
         </SafeAreaView>
-      </ImageBackground>
 
       {/* Sign Select Modal */}
       <SignSelectModal
@@ -554,12 +549,7 @@ const LoveScreen: React.FC<Props> = ({navigation}) => {
 const styles = StyleSheet.create({
   backgroundFallback: {
     flex: 1,
-    backgroundColor: '#0A1628',
-  },
-  backgroundImage: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
+    backgroundColor: Colors.new_background,
   },
   container: {
     flex: 1,
@@ -580,6 +570,7 @@ const styles = StyleSheet.create({
     fontSize: fontScale(40),
     fontWeight: '400',
     textAlign: 'center',
+    color:'white'
   },
   tabBar: {
     flexDirection: 'row',

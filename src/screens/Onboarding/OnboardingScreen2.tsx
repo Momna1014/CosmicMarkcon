@@ -11,7 +11,6 @@ import {
   TouchableOpacity,
   StatusBar,
   ScrollView,
-  Image,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Animated, {
@@ -43,12 +42,12 @@ import {OnboardingButton} from '../../components/OnboardingButton';
 
 // Icons
 import BackArrowIcon from '../../assets/icons/new_onboarding/back_arrow.svg';
-const SpiritualGrowthImg = require('../../assets/icons/new_onboarding/spiritual_growth.png');
-const TrueLoveImg = require('../../assets/icons/new_onboarding/true_love.png');
-const GuidanceClarityImg = require('../../assets/icons/new_onboarding/guidance_clarity.png');
-const FuturePathImg = require('../../assets/icons/new_onboarding/future_path.png');
-const SelfDiscoveryImg = require('../../assets/icons/new_onboarding/self_discovery.png');
-const UnderstandingPeopleImg = require('../../assets/icons/new_onboarding/understanding_people.png');
+import SpiritualGrowthIcon from '../../assets/icons/new_onboarding/spiritual_growth.svg';
+import TrueLoveIcon from '../../assets/icons/new_onboarding/true_love.svg';
+import GuidanceClarityIcon from '../../assets/icons/new_onboarding/guidance_clarity.svg';
+import FuturePathIcon from '../../assets/icons/new_onboarding/future_path.svg';
+import SelfDiscoveryIcon from '../../assets/icons/new_onboarding/self_discovery.svg';
+import UnderstandingPeopleIcon from '../../assets/icons/new_onboarding/understanding_people.svg';
 
 const ICON_SIZE = horizontalScale(44);
 const CIRCLE_SIZE = horizontalScale(24);
@@ -60,17 +59,17 @@ interface OnboardingScreen2Props {
 }
 
 const SEEKING_OPTIONS = [
-  {id: 'spiritual_growth', label: 'Spiritual Growth', image: SpiritualGrowthImg},
-  {id: 'finding_true_love', label: 'Finding True Love', image: TrueLoveImg},
-  {id: 'guidance_clarity', label: 'Guidance & Clarity', image: GuidanceClarityImg},
-  {id: 'my_future_path', label: 'My Future Path', image: FuturePathImg},
-  {id: 'self_discovery', label: 'Self Discovery', image: SelfDiscoveryImg},
-  {id: 'understanding_people', label: 'Understanding People', image: UnderstandingPeopleImg},
+  {id: 'spiritual_growth', label: 'Spiritual Growth', SvgIcon: SpiritualGrowthIcon},
+  {id: 'finding_true_love', label: 'Finding True Love', SvgIcon: TrueLoveIcon},
+  {id: 'guidance_clarity', label: 'Guidance & Clarity', SvgIcon: GuidanceClarityIcon},
+  {id: 'my_future_path', label: 'My Future Path', SvgIcon: FuturePathIcon},
+  {id: 'self_discovery', label: 'Self Discovery', SvgIcon: SelfDiscoveryIcon},
+  {id: 'understanding_people', label: 'Understanding People', SvgIcon: UnderstandingPeopleIcon},
 ];
 
 // Animated Option Row Component - Simple with haptic only
 interface AnimatedOptionRowProps {
-  option: {id: string; label: string; image: any};
+  option: {id: string; label: string; SvgIcon?: React.FC<{width: number; height: number}>};
   isSelected: boolean;
   onPress: () => void;
   index: number;
@@ -116,11 +115,7 @@ const AnimatedOptionRow: React.FC<AnimatedOptionRowProps> = ({
         </Text>
 
         {/* Icon on the right */}
-        <Image
-          source={option.image}
-          style={styles.optionImage}
-          resizeMode="contain"
-        />
+        {option.SvgIcon && <option.SvgIcon width={ICON_SIZE} height={ICON_SIZE} />}
       </TouchableOpacity>
     </Animated.View>
   );
@@ -138,13 +133,13 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
     total_steps: 11,
   });
 
-  const CURRENT_STEP = 1;
-  const TOTAL_STEPS = 9;
+  const CURRENT_STEP = 2;
+  const TOTAL_STEPS = 12;
   const progressWidth = useSharedValue(0);
 
   useEffect(() => {
     trackOnboarding2View();
-    firebaseService.logScreenView('OnboardingScreen2', 'OnboardingScreen2');
+    firebaseService.logScreenView('onboarding_2_seeking_options', 'OnboardingScreen2');
 
     const targetProgress = (CURRENT_STEP / TOTAL_STEPS) * 100;
     progressWidth.value = withDelay(
@@ -241,7 +236,7 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
 
           {/* Continue Button */}
           <Animated.View
-            entering={FadeInUp.delay(800).duration(500)}
+            entering={FadeIn.delay(500).duration(400)}
             style={styles.bottomSection}>
             <OnboardingButton
               text="Pick 1 or more to continue"
@@ -257,7 +252,7 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.newOnboardingBg,
+    backgroundColor: Colors.new_background,
   },
   safeArea: {
     flex: 1,
@@ -300,7 +295,7 @@ const styles = StyleSheet.create({
   // Typography - Centered
   mainHeading: {
     fontFamily: FontFamilies.sunlightDreams,
-    fontWeight: '700',
+    fontWeight: '400',
     fontSize: fontScale(32),
     lineHeight: fontScale(36),
     color: Colors.newOnboardingHeading,
@@ -369,10 +364,6 @@ const styles = StyleSheet.create({
   },
   optionLabelSelected: {
     color: Colors.newOnboardingHeading,
-  },
-  optionImage: {
-    width: ICON_SIZE,
-    height: ICON_SIZE,
   },
   // Bottom
   bottomSection: {

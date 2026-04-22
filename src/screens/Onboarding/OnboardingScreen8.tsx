@@ -35,6 +35,7 @@ import {
 import {hapticLight} from '../../utils/haptics';
 import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
+import {trackOnboarding8BirthplaceView} from '../../utils/onboardingAnalytics';
 import {OnboardingButton} from '../../components/OnboardingButton';
 import {
   CountryPickerModal,
@@ -73,11 +74,12 @@ export const OnboardingScreen8: React.FC<OnboardingScreen8Props> = ({
   });
 
   const CURRENT_STEP = 8;
-  const TOTAL_STEPS = 9;
+  const TOTAL_STEPS = 12;
   const progressWidth = useSharedValue((CURRENT_STEP - 1) / TOTAL_STEPS * 100);
 
   useEffect(() => {
-    firebaseService.logScreenView('OnboardingScreen8', 'OnboardingScreen8');
+    trackOnboarding8BirthplaceView();
+    firebaseService.logScreenView('onboarding_8_birthplace_selection', 'OnboardingScreen8');
 
     const targetProgress = (CURRENT_STEP / TOTAL_STEPS) * 100;
     progressWidth.value = withDelay(
@@ -235,7 +237,7 @@ export const OnboardingScreen8: React.FC<OnboardingScreen8Props> = ({
 
           {/* Continue Button */}
           <Animated.View
-            entering={FadeInUp.delay(600).duration(500)}
+            entering={FadeIn.delay(400).duration(400)}
             style={styles.bottomSection}>
             <OnboardingButton
               text="Continue"
@@ -271,7 +273,7 @@ export const OnboardingScreen8: React.FC<OnboardingScreen8Props> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.newOnboardingBg,
+    backgroundColor: Colors.new_background,
   },
   safeArea: {
     flex: 1,
@@ -314,7 +316,7 @@ const styles = StyleSheet.create({
   // Typography
   mainHeading: {
     fontFamily: FontFamilies.sunlightDreams,
-    fontWeight: '700',
+    fontWeight: '400',
     fontSize: fontScale(28),
     lineHeight: fontScale(32),
     color: Colors.newOnboardingHeading,
@@ -335,7 +337,7 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(16),
   },
   selectionButton: {
-    backgroundColor: '#090C15',
+    backgroundColor: '#3a3a3a21',
     borderRadius: radiusScale(16),
     paddingVertical: verticalScale(20),
     paddingHorizontal: horizontalScale(20),

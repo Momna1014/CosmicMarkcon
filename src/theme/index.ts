@@ -126,6 +126,7 @@ export const Colors = {
   error: '#FF0000',
   info: '#354764',
     background: '#2C2C90',
+    new_background:'#050711',
 
   // Onboarding colors
   progressBarBackground: '#0E0E0E57',
