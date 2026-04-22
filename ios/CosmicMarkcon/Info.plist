@@ -29,16 +29,16 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>fb734401465854955</string>
+				<string>fb1713793223320140</string>
 			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>FacebookAppID</key>
-	<string>734401465854955</string>
+	<string>1713793223320140</string>
 	<key>FacebookClientToken</key>
-	<string>c7d8bbed65dacedc0c8c43563010ded1</string>
+	<string>b17cc23beb86c89e4bd75d3cd1ecea89</string>
 	<key>FacebookDisplayName</key>
 	<string>Cosmic</string>
 	<key>GADApplicationIdentifier</key>
