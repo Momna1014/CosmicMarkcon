@@ -117,14 +117,14 @@ export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
           <Animated.Text
             entering={FadeInDown.delay(200).duration(600).springify()}
             style={styles.mainHeading}>
-            {'Unlock Your\nCosmic Blueprint'}
+            {'Welcome to Your\nCosmic Journey'}
           </Animated.Text>
 
           {/* Subheading */}
           <Animated.Text
             entering={FadeInDown.delay(350).duration(600).springify()}
             style={styles.subHeading}>
-            {'Discover the stars\u2019 guide to your life,\nlove, and cosmic destiny.'}
+            {'Explore astrology, palm reading and\nAI guidance — all in one place.'}
           </Animated.Text>
 
           {/* Lottie Animation - takes all center space */}

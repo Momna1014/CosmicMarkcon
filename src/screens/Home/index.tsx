@@ -120,8 +120,8 @@ const HomeScreen: React.FC = () => {
       return;
     }
 
-    // Don't show rating if notification prompt is pending
-    if (!hasShownFirstPrompt && permissionStatus === 'not-determined') {
+    // Don't show rating until notification permission flow is fully resolved
+    if (permissionStatus === 'not-determined') {
       return;
     }
 

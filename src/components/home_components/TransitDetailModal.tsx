@@ -101,12 +101,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: horizontalScale(20),
   },
   androidBlur: {
-    backgroundColor: 'rgba(0, 0, 0, 0.92)',
+    backgroundColor: 'rgba(0, 0, 0, 0.98)',
   },
   modalContainer: {
     width: '100%',
     // maxWidth: moderateScale(320),
-    backgroundColor: 'rgba(8, 20, 42, 1)',
+    backgroundColor: 'rgb(10, 12, 17)',
     borderRadius: moderateScale(36),
     paddingTop: verticalScale(28),
     paddingBottom: verticalScale(24),

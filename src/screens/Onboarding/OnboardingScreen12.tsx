@@ -65,7 +65,7 @@ export const OnboardingScreen12: React.FC<OnboardingScreen12Props> = ({
 
   useEffect(() => {
     trackOnboarding12FinalVideoView();
-    firebaseService.logScreenView('onboarding_12_palm_reading', 'OnboardingScreen12');
+    firebaseService.logScreenView('onboarding_12_chat_ai', 'OnboardingScreen12');
 
     progressWidth.value = withDelay(
       300,
@@ -128,14 +128,14 @@ export const OnboardingScreen12: React.FC<OnboardingScreen12Props> = ({
           <Animated.Text
             entering={FadeInDown.delay(200).duration(600).springify()}
             style={styles.mainHeading}>
-            {'See What Your\nHand Says'}
+            {'Your AI Cosmic\nAdvisor'}
           </Animated.Text>
 
           {/* Subheading */}
           <Animated.Text
             entering={FadeInDown.delay(350).duration(600).springify()}
             style={styles.subHeading}>
-            {'Explore what your palm lines can reveal\nabout your nature, emotions, and future.'}
+            {'Ask anything about your stars, love,\nor future — get instant cosmic guidance.'}
           </Animated.Text>
 
           {/* Lottie Animation - takes all center space */}

@@ -9,6 +9,7 @@ import {
   Animated,
   Switch,
   AppState,
+  Linking,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSelector, useDispatch} from 'react-redux';
@@ -32,6 +33,12 @@ import {useNotifications} from '../../contexts/NotificationContext';
 import StarIcon from '../../assets/icons/home_icons/welcome_star.svg';
 import NotificationBellIcon from '../../assets/icons/horoscope_icons/notification_bell.svg';
 import AvatarDefaultIcon from '../../assets/icons/horoscope_icons/avatar_default.svg';
+import GoRightIcon from '../../assets/icons/home_icons/right_arrow.svg';
+import TermsIcon from '../../assets/icons/profile_icons/terms_conditions.svg';
+import PrivacyIcon from '../../assets/icons/profile_icons/privacy_policy.svg';
+
+const PRIVACY_URL = 'https://whoop.myappsstudio.com/privacy-policy.html';
+const TERMS_URL = 'https://whoop.myappsstudio.com/terms-and-conditions.html';
 
 // Chat Header (same as Chat screen)
 import {ChatHeader} from '../Chat/components';
@@ -299,7 +306,7 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
       <View style={styles.formContent}>
         {/* Name Field */}
         <View style={styles.fieldContainer}>
-          <Text style={styles.fieldLabel}>NAME (OPT)</Text>
+          <Text style={styles.fieldLabel}>NAME (optional)</Text>
           <View style={styles.inputBox}>
             <TextInput
               style={styles.textInput}
@@ -325,7 +332,7 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
 
         {/* Country Field */}
         <View style={styles.fieldContainer}>
-          <Text style={styles.fieldLabel}>COUNTRY (OPT)</Text>
+          <Text style={styles.fieldLabel}>COUNTRY (optional)</Text>
           <TouchableOpacity style={styles.inputBox} onPress={handleOpenCountryPicker}>
             <Text
               style={[
@@ -340,7 +347,7 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
         {/* City Field - Only show when country is selected and has cities */}
         {selectedCountry && countryHasCities && (
           <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>CITY (OPT)</Text>
+            <Text style={styles.fieldLabel}>CITY (optional)</Text>
             <TouchableOpacity style={styles.inputBox} onPress={handleOpenCityPicker}>
               <Text
                 style={[
@@ -476,10 +483,16 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled">
 
+            {/* SECTION: Your Profile */}
+            <Text style={styles.sectionHeading}>Your Profile</Text>
+
             {/* Form or Profile Card */}
             <View>
               {showProfileCard ? renderProfileCard() : renderForm()}
             </View>
+
+            {/* SECTION: Notifications */}
+            <Text style={styles.sectionHeading}>Notifications</Text>
 
             {/* Notification Toggle Card */}
             <View style={styles.notificationCard}>
@@ -504,6 +517,9 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
                 />
               </View>
             </View>
+
+            {/* SECTION: Premium Access */}
+            <Text style={styles.sectionHeading}>Premium Access</Text>
 
             {/* Premium Card */}
             <TouchableOpacity
@@ -538,6 +554,54 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
                 )}
               </View>
             </TouchableOpacity>
+            {/* SECTION: Legal */}
+            <Text style={styles.sectionHeading}>Legal</Text>
+
+            {/* Legal Card */}
+            <View style={styles.legalCard}>
+              <View style={styles.glassOverlay} />
+
+              {/* Terms & Conditions */}
+              <TouchableOpacity
+                style={styles.legalRow}
+                onPress={() => Linking.openURL(TERMS_URL)}
+                activeOpacity={0.7}>
+                <View style={styles.legalRowIconContainer}>
+                  <TermsIcon width={22} height={22} />
+                </View>
+                <View style={styles.legalRowTextContainer}>
+                  <Text style={styles.legalRowTitle}>Terms & Conditions</Text>
+                  <Text style={styles.legalRowSubtitle}>Review our terms of use</Text>
+                </View>
+                <GoRightIcon
+                  width={16}
+                  height={16}
+                  style={styles.legalRowArrow}
+                />
+              </TouchableOpacity>
+
+              <View style={styles.legalDivider} />
+
+              {/* Privacy Policy */}
+              <TouchableOpacity
+                style={styles.legalRow}
+                onPress={() => Linking.openURL(PRIVACY_URL)}
+                activeOpacity={0.7}>
+                <View style={styles.legalRowIconContainer}>
+                  <PrivacyIcon width={22} height={22} />
+                </View>
+                <View style={styles.legalRowTextContainer}>
+                  <Text style={styles.legalRowTitle}>Privacy Policy</Text>
+                  <Text style={styles.legalRowSubtitle}>How we handle your data</Text>
+                </View>
+                <GoRightIcon
+                  width={16}
+                  height={16}
+                  style={styles.legalRowArrow}
+                />
+              </TouchableOpacity>
+            </View>
+
           </ScrollView>
         </SafeAreaView>
 

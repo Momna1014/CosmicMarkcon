@@ -47,7 +47,7 @@ import {OnboardingButton} from '../../components/OnboardingButton';
 import BackArrowIcon from '../../assets/icons/new_onboarding/back_arrow.svg';
 const HimImg = require('../../assets/icons/new_onboarding/him.png');
 const HerImg = require('../../assets/icons/new_onboarding/her.png');
-const NotToSayImg = require('../../assets/icons/new_onboarding/not_to_say.png');
+const NotToSayImg = require('../../assets/icons/new_onboarding/prefer_not_to_say.png');
 
 const HORIZONTAL_PADDING = horizontalScale(16);
 const ICON_SIZE = horizontalScale(200);

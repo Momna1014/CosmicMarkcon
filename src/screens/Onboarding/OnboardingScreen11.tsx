@@ -128,14 +128,14 @@ export const OnboardingScreen11: React.FC<OnboardingScreen11Props> = ({
           <Animated.Text
             entering={FadeInDown.delay(200).duration(600).springify()}
             style={styles.mainHeading}>
-            {'See Your\nCompatibility Match'}
+            {'Read Your\nPalm Lines'}
           </Animated.Text>
 
           {/* Subheading */}
           <Animated.Text
             entering={FadeInDown.delay(350).duration(600).springify()}
             style={styles.subHeading}>
-            {'Your chart shows only one side. Explore love,\nfriendship, and work connections with others.'}
+            {'Your hand holds secrets of your destiny.\nDiscover what your palm lines reveal.'}
           </Animated.Text>
 
           {/* Lottie Animation - takes all center space */}

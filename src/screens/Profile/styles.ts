@@ -221,7 +221,6 @@ export const styles = StyleSheet.create({
 
   // Notification Card Styles
   notificationCard: {
-    marginTop: verticalScale(24),
     borderRadius: radiusScale(20),
     overflow: 'hidden',
     borderWidth: 1,
@@ -266,7 +265,6 @@ export const styles = StyleSheet.create({
 
   // Premium Card Styles
   premiumCard: {
-    marginTop: verticalScale(16),
     borderRadius: radiusScale(20),
     overflow: 'hidden',
     borderWidth: 1,
@@ -340,5 +338,69 @@ export const styles = StyleSheet.create({
     fontSize: fontScale(16),
     color: '#FFFFFF',
     fontWeight: '700',
+  },
+
+  // Section Heading
+  sectionHeading: {
+    fontFamily: FontFamilies.interMedium,
+    fontSize: fontScale(13),
+    color: 'rgba(194, 209, 243, 0.55)',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    marginTop: verticalScale(24),
+    marginBottom: verticalScale(10),
+    marginLeft: horizontalScale(4),
+  },
+
+  // Legal Card Styles
+  legalCard: {
+    borderRadius: radiusScale(20),
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(194, 209, 243, 0.2)',
+    backgroundColor: 'rgba(194, 209, 243, 0.06)',
+  },
+  legalRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: horizontalScale(18),
+    paddingVertical: verticalScale(16),
+  },
+  legalRowIconContainer: {
+    width: horizontalScale(40),
+    height: horizontalScale(40),
+    borderRadius: horizontalScale(20),
+    backgroundColor: 'rgba(194, 209, 243, 0.10)',
+    borderWidth: 1,
+    borderColor: 'rgba(194, 209, 243, 0.18)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: horizontalScale(14),
+  },
+  legalRowEmoji: {
+    fontSize: fontScale(18),
+  },
+  legalRowTextContainer: {
+    flex: 1,
+  },
+  legalRowTitle: {
+    fontFamily: FontFamilies.interSemiBold,
+    fontSize: fontScale(15),
+    color: '#FFFFFF',
+    marginBottom: verticalScale(2),
+  },
+  legalRowSubtitle: {
+    fontFamily: FontFamilies.interRegular,
+    fontSize: fontScale(12),
+    color: 'rgba(255, 255, 255, 0.5)',
+  },
+  legalRowArrow: {
+    opacity: 0.5,
+    marginLeft: horizontalScale(8),
+  },
+  legalDivider: {
+    height: 1,
+    marginHorizontal: horizontalScale(18),
+    backgroundColor: 'rgba(194, 209, 243, 0.12)',
   },
 });

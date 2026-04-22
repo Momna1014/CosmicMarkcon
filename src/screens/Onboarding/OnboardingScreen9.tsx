@@ -52,10 +52,65 @@ import {OnboardingData} from './OnboardingContainer';
 import BackArrowIcon from '../../assets/icons/new_onboarding/back_arrow.svg';
 
 // Character and card images
-const CharacterImage = require('../../assets/icons/new_onboarding/character.png');
+// Fallback character when gender/sign is unknown
+const DefaultCharacterImage = require('../../assets/icons/new_onboarding/character.png');
 const InnerGuidanceImage = require('../../assets/icons/new_onboarding/moneymoney.png');
 const MoneyCareerImage = require('../../assets/icons/new_onboarding/money.png');
 const LoveRomanceImage = require('../../assets/icons/new_onboarding/love&romance.png');
+
+// Pre-require ALL zodiac character images (Metro requires static paths at build time)
+const ZODIAC_CHARACTERS: Record<string, Record<string, ReturnType<typeof require>>> = {
+  boy: {
+    aries:        require('../../assets/icons/new_onboarding/zodix_characters/boy_aries.png'),
+    taurus:       require('../../assets/icons/new_onboarding/zodix_characters/boy_taurus.png'),
+    gemini:       require('../../assets/icons/new_onboarding/zodix_characters/boy_gemini.png'),
+    cancer:       require('../../assets/icons/new_onboarding/zodix_characters/boy_cancer.png'),
+    leo:          require('../../assets/icons/new_onboarding/zodix_characters/boy_leo.png'),
+    virgo:        require('../../assets/icons/new_onboarding/zodix_characters/boy_virgo.png'),
+    libra:        require('../../assets/icons/new_onboarding/zodix_characters/boy_libra.png'),
+    scorpio:      require('../../assets/icons/new_onboarding/zodix_characters/boy_scorpio.png'),
+    sagittarius:  require('../../assets/icons/new_onboarding/zodix_characters/boy_sagittarius.png'),
+    capricorn:    require('../../assets/icons/new_onboarding/zodix_characters/boy_capricon.png'),
+    aquarius:     require('../../assets/icons/new_onboarding/zodix_characters/boy_aquarius.png'),
+    pisces:       require('../../assets/icons/new_onboarding/zodix_characters/boy_pisces.png'),
+  },
+  girl: {
+    aries:        require('../../assets/icons/new_onboarding/zodix_characters/girl_aries.png'),
+    taurus:       require('../../assets/icons/new_onboarding/zodix_characters/girl_taurus.png'),
+    gemini:       require('../../assets/icons/new_onboarding/zodix_characters/girl_gemini.png'),
+    cancer:       require('../../assets/icons/new_onboarding/zodix_characters/girl_cancer.png'),
+    leo:          require('../../assets/icons/new_onboarding/zodix_characters/girl_leo.png'),
+    virgo:        require('../../assets/icons/new_onboarding/zodix_characters/girl_virgo.png'),
+    libra:        require('../../assets/icons/new_onboarding/zodix_characters/girl_libra.png'),
+    scorpio:      require('../../assets/icons/new_onboarding/zodix_characters/girl_scorpio.png'),
+    sagittarius:  require('../../assets/icons/new_onboarding/zodix_characters/girl_sagittarius.png'),
+    capricorn:    require('../../assets/icons/new_onboarding/zodix_characters/girl_capricon.png'),
+    aquarius:     require('../../assets/icons/new_onboarding/zodix_characters/girl_aquarius.png'),
+    pisces:       require('../../assets/icons/new_onboarding/zodix_characters/girl_pisces.png'),
+  },
+};
+
+/**
+ * Resolves the correct character image based on gender and zodiac sign.
+ * Falls back to DefaultCharacterImage for 'prefer_not_to_say' or missing assets.
+ */
+const getCharacterImage = (
+  gender: string | null | undefined,
+  zodiacSign: string | null | undefined,
+): ReturnType<typeof require> => {
+  const prefix =
+    gender === 'he_him' ? 'boy' :
+    gender === 'she_her' ? 'girl' :
+    null;
+
+  if (!prefix || !zodiacSign) {
+    return DefaultCharacterImage;
+  }
+
+  // Normalise sign name → lookup key (handles 'Capricorn' → 'capricorn' etc.)
+  const signKey = zodiacSign.toLowerCase();
+  return ZODIAC_CHARACTERS[prefix]?.[signKey] ?? DefaultCharacterImage;
+};
 
 const HORIZONTAL_PADDING = horizontalScale(16);
 
@@ -203,7 +258,7 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
                 entering={FadeIn.delay(50).duration(300)}
                 style={[styles.characterAnimated, characterAnimatedStyle]}>
                 <Image
-                  source={CharacterImage}
+                  source={getCharacterImage(onboardingData?.gender, onboardingData?.zodiacSign)}
                   style={styles.characterImage}
                   resizeMode="contain"
                 />
@@ -213,29 +268,31 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
               {/* Inner Guidance Card - Top Left */}
               <View style={[styles.floatingCard, styles.card1, styles.cardRotation1]}>
                 <Animated.View entering={ZoomIn.delay(1050).duration(400).springify()}>
-                <View style={styles.glassCardContainer}>
-                  {Platform.OS === 'ios' ? (
-                    <BlurView
-                      style={styles.glassBlur}
-                      blurType="light"
-                      blurAmount={20}
-                      reducedTransparencyFallbackColor="rgba(255, 255, 255, 0.15)"
-                    />
-                  ) : (
-                    <View style={styles.glassBlurAndroid} />
-                  )}
-                  <View style={styles.cardContent}>
-                    <View style={styles.cardRow}>
-                      <Image
-                        source={InnerGuidanceImage}
-                        style={styles.cardIcon}
-                        resizeMode="contain"
+                <View style={styles.glassCardBorder}>
+                  <View style={styles.glassCardInner}>
+                    {Platform.OS === 'ios' ? (
+                      <BlurView
+                        style={styles.glassBlur}
+                        blurType="light"
+                        blurAmount={20}
+                        reducedTransparencyFallbackColor="rgba(255, 255, 255, 0.15)"
                       />
-                      <Text style={styles.cardLabel}>Inner &{'\n'}Guidance</Text>
-                    </View>
-                    <View style={[styles.cardProgressBarContainer, styles.progressRotation1]}>
-                      <View style={styles.cardProgressBarBackground}>
-                        <View style={[styles.cardProgressBarFill, styles.cardProgress70, styles.cardProgressPink]} />
+                    ) : (
+                      <View style={styles.glassBlurAndroid} />
+                    )}
+                    <View style={styles.cardContent}>
+                      <View style={styles.cardRow}>
+                        <Image
+                          source={InnerGuidanceImage}
+                          style={styles.cardIcon}
+                          resizeMode="contain"
+                        />
+                        <Text style={styles.cardLabel}>Inner &{'\n'}Guidance</Text>
+                      </View>
+                      <View style={[styles.cardProgressBarContainer, styles.progressRotation1]}>
+                        <View style={styles.cardProgressBarBackground}>
+                          <View style={[styles.cardProgressBarFill, styles.cardProgress70, styles.cardProgressPink]} />
+                        </View>
                       </View>
                     </View>
                   </View>
@@ -246,29 +303,31 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
               {/* Money & Career Card - Right */}
               <View style={[styles.floatingCard, styles.card2, styles.cardRotation2]}>
                 <Animated.View entering={ZoomIn.delay(1200).duration(400).springify()}>
-                <View style={styles.glassCardContainer}>
-                  {Platform.OS === 'ios' ? (
-                    <BlurView
-                      style={styles.glassBlur}
-                      blurType="light"
-                      blurAmount={20}
-                      reducedTransparencyFallbackColor="rgba(255, 255, 255, 0.15)"
-                    />
-                  ) : (
-                    <View style={styles.glassBlurAndroid} />
-                  )}
-                  <View style={styles.cardContent}>
-                    <View style={styles.cardRow}>
-                      <Image
-                        source={MoneyCareerImage}
-                        style={styles.cardIcon}
-                        resizeMode="contain"
+                <View style={styles.glassCardBorder}>
+                  <View style={styles.glassCardInner}>
+                    {Platform.OS === 'ios' ? (
+                      <BlurView
+                        style={styles.glassBlur}
+                        blurType="light"
+                        blurAmount={20}
+                        reducedTransparencyFallbackColor="rgba(255, 255, 255, 0.15)"
                       />
-                      <Text style={styles.cardLabel}>Money &{'\n'}Career</Text>
-                    </View>
-                    <View style={[styles.cardProgressBarContainer, styles.progressRotation2]}>
-                      <View style={styles.cardProgressBarBackground}>
-                        <View style={[styles.cardProgressBarFill, styles.cardProgress50, styles.cardProgressBlue]} />
+                    ) : (
+                      <View style={styles.glassBlurAndroid} />
+                    )}
+                    <View style={styles.cardContent}>
+                      <View style={styles.cardRow}>
+                        <Image
+                          source={MoneyCareerImage}
+                          style={styles.cardIcon}
+                          resizeMode="contain"
+                        />
+                        <Text style={styles.cardLabel}>Money &{'\n'}Career</Text>
+                      </View>
+                      <View style={[styles.cardProgressBarContainer, styles.progressRotation2]}>
+                        <View style={styles.cardProgressBarBackground}>
+                          <View style={[styles.cardProgressBarFill, styles.cardProgress50, styles.cardProgressBlue]} />
+                        </View>
                       </View>
                     </View>
                   </View>
@@ -279,29 +338,31 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
               {/* Love & Romance Card - Bottom Left */}
               <View style={[styles.floatingCard, styles.card3, styles.cardRotation3]}>
                 <Animated.View entering={ZoomIn.delay(1350).duration(400).springify()}>
-                <View style={styles.glassCardContainer}>
-                  {Platform.OS === 'ios' ? (
-                    <BlurView
-                      style={styles.glassBlur}
-                      blurType="light"
-                      blurAmount={20}
-                      reducedTransparencyFallbackColor="rgba(255, 255, 255, 0.15)"
-                    />
-                  ) : (
-                    <View style={styles.glassBlurAndroid} />
-                  )}
-                  <View style={styles.cardContent}>
-                    <View style={styles.cardRow}>
-                      <Image
-                        source={LoveRomanceImage}
-                        style={styles.cardIcon}
-                        resizeMode="contain"
+                <View style={styles.glassCardBorder}>
+                  <View style={styles.glassCardInner}>
+                    {Platform.OS === 'ios' ? (
+                      <BlurView
+                        style={styles.glassBlur}
+                        blurType="light"
+                        blurAmount={20}
+                        reducedTransparencyFallbackColor="rgba(255, 255, 255, 0.15)"
                       />
-                      <Text style={styles.cardLabel}>Love &{'\n'}Romance</Text>
-                    </View>
-                    <View style={[styles.cardProgressBarContainer, styles.progressRotation3]}>
-                      <View style={styles.cardProgressBarBackground}>
-                        <View style={[styles.cardProgressBarFill, styles.cardProgress60, styles.cardProgressPink]} />
+                    ) : (
+                      <View style={styles.glassBlurAndroid} />
+                    )}
+                    <View style={styles.cardContent}>
+                      <View style={styles.cardRow}>
+                        <Image
+                          source={LoveRomanceImage}
+                          style={styles.cardIcon}
+                          resizeMode="contain"
+                        />
+                        <Text style={styles.cardLabel}>Love &{'\n'}Romance</Text>
+                      </View>
+                      <View style={[styles.cardProgressBarContainer, styles.progressRotation3]}>
+                        <View style={styles.cardProgressBarBackground}>
+                          <View style={[styles.cardProgressBarFill, styles.cardProgress60, styles.cardProgressPink]} />
+                        </View>
                       </View>
                     </View>
                   </View>
@@ -445,13 +506,17 @@ const styles = StyleSheet.create({
   cardRotation3: {
     transform: [{rotate: '-5deg'}],
   },
-  // Glass Card Container
-  glassCardContainer: {
+  // Glass Card Container — border wrapper (no overflow so corners stay smooth)
+  glassCardBorder: {
     borderRadius: radiusScale(16),
-    overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgb(255, 255, 255)',
+    borderColor: 'rgba(255, 255, 255, 0.6)',
     minWidth: horizontalScale(110),
+  },
+  // Inner clip wrapper — overflow hidden clips blur content to rounded shape
+  glassCardInner: {
+    borderRadius: radiusScale(15),
+    overflow: 'hidden',
   },
   glassBlur: {
     position: 'absolute',
