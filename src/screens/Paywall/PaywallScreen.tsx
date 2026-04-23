@@ -363,12 +363,17 @@ export const PaywallScreen: React.FC = () => {
   });
 
   /**
-   * Log Firebase event helper
+   * Log Firebase event helper.
+   * When the user arrives directly from onboarding (source === 'onboarding_complete')
+   * all events are suffixed with '_via_onboarding' — this only ever happens once,
+   * on the very first paywall visit after the onboarding flow completes.
    */
   const logFirebaseEvent = useCallback((eventName: string, eventParams?: Record<string, any>) => {
-    console.log(`📊 [PaywallScreen] Firebase Event: ${eventName}`, eventParams);
-    firebaseService.logEvent(eventName, eventParams);
-  }, []);
+    const resolvedName =
+      source === 'onboarding_complete' ? `${eventName}_via_onb` : eventName;
+    console.log(`📊 [PaywallScreen] Firebase Event: ${resolvedName}`, eventParams);
+    firebaseService.logEvent(resolvedName, eventParams);
+  }, [source]);
 
   /**
    * Check if billing/offerings are available before rendering the paywall.

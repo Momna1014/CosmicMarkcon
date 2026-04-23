@@ -38,12 +38,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     window = UIWindow(frame: UIScreen.main.bounds)
     
-    // Match BootSplash background color (#2C2C90) to prevent flash/jitter
+    // Match BootSplash background color (#050711) to prevent flash/jitter
     // between splash screen hide and React Native view rendering
     window?.backgroundColor = UIColor(
-      red: 0.172549019607843,
-      green: 0.172549019607843,
-      blue: 0.564705882352941,
+      red: 0.0196078431372549,
+      green: 0.0274509803921569,
+      blue: 0.0666666666666667,
       alpha: 1.0
     )
 
@@ -182,13 +182,13 @@ class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
 #endif
   }
 
-  // Match BootSplash background (#2C2C90) on the root view to prevent jitter
+  // Match BootSplash background (#050711) on the root view to prevent jitter
   override func customize(_ rootView: RCTRootView) {
     super.customize(rootView)
     rootView.backgroundColor = UIColor(
-      red: 0.172549019607843,
-      green: 0.172549019607843,
-      blue: 0.564705882352941,
+      red: 0.0196078431372549,
+      green: 0.0274509803921569,
+      blue: 0.0666666666666667,
       alpha: 1.0
     )
   }

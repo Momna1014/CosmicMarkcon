@@ -11,7 +11,7 @@ import {
   StatusBar,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import LottieView from 'lottie-react-native';
+import Video from 'react-native-video';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -39,7 +39,7 @@ import {useScreenView} from '../../hooks/useFacebookAnalytics';
 import firebaseService from '../../services/firebase/FirebaseService';
 import {OnboardingButton} from '../../components/OnboardingButton';
 
-const WelcomeAnimation = require('../../assets/lottie/ai_chat.json');
+const WelcomeVideo = require('../../assets/Videos/welcome.mp4');
 
 const HORIZONTAL_PADDING = horizontalScale(16);
 const CURRENT_STEP = 1;
@@ -88,6 +88,27 @@ export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
 
   return (
     <View style={styles.container}>
+
+        <View
+            style={styles.lottieContainer}>
+            <Video
+              source={WelcomeVideo}
+              style={styles.lottie}
+              resizeMode="contain"
+              repeat
+              muted
+              playInBackground={false}
+              playWhenInactive={false}
+              ignoreSilentSwitch="ignore"
+              bufferConfig={{
+                minBufferMs: 1000,
+                maxBufferMs: 5000,
+                bufferForPlaybackMs: 500,
+                bufferForPlaybackAfterRebufferMs: 1000,
+              }}
+            />
+          </View>
+     
       <SafeAreaView style={styles.safeArea}>
         <StatusBar
           barStyle="light-content"
@@ -96,7 +117,6 @@ export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
         />
 
         <View style={styles.content}>
-          {/* Header: Back (hidden on first screen) + Progress Bar + Step Counter */}
           <Animated.View
             entering={FadeIn.delay(100).duration(400)}
             style={styles.header}>
@@ -113,39 +133,25 @@ export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
             <Text style={styles.stepCounter}>{CURRENT_STEP}/{TOTAL_STEPS}</Text>
           </Animated.View>
 
-          {/* Main Heading */}
           <Animated.Text
             entering={FadeInDown.delay(200).duration(600).springify()}
             style={styles.mainHeading}>
-            {'Welcome to Your\nCosmiq Journey'}
+            {'Understand what’s\nmeant for you'}
           </Animated.Text>
 
-          {/* Subheading */}
           <Animated.Text
             entering={FadeInDown.delay(350).duration(600).springify()}
             style={styles.subHeading}>
-            {'Explore astrology, palm reading and\nAI guidance — all in one place.'}
+            {'Get simple insights into your love life,\ncareer, and daily path'}
           </Animated.Text>
 
-          {/* Lottie Animation - takes all center space */}
-          <Animated.View
-            entering={FadeIn.delay(450).duration(600)}
-            style={styles.lottieContainer}>
-            <LottieView
-              source={WelcomeAnimation}
-              autoPlay
-              loop
-              style={styles.lottie}
-              resizeMode="contain"
-            />
-          </Animated.View>
+      
 
-          {/* Continue Button */}
           <Animated.View
             entering={FadeIn.delay(500).duration(400)}
             style={styles.bottomSection}>
             <OnboardingButton
-              text="Get Started"
+              text="Explore Insights"
               onPress={handleContinue}
             />
           </Animated.View>
@@ -159,6 +165,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.new_background,
+    // backgroundColor:'red'
   },
   safeArea: {
     flex: 1,
@@ -218,21 +225,34 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: verticalScale(20),
   },
-  // Lottie
+  // Video
   lottieContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    // backgroundColor:'red'
+    // flex: 1,
+    position:'absolute',
+    top:0,
+    width:'100%',
+    height:'100%',
+    alignItems:'center',
+    justifyContent:'center'
+
+
   },
   lottie: {
-    width: moderateScale(500),
-    height: moderateScale(500),
+    // width: moderateScale(500),
+    // height: moderateScale(500),
+        width:'100%',
+    height:'100%',
   },
   // Bottom
   bottomSection: {
-    paddingTop: verticalScale(10),
-    paddingBottom: verticalScale(20),
+    // paddingTop: verticalScale(10),
+    paddingBottom: verticalScale(30),
+    position:'absolute',
+    bottom:0,
+    // flex:1,
+    // backgroundColor:'red',
+    width:'100%',
+    alignSelf:"center"
   },
 });
 
