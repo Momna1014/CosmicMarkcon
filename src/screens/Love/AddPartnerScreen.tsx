@@ -92,12 +92,12 @@ const STEP_CONFIG = {
   },
   location: {
     heading: 'Where were they\nborn?',
-    subheading: 'Location refines their cosmic chart',
+    subheading: 'Location refines their cosmiq chart',
     placeholder: 'e.g. New York',
   },
   analyze: {
     heading: 'Partner Added\nSuccessfully!',
-    subheading: 'Ready to explore your cosmic connection?',
+    subheading: 'Ready to explore your cosmiq connection?',
     placeholder: '',
   },
 };

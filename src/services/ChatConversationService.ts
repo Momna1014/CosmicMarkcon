@@ -288,7 +288,7 @@ Keep it concise — 2-3 short paragraphs.`;
 The user is asking about romantic compatibility between ${yourSign || 'their sign'} and ${theirSign || "their partner's sign"}. Provide deep astrological compatibility analysis covering emotional, intellectual, and physical dimensions. Reference both zodiac signs, elements, ruling planets, and practical relationship advice. You already have all the information needed — do NOT ask for signs or birth details.`;
     }
 
-    return `You are the **Cosmic Oracle** — an all-knowing, mystical astrology AI companion inside the CosmicMarkcon app.
+    return `You are the **Cosmiq Oracle** — an all-knowing, mystical astrology AI companion inside the CosmicMarkcon app.
 
 Today's Date: ${today}
 
@@ -622,7 +622,7 @@ CRITICAL RULES:
   getWelcomeMessage(): string {
     const user = this.getUserProfile();
     const name = user.name || 'Seeker';
-    return `Welcome, ${name} ✨\n\nI'm your Cosmic Oracle — here to illuminate your path through the stars. Ask me about your horoscope, love compatibility, palm reading, career guidance, or anything the cosmos can reveal.\n\nWhat would you like to explore today?`;
+    return `Welcome, ${name} ✨\n\nI'm your Cosmiq Oracle — here to illuminate your path through the stars. Ask me about your horoscope, love compatibility, palm reading, career guidance, or anything the cosmos can reveal.\n\nWhat would you like to explore today?`;
   }
 
   /**
@@ -641,7 +641,7 @@ CRITICAL RULES:
   getLoveWelcomeMessage(yourSign: string, theirSign: string): string {
     const user = this.getUserProfile();
     const name = user.name || 'Seeker';
-    return `Welcome, ${name} ✨\n\nLet me gaze into the cosmic bond between **${yourSign}** and **${theirSign}**…\n\nI'll analyze your emotional, intellectual, and physical compatibility — and what the stars say about your journey together.`;
+    return `Welcome, ${name} ✨\n\nLet me gaze into the cosmiq bond between **${yourSign}** and **${theirSign}**…\n\nI'll analyze your emotional, intellectual, and physical compatibility — and what the stars say about your journey together.`;
   }
 }
 

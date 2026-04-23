@@ -329,8 +329,8 @@ const ChatScreen: React.FC<Props> = () => {
         }
         const errorMsg = createAIMessage(
           isQuota
-            ? 'The cosmic channels are temporarily overloaded ✨ Please try again in a moment.'
-            : 'The cosmic connection flickered for a moment ✨ Please try sending your message again.',
+            ? 'The cosmiq channels are temporarily overloaded ✨ Please try again in a moment.'
+            : 'The cosmiq connection flickered for a moment ✨ Please try sending your message again.',
         );
         addMessage(errorMsg);
       } finally {

@@ -60,13 +60,13 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Cosmic needs access to your camera to take photos.</string>
+	<string>Cosmiq needs access to your camera to take photos.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Cosmiq needs access to your location to provide location-based features.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Cosmic needs permission to save images to your photo library.</string>
+	<string>Cosmiq needs permission to save images to your photo library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Cosmic needs access to your photo library to let you select and upload images.</string>
+	<string>Cosmiq needs access to your photo library to let you select and upload images.</string>
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>Cosmiq would like to send you notifications about important updates and messages.</string>
 	<key>NSUserTrackingUsageDescription</key>

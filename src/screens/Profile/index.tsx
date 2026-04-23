@@ -234,7 +234,7 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
       showAlert({
         type: 'info',
         title: 'Zodiac Sign Changed ✨',
-        message: `Your sign updated to ${calculatedZodiacSign}. Your cosmic readings will refresh with your new celestial identity.`,
+        message: `Your sign updated to ${calculatedZodiacSign}. Your cosmiq readings will refresh with your new celestial identity.`,
         buttons: [{text: 'OK', style: 'default'}],
         hideIcon: true,
       });
@@ -242,7 +242,7 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
       showAlert({
         type: 'success',
         title: 'Identity Saved ✅',
-        message: 'Your profile has been updated. Cosmic readings will refresh with your new details.',
+        message: 'Your profile has been updated. Cosmiq readings will refresh with your new details.',
         buttons: [{text: 'OK', style: 'default'}],
         hideIcon: true,
       });
@@ -506,7 +506,7 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
                   <Text style={styles.notificationSubtitle}>
                     {notificationsEnabled
                       ? 'Daily horoscope at 8:00 PM'
-                      : 'Enable for cosmic insights'}
+                      : 'Enable for cosmiq insights'}
                   </Text>
                 </View>
                 <Switch
@@ -537,7 +537,7 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
                   </Text>
                   <Text style={styles.premiumSubtitle}>
                     {isPremium 
-                      ? 'Enjoy unlimited cosmic insights'
+                      ? 'Enjoy unlimited cosmiq insights'
                       : 'Get unlimited readings & features'
                     }
                   </Text>

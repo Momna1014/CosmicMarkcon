@@ -390,8 +390,8 @@ const LoveScreen: React.FC<Props> = ({navigation}) => {
                 transform: [{translateY: titleSlideAnim}],
               }
             ]}>
-              {/* <GradientText style={styles.mainTitle}>Cosmic Synastry</GradientText> */}
-              <Text style={styles.mainTitle}>Cosmic Synastry</Text>
+              {/* <GradientText style={styles.mainTitle}>Cosmiq Synastry</GradientText> */}
+              <Text style={styles.mainTitle}>Cosmiq Synastry</Text>
 
             </Animated.View>
 
@@ -482,7 +482,7 @@ const LoveScreen: React.FC<Props> = ({navigation}) => {
 
                     {/* Empty State Text */}
                     <Text style={styles.emptyStateText}>
-                      You haven't added any cosmic connections yet.
+                      You haven't added any cosmiq connections yet.
                     </Text>
 
                     {/* Add Partner Button */}
