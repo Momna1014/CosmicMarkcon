@@ -54,7 +54,7 @@ const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 const HORIZONTAL_PADDING = horizontalScale(16);
 
 // Background images
-const GirlBackgroundImage = require('../../assets/icons/new_onboarding/girl_gender_backimage.png');
+const GirlBackgroundImage = require('../../assets/icons/new_onboarding/girl_gender_backimage.webp');
 const BoyBackgroundImage = require('../../assets/icons/new_onboarding/boy_gender.png');
 const NotToSayBackgroundImage = require('../../assets/icons/new_onboarding/prefer_not_to_say.png');
 
