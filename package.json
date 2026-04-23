@@ -8,7 +8,7 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "generate-bootsplash": "npx react-native-bootsplash generate src/assets/SplashLogo/logo.png --platforms=android,ios --background=#2C2C90 --logo-width=100",
+    "generate-bootsplash": "npx react-native-bootsplash generate src/assets/SplashLogo/logo.png --platforms=android,ios --background=#050711 --logo-width=100",
     "generate-app-icon": "npx react-native set-icon --path ./src/assets/AppLogo/app_logo.png --background \"#FFFFFF\"",
     "generate-app-icon:custom": "npx react-native set-icon --path ./src/assets/AppLogo/app_logo.png --background",
     "android:clean": "cd android && ./gradlew clean && cd ..",

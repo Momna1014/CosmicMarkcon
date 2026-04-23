@@ -329,8 +329,8 @@ const ChatScreen: React.FC<Props> = () => {
         }
         const errorMsg = createAIMessage(
           isQuota
-            ? 'The cosmic channels are temporarily overloaded ✨ Please try again in a moment.'
-            : 'The cosmic connection flickered for a moment ✨ Please try sending your message again.',
+            ? 'The cosmiq channels are temporarily overloaded ✨ Please try again in a moment.'
+            : 'The cosmiq connection flickered for a moment ✨ Please try sending your message again.',
         );
         addMessage(errorMsg);
       } finally {
@@ -553,7 +553,7 @@ const ChatScreen: React.FC<Props> = () => {
                 ? 'Palm Reader'
                 : source === 'love'
                 ? 'Love Oracle'
-                : 'Cosmic Oracle'
+                : 'Cosmiq Oracle'
             }
             subtitle={
               source === 'palm'
@@ -646,8 +646,8 @@ const ChatScreen: React.FC<Props> = () => {
       {/* Quota Error Alert */}
       <CosmicAlert
         visible={showQuotaAlert}
-        title="Cosmic Channels Busy"
-        message="The oracle is receiving too many cosmic transmissions right now. Please try again in a moment."
+        title="Cosmiq Channels Busy"
+        message="The oracle is receiving too many transmissions right now. Please try again in a moment."
         buttonText="Got It"
         onDismiss={() => setShowQuotaAlert(false)}
       />

@@ -31,7 +31,7 @@ export const TODAY_HOROSCOPE: HoroscopeData = {
   sections: [
     {
       id: 'cosmic_overview',
-      title: 'Cosmic Overview',
+      title: 'Celestial Overview',
       icon: 'cosmic_overview',
       iconColor: 'rgba(255, 165, 0, 1)',
       description: 'A change in perspective shifts everything. Look at a current challenge from a new angle.',
@@ -82,7 +82,7 @@ export const TOMORROW_HOROSCOPE: HoroscopeData = {
   sections: [
     {
       id: 'cosmic_overview',
-      title: 'Cosmic Overview',
+      title: 'Celestial Overview',
       icon: 'cosmic_overview',
       iconColor: 'rgba(255, 165, 0, 1)',
       description: 'The universe is preparing a surprise for you. Stay open to unexpected opportunities.',
@@ -133,7 +133,7 @@ export const WEEKLY_HOROSCOPE: HoroscopeData = {
   sections: [
     {
       id: 'cosmic_overview',
-      title: 'Cosmic Overview',
+      title: 'Celestial Overview',
       icon: 'cosmic_overview',
       iconColor: 'rgba(255, 165, 0, 1)',
       description: 'This week brings transformation. Mercury\'s influence encourages clear communication and new learning.',

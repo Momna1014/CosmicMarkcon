@@ -23,7 +23,7 @@ import {
 } from '../../theme';
 import {LoveMatchData, CompatibilityMetric} from './loveMatchMockData';
 import {conversationService, LoveMatchResult} from '../../services/ConversationService';
-import CosmicLoader from '../../components/CosmicLoader';
+import LoveLoader from '../../components/LoveLoader';
 import CosmicAlert from '../../components/CosmicAlert';
 
 // Analytics
@@ -504,7 +504,7 @@ const LoveMatchScreen: React.FC<Props> = ({route}) => {
   const handleAskOracle = useCallback(() => {
     trackLoveMatchAskOracleTap(yourSign, theirSign);
     const summary = matchData
-      ? `My sign: ${yourSign}\nPartner's sign: ${theirSign}\nOverall compatibility: ${matchData.overallScore}%\nAlignment: ${matchData.alignmentText}\n${matchData.metrics.map(m => `${m.label}: ${m.percentage}%`).join('\n')}\nCosmic Insight: ${matchData.cosmicInsight.description}`
+      ? `My sign: ${yourSign}\nPartner's sign: ${theirSign}\nOverall compatibility: ${matchData.overallScore}%\nAlignment: ${matchData.alignmentText}\n${matchData.metrics.map(m => `${m.label}: ${m.percentage}%`).join('\n')}\nCelestial Insight: ${matchData.cosmicInsight.description}`
       : `My sign: ${yourSign}, Partner's sign: ${theirSign}`;
     navigation.navigate('Chat', {
       source: 'love',
@@ -519,7 +519,7 @@ const LoveMatchScreen: React.FC<Props> = ({route}) => {
     return (
       <View style={styles.backgroundFallback}>
         <View style={styles.loaderContainer}>
-          <CosmicLoader visible={true} text="Calculating your cosmic compatibility..." inline />
+          <LoveLoader visible={true} text="Calculating your compatibility..." inline />
         </View>
       </View>
     );
@@ -580,8 +580,8 @@ const LoveMatchScreen: React.FC<Props> = ({route}) => {
       {/* Quota Error Alert */}
       <CosmicAlert
         visible={showQuotaAlert}
-        title="Cosmic Signals Busy"
-        message="The love oracle is overwhelmed with cosmic energy right now. You're seeing estimated compatibility — a personalized reading will be available shortly."
+        title="Cosmiq Signals Busy"
+        message="The love oracle is overwhelmed with celestial energy right now. You're seeing estimated compatibility — a personalized reading will be available shortly."
         buttonText="Got It"
         onDismiss={() => setShowQuotaAlert(false)}
       />

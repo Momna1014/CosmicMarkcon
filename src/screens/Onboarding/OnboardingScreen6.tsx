@@ -54,7 +54,7 @@ const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 const HORIZONTAL_PADDING = horizontalScale(16);
 
 // Background images
-const GirlBackgroundImage = require('../../assets/icons/new_onboarding/girl_gender_backimage.png');
+const GirlBackgroundImage = require('../../assets/icons/new_onboarding/girl_gender_backimage.webp');
 const BoyBackgroundImage = require('../../assets/icons/new_onboarding/boy_gender.png');
 const NotToSayBackgroundImage = require('../../assets/icons/new_onboarding/prefer_not_to_say.png');
 
@@ -210,7 +210,7 @@ export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
                   />
                   <View style={styles.cosmicProfileTextContainer}>
                     <Text style={styles.cosmicProfileText}>
-                      Your cosmic profile{'\n'}is taking shape
+                      Your Cosmiq profile{'\n'}is taking shape
                     </Text>
                   </View>
                   <EndCosmicProfileIcon

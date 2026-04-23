@@ -178,7 +178,7 @@ const LessonDetail: React.FC<LessonDetailProps> = ({navigation, route}) => {
       <CosmicAlert
         visible={showAlert}
         title="Lesson Complete! ✨"
-        message="You've absorbed the cosmic wisdom of this lesson. Continue your celestial journey!"
+        message="You've absorbed the celestial wisdom of this lesson. Continue your journey!"
         buttonText="Continue"
         onDismiss={handleAlertDismiss}
       />

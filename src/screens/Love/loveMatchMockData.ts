@@ -82,7 +82,7 @@ const generateCosmicInsight = (
     insights[key1] || insights[key2] || insights.default.replace('${theirSign}', theirSign);
 
   return {
-    title: 'COSMIC INSIGHT',
+    title: 'CELESTIAL INSIGHT',
     description: description.replace("${theirSign}'s", `${theirSign}'s`),
   };
 };
@@ -139,7 +139,7 @@ export const DEFAULT_LOVE_MATCH_DATA: LoveMatchData = {
     },
   ],
   cosmicInsight: {
-    title: 'COSMIC INSIGHT',
+    title: 'CELESTIAL INSIGHT',
     description:
       "This connection challenges you to grow. Embrace the friction as a teacher, and practice patience with Taurus's contrasting approach.",
   },

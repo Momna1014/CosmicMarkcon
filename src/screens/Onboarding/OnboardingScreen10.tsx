@@ -40,7 +40,7 @@ import {OnboardingButton} from '../../components/OnboardingButton';
 // Icons
 import BackArrowIcon from '../../assets/icons/new_onboarding/back_arrow.svg';
 
-const PalmReadingAnimation = require('../../assets/lottie/ai_chat_final.json');
+const PalmReadingAnimation = require('../../assets/lottie/Love_compatibility.json');
 
 const HORIZONTAL_PADDING = horizontalScale(16);
 const CURRENT_STEP = 10;
@@ -233,10 +233,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom:moderateScale(40)
   },
   lottie: {
-    width: '100%',
-    height: '100%',
+    width: moderateScale(530),
+    height: moderateScale(530),
   },
   // Bottom
   bottomSection: {

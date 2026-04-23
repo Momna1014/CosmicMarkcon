@@ -299,7 +299,7 @@ const ChiromancyScreen: React.FC<Props> = ({navigation}) => {
                 transform: [{translateY: subtitleSlideAnim}],
               }
             ]}>
-              Capture an image of your palm and let the{'\n'}Cosmic Whoop decode the map written on your hands.
+              Capture an image of your palm and let the{'\n'}Cosmiq Whoop decode the map written on your hands.
             </Animated.Text>
 
             {/* Tab Bar */}

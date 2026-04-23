@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Cosmic</string>
+    <string name="app_name">Cosmiq</string>
     
     <!-- Facebook SDK Configuration -->
     <string name="facebook_app_id">1713793223320140</string>

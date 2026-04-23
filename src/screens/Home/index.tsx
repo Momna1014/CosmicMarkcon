@@ -258,7 +258,7 @@ const HomeScreen: React.FC = () => {
       {/* Quota Error Alert */}
       <CosmicAlert
         visible={showQuotaAlert}
-        title="Cosmic Signals Busy"
+        title="Cosmiq Signals Busy"
         message="The stars are overloaded right now. You're seeing cached readings — fresh insights will return shortly."
         buttonText="Got It"
         onDismiss={() => setShowQuotaAlert(false)}

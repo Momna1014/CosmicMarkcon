@@ -179,7 +179,7 @@ User Profile:
 Provide the following in JSON format:
 
 1. "dailyEnergy": A personalized daily energy reading for this user based on their zodiac sign and today's date. Include:
-   - "message": A single short sentence (maximum 10-12 words) in an inspiring cosmic tone. Example length: "The cosmos aligns in your favor. Trust your intuition."
+   - "message": A single short sentence (maximum 10-12 words) in an inspiring cosmiq tone. Example length: "The cosmos aligns in your favor. Trust your intuition."
 
 2. "transits": An array of today's REAL planetary transits based on actual astronomical positions for ${today}. For each of the 8 planets (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto), provide:
    - "id": lowercase planet name
@@ -262,7 +262,7 @@ Return JSON with keys "days" and "weekly".
 
 Each entry (today, tomorrow, weekly) MUST have:
 - "sections": Array of exactly 4 objects:
-  {"id":"cosmic_overview","title":"Cosmic Overview","icon":"cosmic_overview","iconColor":"rgba(255, 165, 0, 1)","description":"..."}
+  {"id":"cosmic_overview","title":"Cosmiq Overview","icon":"cosmic_overview","iconColor":"rgba(255, 165, 0, 1)","description":"..."}
   {"id":"love_relationship","title":"Love & Relationships","icon":"love_relationship","iconColor":"rgba(255, 107, 107, 1)","description":"..."}
   {"id":"path_purpose","title":"Path & Purpose","icon":"path_purpose","iconColor":"rgba(110, 231, 183, 1)","description":"..."}
   {"id":"vitality","title":"Vitality","icon":"vitality","iconColor":"rgba(96, 165, 250, 1)","description":"..."}
@@ -312,7 +312,7 @@ Return JSON with these exact keys:
 
 1. "overallScore": A compatibility percentage (20-99) that is accurate for this specific pairing based on real astrological compatibility.
 
-2. "alignmentText": Exactly one sentence, approximately 12-15 words long, describing their cosmic connection. Must mention both signs by name. Example format: "The cosmic alignment between ${yourSign} and ${theirSign} creates a unique energetic signature."
+2. "alignmentText": Exactly one sentence, approximately 12-15 words long, describing their cosmiq connection. Must mention both signs by name. Example format: "The cosmiq alignment between ${yourSign} and ${theirSign} creates a unique energetic signature."
 
 3. "lovePercentage": Love & Romance compatibility (20-99), must be different from overallScore.
 
@@ -321,7 +321,7 @@ Return JSON with these exact keys:
 5. "passionPercentage": Passion & Energy compatibility (20-99), must be different from all other percentages.
 
 6. "cosmicInsight": An object with:
-   - "title": "COSMIC INSIGHT"
+   - "title": "COSMIQ INSIGHT"
    - "description": 2-3 sentences of personalized astrological insight about the ${yourSign}-${theirSign} pairing. Mention their elemental compatibility and advice.
 
 RULES:

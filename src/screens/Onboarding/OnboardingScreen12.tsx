@@ -40,7 +40,7 @@ import {OnboardingButton} from '../../components/OnboardingButton';
 // Icons
 import BackArrowIcon from '../../assets/icons/new_onboarding/back_arrow.svg';
 
-const PalmReadingAnimation = require('../../assets/lottie/test4.json');
+const PalmReadingAnimation = require('../../assets/lottie/ai_chat.json');
 
 const HORIZONTAL_PADDING = horizontalScale(16);
 const CURRENT_STEP = 12;
@@ -128,14 +128,14 @@ export const OnboardingScreen12: React.FC<OnboardingScreen12Props> = ({
           <Animated.Text
             entering={FadeInDown.delay(200).duration(600).springify()}
             style={styles.mainHeading}>
-            {'Your AI Cosmic\nAdvisor'}
+            {'Your AI Cosmiq\nAdvisor'}
           </Animated.Text>
 
           {/* Subheading */}
           <Animated.Text
             entering={FadeInDown.delay(350).duration(600).springify()}
             style={styles.subHeading}>
-            {'Ask anything about your stars, love,\nor future — get instant cosmic guidance.'}
+            {'Ask anything about your stars, love,\nor future — get instant guidance.'}
           </Animated.Text>
 
           {/* Lottie Animation - takes all center space */}
@@ -235,8 +235,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   lottie: {
-    width: '100%',
-    height: '100%',
+     width: moderateScale(500),
+    height: moderateScale(500),
   },
   // Bottom
   bottomSection: {
