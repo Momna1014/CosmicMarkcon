@@ -235,8 +235,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   lottie: {
-    width: '100%',
-    height: '100%',
+    width: moderateScale(400),
+    height: moderateScale(400),
   },
   // Bottom
   bottomSection: {

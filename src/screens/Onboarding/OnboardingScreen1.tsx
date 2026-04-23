@@ -117,7 +117,7 @@ export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
           <Animated.Text
             entering={FadeInDown.delay(200).duration(600).springify()}
             style={styles.mainHeading}>
-            {'Welcome to Your\nCosmic Journey'}
+            {'Welcome to Your\nCosmiq Journey'}
           </Animated.Text>
 
           {/* Subheading */}
@@ -223,10 +223,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    // backgroundColor:'red'
   },
   lottie: {
-    width: '100%',
-    height: '100%',
+    width: moderateScale(500),
+    height: moderateScale(500),
   },
   // Bottom
   bottomSection: {

@@ -315,7 +315,7 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react';
-import {StyleSheet, View, Platform, StatusBar, Alert, Text, ActivityIndicator} from 'react-native';
+import {StyleSheet, View, Platform, StatusBar, Alert, Text, ActivityIndicator, TouchableOpacity} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useApp} from '../../contexts/AppContext';
@@ -669,35 +669,35 @@ export const PaywallScreen: React.FC = () => {
   }
 
   // Billing unavailable - show fallback UI instead of broken RevenueCat paywall
-  // if (billingStatus === 'unavailable') {
-  //   return (
-  //     <View style={[styles.container, styles.fallbackContainer,
-  //       needsAndroidTopPadding && { paddingTop: insets.top || StatusBar.currentHeight || 24 }
-  //     ]}>
-  //       {/* Cross button - same behavior as paywall dismiss */}
-  //       {/* <TouchableOpacity
-  //         style={[styles.crossButton, { top: (insets.top || StatusBar.currentHeight || 44) + 10 }]}
-  //         onPress={navigateBack}
-  //         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-  //       >
-  //         <Text style={styles.crossButtonText}>{'✕'}</Text>
-  //       </TouchableOpacity> */}
+  if (billingStatus === 'unavailable') {
+    return (
+      <View style={[styles.container, styles.fallbackContainer,
+        needsAndroidTopPadding && { paddingTop: insets.top || StatusBar.currentHeight || 24 }
+      ]}>
+        {/* Cross button - same behavior as paywall dismiss */}
+        {/* <TouchableOpacity
+          style={[styles.crossButton, { top: (insets.top || StatusBar.currentHeight || 44) + 10 }]}
+          onPress={navigateBack}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Text style={styles.crossButtonText}>{'✕'}</Text>
+        </TouchableOpacity> */}
 
-  //       <View style={styles.fallbackContent}>
-  //         <Text style={styles.fallbackIcon}>{'🛒'}</Text>
-  //         <Text style={styles.fallbackTitle}>Store Unavailable</Text>
-  //         <Text style={styles.fallbackMessage}>
-  //           {Platform.OS === 'android'
-  //             ? 'We couldn\'t connect to Google Play. Please make sure your Google Play account is signed in and try again.'
-  //             : 'We couldn\'t connect to the App Store. Please make sure your App Store account is signed in and try again.'}
-  //         </Text>
-  //         <TouchableOpacity style={styles.retryButton} onPress={checkBillingAvailability}>
-  //           <Text style={styles.retryButtonText}>Try Again</Text>
-  //         </TouchableOpacity>
-  //       </View>
-  //     </View>
-  //   );
-  // }
+        <View style={styles.fallbackContent}>
+          <Text style={styles.fallbackIcon}>{'🛒'}</Text>
+          <Text style={styles.fallbackTitle}>Store Unavailable</Text>
+          <Text style={styles.fallbackMessage}>
+            {Platform.OS === 'android'
+              ? 'We couldn\'t connect to Google Play. Please make sure your Google Play account is signed in and try again.'
+              : 'We couldn\'t connect to the App Store. Please make sure your App Store account is signed in and try again.'}
+          </Text>
+          <TouchableOpacity style={styles.retryButton} onPress={checkBillingAvailability}>
+            <Text style={styles.retryButtonText}>Try Again</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
 
   // Billing available - render the actual RevenueCat paywall
   return (

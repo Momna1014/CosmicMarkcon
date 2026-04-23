@@ -210,7 +210,7 @@ export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
                   />
                   <View style={styles.cosmicProfileTextContainer}>
                     <Text style={styles.cosmicProfileText}>
-                      Your cosmic profile{'\n'}is taking shape
+                      Your Cosmiq profile{'\n'}is taking shape
                     </Text>
                   </View>
                   <EndCosmicProfileIcon

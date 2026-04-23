@@ -233,10 +233,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom:moderateScale(40)
   },
   lottie: {
-    width: '100%',
-    height: '100%',
+    width: moderateScale(530),
+    height: moderateScale(530),
   },
   // Bottom
   bottomSection: {

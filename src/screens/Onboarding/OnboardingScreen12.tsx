@@ -128,14 +128,14 @@ export const OnboardingScreen12: React.FC<OnboardingScreen12Props> = ({
           <Animated.Text
             entering={FadeInDown.delay(200).duration(600).springify()}
             style={styles.mainHeading}>
-            {'Your AI Cosmic\nAdvisor'}
+            {'Your AI Cosmiq\nAdvisor'}
           </Animated.Text>
 
           {/* Subheading */}
           <Animated.Text
             entering={FadeInDown.delay(350).duration(600).springify()}
             style={styles.subHeading}>
-            {'Ask anything about your stars, love,\nor future — get instant cosmic guidance.'}
+            {'Ask anything about your stars, love,\nor future — get instant guidance.'}
           </Animated.Text>
 
           {/* Lottie Animation - takes all center space */}
@@ -235,8 +235,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   lottie: {
-    width: '100%',
-    height: '100%',
+     width: moderateScale(500),
+    height: moderateScale(500),
   },
   // Bottom
   bottomSection: {

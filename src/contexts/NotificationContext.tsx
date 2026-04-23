@@ -200,7 +200,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
       // Schedule new daily notification at 8:00 PM (20:00)
       const notificationId = await notificationService.scheduleDailyNotification(
         '� Your Evening Horoscope Awaits',
-        'The stars have aligned with a message for you. Check your cosmic insights before the day ends!',
+        'The stars have aligned with a message for you. Check your insights before the day ends!',
         20, // Hour: 8 PM
         0,  // Minute: 00
         { type: 'daily_reminder' }
@@ -254,8 +254,8 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     try {
       console.log('[NotificationContext] 🎉 Showing welcome notification...');
       await notificationService.displayNotification(
-        '✨ Welcome to the Cosmos!',
-        'You\'ll now receive daily horoscope insights and cosmic guidance at 8 PM.',
+        '✨ Welcome to the Cosmiq!',
+        'You\'ll now receive daily horoscope insights and guidance at 8 PM.',
         { type: 'welcome' }
       );
       console.log('[NotificationContext] ✅ Welcome notification displayed');
@@ -282,7 +282,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
           PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
           {
             title: 'Notification Permission',
-            message: 'CosmicMarkcon needs notification permission to send you daily horoscope insights and cosmic updates.',
+            message: 'Cosmiq needs notification permission to send you daily horoscope insights and updates.',
             buttonNeutral: 'Ask Me Later',
             buttonNegative: 'Cancel',
             buttonPositive: 'OK',
@@ -371,7 +371,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
           console.log('[NotificationContext] ⚠️ Permission denied, need to open settings');
           Alert.alert(
             'Notifications Disabled',
-            'To enable notifications, please go to Settings and allow notifications for CosmicMarkcon.',
+            'To enable notifications, please go to Settings and allow notifications for Cosmiq.',
             [
               { text: 'Cancel', style: 'cancel' },
               { text: 'Open Settings', onPress: () => openNotificationSettings() },

@@ -553,7 +553,7 @@ const ChatScreen: React.FC<Props> = () => {
                 ? 'Palm Reader'
                 : source === 'love'
                 ? 'Love Oracle'
-                : 'Cosmic Oracle'
+                : 'Cosmiq Oracle'
             }
             subtitle={
               source === 'palm'
@@ -646,8 +646,8 @@ const ChatScreen: React.FC<Props> = () => {
       {/* Quota Error Alert */}
       <CosmicAlert
         visible={showQuotaAlert}
-        title="Cosmic Channels Busy"
-        message="The oracle is receiving too many cosmic transmissions right now. Please try again in a moment."
+        title="Cosmiq Channels Busy"
+        message="The oracle is receiving too many transmissions right now. Please try again in a moment."
         buttonText="Got It"
         onDismiss={() => setShowQuotaAlert(false)}
       />

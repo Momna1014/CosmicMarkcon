@@ -191,7 +191,7 @@ export const OnboardingScreen8: React.FC<OnboardingScreen8Props> = ({
           <Animated.Text
             entering={FadeInDown.delay(350).duration(600).springify()}
             style={styles.subHeading}>
-            Your location shapes your cosmic{'\n'}blueprint.
+            Your location shapes your Cosmiq{'\n'}blueprint.
           </Animated.Text>
 
           {/* Country Selection */}

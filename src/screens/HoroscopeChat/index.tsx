@@ -94,14 +94,14 @@ const HoroscopeChatScreen: React.FC = () => {
 
         {/* Center content */}
         <View style={styles.centerContent}>
-          {/* Cosmic Oracle Icon */}
+          {/* Cosmiq Oracle Icon */}
           <Animated.View style={[{opacity: iconFade, transform: [{scale: iconScale}]}, styles.iconContainer]}>
             <CosmicOracleChatIcon width={moderateScale(190)} height={moderateScale(190)} />
           </Animated.View>
 
           {/* Title and subtitle */}
           <Animated.View style={[{opacity: textFade, transform: [{translateY: textSlide}]}]}>
-            <Text style={styles.title}>Cosmic Oracle</Text>
+            <Text style={styles.title}>Cosmiq Oracle</Text>
             <Text style={styles.subtitle}>Your personal AI astrologer awaits</Text>
           </Animated.View>
         </View>
