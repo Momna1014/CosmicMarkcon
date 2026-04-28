@@ -38,9 +38,9 @@ declare module '@env' {
   export const FACEBOOK_APP_ID: string
   export const FACEBOOK_CLIENT_TOKEN: string
   
-  // Attribution (AppsFlyer)
-  export const APPSFLYER_DEV_KEY: string
-  export const APPSFLYER_APP_ID: string
+  // Attribution (Adjust)
+  export const ADJUST_TOKEN_IOS: string
+  export const ADJUST_TOKEN_ANDROID: string
 
   // Consent Management (Usercentrics)
   export const USER_CENTRIC: string

@@ -69,9 +69,14 @@ class RevenueCatService {
         activeSubscriptions: customerInfo.activeSubscriptions,
       });
 
-      // Set attribution data (IDFA, AppsFlyer, Facebook)
-      // This should be called after ATT permission is granted
-      await this.setupAttribution();
+      // NOTE: setupAttribution() is intentionally NOT called here.
+      // Calling Purchases.setAttributes() during initialization triggers an
+      // async RevenueCat server sync. If that sync returns a stale Apple
+      // sandbox receipt (cancellations propagate slowly in sandbox), the
+      // customerInfoUpdate listener fires with premium=true, corrupts
+      // AsyncStorage, and the next launch shows "premium" instead of the
+      // paywall. Attribution is set later via setupAttribution(), called
+      // from SDKBootstrapper.updateAdsConfiguration() after ATT resolves.
 
     } catch (error) {
       console.error('[RevenueCat] Initialization failed:', error);
@@ -88,7 +93,7 @@ class RevenueCatService {
     try {
       console.log('[RevenueCat] Setting up attribution...');
       
-      // Set all attribution identifiers (IDFA, AppsFlyer, Facebook)
+      // Set all attribution identifiers (IDFA, Adjust, Facebook)
       await setRevenueCatAttribution();
       
       // Set device information

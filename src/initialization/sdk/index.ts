@@ -5,7 +5,7 @@
  */
 
 export { FirebaseAdapter } from './FirebaseAdapter';
-export { AppsFlyerAdapter } from './AppsFlyerAdapter';
+export { AdjustAdapter } from './AdjustAdapter';
 export { SentryAdapter } from './SentryAdapter';
 export { AppLovinAdapter } from './AppLovinAdapter';
 export { RevenueCatAdapter } from './RevenueCatAdapter';
@@ -18,7 +18,7 @@ export type {
   ITrackingSDK,
   IAdsSDK,
   FirebaseConfig,
-  AppsFlyerConfig,
+  AdjustConfig,
   SentryConfig,
   AppLovinConfig,
   RevenueCatPhase1Config,

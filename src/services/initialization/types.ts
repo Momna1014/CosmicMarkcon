@@ -102,7 +102,7 @@ export interface SDKStatusMap {
   remoteConfig: SDKInitStatus;
   facebook: SDKInitStatus;
   firebaseAnalytics: SDKInitStatus;
-  appsFlyer: SDKInitStatus;
+  adjust: SDKInitStatus;
   appLovin: SDKInitStatus;
   att: SDKInitStatus;
 }
@@ -231,7 +231,7 @@ export const DEFAULT_SDK_STATUS: SDKStatusMap = {
   remoteConfig: SDKInitStatus.NOT_STARTED,
   facebook: SDKInitStatus.NOT_STARTED,
   firebaseAnalytics: SDKInitStatus.NOT_STARTED,
-  appsFlyer: SDKInitStatus.NOT_STARTED,
+  adjust: SDKInitStatus.NOT_STARTED,
   appLovin: SDKInitStatus.NOT_STARTED,
   att: SDKInitStatus.NOT_STARTED,
 };

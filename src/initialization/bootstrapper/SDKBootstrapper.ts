@@ -7,9 +7,10 @@
 
 import { AsyncLock, withTimeout } from '../core';
 import { SDKInitializationError, SDKAlreadyInitializedError } from '../core/errors';
+import { revenueCatService } from '../../services/RevenueCatService';
 import {
   FirebaseAdapter,
-  AppsFlyerAdapter,
+  AdjustAdapter,
   SentryAdapter,
   AppLovinAdapter,
   RevenueCatAdapter,
@@ -47,7 +48,7 @@ export interface CoreSDKConfig {
 export class SDKBootstrapper {
   // SDK Adapters
   readonly firebase: FirebaseAdapter;
-  readonly appsFlyer: AppsFlyerAdapter;
+  readonly adjust: AdjustAdapter;
   readonly sentry: SentryAdapter;
   readonly appLovin: AppLovinAdapter;
   readonly revenueCat: RevenueCatAdapter;
@@ -61,7 +62,7 @@ export class SDKBootstrapper {
 
   constructor() {
     this.firebase = new FirebaseAdapter();
-    this.appsFlyer = new AppsFlyerAdapter();
+    this.adjust = new AdjustAdapter();
     this.sentry = new SentryAdapter();
     this.appLovin = new AppLovinAdapter();
     this.revenueCat = new RevenueCatAdapter();
@@ -192,8 +193,8 @@ export class SDKBootstrapper {
         },
       },
       {
-        name: 'appsflyer',
-        init: () => this.appsFlyer.initialize(),
+        name: 'adjust',
+        init: () => this.adjust.initialize(),
       },
       {
         name: 'remote-config',
@@ -268,10 +269,18 @@ export class SDKBootstrapper {
         await this.appLovin.configureForNonPersonalizedAds();
       }
 
-      // Update AppsFlyer if tracking is allowed
-      if (resolution.trackingAllowed && this.appsFlyer.isInitialized()) {
-        this.appsFlyer.updateTrackingStatus(resolution.idfaEnabled);
+      // Update Adjust if tracking is allowed
+      if (resolution.trackingAllowed && this.adjust.isInitialized()) {
+        this.adjust.updateTrackingStatus(resolution.idfaEnabled);
       }
+
+      // Set RevenueCat attribution (Adjust ADID, IDFA, Facebook) here — after ATT
+      // is resolved — so the async Purchases.setAttributes() call cannot race
+      // against the initial getCustomerInfo() and corrupt AsyncStorage with a
+      // stale Apple sandbox receipt.
+      revenueCatService.setupAttribution().catch((err) =>
+        console.warn('[Bootstrapper] RevenueCat attribution setup failed:', err),
+      );
 
       console.log('[Bootstrapper] Ads configuration updated:', resolution.mode);
     } catch (error) {

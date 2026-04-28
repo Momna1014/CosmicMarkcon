@@ -435,7 +435,7 @@ class SDKInitializationOrchestrator {
     const sdkStatus = { ...this.state.sdkStatus };
     sdkStatus.facebook = SDKInitStatus.DISABLED;
     sdkStatus.firebaseAnalytics = SDKInitStatus.DISABLED;
-    sdkStatus.appsFlyer = SDKInitStatus.DISABLED;
+    sdkStatus.adjust = SDKInitStatus.DISABLED;
     sdkStatus.appLovin = SDKInitStatus.DISABLED;
 
     this.updateState({ sdkStatus });

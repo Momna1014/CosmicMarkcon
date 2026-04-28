@@ -1,4 +1,9 @@
 PODS:
+  - Adjust (5.5.0):
+    - Adjust/Adjust (= 5.5.0)
+  - Adjust/Adjust (5.5.0):
+    - AdjustSignature (= 3.62.0)
+  - AdjustSignature (3.62.0)
   - AppAuth (2.0.0):
     - AppAuth/Core (= 2.0.0)
     - AppAuth/ExternalUserAgent (= 2.0.0)
@@ -16,9 +21,6 @@ PODS:
     - AppLovinSDK (>= 13.0.0)
     - UnityAds (= 4.17.0)
   - AppLovinSDK (13.6.1)
-  - AppsFlyerFramework (6.17.9):
-    - AppsFlyerFramework/Main (= 6.17.9)
-  - AppsFlyerFramework/Main (6.17.9)
   - boost (1.84.0)
   - BVLinearGradient (2.8.3):
     - React-Core
@@ -2097,6 +2099,9 @@ PODS:
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
     - SocketRocket
+  - react-native-adjust (5.5.0):
+    - Adjust (= 5.5.0)
+    - React-Core
   - react-native-applovin-max (9.5.1):
     - AppLovinSDK (= 13.6.1)
     - boost
@@ -2126,9 +2131,6 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-appsflyer (6.17.9):
-    - AppsFlyerFramework (= 6.17.9)
-    - React
   - react-native-blob-util (0.24.7):
     - boost
     - DoubleConversion
@@ -4032,8 +4034,8 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
+  - react-native-adjust (from `../node_modules/react-native-adjust`)
   - react-native-applovin-max (from `../node_modules/react-native-applovin-max`)
-  - react-native-appsflyer (from `../node_modules/react-native-appsflyer`)
   - react-native-blob-util (from `../node_modules/react-native-blob-util`)
   - "react-native-blur (from `../node_modules/@react-native-community/blur`)"
   - react-native-fbsdk-next (from `../node_modules/react-native-fbsdk-next`)
@@ -4114,12 +4116,13 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - Adjust
+    - AdjustSignature
     - AppAuth
     - AppCheckCore
     - AppLovinMediationGoogleAdapter
     - AppLovinMediationUnityAdsAdapter
     - AppLovinSDK
-    - AppsFlyerFramework
     - FBAEMKit
     - FBSDKCoreKit
     - FBSDKCoreKit_Basics
@@ -4259,10 +4262,10 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   React-microtasksnativemodule:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
+  react-native-adjust:
+    :path: "../node_modules/react-native-adjust"
   react-native-applovin-max:
     :path: "../node_modules/react-native-applovin-max"
-  react-native-appsflyer:
-    :path: "../node_modules/react-native-appsflyer"
   react-native-blob-util:
     :path: "../node_modules/react-native-blob-util"
   react-native-blur:
@@ -4415,12 +4418,13 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
+  Adjust: a0095eda439b925f809b0efbf64923c05701e937
+  AdjustSignature: 682d788005a6e21557913a9dc0381ae8d943ca0a
   AppAuth: 1c1a8afa7e12f2ec3a294d9882dfa5ab7d3cb063
   AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
   AppLovinMediationGoogleAdapter: fea0cb088ca9795d299b899453d926f1b6dc3d48
   AppLovinMediationUnityAdsAdapter: 23afa95da0fc9c02c868f583a682d95811447bf4
   AppLovinSDK: fb0795377cc861aa8813019ddc5d05fbd998c527
-  AppsFlyerFramework: 4f9a8237d40e9093941aef760cd77d606238aedd
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
   BVLinearGradient: cb006ba232a1f3e4f341bb62c42d1098c284da70
   DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb
@@ -4503,8 +4507,8 @@ SPEC CHECKSUMS:
   React-logger: 500f2fa5697d224e63c33d913c8a4765319e19bf
   React-Mapbuffer: 4c50cf6af44286015a20a5995d5321f625c93459
   React-microtasksnativemodule: a84b9331106616ab1fa36de9ae555718d4bbdcf5
+  react-native-adjust: 4defc7b3283aa8aa2e5cf089f3de7c4289118d82
   react-native-applovin-max: a50f12aa818bb6aaf81790064203ddfc36435bae
-  react-native-appsflyer: 7611f6b35b5637ec5fb260f02a49c8bdb4ab5605
   react-native-blob-util: 573f119564b0cf1d498e0c25ef94084292a52cd2
   react-native-blur: b83ffbc5380d8bd2f06804b4b0e848be3507e65c
   react-native-fbsdk-next: 325e4973a478f098bb9406fb2a13fa2e1f5dffeb

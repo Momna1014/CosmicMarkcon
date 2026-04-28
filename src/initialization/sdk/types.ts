@@ -50,13 +50,12 @@ export interface FirebaseConfig {
 }
 
 /**
- * AppsFlyer configuration
+ * Adjust configuration
  */
-export interface AppsFlyerConfig {
-  devKey: string;
-  appId: string;
+export interface AdjustConfig {
+  tokenIos: string;
+  tokenAndroid: string;
   isDebug: boolean;
-  onInstallConversionDataListener: boolean;
 }
 
 /**

@@ -5,7 +5,7 @@
  */
 
 import Purchases from 'react-native-purchases';
-import appsFlyer from 'react-native-appsflyer';
+import { Adjust } from 'react-native-adjust';
 import { Platform } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 
@@ -29,8 +29,8 @@ export const setRevenueCatAttribution = async (): Promise<void> => {
     // Set device identifiers
     await setDeviceIdentifiers();
 
-    // Set AppsFlyer ID
-    await setAppsFlyerAttribution();
+    // Set Adjust ID
+    await setAdjustAttribution();
 
     // Set Facebook Anonymous ID (if available)
     await setFacebookAttribution();
@@ -63,67 +63,53 @@ const setDeviceIdentifiers = async (): Promise<void> => {
 };
 
 /**
- * Set AppsFlyer ID in RevenueCat
- * Uses the same pattern as Noorly project
+ * Set Adjust ID and attribution data in RevenueCat.
+ * Uses callback-based Adjust.getAdid() and Adjust.getAttribution().
  */
-const setAppsFlyerAttribution = async (): Promise<void> => {
+const setAdjustAttribution = async (): Promise<void> => {
   try {
-    // Get AppsFlyer UID using Promise wrapper (matches Noorly implementation)
-    const getAppsFlyerUIDPromise = (): Promise<string> => {
-      return new Promise((resolve, reject) => {
-        appsFlyer.getAppsFlyerUID((error, uid) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(uid || '');
-          }
-        });
-      });
-    };
-
-    const appsFlyerUID = await getAppsFlyerUIDPromise();
-
-    if (appsFlyerUID) {
-      // Set as attribute (matches Noorly: uses $appsflyerId with dollar sign)
-      await Purchases.setAttributes({
-        $appsflyerId: appsFlyerUID,
-      });
-      console.log(
-        `✅ [RevenueCat Attribution] AppsFlyer ID set: ${appsFlyerUID}`
-      );
-    } else {
-      console.log(
-        '⚠️ [RevenueCat Attribution] AppsFlyer UID not available yet'
-      );
-    }
-
-    // Listen for conversion data
-    appsFlyer.onInstallConversionData((data) => {
-      console.log(
-        '📊 [RevenueCat Attribution] AppsFlyer conversion data:',
-        data
-      );
-
-      // Set attribution data as attributes
-      if (data && data.data) {
-        const conversionData = data.data;
-        Purchases.setAttributes({
-          $mediaSource: conversionData.media_source || 'organic',
-          $campaign: conversionData.campaign || '',
-          $adGroup: conversionData.adgroup || '',
-          $ad: conversionData.ad_id || '',
-        }).catch((error) => {
-          console.error(
-            '❌ [RevenueCat Attribution] Error setting AppsFlyer attributes:',
-            error
+    // Retrieve the Adjust device ID (ADID) via callback and set it in RevenueCat
+    await new Promise<void>((resolve) => {
+      Adjust.getAdid((adid) => {
+        if (adid) {
+          Purchases.setAttributes({ $adjustId: adid }).catch((err) =>
+            console.error(
+              '❌ [RevenueCat Attribution] Error setting Adjust ID:',
+              err,
+            ),
           );
-        });
-      }
+          console.log(`✅ [RevenueCat Attribution] Adjust ID set: ${adid}`);
+        } else {
+          console.log('⚠️ [RevenueCat Attribution] Adjust ADID not available yet');
+        }
+        resolve();
+      });
+    });
+
+    // Retrieve campaign / attribution data and pass it to RevenueCat
+    Adjust.getAttribution((attribution) => {
+      if (!attribution) return;
+      Purchases.setAttributes({
+        $mediaSource: attribution.network ?? 'organic',
+        $campaign: attribution.campaign ?? '',
+        $adGroup: attribution.adgroup ?? '',
+        $ad: attribution.creative ?? '',
+      }).catch((err) =>
+        console.error(
+          '❌ [RevenueCat Attribution] Error setting Adjust attribution:',
+          err,
+        ),
+      );
+      console.log(
+        '📊 [RevenueCat Attribution] Adjust attribution set:',
+        attribution.network,
+        attribution.campaign,
+      );
     });
   } catch (error) {
     console.error(
-      '❌ [RevenueCat Attribution] Error setting AppsFlyer ID:',
-      error
+      '❌ [RevenueCat Attribution] Error setting Adjust attribution:',
+      error,
     );
   }
 };

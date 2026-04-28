@@ -141,6 +141,12 @@ dependencies {
     }
     
     // ========================================
+    // Adjust SDK — install referrer & Google Advertising ID
+    // ========================================
+    implementation 'com.android.installreferrer:installreferrer:2.2'
+    implementation 'com.google.android.gms:play-services-ads-identifier:18.1.0'
+
+    // ========================================
     // AppLovin MAX SDK - Core SDK
     // ========================================
     implementation 'com.applovin:applovin-sdk:+'
