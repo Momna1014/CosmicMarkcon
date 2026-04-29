@@ -131,7 +131,7 @@ export const initializeUserCentric = async (options?: UsercentricsOptions): Prom
       let userMadeDecision = false;
       
       while (!userMadeDecision) {
-        const userResponse = await Usercentrics.showFirstLayer();
+        const userResponse = await Usercentrics.showSecondLayer();
         console.log('[UserCentric] User response:', userResponse);
 
         // Handle user interaction

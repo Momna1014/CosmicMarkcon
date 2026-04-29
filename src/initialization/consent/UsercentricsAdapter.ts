@@ -24,7 +24,13 @@ import env from '../../config/env';
  */
 const CONFIG = {
   INIT_TIMEOUT: 10000,
-  BANNER_TIMEOUT: 120000, // 2 minutes for user decision
+  // Banner shown on FIRST launch — user must decide; 2 min is enough.
+  BANNER_TIMEOUT: 120000,
+  // Banner re-opened from Settings (Manage Privacy Preferences). The user
+  // is intentionally engaging with the granular toggles — they may take a
+  // long time reading the per-vendor list. We give them 5 minutes and, on
+  // timeout, treat it as "dismiss without change" instead of an error.
+  REOPEN_BANNER_TIMEOUT: 300000,
   MAX_RETRIES: 3,
   RETRY_DELAY_BASE: 1000,
   NETWORK_WAIT_TIMEOUT: 5000,
@@ -72,12 +78,16 @@ export class UsercentricsAdapter implements IUsercentricsAdapter {
       try {
         console.log(`[Usercentrics] Initializing (attempt ${attempt}/${CONFIG.MAX_RETRIES})`);
 
+        // Prefer the new CMP v2 settingsId. Fall back to the legacy ruleSetId
+        // env value to keep older builds working during the migration window.
+        const settingsId = env.USERCENTRICS_SETTINGS_ID || env.USER_CENTRIC;
         const options: UsercentricsOptions = {
-          ruleSetId: env.USER_CENTRIC,
+          settingsId,
           loggerLevel: __DEV__ ? 1 : 0,
           timeoutMillis: CONFIG.INIT_TIMEOUT,
         };
 
+        console.log('[Usercentrics] Configuring with settingsId:', settingsId);
         Usercentrics.configure(options);
 
         // Wait for SDK to be ready
@@ -117,10 +127,16 @@ export class UsercentricsAdapter implements IUsercentricsAdapter {
     await this.ensureInitialized();
 
     try {
-      console.log('[Usercentrics] Showing consent banner');
+      console.log('[Usercentrics] ┌─────────────────────────────────────────────');
+      console.log('[Usercentrics] │ SHOWING CONSENT BANNER (first launch / required)');
+      console.log('[Usercentrics] │ Loop until user makes explicit decision');
+      console.log('[Usercentrics] │ Timeout per attempt: ' + CONFIG.BANNER_TIMEOUT + 'ms');
+      console.log('[Usercentrics] └─────────────────────────────────────────────');
 
-      // Keep showing banner until user makes an explicit decision
+      let attempt = 0;
       while (true) {
+        attempt++;
+        console.log('[Usercentrics] ⏳ Awaiting user decision (attempt #' + attempt + ')…');
         const response = await withTimeout(
           Usercentrics.showSecondLayer(),
           CONFIG.BANNER_TIMEOUT,
@@ -128,13 +144,13 @@ export class UsercentricsAdapter implements IUsercentricsAdapter {
         );
 
         const result = this.parseConsentResponse(response);
-        
+
         // Check if user made an explicit decision
         if (result.source === ConsentSource.USERCENTRICS) {
-          // User made an explicit decision (acceptAll, denyAll, or granular)
+          console.log('[Usercentrics] ✅ Explicit decision captured on attempt #' + attempt + ': ' + result.status);
           return result;
         }
-        
+
         // User dismissed without decision (back button) - re-show banner
         console.log('[Usercentrics] ⚠️ User dismissed without decision - re-showing banner...');
       }
@@ -150,6 +166,58 @@ export class UsercentricsAdapter implements IUsercentricsAdapter {
 
       console.error('[Usercentrics] Banner error:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Re-open the Usercentrics second layer for an already-consented user.
+   * Used by the in-app "Manage Privacy Preferences" entry. Single-shot:
+   * does NOT loop on dismiss — if the user closes without changing anything
+   * we return null and the caller should keep the existing stored consent.
+   *
+   * GDPR Art. 7(3): the user must be able to WITHDRAW consent at any time and
+   * as easily as they gave it. This method backs that requirement.
+   *
+   * Timeout handling: a long (5 min) timeout is used because the user is
+   * intentionally interacting with the granular UI; a TimeoutError here is
+   * treated as "user walked away" — we keep existing consent untouched.
+   */
+  async showSecondLayerForUpdate(): Promise<ConsentResult | null> {
+    await this.ensureInitialized();
+
+    console.log('[Usercentrics] ┌─────────────────────────────────────────────');
+    console.log('[Usercentrics] │ RE-OPEN SECOND LAYER (Manage Privacy Prefs)');
+    console.log('[Usercentrics] │ Timeout: ' + CONFIG.REOPEN_BANNER_TIMEOUT + 'ms (' + (CONFIG.REOPEN_BANNER_TIMEOUT / 60000) + ' min)');
+    console.log('[Usercentrics] └─────────────────────────────────────────────');
+
+    try {
+      const response = await withTimeout(
+        Usercentrics.showSecondLayer(),
+        CONFIG.REOPEN_BANNER_TIMEOUT,
+        'Consent banner timeout',
+      );
+
+      console.log('[Usercentrics] Second layer returned. Parsing response...');
+      const result = this.parseConsentResponse(response);
+
+      // Only return a result when the user actually made/changed a decision.
+      // ConsentSource.DEFAULT means the banner was dismissed without interaction.
+      if (result.source !== ConsentSource.USERCENTRICS) {
+        console.log('[Usercentrics] ⚠️ Second layer dismissed without explicit decision — keeping existing consent');
+        return null;
+      }
+
+      console.log('[Usercentrics] ✅ Second layer produced new decision:', result.status);
+      return result;
+    } catch (error: any) {
+      // Timeout in the re-open path is NOT an error — the user simply walked
+      // away from the granular UI. We keep the existing stored consent.
+      if (error instanceof TimeoutError) {
+        console.warn('[Usercentrics] ⏱️ Re-open second layer timed out — keeping existing consent (no change)');
+        return null;
+      }
+      console.error('[Usercentrics] ❌ Re-open second layer failed:', error?.message || error);
+      return null;
     }
   }
 
@@ -280,13 +348,13 @@ export class UsercentricsAdapter implements IUsercentricsAdapter {
         break;
 
       case UsercentricsUserInteraction.granular:
-        // User made granular choices - check relevant tracking consents
+        // User made granular choices via the second layer.
+        // Preserve GRANULAR status end-to-end so downstream SDKs can be toggled
+        // per-vendor instead of being collapsed to ACCEPTED/DENIED.
         grants = this.parseConsentGrants(consents);
-        // Consider accepted only if user granted at least analytics OR advertising
-        const hasRelevantConsents = grants.analytics || grants.advertising;
-        status = hasRelevantConsents ? ConsentStatus.ACCEPTED : ConsentStatus.DENIED;
+        status = ConsentStatus.GRANULAR;
         source = ConsentSource.USERCENTRICS;
-        console.log('[Usercentrics] 🔧 Granular consent:', status);
+        console.log('[Usercentrics] 🔧 Granular consent (preserved). Grants:', grants);
         break;
 
       default:
@@ -307,50 +375,101 @@ export class UsercentricsAdapter implements IUsercentricsAdapter {
   }
 
   /**
-   * Parse individual consent grants from Usercentrics response
+   * Parse individual consent grants from Usercentrics response.
+   *
+   * Maps each consented vendor/template into BOTH the legacy 4 coarse buckets
+   * (analytics/advertising/personalization/crashReporting) AND the new
+   * per-vendor flags used by the granular SDK gating.
    */
   private parseConsentGrants(consents: any[]): ConsentGrants {
     const grants: ConsentGrants = { ...DEFAULT_CONSENT_GRANTS };
 
+    console.log('[Usercentrics] ── Parsing per-vendor grants from ' + (consents?.length || 0) + ' consent entries ──');
+
     for (const consent of consents) {
-      if (!consent.status) continue;
+      if (!consent?.status) {
+        // Skip vendors the user explicitly turned OFF in the granular UI.
+        if (consent?.dataProcessor || consent?.templateId) {
+          console.log('[Usercentrics]   ⏭️  ' + (consent.dataProcessor || consent.templateId) + ' → OFF');
+        }
+        continue;
+      }
 
-      const templateId = consent.templateId?.toLowerCase() || '';
-      const dataProcessor = consent.dataProcessor?.toLowerCase() || '';
+      const templateId = (consent.templateId || '').toString().toLowerCase();
+      const dataProcessor = (consent.dataProcessor || '').toString().toLowerCase();
+      const haystack = `${templateId} ${dataProcessor}`;
+      console.log('[Usercentrics]   ✅  ' + (consent.dataProcessor || consent.templateId) + ' → ON');
 
-      // Map Usercentrics templates to grant categories
+      // ---- Per-vendor mapping (granular) ----
+      if (haystack.includes('firebase analytics') || haystack.includes('firebase-analytics') || haystack.includes('google analytics')) {
+        grants.firebaseAnalytics = true;
+      }
+      if (haystack.includes('crashlytics')) {
+        grants.crashlytics = true;
+      }
+      if (haystack.includes('sentry')) {
+        grants.sentry = true;
+      }
+      if (haystack.includes('facebook') || haystack.includes('meta')) {
+        grants.facebook = true;
+      }
+      if (haystack.includes('adjust')) {
+        grants.adjust = true;
+      }
+      if (haystack.includes('applovin') || haystack.includes('max ')) {
+        grants.appLovin = true;
+      }
+      if (haystack.includes('revenuecat')) {
+        grants.revenueCat = true;
+      }
+      if (haystack.includes('appsflyer')) {
+        grants.appsFlyer = true;
+      }
+
+      // ---- Coarse bucket mapping (legacy) ----
       if (
-        templateId.includes('analytics') ||
-        dataProcessor.includes('analytics') ||
-        dataProcessor.includes('firebase')
+        haystack.includes('analytics') ||
+        haystack.includes('firebase')
       ) {
         grants.analytics = true;
       }
 
       if (
-        templateId.includes('advertising') ||
-        templateId.includes('marketing') ||
-        dataProcessor.includes('applovin') ||
-        dataProcessor.includes('appsflyer')
+        haystack.includes('advertising') ||
+        haystack.includes('marketing') ||
+        haystack.includes('applovin') ||
+        haystack.includes('appsflyer') ||
+        haystack.includes('facebook') ||
+        haystack.includes('adjust')
       ) {
         grants.advertising = true;
       }
 
       if (
-        templateId.includes('personalization') ||
-        templateId.includes('personalisation')
+        haystack.includes('personalization') ||
+        haystack.includes('personalisation')
       ) {
         grants.personalization = true;
       }
 
       if (
-        templateId.includes('crash') ||
-        dataProcessor.includes('sentry') ||
-        dataProcessor.includes('crashlytics')
+        haystack.includes('crash') ||
+        haystack.includes('sentry') ||
+        haystack.includes('crashlytics')
       ) {
         grants.crashReporting = true;
       }
     }
+
+    console.log('[Usercentrics] ── Final per-vendor grants ──');
+    console.log('[Usercentrics]   firebaseAnalytics : ' + grants.firebaseAnalytics);
+    console.log('[Usercentrics]   crashlytics       : ' + grants.crashlytics);
+    console.log('[Usercentrics]   sentry            : ' + grants.sentry);
+    console.log('[Usercentrics]   facebook          : ' + grants.facebook);
+    console.log('[Usercentrics]   adjust            : ' + grants.adjust);
+    console.log('[Usercentrics]   appLovin          : ' + grants.appLovin);
+    console.log('[Usercentrics]   revenueCat        : ' + grants.revenueCat);
+    console.log('[Usercentrics]   appsFlyer         : ' + grants.appsFlyer);
 
     return grants;
   }

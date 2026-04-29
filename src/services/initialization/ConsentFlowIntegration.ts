@@ -120,7 +120,7 @@ export async function runConsentFlow(config: ConsentFlowConfig): Promise<void> {
     let source: string = 'dismissed';
 
     while (!userMadeDecision) {
-      const response = await Usercentrics.showFirstLayer();
+      const response = await Usercentrics.showSecondLayer();
 
       if (debug) {
         console.log(`${LOG_PREFIX} User response:`, {

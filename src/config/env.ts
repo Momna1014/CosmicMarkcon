@@ -23,6 +23,7 @@ import {
   ADJUST_TOKEN_IOS,
   ADJUST_TOKEN_ANDROID,
   USER_CENTRIC,
+  USERCENTRICS_SETTINGS_ID,
   ADMOB_APP_ID_IOS,
   ADMOB_APP_ID_ANDROID,
   IRONSOURCE_APP_KEY_IOS,
@@ -55,6 +56,7 @@ export type Env = {
   ADJUST_TOKEN_IOS: string
   ADJUST_TOKEN_ANDROID: string
   USER_CENTRIC: string
+  USERCENTRICS_SETTINGS_ID: string
   ADMOB_APP_ID_IOS: string
   ADMOB_APP_ID_ANDROID: string
   IRONSOURCE_APP_KEY_IOS: string
@@ -87,6 +89,10 @@ const env: Env = {
   ADJUST_TOKEN_IOS: ADJUST_TOKEN_IOS ?? '',
   ADJUST_TOKEN_ANDROID: ADJUST_TOKEN_ANDROID ?? '',
   USER_CENTRIC: USER_CENTRIC ?? '',
+  // Usercentrics CMP v2 Settings ID (preferred). Fallback to USER_CENTRIC for back-compat
+  // and finally to the hard-coded production settings ID so a missing env never
+  // breaks consent.
+  USERCENTRICS_SETTINGS_ID: USERCENTRICS_SETTINGS_ID,
   ADMOB_APP_ID_IOS: ADMOB_APP_ID_IOS ?? '',
   ADMOB_APP_ID_ANDROID: ADMOB_APP_ID_ANDROID ?? '',
   IRONSOURCE_APP_KEY_IOS: IRONSOURCE_APP_KEY_IOS ?? '',

@@ -10,6 +10,7 @@ import {
   Switch,
   AppState,
   Linking,
+  Platform,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSelector, useDispatch} from 'react-redux';
@@ -57,6 +58,24 @@ import {
 } from '../../components/pickers';
 import {getZodiacSign} from '../../components/mock/zodiacMockData';
 import {styles} from './styles';
+
+// Privacy / Consent
+import {getOrchestrator} from '../../initialization/orchestrator';
+import {ConsentStatus} from '../../initialization/consent/types';
+import {ATTStatus} from '../../initialization/att/types';
+
+const consentStatusLabel = (status: ConsentStatus): string => {
+  switch (status) {
+    case ConsentStatus.ACCEPTED:
+      return 'All accepted';
+    case ConsentStatus.DENIED:
+      return 'All declined';
+    case ConsentStatus.GRANULAR:
+      return 'Custom selection';
+    default:
+      return 'Update your consent choices';
+  }
+};
 
 type Props = {
   navigation: any;
@@ -156,6 +175,57 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
   // Picker visibility
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [showCityPicker, setShowCityPicker] = useState(false);
+
+  // Privacy preferences (re-opens Usercentrics second layer)
+  const [consentStatus, setConsentStatus] = useState<ConsentStatus>(() => {
+    try {
+      return getOrchestrator().getConsentStatus();
+    } catch {
+      return ConsentStatus.UNKNOWN;
+    }
+  });
+
+  const handleManagePrivacyPreferences = useCallback(async () => {
+    try {
+      const newStatus = await getOrchestrator().reopenConsent();
+      if (newStatus) {
+        setConsentStatus(newStatus);
+      }
+    } catch (err) {
+      console.warn('[Profile] Failed to open consent preferences:', err);
+      showAlert({
+        title: 'Unable to open preferences',
+        message: 'Please try again in a moment.',
+        buttons: [{text: 'OK'}],
+      });
+    }
+  }, [showAlert]);
+
+  const handleOpenAppSettingsForATT = useCallback(() => {
+    showAlert({
+      title: 'App Tracking',
+      message:
+        'Tracking permission can only be changed in iOS Settings. Open Settings now?',
+      buttons: [
+        {text: 'Cancel', style: 'cancel'},
+        {
+          text: 'Open Settings',
+          onPress: () => {
+            Linking.openURL('app-settings:').catch((e) =>
+              console.warn('[Profile] Failed to open app settings:', e),
+            );
+          },
+        },
+      ],
+    });
+  }, [showAlert]);
+
+  const showATTRevisitRow = useMemo(() => {
+    // iOS only, and only if user did not authorize ATT (so there's something to change)
+    if (Platform.OS !== 'ios') return false;
+    const att = getOrchestrator().getATTStatus();
+    return att !== ATTStatus.AUTHORIZED && att !== ATTStatus.NOT_APPLICABLE;
+  }, []);
 
   // Calculate zodiac sign dynamically based on current birth date
   const calculatedZodiacSign = useMemo(() => {
@@ -600,6 +670,54 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
                   style={styles.legalRowArrow}
                 />
               </TouchableOpacity>
+
+              <View style={styles.legalDivider} />
+
+              {/* Manage Privacy Preferences (re-opens Usercentrics second layer) */}
+              <TouchableOpacity
+                style={styles.legalRow}
+                onPress={handleManagePrivacyPreferences}
+                activeOpacity={0.7}>
+                <View style={styles.legalRowIconContainer}>
+                  <PrivacyIcon width={22} height={22} />
+                </View>
+                <View style={styles.legalRowTextContainer}>
+                  <Text style={styles.legalRowTitle}>Manage Privacy Preferences</Text>
+                  <Text style={styles.legalRowSubtitle}>
+                    {consentStatusLabel(consentStatus)}
+                  </Text>
+                </View>
+                <GoRightIcon
+                  width={16}
+                  height={16}
+                  style={styles.legalRowArrow}
+                />
+              </TouchableOpacity>
+
+              {showATTRevisitRow && (
+                <>
+                  <View style={styles.legalDivider} />
+                  <TouchableOpacity
+                    style={styles.legalRow}
+                    onPress={handleOpenAppSettingsForATT}
+                    activeOpacity={0.7}>
+                    <View style={styles.legalRowIconContainer}>
+                      <PrivacyIcon width={22} height={22} />
+                    </View>
+                    <View style={styles.legalRowTextContainer}>
+                      <Text style={styles.legalRowTitle}>App Tracking</Text>
+                      <Text style={styles.legalRowSubtitle}>
+                        Change tracking permission in iOS Settings
+                      </Text>
+                    </View>
+                    <GoRightIcon
+                      width={16}
+                      height={16}
+                      style={styles.legalRowArrow}
+                    />
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
 
           </ScrollView>

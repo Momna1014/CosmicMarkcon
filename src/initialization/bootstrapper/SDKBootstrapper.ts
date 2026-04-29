@@ -18,6 +18,7 @@ import {
   SDKStatus,
 } from '../sdk';
 import { AdsMode, AdsModeResolution, AdsConfig } from '../ads/types';
+import { ConsentGrants, DEFAULT_CONSENT_GRANTS } from '../consent/types';
 
 /**
  * SDK initialization timeouts
@@ -152,17 +153,36 @@ export class SDKBootstrapper {
   }
 
   /**
-   * Initialize tracking SDKs (consent required)
-   * 
+   * Initialize tracking SDKs (consent required).
+   *
+   * Each vendor is gated on its corresponding `ConsentGrants` flag so that
+   * a granular decision (e.g. "Firebase Analytics ON, Facebook OFF") is
+   * faithfully respected. When `grants` is omitted the legacy "all on"
+   * behaviour is used for backwards compatibility.
+   *
    * NOTE: AppsFlyer initialization temporarily disabled - uncomment when devKey is configured
    */
-  async initializeTracking(): Promise<void> {
+  async initializeTracking(grants: ConsentGrants = { ...DEFAULT_CONSENT_GRANTS,
+    firebaseAnalytics: true, crashlytics: true, sentry: true, facebook: true,
+    adjust: true, appLovin: true, revenueCat: true, appsFlyer: true,
+    analytics: true, advertising: true, personalization: true, crashReporting: true,
+  }): Promise<void> {
     console.log('[Bootstrapper] Starting tracking SDK initialization...');
     console.log('[Bootstrapper] ATT authorized status:', this.attAuthorized);
+    console.log('[Bootstrapper] Per-vendor grants:', {
+      firebaseAnalytics: grants.firebaseAnalytics,
+      sentry: grants.sentry,
+      facebook: grants.facebook,
+      adjust: grants.adjust,
+      appLovin: grants.appLovin,
+      revenueCat: grants.revenueCat,
+    });
 
-    // Sequential initialization for tracking SDKs
-    const sdks = [
-      {
+    // Sequential initialization for tracking SDKs — gated per-vendor.
+    const sdks: Array<{ name: string; init: () => Promise<void> }> = [];
+
+    if (grants.firebaseAnalytics) {
+      sdks.push({
         name: 'firebase-analytics',
         init: async () => {
           if (this.firebase.isInitialized()) {
@@ -170,20 +190,29 @@ export class SDKBootstrapper {
           } else {
             await this.firebase.initialize({
               analyticsEnabled: true,
-              crashlyticsEnabled: true,
-              crashlyticsFullMode: true,
+              crashlyticsEnabled: grants.crashlytics,
+              crashlyticsFullMode: grants.crashlytics,
             });
           }
         },
-      },
-      {
+      });
+    } else {
+      console.log('[Bootstrapper] firebase-analytics SKIPPED (no grant)');
+    }
+
+    if (grants.sentry) {
+      sdks.push({
         name: 'sentry-full-tracking',
         init: async () => {
-          // Enable full Sentry tracking (PII, user context) after consent
           await this.sentry.enableFullTracking();
         },
-      },
-      {
+      });
+    } else {
+      console.log('[Bootstrapper] sentry-full-tracking SKIPPED (no grant)');
+    }
+
+    if (grants.facebook) {
+      sdks.push({
         name: 'facebook',
         init: async () => {
           await this.facebook.initialize({
@@ -191,24 +220,41 @@ export class SDKBootstrapper {
             autoLogAppEvents: true,
           });
         },
-      },
-      {
+      });
+    } else {
+      console.log('[Bootstrapper] facebook SKIPPED (no grant)');
+    }
+
+    if (grants.adjust) {
+      sdks.push({
         name: 'adjust',
         init: () => this.adjust.initialize(),
-      },
-      {
+      });
+    } else {
+      console.log('[Bootstrapper] adjust SKIPPED (no grant)');
+    }
+
+    // Remote config piggybacks on Firebase. Allow it when ANY firebase grant
+    // is present so feature flags still work.
+    if (grants.firebaseAnalytics || grants.crashlytics) {
+      sdks.push({
         name: 'remote-config',
         init: () => this.firebase.initializeRemoteConfig(),
-      },
-      {
+      });
+    }
+
+    if (grants.revenueCat) {
+      sdks.push({
         name: 'revenuecat-phase2',
         init: () =>
           this.revenueCat.upgradeToPhase2({
             collectDeviceIdentifiers: true,
             automaticAppleSearchAdsAttributionCollection: true,
           }),
-      },
-    ];
+      });
+    } else {
+      console.log('[Bootstrapper] revenuecat-phase2 SKIPPED (no grant)');
+    }
 
     for (const sdk of sdks) {
       try {
@@ -220,6 +266,116 @@ export class SDKBootstrapper {
     }
 
     console.log('[Bootstrapper] Tracking SDK initialization complete');
+  }
+
+  /**
+   * Apply a runtime consent change (e.g. user updated preferences from the
+   * Settings "Manage Privacy Preferences" entry). Toggles already-initialized
+   * SDKs on/off without restarting the app.
+   */
+  async applyConsentUpdate(grants: ConsentGrants, attAuthorized?: boolean): Promise<void> {
+    if (typeof attAuthorized === 'boolean') {
+      this.attAuthorized = attAuthorized;
+    }
+
+    console.log('[Bootstrapper] Applying runtime consent update. Grants:', {
+      firebaseAnalytics: grants.firebaseAnalytics,
+      crashlytics: grants.crashlytics,
+      sentry: grants.sentry,
+      facebook: grants.facebook,
+      adjust: grants.adjust,
+      appLovin: grants.appLovin,
+      revenueCat: grants.revenueCat,
+    });
+
+    // Firebase Analytics + Crashlytics
+    try {
+      if (this.firebase.isInitialized()) {
+        if (grants.firebaseAnalytics) {
+          await this.firebase.enableAnalytics();
+        } else {
+          await this.firebase.disableAnalytics();
+        }
+      } else if (grants.firebaseAnalytics || grants.crashlytics) {
+        await this.initializeSDK('firebase', () =>
+          this.firebase.initialize({
+            analyticsEnabled: grants.firebaseAnalytics,
+            crashlyticsEnabled: grants.crashlytics,
+            crashlyticsFullMode: grants.crashlytics,
+          }),
+        );
+      }
+    } catch (error) {
+      console.warn('[Bootstrapper] Firebase consent update failed:', error);
+    }
+
+    // Sentry
+    try {
+      if (grants.sentry) {
+        await this.sentry.enable();
+        await this.sentry.enableFullTracking();
+      } else {
+        await this.sentry.disable();
+      }
+    } catch (error) {
+      console.warn('[Bootstrapper] Sentry consent update failed:', error);
+    }
+
+    // Facebook
+    try {
+      if (grants.facebook) {
+        if (!this.facebook.isInitialized()) {
+          await this.initializeSDK('facebook', () =>
+            this.facebook.initialize({
+              attAuthorized: this.attAuthorized,
+              autoLogAppEvents: true,
+            }),
+          );
+        } else {
+          await this.facebook.enable();
+        }
+      } else {
+        await this.facebook.disable();
+      }
+    } catch (error) {
+      console.warn('[Bootstrapper] Facebook consent update failed:', error);
+    }
+
+    // Adjust
+    try {
+      if (grants.adjust) {
+        if (!this.adjust.isInitialized()) {
+          await this.initializeSDK('adjust', () => this.adjust.initialize());
+        } else {
+          await this.adjust.enable();
+        }
+        // Refresh tracking consent based on current ATT status.
+        try {
+          this.adjust.updateTrackingStatus(this.attAuthorized);
+        } catch (e) {
+          console.warn('[Bootstrapper] Adjust updateTrackingStatus failed:', e);
+        }
+      } else {
+        await this.adjust.disable();
+      }
+    } catch (error) {
+      console.warn('[Bootstrapper] Adjust consent update failed:', error);
+    }
+
+    // AppLovin (only if already initialized — no SDK key currently configured)
+    try {
+      if (this.appLovin.isInitialized()) {
+        if (grants.appLovin && grants.advertising) {
+          await this.appLovin.configureForPersonalizedAds();
+        } else {
+          await this.appLovin.configureForNonPersonalizedAds();
+        }
+      }
+    } catch (error) {
+      console.warn('[Bootstrapper] AppLovin consent update failed:', error);
+    }
+
+    console.log('[Bootstrapper] Runtime consent update complete');
   }
 
   /**

@@ -19,6 +19,7 @@ import {
   IConsentStorage,
   StoredConsent,
   DEFAULT_CONSENT_GRANTS,
+  FULL_CONSENT_GRANTS,
 } from './types';
 
 /**
@@ -57,20 +58,25 @@ export class ConsentGate implements IConsentGate {
    */
   async presentConsentUI(): Promise<ConsentResult> {
     return this.lock.acquire('present', async () => {
+      console.log('[ConsentGate] ════════════════════════════════════════════════');
+      console.log('[ConsentGate]  PRESENT CONSENT UI — boot consent flow');
+      console.log('[ConsentGate] ════════════════════════════════════════════════');
+
       // Check for cached consent first
       const cached = await this.checkCachedConsent();
       if (cached) {
-        console.log('[ConsentGate] Using cached consent:', cached.status);
+        console.log('[ConsentGate] 💾 Using cached consent:', cached.status, '(no UI needed)');
         this.resolveConsent(cached);
         return cached;
       }
 
       try {
         // Initialize and show Usercentrics banner
+        console.log('[ConsentGate] No cached consent — initializing Usercentrics SDK…');
         await this.usercentricsAdapter.initialize();
 
         // Check if consent is actually required
-        console.log('[ConsentGate] Checking if consent is required...');
+        console.log('[ConsentGate] Checking if consent is required (geolocation lookup)…');
         const isRequired = await this.usercentricsAdapter.isConsentRequired();
         console.log('[ConsentGate] isConsentRequired result:', isRequired);
         
@@ -78,12 +84,7 @@ export class ConsentGate implements IConsentGate {
           console.log('[ConsentGate] ✅ Consent not required in this region - auto-accepting');
           const result: ConsentResult = {
             status: ConsentStatus.ACCEPTED,
-            grants: {
-              analytics: true,
-              advertising: true,
-              personalization: true,
-              crashReporting: true,
-            },
+            grants: { ...FULL_CONSENT_GRANTS },
             source: ConsentSource.REGION_NOT_REQUIRED,
           };
           this.resolveConsent(result);
@@ -175,10 +176,44 @@ export class ConsentGate implements IConsentGate {
       grants: result.grants,
       source: result.source,
       timestamp: Date.now(),
-      version: '2.0.0',
+      version: '3.0.0',
     };
 
     await this.storage.storeConsent(stored);
+  }
+
+  /**
+   * Re-open the Usercentrics second layer for an already-consented user.
+   * Called from the in-app "Manage Privacy Preferences" entry.
+   *
+   * Returns the new ConsentResult on success, or null if the user dismissed
+   * the banner without changing anything (in which case the existing stored
+   * consent is preserved).
+   */
+  async reopenConsentUI(): Promise<ConsentResult | null> {
+    return this.lock.acquire('reopen', async () => {
+      console.log('[ConsentGate] ════════════════════════════════════════════════');
+      console.log('[ConsentGate]  RE-OPEN CONSENT UI (Manage Privacy Preferences)');
+      console.log('[ConsentGate] ════════════════════════════════════════════════');
+      try {
+        await this.usercentricsAdapter.initialize();
+        const result = await this.usercentricsAdapter.showSecondLayerForUpdate();
+
+        if (!result) {
+          console.log('[ConsentGate] reopenConsentUI: no change — existing consent preserved');
+          return null;
+        }
+
+        // Update in-memory state and persist for next launch.
+        console.log('[ConsentGate] reopenConsentUI: NEW consent decision →', result.status);
+        this.resolveConsent(result);
+        await this.persistConsent(result);
+        return result;
+      } catch (error) {
+        console.error('[ConsentGate] reopenConsentUI failed:', error);
+        return null;
+      }
+    });
   }
 
   /**
@@ -242,9 +277,12 @@ export class ConsentGate implements IConsentGate {
   }
 
   /**
-   * Resolve consent internally
+   * Resolve consent internally.
+   *
+   * Allows external re-resolution (e.g. when consent state is rehydrated from
+   * storage during boot, or when the user changes preferences from Settings).
    */
-  private resolveConsent(result: ConsentResult): void {
+  resolveConsent(result: ConsentResult): void {
     this.consentStatus = result.status;
     this.consentGrants = result.grants;
     this.consentResolved = true;

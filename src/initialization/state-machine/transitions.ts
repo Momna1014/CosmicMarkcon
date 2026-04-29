@@ -133,9 +133,17 @@ export const stateTransitions: StateTransitionMap = {
 
   // =====================================================
   // CONSENT DENIED PATH
+  // ATT is independent of consent: on iOS we still show the system prompt
+  // (once per install) BEFORE finalizing the (limited) ads/tracking config.
   // =====================================================
   [InitState.CONSENT_DENIED]: {
     [InitEvent.CORE_INIT_COMPLETE]: {
+      // iOS: route through ATT first, even when consent is denied.
+      target: InitState.ATT_PENDING,
+      effect: 'presentATTDialog',
+    },
+    [InitEvent.ATT_SKIPPED]: {
+      // Android (no ATT) — go straight to non-personalized ads.
       target: InitState.INITIALIZING_ADS_NON_PERSONALIZED,
       effect: 'initializeNonPersonalizedAds',
     },

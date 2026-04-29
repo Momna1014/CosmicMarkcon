@@ -113,6 +113,59 @@ export class InitializationOrchestrator {
   }
 
   /**
+   * Re-open the Usercentrics second layer (granular preference UI) so the
+   * user can update consent from inside the app (e.g. Profile \u2192 Manage
+   * Privacy Preferences). On a successful change, the new grants are
+   * persisted AND propagated live to all SDK adapters via
+   * `SDKBootstrapper.applyConsentUpdate()` \u2014 no app restart required.
+   *
+   * @returns the updated `ConsentStatus`, or `null` if the user dismissed
+   *          the banner without changing anything.
+   */
+  async reopenConsent(): Promise<ConsentStatus | null> {
+    try {
+      const result = await this.consentGate.reopenConsentUI();
+      if (!result) {
+        return null;
+      }
+
+      // Persist ATT-aware live update to SDKs.
+      const attAuthorized = this.attController.getStatus() === ATTStatus.AUTHORIZED;
+      await this.sdkBootstrapper.applyConsentUpdate(result.grants, attAuthorized);
+
+      return result.status;
+    } catch (error) {
+      console.error('[Orchestrator] reopenConsent failed:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Get the currently resolved consent status (or UNKNOWN if not yet resolved).
+   */
+  getConsentStatus(): ConsentStatus {
+    try {
+      return this.consentGate.getConsentStatus();
+    } catch {
+      return ConsentStatus.UNKNOWN;
+    }
+  }
+
+  /**
+   * Get the current per-vendor consent grants.
+   */
+  getConsentGrants() {
+    return this.consentGate.getConsentGrants();
+  }
+
+  /**
+   * Get the current ATT status (iOS only \u2014 returns NOT_APPLICABLE on Android).
+   */
+  getATTStatus(): ATTStatus {
+    return this.attController.getStatus();
+  }
+
+  /**
    * Mark navigation as ready
    */
   setNavigationReady(): void {
@@ -228,8 +281,13 @@ export class InitializationOrchestrator {
         const result = await this.consentGate.presentConsentUI();
         console.log('[Orchestrator] Consent result received:', result.status);
 
-        if (result.status === ConsentStatus.ACCEPTED) {
-          console.log('[Orchestrator] Sending CONSENT_ACCEPTED event');
+        // GRANULAR is treated like ACCEPTED for routing — the actual per-vendor
+        // gating happens later via the bootstrapper's grant-aware init paths.
+        if (
+          result.status === ConsentStatus.ACCEPTED ||
+          result.status === ConsentStatus.GRANULAR
+        ) {
+          console.log('[Orchestrator] Sending CONSENT_ACCEPTED event (status:', result.status, ')');
           machine.send(InitEvent.CONSENT_ACCEPTED);
         } else {
           console.log('[Orchestrator] Sending CONSENT_DENIED event');
@@ -242,19 +300,21 @@ export class InitializationOrchestrator {
     });
 
     machine.onEffect('storeConsentAccepted', async () => {
-      console.log('[Orchestrator] ✅ Consent ACCEPTED');
-      
-      // Initialize core SDKs first (this is synchronous to the state machine)
+      const grants = this.consentGate.getConsentGrants();
+      console.log('[Orchestrator] ✅ Consent ACCEPTED/GRANULAR. Grants:', {
+        crashlytics: grants.crashlytics,
+        sentry: grants.sentry,
+      });
+
+      // Initialize core SDKs first, gated on per-vendor crash/sentry grants.
       try {
         await this.sdkBootstrapper.initializeCore({
-          crashlytics: { enabled: true, fullMode: true },
-          sentry: { enabled: true, fullMode: true },
+          crashlytics: { enabled: grants.crashlytics, fullMode: grants.crashlytics },
+          sentry: { enabled: grants.sentry, fullMode: grants.sentry },
         });
         console.log('[Orchestrator] Core SDKs initialized');
-        
-        // After core init, decide next step based on platform
-        // iOS: Show ATT dialog (send CORE_INIT_COMPLETE to trigger ATT_PENDING)
-        // Android: Skip ATT (send ATT_SKIPPED to go directly to tracking)
+
+        // ATT runs after core init on iOS, regardless of consent outcome.
         if (this.config.skipATT || Platform.OS !== 'ios') {
           console.log('[Orchestrator] Platform is Android or skipATT - skipping ATT');
           machine.send(InitEvent.ATT_SKIPPED);
@@ -270,6 +330,9 @@ export class InitializationOrchestrator {
 
     machine.onEffect('storeConsentDenied', async () => {
       console.log('[Orchestrator] ❌ Consent DENIED - initializing minimal SDKs');
+      // ATT must still be presented on iOS even when consent is denied
+      // (independence requirement). initializeMinimalSDKs() emits CORE_INIT_COMPLETE
+      // which will route through the new CONSENT_DENIED → ATT_PENDING transition.
       await this.initializeMinimalSDKs();
     });
 
@@ -291,7 +354,16 @@ export class InitializationOrchestrator {
     // Tracking effects
     machine.onEffect('initializeTrackingSDKs', async () => {
       try {
-        await this.sdkBootstrapper.initializeTracking();
+        const consentStatus = machine.getContext().consentStatus;
+        // If consent was denied, ATT may have still been shown (independence),
+        // but we MUST NOT initialize tracking SDKs in that case.
+        if (consentStatus === ConsentStatus.DENIED) {
+          console.log('[Orchestrator] Consent DENIED — skipping tracking SDK init');
+          machine.send(InitEvent.TRACKING_INIT_COMPLETE);
+          return;
+        }
+        const grants = this.consentGate.getConsentGrants();
+        await this.sdkBootstrapper.initializeTracking(grants);
         machine.send(InitEvent.TRACKING_INIT_COMPLETE);
       } catch (error) {
         console.error('[Orchestrator] Tracking init error:', error);
@@ -345,30 +417,13 @@ export class InitializationOrchestrator {
         machine.send(InitEvent.ATT_SKIPPED);
         return;
       }
-
-      // Check if consent was denied - skip ATT if so
-      const context = machine.getContext();
-      if (context.consentStatus === ConsentStatus.DENIED) {
-        console.log('[Orchestrator] Skipping ATT - consent was denied');
-        machine.send(InitEvent.ATT_SKIPPED);
-        return;
-      }
-
+      // ATT is independent of consent — always request on iOS, once per install.
       machine.send(InitEvent.ATT_REQUEST);
     });
 
     machine.onEffect('presentATTDialog', async () => {
-      // CRITICAL: Check if consent was denied - skip ATT if so
-      // Per privacy rules: ATT cannot override consent denial
-      const context = machine.getContext();
-      if (context.consentStatus === ConsentStatus.DENIED) {
-        console.log('[Orchestrator] Skipping ATT dialog - consent was denied (privacy rule)');
-        // Treat as ATT denied to continue the flow
-        machine.send(InitEvent.ATT_DENIED);
-        return;
-      }
-
-      // Also skip if not iOS or skipATT config
+      // ATT is independent of consent: it MUST run on iOS regardless of
+      // ACCEPTED / DENIED / GRANULAR status, once per install.
       if (this.config.skipATT || Platform.OS !== 'ios') {
         console.log('[Orchestrator] Skipping ATT dialog - not iOS or skipATT enabled');
         machine.send(InitEvent.ATT_DENIED);

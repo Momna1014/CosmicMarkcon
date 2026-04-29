@@ -44,6 +44,8 @@ declare module '@env' {
 
   // Consent Management (Usercentrics)
   export const USER_CENTRIC: string
+  // CMP v2 Settings ID (preferred over legacy ruleSetId)
+  export const USERCENTRICS_SETTINGS_ID: string
 
   // GPT Keys API
   export const GPT_KEYS_BASE_URL: string

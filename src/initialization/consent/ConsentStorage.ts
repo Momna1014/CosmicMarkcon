@@ -12,8 +12,12 @@ import {
   DEFAULT_CONSENT_GRANTS,
 } from './types';
 
-const CONSENT_STORAGE_KEY = '@init_consent_state_v2';
-const CONSENT_VERSION = '2.0.0';
+const CONSENT_STORAGE_KEY = '@init_consent_state_v3';
+const CONSENT_VERSION = '3.0.0';
+
+// Legacy v2 key — wiped on first run after upgrade so users get a fresh
+// granular decision aligned with the new per-vendor schema.
+const LEGACY_KEYS = ['@init_consent_state_v2'];
 
 /**
  * Consent validity period (365 days)
@@ -29,6 +33,20 @@ const storage = createMMKV({ id: 'consent-storage' });
  * Consent Storage Implementation
  */
 export class ConsentStorage implements IConsentStorage {
+  constructor() {
+    // Best-effort drop of legacy keys so we don't carry stale 4-bucket grants
+    // into the new per-vendor schema.
+    for (const key of LEGACY_KEYS) {
+      try {
+        if (storage.getString(key)) {
+          storage.remove(key);
+          console.log('[ConsentStorage] Cleared legacy consent key:', key);
+        }
+      } catch {
+        // ignore
+      }
+    }
+  }
   /**
    * Get stored consent from persistent storage
    */

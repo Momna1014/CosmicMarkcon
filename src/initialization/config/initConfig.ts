@@ -71,7 +71,8 @@ export const SDK_KEYS = {
     dsn: env.SENTRY_DSN,
   },
   usercentrics: {
-    ruleSetId: env.USER_CENTRIC,
+    // CMP v2 settingsId (preferred). Fallback to USER_CENTRIC for back-compat.
+    settingsId: env.USERCENTRICS_SETTINGS_ID || env.USER_CENTRIC,
   },
 };
 

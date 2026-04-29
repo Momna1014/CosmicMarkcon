@@ -6,11 +6,17 @@
 
 /**
  * User consent status
+ *
+ * - ACCEPTED: User accepted ALL vendors via Usercentrics "Accept All"
+ * - DENIED: User denied ALL vendors via Usercentrics "Deny All"
+ * - GRANULAR: User made selective choices via the Usercentrics second layer
+ *   (some vendors on, some off). The exact per-vendor flags live in `ConsentGrants`.
  */
 export enum ConsentStatus {
   UNKNOWN = 'UNKNOWN',
   ACCEPTED = 'ACCEPTED',
   DENIED = 'DENIED',
+  GRANULAR = 'GRANULAR',
 }
 
 /**
@@ -24,13 +30,28 @@ export enum ConsentSource {
 }
 
 /**
- * Individual consent grants for specific purposes
+ * Individual consent grants for specific purposes.
+ *
+ * Coarse buckets (analytics/advertising/personalization/crashReporting) are kept
+ * for backwards compatibility with existing consumers. Per-vendor flags drive
+ * the actual granular SDK enable/disable behaviour.
  */
 export interface ConsentGrants {
+  // Coarse buckets (legacy)
   analytics: boolean;
   advertising: boolean;
   personalization: boolean;
   crashReporting: boolean;
+
+  // Per-vendor flags (granular)
+  firebaseAnalytics: boolean;
+  crashlytics: boolean;
+  sentry: boolean;
+  facebook: boolean;
+  adjust: boolean;
+  appLovin: boolean;
+  revenueCat: boolean;
+  appsFlyer: boolean;
 }
 
 /**
@@ -41,6 +62,14 @@ export const DEFAULT_CONSENT_GRANTS: ConsentGrants = {
   advertising: false,
   personalization: false,
   crashReporting: false,
+  firebaseAnalytics: false,
+  crashlytics: false,
+  sentry: false,
+  facebook: false,
+  adjust: false,
+  appLovin: false,
+  revenueCat: false,
+  appsFlyer: false,
 };
 
 /**
@@ -51,6 +80,14 @@ export const FULL_CONSENT_GRANTS: ConsentGrants = {
   advertising: true,
   personalization: true,
   crashReporting: true,
+  firebaseAnalytics: true,
+  crashlytics: true,
+  sentry: true,
+  facebook: true,
+  adjust: true,
+  appLovin: true,
+  revenueCat: true,
+  appsFlyer: true,
 };
 
 /**
@@ -93,6 +130,12 @@ export interface IConsentGate {
 export interface IUsercentricsAdapter {
   initialize(): Promise<void>;
   showConsentBanner(): Promise<ConsentResult>;
+  /**
+   * Re-open the Usercentrics second layer for an already-consented user
+   * (e.g. from a Settings screen). Single-shot — does NOT loop on dismiss.
+   * Returns the new ConsentResult, or null if the user dismissed without a decision.
+   */
+  showSecondLayerForUpdate(): Promise<ConsentResult | null>;
   getStatus(): Promise<UsercentricsStatus>;
   isConsentRequired(): Promise<boolean>;
 }
