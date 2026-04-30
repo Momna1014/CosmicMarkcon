@@ -1,3 +1,4 @@
+// @feature:sentry:start
 /**
  * Sentry Service
  * 
@@ -90,7 +91,7 @@ class SentryService {
         enableNative: config.enableNative !== undefined ? config.enableNative : true,
         enableNativeCrashHandling: config.enableNativeCrashHandling !== undefined 
           ? config.enableNativeCrashHandling 
-          : false,
+          : true,
         
         // Performance Monitoring
         tracesSampleRate: config.tracesSampleRate !== undefined 
@@ -337,3 +338,4 @@ export const sentryService = new SentryService();
 // Export types
 export type { SentryConfig, UserContext };
 export { Sentry };
+// @feature:sentry:end

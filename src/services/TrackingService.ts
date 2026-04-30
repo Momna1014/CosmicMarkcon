@@ -1,3 +1,4 @@
+// @feature:att:start
 /**
  * App Tracking Transparency (ATT) Service
  * 
@@ -153,3 +154,4 @@ export default {
   getStatus: getTrackingPermissionStatus,
   isAuthorized: isTrackingAuthorized,
 };
+// @feature:att:end

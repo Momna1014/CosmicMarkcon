@@ -1,3 +1,4 @@
+// @feature:revenuecat:start
 /**
  * RevenueCat Service
  * 
@@ -28,55 +29,110 @@ import {
 class RevenueCatService {
   private isInitialized = false;
   private currentOfferings: PurchasesOfferings | null = null;
+  private initializationPromise: Promise<void> | null = null;
 
   /**
    * Initialize RevenueCat SDK
    * Call this once when app starts
    */
-  async initialize(userId?: string): Promise<void> {
-    try {
-      if (this.isInitialized) {
-        console.log('[RevenueCat] Already initialized');
-        return;
-      }
-
-      // Configure SDK
-      Purchases.setLogLevel(LOG_LEVEL.DEBUG); // Use INFO or WARN in production
-
-      // Get platform-specific API key from environment
-      const apiKey = Platform.select({
-        ios: env.REVENUECAT_IOS_KEY,
-        android: env.REVENUECAT_ANDROID_KEY,
-      });
-
-      if (!apiKey) {
-        throw new Error('No RevenueCat API key found for this platform. Please add REVENUECAT_IOS_KEY and REVENUECAT_ANDROID_KEY to your .env file');
-      }
-
-      // Configure and initialize
-      await Purchases.configure({
-        apiKey,
-        appUserID: userId, // Optional: pass user ID for cross-platform purchases
-      });
-
-      this.isInitialized = true;
-      console.log('[RevenueCat] Initialized successfully');
-
-      // Fetch initial customer info
-      const customerInfo = await this.getCustomerInfo();
-      console.log('[RevenueCat] Customer Info:', {
-        isPremium: this.isPremium(customerInfo),
-        activeSubscriptions: customerInfo.activeSubscriptions,
-      });
-
-      // Set attribution data (IDFA, AppsFlyer, Facebook)
-      // This should be called after ATT permission is granted
-      await this.setupAttribution();
-
-    } catch (error) {
-      console.error('[RevenueCat] Initialization failed:', error);
-      throw error;
+  async initialize(
+    userId?: string,
+    options?: { enableAttribution?: boolean },
+  ): Promise<void> {
+    if (this.isInitialized) {
+      console.log('[RevenueCat] Already initialized');
+      return;
     }
+
+    if (this.initializationPromise) {
+      return this.initializationPromise;
+    }
+
+    this.initializationPromise = (async () => {
+      try {
+        // Configure SDK
+        Purchases.setLogLevel(LOG_LEVEL.DEBUG); // Use INFO or WARN in production
+
+        // Get platform-specific API key from environment
+        const apiKey = Platform.select({
+          ios: env.REVENUECAT_IOS_KEY,
+          android: env.REVENUECAT_ANDROID_KEY,
+        });
+
+        if (!apiKey) {
+          throw new Error('No RevenueCat API key found for this platform. Please add REVENUECAT_IOS_KEY and REVENUECAT_ANDROID_KEY to your .env file');
+        }
+
+        const enableAttribution = options?.enableAttribution ?? true;
+
+        // Configure and initialize
+        await Purchases.configure({
+          apiKey,
+          appUserID: userId, // Optional: pass user ID for cross-platform purchases
+          automaticDeviceIdentifierCollectionEnabled: enableAttribution,
+        });
+
+        this.isInitialized = true;
+        console.log('[RevenueCat] Initialized successfully');
+
+        // Fetch initial customer info without blocking startup.
+        this.getCustomerInfo()
+          .then(customerInfo => {
+            console.log('[RevenueCat] Customer Info:', {
+              isPremium: this.isPremium(customerInfo),
+              activeSubscriptions: customerInfo.activeSubscriptions,
+            });
+          })
+          .catch(error => {
+            console.warn('[RevenueCat] Initial customer info fetch failed:', error);
+          });
+
+        // Set attribution data (IDFA, AppsFlyer, Facebook)
+        // This should be called after ATT permission is granted
+        if (enableAttribution) {
+          await this.setupAttribution();
+        }
+      } catch (error) {
+        console.error('[RevenueCat] Initialization failed:', error);
+        throw error;
+      }
+    })();
+
+    try {
+      await this.initializationPromise;
+    } finally {
+      this.initializationPromise = null;
+    }
+  }
+
+  async waitForInitialization(
+    timeoutMs: number = 10000,
+    pollIntervalMs: number = 100,
+  ): Promise<boolean> {
+    if (this.isInitialized) {
+      return true;
+    }
+
+    if (this.initializationPromise) {
+      try {
+        await Promise.race([
+          this.initializationPromise,
+          new Promise<never>((_, reject) => {
+            setTimeout(() => reject(new Error('timeout')), timeoutMs);
+          }),
+        ]);
+      } catch {
+        // Timeout or init failure -> return current status below.
+      }
+      return this.isInitialized;
+    }
+
+    const startedAt = Date.now();
+    while (!this.isInitialized && Date.now() - startedAt < timeoutMs) {
+      await new Promise<void>(resolve => setTimeout(resolve, pollIntervalMs));
+    }
+
+    return this.isInitialized;
   }
 
   /**
@@ -121,48 +177,67 @@ class RevenueCatService {
 
   /**
    * Get current customer info (subscription status)
+   * Includes retry logic for transient network failures
    */
-  async getCustomerInfo(): Promise<CustomerInfo> {
-    try {
-      const customerInfo = await Purchases.getCustomerInfo();
-      return customerInfo;
-    } catch (error) {
-      console.error('[RevenueCat] Failed to get customer info:', error);
-      throw error;
+  async getCustomerInfo(retries: number = 3): Promise<CustomerInfo> {
+    let lastError: any;
+    
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        const customerInfo = await Purchases.getCustomerInfo();
+        return customerInfo;
+      } catch (error: any) {
+        lastError = error;
+        console.warn(`[RevenueCat] Failed to get customer info (attempt ${attempt}/${retries}):`, error.message);
+        
+        // Don't retry if it's not a network error
+        if (error.code && !['NETWORK_ERROR', 'UNKNOWN'].includes(error.code)) {
+          throw error;
+        }
+        
+        // Wait before retry (exponential backoff)
+        if (attempt < retries) {
+          const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+          await new Promise<void>(resolve => setTimeout(resolve, delay));
+        }
+      }
     }
+    
+    console.error('[RevenueCat] Failed to get customer info after all retries');
+    throw lastError;
   }
 
   /**
    * Check if user has active premium subscription
    */
   isPremium(customerInfo: CustomerInfo): boolean {
-    // Check for your specific entitlement ID from RevenueCat Dashboard
-    // Your entitlement is named 'Premium_Access'
-    const entitlementId = 'Premium_Access';
-    const hasSpecificEntitlement = 
+    // Check if user has any active entitlements
+    // The entitlement identifier should match what you set in RevenueCat dashboard
+    // Common identifiers: 'premium', 'pro', 'all_access'
+    const entitlementId = 'premium'; // Primary entitlement to check
+    
+    const hasActiveEntitlement = 
       customerInfo.entitlements.active[entitlementId] !== undefined;
 
-    // Fallback: Check if user has ANY active entitlement
-    const hasAnyEntitlement = Object.keys(customerInfo.entitlements.active).length > 0;
+    // Also check if there are ANY active entitlements (fallback for different entitlement names)
+    const hasAnyActiveEntitlement = 
+      Object.keys(customerInfo.entitlements.active).length > 0;
 
-    // Fallback: Check if user has any active subscription
-    const hasActiveSubscription = customerInfo.activeSubscriptions.length > 0;
+    // Also check for active subscriptions (backup check)
+    const hasActiveSubscription = 
+      customerInfo.activeSubscriptions.length > 0;
 
-    // Log for debugging
-    console.log('[RevenueCat] 🔍 isPremium check:', {
-      entitlementId,
-      hasSpecificEntitlement,
-      hasAnyEntitlement,
+    // Log detailed info for debugging
+    console.log('[RevenueCat] isPremium check:', {
+      hasActiveEntitlement,
+      hasAnyActiveEntitlement,
       hasActiveSubscription,
       activeEntitlements: Object.keys(customerInfo.entitlements.active),
       activeSubscriptions: customerInfo.activeSubscriptions,
     });
 
-    // Return true if user has the specific entitlement OR any active subscription
-    const isPremium = hasSpecificEntitlement || hasAnyEntitlement || hasActiveSubscription;
-    console.log('[RevenueCat] 💰 isPremium result:', isPremium);
-    
-    return isPremium;
+    // User is premium if they have the specific entitlement, any entitlement, or active subscription
+    return hasActiveEntitlement || hasAnyActiveEntitlement || hasActiveSubscription;
   }
 
   /**
@@ -213,9 +288,8 @@ class RevenueCatService {
         activeSubscriptions: customerInfo.activeSubscriptions,
       });
 
-      // Refresh attribution data after purchase
-      // This ensures IDFA and other identifiers are captured with the purchase
-      await this.setupAttribution();
+      // Note: Attribution is already set up at app start, no need to refresh here
+      // Removing setupAttribution() call to avoid slowing down purchase completion
 
       return { customerInfo, productIdentifier };
     } catch (error: any) {
@@ -247,9 +321,7 @@ class RevenueCatService {
         isPremium: this.isPremium(customerInfo),
       });
 
-      // Refresh attribution data after purchase
-      // This ensures IDFA and other identifiers are captured with the purchase
-      await this.setupAttribution();
+      // Note: Attribution is already set up at app start, no need to refresh here
 
       return { customerInfo, productIdentifier };
     } catch (error: any) {
@@ -401,3 +473,4 @@ export type {
   CustomerInfo,
   PurchasesStoreProduct,
 };
+// @feature:revenuecat:end

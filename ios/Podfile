@@ -8,30 +8,30 @@ require Pod::Executable.execute_command('node', ['-p',
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
-# Use static frameworks - required for Firebase Swift pods to generate proper headers
-use_frameworks! :linkage => :static
-$RNFirebaseAsStaticFramework = true
-
-# Fix for AppLovin + react-native-video AVFoundation factory conflict
-install! 'cocoapods', :deterministic_uuids => false
-
-# react-native-permissions configuration
-# Only include the permissions you need to reduce app size
-def node_require(script)
-  require Pod::Executable.execute_command('node', ['-p',
-    "require.resolve('#{script}', {paths: [process.argv[1]]})", __dir__]).strip
-end
-
-node_require('react-native-permissions/scripts/setup.rb')
-
+# react-native-permissions: opt-in to specific permission handlers
+require_relative '../node_modules/react-native-permissions/scripts/setup'
 setup_permissions([
   'Camera',
   'PhotoLibrary',
 ])
 
-target 'CosmicMarkcon' do
+# Firebase 12.x ships FirebaseAuth as a Swift module. The umbrella `Firebase.h`
+# imports `FirebaseAuth-Swift.h`, which is only generated when pods are built as
+# frameworks. Default to static frameworks so the Swift header is produced and
+# discoverable by Obj-C consumers (RNFBAuth/Messaging/RemoteConfig, etc.).
+ENV['USE_FRAMEWORKS'] ||= 'static'
+
+linkage = ENV['USE_FRAMEWORKS']
+if linkage != nil
+  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
+  use_frameworks! :linkage => linkage.to_sym
+  
+end
+
+target 'Cosmiq' do
   config = use_native_modules!
   
+  # @feature:firebase-remote-config:start
   # Enable modular headers for Firebase dependencies that require it
   pod 'FirebaseCore', :modular_headers => true
   pod 'FirebaseCoreExtension', :modular_headers => true
@@ -40,34 +40,27 @@ target 'CosmicMarkcon' do
   pod 'GoogleUtilities', :modular_headers => true
   pod 'nanopb', :modular_headers => true
   pod 'FirebaseABTesting', :modular_headers => true
+  pod 'FirebaseAuth', :modular_headers => true        # ← add this
+  pod 'GTMSessionFetcher', :modular_headers => true   # ← add this
   pod 'FirebaseRemoteConfig', :modular_headers => true
   pod 'FirebaseAuthInterop', :modular_headers => true
   pod 'FirebaseAppCheckInterop', :modular_headers => true
   pod 'RecaptchaInterop', :modular_headers => true
+  # @feature:firebase-remote-config:end
 
-  # ========================================
-  # AppLovin Mediation Adapters
-  # ========================================
-  # IMPORTANT: Some adapters are commented out due to conflicts with react-native-video
-  # 
-  # ISSUE: IronSource, Vungle, Mintegral, and Fyber adapters include their own video 
-  # players for video ads. These register AVFoundation component factories that conflict 
-  # with react-native-video, causing this crash at runtime:
-  #   "AddInstanceForFactory: No factory registered for id F8BB1C28-BAE8-11D6-9C31-00039315CD46"
-  #
-  # SAFE ADAPTERS (kept with modular headers isolation):
-  pod 'AppLovinMediationGoogleAdapter', :modular_headers => true  # ✅ Compatible
-  pod 'AppLovinMediationUnityAdsAdapter', :modular_headers => true  # ✅ Compatible
-  
-  # CONFLICTING ADAPTERS (contain video ad players that interfere with react-native-video):
-  # If you need these, test them individually with video playback to verify compatibility
-  # pod 'AppLovinMediationIronSourceAdapter'   # ❌ Contains IronSource video player
-  # pod 'AppLovinMediationVungleAdapter'       # ❌ Video-focused ad network
-  # pod 'AppLovinMediationMintegralAdapter'    # ❌ Heavy video ad components
-  # pod 'AppLovinMediationFyberAdapter'        # ❌ Video ad capabilities
-  
-  # Not currently needed:
-  # pod 'AppLovinMediationFacebookAdapter'
+  # @feature:applovin-max:start [disabled]
+  # # ========================================
+  # # AppLovin Mediation Adapters
+  # # ========================================
+  # # Temporarily disabled Facebook adapter due to iOS build issues (FBAudienceNetwork bundle)
+  # # pod 'AppLovinMediationFacebookAdapter'
+  # pod 'AppLovinMediationGoogleAdapter'
+  # pod 'AppLovinMediationUnityAdsAdapter'
+  # pod 'AppLovinMediationIronSourceAdapter'
+  # pod 'AppLovinMediationVungleAdapter'
+  # pod 'AppLovinMediationMintegralAdapter'
+  # pod 'AppLovinMediationFyberAdapter'
+  # @feature:applovin-max:end
 
   use_react_native!(
     :path => config[:reactNativePath],
@@ -83,7 +76,7 @@ target 'CosmicMarkcon' do
       # :ccache_enabled => true
     )
     
-    # Exclude x86_64 architecture for Apple Silicon Macs (required for AppsFlyer)
+    # Exclude x86_64 architecture for Apple Silicon Macs
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
         config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'x86_64'
@@ -91,30 +84,6 @@ target 'CosmicMarkcon' do
         # Force dSYM generation for all pods
         config.build_settings['DEBUG_INFORMATION_FORMAT'] = 'dwarf-with-dsym'
         config.build_settings['GENERATE_DSYM'] = 'YES'
-        
-        # FIX: Enable modular headers for AppLovin adapters to prevent video factory conflicts
-        if target.name.start_with?('AppLovinMediation') || target.name == 'AppLovinSDK'
-          config.build_settings['DEFINES_MODULE'] = 'YES'
-          config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
-          config.build_settings['CLANG_ENABLE_MODULES'] = 'YES'
-        end
-        
-        # FIX: Ensure react-native-video has priority for AVFoundation components
-        if target.name == 'react-native-video'
-          config.build_settings['DEFINES_MODULE'] = 'YES'
-          config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
-          config.build_settings['CLANG_ENABLE_MODULES'] = 'YES'
-          # Give video library highest priority
-          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
-          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'RN_VIDEO_HAS_PRIORITY=1'
-        end
-        
-        # Additional isolation for video ad SDKs
-        if target.name.include?('IronSource') || target.name.include?('Vungle') || 
-           target.name.include?('Mintegral') || target.name.include?('Fyber')
-          config.build_settings['CLANG_ENABLE_MODULES'] = 'YES'
-          config.build_settings['DEFINES_MODULE'] = 'YES'
-        end
         
         # Fixes for AppLovin and related frameworks
         if target.name.include?('AppLovin')

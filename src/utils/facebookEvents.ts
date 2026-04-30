@@ -200,18 +200,20 @@ export const trackSubscriptionView = async (
 };
 
 /**
- * Track subscription started
+ * Track subscription started - Uses Facebook's STANDARD Subscribe event
+ * This is critical for iOS 14+ SKAdNetwork conversion tracking!
  */
 export const trackSubscriptionStarted = async (
   planId: string,
   planName: string,
   price: number,
-  interval: 'monthly' | 'yearly'
+  interval: 'monthly' | 'yearly',
+  currency: string = 'USD'
 ) => {
-  await facebookAnalytics.logCustomEvent('subscription_started', {
+  // Use the STANDARD fb_mobile_subscribe event for SKAdNetwork compatibility
+  await facebookAnalytics.logSubscribe(price, currency, undefined, {
     plan_id: planId,
     plan_name: planName,
-    price,
     billing_interval: interval,
     platform: Platform.OS,
   });
@@ -248,13 +250,17 @@ export const trackSubscriptionRenewed = async (
 };
 
 /**
- * Track trial started
+ * Track trial started - Uses Facebook's STANDARD Start Trial event
+ * This is critical for iOS 14+ SKAdNetwork conversion tracking!
  */
 export const trackTrialStarted = async (
   planId: string,
-  trialDays: number
+  trialDays: number,
+  price: number = 0,
+  currency: string = 'USD'
 ) => {
-  await facebookAnalytics.logCustomEvent('trial_started', {
+  // Use the STANDARD fb_mobile_start_trial event for SKAdNetwork compatibility
+  await facebookAnalytics.logStartTrial(price, currency, undefined, {
     plan_id: planId,
     trial_duration_days: trialDays,
     platform: Platform.OS,
@@ -743,6 +749,103 @@ export const trackExternalLinkClicked = async (
   });
 };
 
+/**
+ * ====================
+ * PAYWALL EVENTS (Facebook Standard Events)
+ * Critical for iOS 14+ SKAdNetwork and Facebook Ads optimization
+ * ====================
+ */
+
+/**
+ * Track paywall shown - Facebook standard event
+ * Uses VIEW_CONTENT with paywall content type for proper attribution
+ */
+export const trackPaywallShown = async (
+  source: string,
+  paywallType: 'soft' | 'hard' | 'discount' = 'soft',
+  offeringId?: string
+) => {
+  await facebookAnalytics.logViewContent('paywall', offeringId || 'default', {
+    source,
+    paywall_type: paywallType,
+    platform: Platform.OS,
+    timestamp: Date.now(),
+  });
+  console.log('[Facebook] 📊 Paywall shown event logged:', { source, paywallType, offeringId });
+};
+
+/**
+ * Track purchase button pressed on paywall - Facebook standard event
+ * Uses INITIATED_CHECKOUT for proper attribution in the conversion funnel
+ */
+export const trackPurchaseButtonPressed = async (
+  productId: string,
+  productName: string,
+  price: number,
+  currency: string = 'USD',
+  source?: string
+) => {
+  await facebookAnalytics.logInitiatedCheckout(1, currency, price, {
+    product_id: productId,
+    product_name: productName,
+    source: source || 'paywall',
+    platform: Platform.OS,
+  });
+  console.log('[Facebook] 📊 Purchase button pressed event logged:', { productId, price, currency });
+};
+
+/**
+ * Track trial conversion - Uses START_TRIAL standard event
+ * Critical for SKAdNetwork optimization
+ */
+export const trackTrialConversion = async (
+  productId: string,
+  trialDurationDays: number,
+  trialPrice: number = 0,
+  currency: string = 'USD',
+  subscriptionPrice?: number
+) => {
+  // Calculate predicted LTV based on subscription price (helps Facebook optimize ads)
+  const predictedLTV = subscriptionPrice ? subscriptionPrice * 6 : undefined; // 6-month average retention
+  
+  await facebookAnalytics.logStartTrial(trialPrice, currency, predictedLTV, {
+    product_id: productId,
+    trial_duration_days: trialDurationDays,
+    subscription_price: subscriptionPrice || 0,
+    platform: Platform.OS,
+  });
+  console.log('[Facebook] 📊 Trial conversion event logged:', { productId, trialDurationDays, trialPrice });
+};
+
+/**
+ * Track subscription purchase - Uses SUBSCRIBE standard event
+ * Critical for SKAdNetwork optimization and ROAS tracking
+ */
+export const trackSubscriptionPurchase = async (
+  productId: string,
+  productName: string,
+  price: number,
+  billingInterval: 'monthly' | 'yearly' | 'weekly',
+  currency: string = 'USD',
+  isTrial: boolean = false
+) => {
+  // Calculate predicted LTV based on billing interval
+  const ltv = billingInterval === 'yearly' 
+    ? price * 2 // 2-year average for yearly subscribers
+    : billingInterval === 'monthly'
+    ? price * 6 // 6-month average for monthly
+    : price * 4; // 1-month average for weekly (weekly * 4)
+  
+  await facebookAnalytics.logSubscribe(price, currency, ltv, {
+    product_id: productId,
+    product_name: productName,
+    billing_interval: billingInterval,
+    is_trial_conversion: isTrial ? 1 : 0,
+    platform: Platform.OS,
+  });
+  console.log('[Facebook] 📊 Subscription purchase event logged:', { productId, price, billingInterval });
+};
+
 // Export all tracking functions
 export default {
   // Authentication
@@ -817,4 +920,10 @@ export default {
   // Navigation
   trackDeepLinkOpened,
   trackExternalLinkClicked,
+  
+  // Paywall Events (SKAdNetwork compatible)
+  trackPaywallShown,
+  trackPurchaseButtonPressed,
+  trackTrialConversion,
+  trackSubscriptionPurchase,
 };

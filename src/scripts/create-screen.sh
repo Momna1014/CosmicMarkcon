@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script to create a new screen folder with index.tsx and styles.ts
-# Usage: ./src/scripts/create-screen.sh ScreenName
+# Usage: ./src/scripts/create-screen.sh
 
 set -e
 
@@ -13,15 +13,32 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-# Check if screen name is provided
-if [ -z "$1" ]; then
-    echo -e "${RED}Error: Screen name is required${NC}"
-    echo "Usage: ./src/scripts/create-screen.sh ScreenName"
-    echo "Example: ./src/scripts/create-screen.sh Dashboard"
-    exit 1
+# Prompt for screen name
+prompt_screen_name() {
+  while true; do
+    echo -ne "${BLUE}Enter screen name (PascalCase, e.g., Dashboard): ${NC}"
+    read -r SCREEN_NAME
+
+    if [ -z "$SCREEN_NAME" ]; then
+      echo -e "${RED}Error: Screen name cannot be empty${NC}"
+      continue
+    fi
+
+    if [[ ! "$SCREEN_NAME" =~ ^[A-Z][A-Za-z0-9]*$ ]]; then
+      echo -e "${RED}Error: Use PascalCase with letters/numbers only (e.g., Dashboard)${NC}"
+      continue
+    fi
+
+    break
+  done
+}
+
+if [ -n "$1" ]; then
+  echo -e "${YELLOW}Note: Positional arguments are ignored. Enter screen name below.${NC}"
 fi
 
-SCREEN_NAME=$1
+prompt_screen_name
+
 SCREENS_DIR="./src/screens"
 SCREEN_DIR="${SCREENS_DIR}/${SCREEN_NAME}"
 NAVIGATION_DIR="./src/navigation"
@@ -93,178 +110,34 @@ mkdir -p "$SCREEN_DIR"
 # Create index.tsx
 echo -e "${YELLOW}Creating index.tsx...${NC}"
 cat > "${SCREEN_DIR}/index.tsx" << 'EOF'
-import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  ActivityIndicator,
-} from 'react-native';
-import { useScreenView, useButtonClick } from '../../hooks/useFacebookAnalytics';
-import { 
-  trackContentView,
-  trackSearch,
-} from '../../analytics';
-import firebaseService from '../../services/firebase/FirebaseService';
+import React, { useCallback } from 'react';
+import { View, Text } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { logEvent } from '../../services/firebase/FirebaseService';
 import { useStyles } from './styles';
-import { useTheme } from '../../theme/ThemeProvider';
 
-type Props = {
-  navigation: any;
-  route?: any;
-};
-
-const SCREEN_NAMEScreen: React.FC<Props> = ({ navigation, route }) => {
-  // Get dynamic styles based on current theme
+const SCREEN_NAMEScreen: React.FC = () => {
   const styles = useStyles();
-  const theme = useTheme();
-  
-  // Track screen view automatically
-  useScreenView('SCREEN_NAMEScreen', {
-    screen_category: 'SCREEN_NAME_LOWER',
-    previous_screen: route?.params?.from || 'unknown',
-  });
 
-  /**
-   * Log Firebase event helper
-   */
-  const logFirebaseEvent = (eventName: string, params?: Record<string, any>) => {
-    firebaseService.logEvent(eventName, params);
-  };
-
-  // State
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<any[]>([]);
-
-  /**
-   * Fetch data on mount
-   */
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  /**
-   * Fetch data from API
-   */
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      // TODO: Implement API call
-      // const response = await api.get(API_ENDPOINTS.YOUR_ENDPOINT);
-      // setData(response);
-      
-      // Track content view
-      trackContentView(
-        'article',
-        'SCREEN_NAME_LOWER_list',
-        'SCREEN_NAMEScreen Content',
-        'SCREEN_NAME_LOWER'
-      );
-
-      // Log Firebase event
-      logFirebaseEvent('SCREEN_NAME_LOWER_data_loaded', {
-        screen: 'SCREEN_NAMEScreen',
-        timestamp: Date.now(),
+  useFocusEffect(
+    useCallback(() => {
+      void logEvent('screen_name_viewed', {
+        screen_name: 'SCREEN_NAME_EVENT',
       });
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      
-      // Log error to Firebase
-      logFirebaseEvent('SCREEN_NAME_LOWER_fetch_error', {
-        error: String(error),
-        screen: 'SCREEN_NAMEScreen',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  /**
-   * Handle item press
-   */
-  const handleItemPress = (item: any) => {
-    // Log Firebase event
-    logFirebaseEvent('SCREEN_NAME_LOWER_item_clicked', {
-      item_id: item?.id,
-      item_name: item?.name,
-      screen: 'SCREEN_NAMEScreen',
-    });
-
-    // Navigate to details or perform action
-    // navigation.navigate('Details', { id: item.id });
-  };
-
-  /**
-   * Handle search
-   */
-  const handleSearch = (query: string) => {
-    // Track search event
-    trackSearch(query, 0, 'SCREEN_NAME_LOWER');
-
-    // Log Firebase event
-    logFirebaseEvent('SCREEN_NAME_LOWER_search', {
-      query,
-      screen: 'SCREEN_NAMEScreen',
-    });
-
-    // TODO: Implement search logic
-  };
-
-  /**
-   * Handle refresh
-   */
-  const handleRefresh = () => {
-    // Log Firebase event
-    logFirebaseEvent('SCREEN_NAME_LOWER_refreshed', {
-      screen: 'SCREEN_NAMEScreen',
-    });
-    
-    fetchData();
-  };
-
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text style={styles.loadingText}>Loading...</Text>
-      </View>
-    );
-  }
+      return undefined;
+    }, []),
+  );
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>SCREEN_NAMEScreen</Text>
-        <Text style={styles.subtitle}>Welcome to SCREEN_NAMEScreen</Text>
+    <View style={styles.container}>
+      <View style={styles.contentContainer}>
+        <View style={styles.header}>
+          <Text style={styles.title}>SCREEN_NAMEScreen</Text>
+          <Text style={styles.subtitle}>Welcome to SCREEN_NAMEScreen</Text>
+        </View>
       </View>
-
-      {/* Content */}
-      <View style={styles.content}>
-        {data.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No data available</Text>
-            <TouchableOpacity 
-              style={styles.button}
-              onPress={handleRefresh}
-            >
-              <Text style={styles.buttonText}>Refresh</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          data.map((item, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.item}
-              onPress={() => handleItemPress(item)}
-            >
-              <Text style={styles.itemText}>{item.name}</Text>
-            </TouchableOpacity>
-          ))
-        )}
-      </View>
-    </ScrollView>
+    </View>
   );
 };
 
@@ -275,7 +148,7 @@ EOF
 echo -e "${YELLOW}Creating styles.ts...${NC}"
 cat > "${SCREEN_DIR}/styles.ts" << 'EOF'
 import { StyleSheet } from 'react-native';
-import { AppTheme } from '../../theme';
+import type { AppTheme } from '../../theme';
 import { useTheme } from '../../theme/ThemeProvider';
 
 /**
@@ -388,16 +261,16 @@ export default createStyles;
 EOF
 
 # Replace SCREEN_NAME placeholder with actual screen name
-# Convert to lowercase using tr for compatibility
-SCREEN_NAME_LOWER=$(echo "$SCREEN_NAME" | tr '[:upper:]' '[:lower:]')
+# Convert from PascalCase to snake_case for analytics payload
+SCREEN_NAME_EVENT=$(echo "$SCREEN_NAME" | sed -E 's/([a-z0-9])([A-Z])/\1_\2/g' | tr '[:upper:]' '[:lower:]')
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    # macOS - Replace SCREEN_NAME_LOWER first to avoid partial replacement
-    sed -i '' "s/SCREEN_NAME_LOWER/${SCREEN_NAME_LOWER}/g" "${SCREEN_DIR}/index.tsx"
+  # macOS - Replace analytics placeholder first to avoid partial replacement
+  sed -i '' "s/SCREEN_NAME_EVENT/${SCREEN_NAME_EVENT}/g" "${SCREEN_DIR}/index.tsx"
     sed -i '' "s/SCREEN_NAME/${SCREEN_NAME}/g" "${SCREEN_DIR}/index.tsx"
 else
-    # Linux - Replace SCREEN_NAME_LOWER first to avoid partial replacement
-    sed -i "s/SCREEN_NAME_LOWER/${SCREEN_NAME_LOWER}/g" "${SCREEN_DIR}/index.tsx"
+  # Linux - Replace analytics placeholder first to avoid partial replacement
+  sed -i "s/SCREEN_NAME_EVENT/${SCREEN_NAME_EVENT}/g" "${SCREEN_DIR}/index.tsx"
     sed -i "s/SCREEN_NAME/${SCREEN_NAME}/g" "${SCREEN_DIR}/index.tsx"
 fi
 

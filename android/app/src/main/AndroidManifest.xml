@@ -2,7 +2,34 @@
   xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:tools="http://schemas.android.com/tools">
   <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
   <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+
+  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+  <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+  <uses-permission android:name="android.permission.CAMERA" />
+  <uses-feature
+    android:name="android.hardware.camera"
+    android:required="false" />
+  <uses-feature
+    android:name="android.hardware.camera.autofocus"
+    android:required="false" />
+
+  <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+  <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+
+  <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
+
+  <uses-permission
+    android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    android:maxSdkVersion="32"
+    tools:replace="android:maxSdkVersion" />
+  <uses-permission
+    android:name="android.permission.READ_EXTERNAL_STORAGE"
+    android:maxSdkVersion="32" />
 
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
   <uses-permission android:name="android.permission.VIBRATE" />
@@ -10,17 +37,16 @@
   <uses-permission android:name="android.permission.WAKE_LOCK" />
   <uses-permission android:name="com.android.vending.BILLING" />
 
-  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
-
-  <uses-permission android:name="android.permission.CAMERA" />
   <uses-permission
-    android:name="android.permission.READ_EXTERNAL_STORAGE"
-    android:maxSdkVersion="32" />
-  <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-  <uses-feature
-    android:name="android.hardware.camera"
-    android:required="false" />
+    android:name="android.permission.FOREGROUND_SERVICE"
+    tools:node="remove" />
+  <uses-permission
+    android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"
+    tools:node="remove" />
+
+  <uses-permission
+    android:name="android.permission.WRITE_SETTINGS"
+    tools:ignore="ProtectedPermissions" />
 
   <application
     android:name=".MainApplication"
@@ -31,9 +57,10 @@
     android:usesCleartextTraffic="${usesCleartextTraffic}"
     android:supportsRtl="true"
     tools:replace="android:allowBackup">
-    <meta-data
-      android:name="com.google.android.gms.ads.APPLICATION_ID"
-      android:value="ca-app-pub-2129001407304490~8985572298" />
+    <provider
+      android:name="com.google.firebase.provider.FirebaseInitProvider"
+      android:authorities="${applicationId}.firebaseinitprovider"
+      tools:node="remove" />
 
     <meta-data
       android:name="com.facebook.sdk.ApplicationId"
@@ -41,6 +68,45 @@
     <meta-data
       android:name="com.facebook.sdk.ClientToken"
       android:value="@string/facebook_client_token" />
+    <meta-data
+      android:name="com.facebook.sdk.AutoInitEnabled"
+      android:value="false" />
+    <meta-data
+      android:name="com.facebook.sdk.AutoLogAppEventsEnabled"
+      android:value="false" />
+    <meta-data
+      android:name="com.facebook.sdk.AdvertiserIDCollectionEnabled"
+      android:value="false" />
+
+    <meta-data
+      android:name="firebase_analytics_collection_enabled"
+      android:value="false" />
+    <meta-data
+      android:name="firebase_crashlytics_collection_enabled"
+      android:value="false" />
+    <meta-data
+      android:name="firebase_messaging_auto_init_enabled"
+      android:value="false" />
+    <meta-data
+      android:name="google_analytics_default_allow_ad_personalization_signals"
+      android:value="false"
+      tools:replace="android:value" />
+    <meta-data
+      android:name="firebase_performance_collection_enabled"
+      android:value="false" />
+    <meta-data
+      android:name="firebase_remote_config_auto_fetch_enabled"
+      android:value="false" />
+    <meta-data
+      android:name="google_analytics_deferred_deep_link_enabled"
+      android:value="false" />
+    <meta-data
+      android:name="firebase_inapp_messaging_auto_data_collection_enabled"
+      android:value="false" />
+
+    <meta-data
+      android:name="com.google.android.gms.ads.DELAY_APP_MEASUREMENT_INIT"
+      android:value="true" />
 
     <activity
       android:name="com.facebook.FacebookActivity"
@@ -82,23 +148,14 @@
 
     <service
       android:name="app.notifee.core.ForegroundService"
-      android:foregroundServiceType="dataSync" />
-    <service
+      tools:node="remove" />
+    <receiver
       android:name="app.notifee.core.BlockStateBroadcastReceiver"
-      android:exported="false" />
+      tools:node="remove" />
 
     <meta-data
-      android:name="applovin.sdk.key"
-      android:value="hbi2E0uLXSPa98r-2F5LFfuw4ximVgyBGfEVf7rBZFmkNbiQrom5Se_XaiH4NDGduV7XdzkBDTwa3c0vPn_sP_"
-      tools:replace="android:value" />
-
-    <receiver
-      android:name="com.appsflyer.SingleInstallBroadcastReceiver"
-      android:exported="true">
-      <intent-filter>
-        <action android:name="com.android.vending.INSTALL_REFERRER" />
-      </intent-filter>
-    </receiver>
+      android:name="com.google.android.gms.ads.APPLICATION_ID"
+      android:value="ca-app-pub-3781511156022357~2699873695" />
 
     <receiver
       android:name=".widget.TodoWidgetProvider"
@@ -118,7 +175,6 @@
       android:launchMode="singleTask"
       android:windowSoftInputMode="adjustResize"
       android:exported="true"
-      android:screenOrientation="portrait"
       android:theme="@style/BootTheme">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />

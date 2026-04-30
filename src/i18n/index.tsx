@@ -3,21 +3,30 @@ import { initReactI18next } from 'react-i18next';
 import { getLocales } from 'react-native-localize';
 import { I18nManager } from 'react-native';
 
-// Import translation files
-import en from './locales/en.json';
-import ar from './locales/ar.json';
-import tr from './locales/tr.json';
-import fr from './locales/fr.json';
-
 // Dynamically determine available languages from imported locale files
-const availableLocales: Record<string, any> = { en, ar, tr, fr };
-const SUPPORTED_LANGUAGES = Object.keys(availableLocales);
+const SUPPORTED_LANGUAGES = ['en', 'ar', 'tr', 'fr'];
 
 // RTL languages configuration
 const RTL_LANGUAGES = ['ar'];
 
+// Lazy-loaded locale data — only loaded when initI18n() is called
+let availableLocales: Record<string, any> | null = null;
+
+function loadLocales(): Record<string, any> {
+  if (!availableLocales) {
+    availableLocales = {
+      en: require('./locales/en.json'),
+      ar: require('./locales/ar.json'),
+      tr: require('./locales/tr.json'),
+      fr: require('./locales/fr.json'),
+    };
+  }
+  return availableLocales;
+}
+
 // Export supported languages and RTL configuration for use in other parts of the app
-export { SUPPORTED_LANGUAGES, availableLocales, RTL_LANGUAGES };
+export { SUPPORTED_LANGUAGES, RTL_LANGUAGES };
+export { availableLocales };
 
 // Function to check if a language is RTL
 export const isRTL = (language: string): boolean => {
@@ -27,28 +36,17 @@ export const isRTL = (language: string): boolean => {
 // Function to get the appropriate initial language
 const getInitialLanguage = (): string => {
   try {
-    // Get device locales using react-native-localize
     const deviceLocales = getLocales();
     const deviceLanguage = deviceLocales[0]?.languageCode;
 
-    // console.log('Device locales:', deviceLocales);
-    // console.log('Device primary language:', deviceLanguage);
-    // console.log('Supported app languages:', SUPPORTED_LANGUAGES);
-
-    // Check if device language is supported
     if (deviceLanguage && SUPPORTED_LANGUAGES.includes(deviceLanguage)) {
-      // console.log('Using device language (supported):', deviceLanguage);
       return deviceLanguage;
     } else {
-      // console.log(
-      //   'Device language not supported, using English fallback. Device language was:',
-      //   deviceLanguage,
-      // );
-      return 'en'; // Fallback to English if device language is not supported
+      return 'en';
     }
   } catch (error) {
     console.error('Error detecting device language:', error);
-    return 'en'; // Fallback to English on error
+    return 'en';
   }
 };
 
@@ -58,42 +56,44 @@ const updateRTLLayout = (language: string) => {
   if (I18nManager.isRTL !== shouldBeRTL) {
     I18nManager.allowRTL(shouldBeRTL);
     I18nManager.forceRTL(shouldBeRTL);
-    // console.log(`RTL layout updated: ${shouldBeRTL} for language: ${language}`);
   }
 };
 
-// Determine initial language based on system language
-const initialLanguage = getInitialLanguage();
+/**
+ * Lazy i18n initialization — call this once before rendering.
+ * Avoids blocking bundle eval with getLocales(), RTL setup, and JSON parsing.
+ */
+let _i18nInitialized = false;
 
-// Set up RTL for initial language
-updateRTLLayout(initialLanguage);
+export function initI18n(): void {
+  if (_i18nInitialized) return;
+  _i18nInitialized = true;
 
-// console.log('i18n initialized with language:', initialLanguage);
-// console.log('Available languages:', SUPPORTED_LANGUAGES);
-// console.log('RTL enabled:', I18nManager.isRTL);
+  const initialLanguage = getInitialLanguage();
+  updateRTLLayout(initialLanguage);
 
-// Build resources object dynamically from available locales
-const resources = Object.keys(availableLocales).reduce((acc, lang) => {
-  acc[lang] = { translation: availableLocales[lang] };
-  return acc;
-}, {} as Record<string, { translation: any }>);
+  const locales = loadLocales();
+  const resources = Object.keys(locales).reduce((acc, lang) => {
+    acc[lang] = { translation: locales[lang] };
+    return acc;
+  }, {} as Record<string, { translation: any }>);
 
-i18n.use(initReactI18next).init({
-  resources,
-  lng: initialLanguage, // Use supported device language or fallback to English
-  fallbackLng: 'en', // Fallback to English if device language is not supported
+  i18n.use(initReactI18next).init({
+    resources,
+    lng: initialLanguage,
+    fallbackLng: 'en',
 
-  interpolation: {
-    escapeValue: false, // React already does escaping
-  },
+    interpolation: {
+      escapeValue: false,
+    },
 
-  react: {
-    useSuspense: false,
-  },
+    react: {
+      useSuspense: false,
+    },
 
-  // Debug mode for development
-  debug: __DEV__,
-});
+    debug: false, // i18next debug logging is extremely verbose — disable even in dev
+  });
+}
 
 // Language change handler
 export const changeLanguage = (language: string): Promise<any> => {

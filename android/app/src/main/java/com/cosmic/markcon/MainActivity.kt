@@ -13,13 +13,13 @@ class MainActivity : ReactActivity() {
    * Returns the name of the main component registered from JavaScript. This is used to schedule
    * rendering of the component.
    */
-  override fun getMainComponentName(): String = "CosmicMarkcon"
+  override fun getMainComponentName(): String = "Cosmiq"
 
   /**
    * Initialize BootSplash when activity is created
    */
   override fun onCreate(savedInstanceState: Bundle?) {
-    RNBootSplash.init(this, R.style.BootTheme) // Initialize before super.onCreate
+    RNBootSplash.init(this, R.style.BootTheme)
     super.onCreate(savedInstanceState)
   }
 

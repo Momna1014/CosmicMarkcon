@@ -1,109 +1,13 @@
-// /**
-//  * RootNavigator
-//  * 
-//  * Main navigation container that wraps the entire app
-//  * Integrates: StackNavigator, DeepLinking, NavigationService
-//  */
+/**
+ * RootNavigator
+ *
+ * Main navigation container that wraps the entire app
+ * Integrates: StackNavigator, DeepLinking, NavigationService
+ *
+ * InitializationFlow keeps the splash visible until consent + ATT are resolved.
+ */
 
-// import React from 'react';
-// import {Text, View, StyleSheet, ActivityIndicator} from 'react-native';
-// import {NavigationContainer} from '@react-navigation/native';
-// import RNBootSplash from 'react-native-bootsplash';
-
-// // Import modular navigation
-// import StackNavigator from './StackNavigator';
-// import {linking} from './deepLinking';
-// import {navigationRef} from './NavigationService';
-
-// // Import context
-// import {AppProvider} from '../contexts/AppContext';
-
-// /**
-//  * Loading Fallback Component
-//  */
-// // function LoadingFallback() {
-// //   return (
-// //     <View style={styles.loadingContainer}>
-// //       <ActivityIndicator size="large" color="#007AFF" />
-// //       <Text style={styles.loadingText}>Loading...</Text>
-// //     </View>
-// //   );
-// // }
-
-// /**
-//  * Root Navigator Component
-//  */
-// function RootNavigatorContent() {
-//   const [isNavigationReady, setIsNavigationReady] = React.useState(false);
-
-//   React.useEffect(() => {
-//     // Don't hide splash immediately - wait for navigation to be fully ready
-//     // This prevents showing splash over popups
-//     if (isNavigationReady) {
-//       // Add a small delay to ensure UI is fully rendered
-//       const timer = setTimeout(() => {
-//         console.log('Navigation ready - hiding splash');
-//         RNBootSplash.hide({fade: true});
-//       }, 300); // 300ms delay after navigation is ready
-
-//       return () => clearTimeout(timer);
-//     }
-//   }, [isNavigationReady]);
-
-//   return (
-//     <NavigationContainer
-//       ref={navigationRef}
-//       linking={linking as any}
-//       // fallback={<LoadingFallback />}
-//       onReady={() => {
-//         setIsNavigationReady(true);
-//         console.log('Navigation ready');
-//       }}>
-//       <StackNavigator />
-//     </NavigationContainer>
-//   );
-// }
-
-// /**
-//  * Root Navigator with Context Provider
-//  * 
-//  * Wraps navigation with AppProvider for global state
-//  */
-// export default function RootNavigator() {
-//   return (
-//     <AppProvider>
-//       <RootNavigatorContent />
-//     </AppProvider>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   loadingContainer: {
-//     flex: 1,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     backgroundColor: '#FFFFFF',
-//   },
-//   loadingText: {
-//     marginTop: 12,
-//     fontSize: 16,
-//     color: '#8E8E93',
-//   },
-// });
-
-
-// new code
-// * RootNavigator
-//  *
-//  * Main navigation container that wraps the entire app
-//  * Integrates: StackNavigator, DeepLinking, NavigationService
-//  *
-//  * Now integrated with InitializationOrchestrator for coordinated boot flow:
-//  * - Navigation ready signal is sent to orchestrator
-//  * - Splash screen is controlled by orchestrator
-//  */
-
-import React, { useCallback } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 
 // Import modular navigation
@@ -112,48 +16,59 @@ import { linking } from './deepLinking';
 import { navigationRef } from './NavigationService';
 
 // Import context
-import { AppProvider } from '../contexts/AppContext';
+import { AppProvider, useApp } from '../contexts/AppContext';
 
-// Import initialization orchestrator
-import { getOrchestrator } from '../initialization';
+// Import AdMob service for app open ad
+// @feature:admob:start
+import { adMobService } from '../services/AdMob/AdMobService';
+// @feature:admob:end
 
 /**
- * Root Navigator Component
- *
- * Signals navigation readiness to the orchestrator.
- * Splash screen hiding is now controlled by InitializationOrchestrator.
- */
+ * Root Navigator Component
+ *
+ * Signals navigation readiness to the orchestrator.
+ * Shows App Open ad once on cold start after splash hides.
+ */
 function RootNavigatorContent() {
-  const handleNavigationReady = useCallback(() => {
-    console.log('[RootNavigator] Navigation ready - notifying orchestrator');
+  const { isPremium, onboardingCompleted } = useApp();
+  const hasTriggeredAppOpenAd = useRef(false);
 
-    // Notify orchestrator that navigation is ready
-    // The orchestrator will handle splash screen hiding at the appropriate time
-    getOrchestrator().setNavigationReady();
-  }, []);
+  // Show App Open ad first, then PaywallScreen handles showing paywall after it completes
+  useEffect(() => {
+    if (hasTriggeredAppOpenAd.current) return;
+    hasTriggeredAppOpenAd.current = true;
+    if (!onboardingCompleted) {
+      // @feature:admob:start
+      adMobService.skipAppOpenAd();
+      // @feature:admob:end
+      return;
+    }
+    if (isPremium) return;
+    // @feature:admob:start
+    adMobService.showAppOpenAd();
+    // @feature:admob:end
+  }, [isPremium, onboardingCompleted]);
 
-  return (
-    <NavigationContainer
-      ref={navigationRef}
-      linking={linking as any}
-      onReady={handleNavigationReady}
-
-    >
-      <StackNavigator />
-    </NavigationContainer>
-  );
+  return (
+    <NavigationContainer
+      ref={navigationRef}
+      linking={linking as any}
+    >
+      <StackNavigator />
+    </NavigationContainer>
+  );
 }
 
 /**
- * Root Navigator with Context Provider
- *
- * Wraps navigation with AppProvider for global state
- * Note: PaywallModal uses presentPaywall() API - no component needed
- */
+ * Root Navigator with Context Provider
+ *
+ * Wraps navigation with AppProvider for global state
+ * Note: PaywallModal uses presentPaywall() API - no component needed
+ */
 export default function RootNavigator() {
-  return (
-    <AppProvider>
-      <RootNavigatorContent />
-    </AppProvider>
-  );
+  return (
+    <AppProvider>
+      <RootNavigatorContent />
+    </AppProvider>
+  );
 }

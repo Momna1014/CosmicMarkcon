@@ -1,10 +1,12 @@
 <resources>
     <string name="app_name">Cosmiq</string>
     
-    <!-- Facebook SDK Configuration -->
-    <string name="facebook_app_id">1713793223320140</string>
-    <string name="facebook_client_token">b17cc23beb86c89e4bd75d3cd1ecea89</string>
-    <string name="fb_login_protocol_scheme">fb1713793223320140</string>
+<!-- @feature:facebook-sdk:start -->
+      <!-- Facebook SDK Configuration -->
+      <string name="facebook_app_id">1435269011138143</string>
+      <string name="facebook_client_token">9a70f443d8e35b2f9d5ae111d9c1ccbd</string>
+      <string name="fb_login_protocol_scheme">fb1435269011138143</string>
+<!-- @feature:facebook-sdk:end -->
     
     <!-- Widget Configuration -->
     <string name="widget_description">Display your todo list on the home screen</string>

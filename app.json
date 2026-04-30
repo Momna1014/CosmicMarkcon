@@ -1,4 +1,9 @@
 {
-  "name": "CosmicMarkcon",
-  "displayName": "Cosmiq"
+  "name": "Cosmiq",
+  "displayName": "Cosmiq",
+    "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-3781511156022357~2699873695",
+    "ios_app_id": "ca-app-pub-3781511156022357~2699873695",
+    "delay_app_measurement_init": true
+  }
 }

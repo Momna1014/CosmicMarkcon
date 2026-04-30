@@ -18,6 +18,7 @@ export const useScreenView = (
   params?: Record<string, string | number>
 ) => {
   useEffect(() => {
+    if (!facebookAnalytics.canLog()) return;
     facebookAnalytics.logScreenView(screenName, params);
   }, [screenName]);
 };
@@ -32,6 +33,7 @@ export const useButtonClick = (
   params?: Record<string, string | number>
 ) => {
   return useCallback(async () => {
+    if (!facebookAnalytics.canLog()) return;
     await facebookAnalytics.logButtonClick(buttonName, screenName, params);
   }, [buttonName, screenName, params]);
 };
@@ -43,6 +45,7 @@ export const useButtonClick = (
 export const useNavigationTracking = () => {
   const trackNavigation = useCallback(
     async (screenName: string, params?: Record<string, string | number>) => {
+      if (!facebookAnalytics.canLog()) return;
       await facebookAnalytics.logScreenView(screenName, {
         platform: Platform.OS,
         ...params,
@@ -61,6 +64,7 @@ export const useNavigationTracking = () => {
 export const useFeatureTracking = () => {
   const trackFeature = useCallback(
     async (featureName: string, params?: Record<string, string | number>) => {
+      if (!facebookAnalytics.canLog()) return;
       await facebookAnalytics.logFeatureUsed(featureName, params);
     },
     []
@@ -80,6 +84,7 @@ export const useErrorTracking = () => {
       errorMessage: string,
       params?: Record<string, string | number>
     ) => {
+      if (!facebookAnalytics.canLog()) return;
       await facebookAnalytics.logError(errorCode, errorMessage, params);
     },
     []
@@ -93,6 +98,7 @@ export const useErrorTracking = () => {
  */
 export const useAppLifecycle = () => {
   useEffect(() => {
+    if (!facebookAnalytics.canLog()) return;
     facebookAnalytics.logAppLaunch();
   }, []);
 };

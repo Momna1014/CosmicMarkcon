@@ -1,3 +1,4 @@
+// @feature:facebook-sdk:start
 /**
  * Facebook Analytics Service
  * 
@@ -24,6 +25,10 @@ export enum FacebookEventName {
   INITIATED_CHECKOUT = 'fb_mobile_initiated_checkout',
   PURCHASE = 'fb_mobile_purchase',
   ADD_PAYMENT_INFO = 'fb_mobile_add_payment_info',
+  
+  // Subscription Events (iOS 14+ SKAdNetwork compatible)
+  START_TRIAL = 'fb_mobile_start_trial',       // Critical for trial tracking
+  SUBSCRIBE = 'fb_mobile_subscribe',           // Critical for subscription tracking
   
   // Content Events
   VIEW_CONTENT = 'fb_mobile_content_view',
@@ -77,55 +82,92 @@ export interface PurchaseDetails {
 
 class FacebookAnalyticsService {
   private isInitialized = false;
-  private isEnabled = true;
+  private isEnabled = false;
+  private isAdvertiserTrackingEnabled = false;
+  private consentGranted = false;
 
   /**
    * Initialize Facebook SDK
    * Must be called before any other Facebook SDK methods
+   * 
+   * @param attAuthorized - Whether ATT (App Tracking Transparency) was authorized by user
+   *                        If not provided, defaults to false (privacy-first approach)
    */
-  async initialize(): Promise<void> {
+  async initialize(attAuthorized: boolean = false): Promise<void> {
     try {
+      if (!this.consentGranted) {
+        console.warn('[Facebook] Consent not granted, skipping SDK init');
+        this.isInitialized = false;
+        return;
+      }
+
       console.log('[Facebook] Initializing Facebook SDK...');
-      console.log('[Facebook] 🔑 Configuration:');
-      console.log('[Facebook]   - Platform:', Platform.OS);
-      console.log('[Facebook]   - App ID: (configured in native Info.plist/AndroidManifest)');
+      console.log('[Facebook] ATT Authorization status:', attAuthorized);
       
       // Initialize Facebook SDK
       Settings.initializeSDK();
-      console.log('[Facebook] ✅ SDK initialized');
+      console.log('[Facebook] SDK initialized');
       
       // Enable auto-logging of app events
-      Settings.setAutoLogAppEventsEnabled(true);
-      console.log('[Facebook] Auto-logging enabled');
+      this.isEnabled = this.consentGranted;
+      Settings.setAutoLogAppEventsEnabled(this.isEnabled);
+      console.log(`[Facebook] Auto-logging ${this.isEnabled ? 'enabled' : 'disabled'}`);
       
-      // Enable advertiser tracking (requires ATT permission on iOS)
-      Settings.setAdvertiserTrackingEnabled(true);
-      console.log('[Facebook] Advertiser tracking enabled');
+      // Set advertiser tracking based on ATT authorization status (GDPR/ATT compliance)
+      // Only enable advertiser tracking if user explicitly authorized via ATT
+      const trackingAllowed = this.consentGranted && attAuthorized;
+      this.isAdvertiserTrackingEnabled = trackingAllowed;
+      Settings.setAdvertiserTrackingEnabled(trackingAllowed);
+      console.log(`[Facebook] Advertiser tracking ${trackingAllowed ? 'enabled' : 'disabled'} (based on consent + ATT)`);
       
       // Set data processing options (GDPR compliance)
-      // Skip on iOS due to known issues with some SDK versions
+      // If consent/ATT not granted, limit data processing
       if (Platform.OS === 'android') {
         try {
-          Settings.setDataProcessingOptions([]);
-          console.log('[Facebook] Data processing options set');
+          // Empty array = no restrictions (consent granted)
+          // ['LDU'] = Limited Data Use (consent denied)
+          Settings.setDataProcessingOptions(trackingAllowed ? [] : ['LDU']);
+          console.log(`[Facebook] Data processing options set: ${trackingAllowed ? 'full' : 'LDU (limited)'}`);
         } catch (dataProcessingError) {
           console.warn('[Facebook] Could not set data processing options (non-critical):', dataProcessingError);
         }
       } else {
-        console.log('[Facebook] Skipping data processing options on iOS (known SDK issue)');
+        // iOS - try to set data processing options
+        try {
+          Settings.setDataProcessingOptions(trackingAllowed ? [] : ['LDU']);
+          console.log(`[Facebook] Data processing options set: ${trackingAllowed ? 'full' : 'LDU (limited)'}`);
+        } catch (dataProcessingError) {
+          console.log('[Facebook] Skipping data processing options on iOS (known SDK issue)');
+        }
       }
       
       this.isInitialized = true;
-      console.log('[Facebook] Facebook SDK initialized successfully');
+      console.log('[Facebook] ✅ Facebook SDK initialized successfully');
       
       // Log app launch event
       await this.logAppLaunch();
       
     } catch (error) {
-      console.error('[Facebook] Failed to initialize Facebook SDK:', error);
+      console.error('[Facebook] ❌ Failed to initialize Facebook SDK:', error);
       // Don't throw - mark as not initialized and continue
       this.isInitialized = false;
     }
+  }
+
+  /**
+   * Update advertiser tracking status
+   * Call this when ATT status changes (e.g., after user responds to ATT prompt)
+   */
+  updateAdvertiserTracking(authorized: boolean): void {
+    if (!this.isInitialized) {
+      console.warn('[Facebook] Cannot update advertiser tracking - SDK not initialized');
+      return;
+    }
+
+    const trackingAllowed = this.consentGranted && authorized;
+    this.isAdvertiserTrackingEnabled = trackingAllowed;
+    Settings.setAdvertiserTrackingEnabled(trackingAllowed);
+    console.log(`[Facebook] Advertiser tracking updated: ${trackingAllowed ? 'enabled' : 'disabled'}`);
   }
 
   /**
@@ -136,12 +178,38 @@ class FacebookAnalyticsService {
   }
 
   /**
+   * Set whether consent allows Facebook analytics/ads tracking
+   */
+  setConsentGranted(granted: boolean): void {
+    this.consentGranted = granted;
+    if (!granted) {
+      this.isEnabled = false;
+      if (this.isInitialized) {
+        Settings.setAutoLogAppEventsEnabled(false);
+        Settings.setAdvertiserTrackingEnabled(false);
+      }
+    }
+  }
+
+  /**
+   * Check if events can be logged
+   */
+  canLog(): boolean {
+    return this.isInitialized && this.isEnabled && this.consentGranted;
+  }
+
+  /**
    * Enable or disable Facebook Analytics
    */
   setEnabled(enabled: boolean): void {
-    this.isEnabled = enabled;
-    Settings.setAutoLogAppEventsEnabled(enabled);
-    console.log(`[Facebook] Analytics ${enabled ? 'enabled' : 'disabled'}`);
+    this.isEnabled = enabled && this.consentGranted;
+    if (this.isInitialized) {
+      Settings.setAutoLogAppEventsEnabled(this.isEnabled);
+      if (!this.isEnabled) {
+        Settings.setAdvertiserTrackingEnabled(false);
+      }
+    }
+    console.log(`[Facebook] Analytics ${this.isEnabled ? 'enabled' : 'disabled'}`);
   }
 
   /**
@@ -376,6 +444,68 @@ class FacebookAnalyticsService {
     }
   }
 
+  // ==================== Subscription Events (iOS 14+ SKAdNetwork compatible) ====================
+
+  /**
+   * Log Start Trial event - CRITICAL for iOS 14+ and SKAdNetwork
+   * This is a standard Facebook event that works with Apple's SKAdNetwork
+   * 
+   * @param price - Trial price (usually 0 for free trial)
+   * @param currency - Currency code (e.g., 'USD')
+   * @param predictedLTV - Predicted lifetime value (optional but recommended)
+   * @param params - Additional parameters
+   */
+  async logStartTrial(
+    price: number = 0,
+    currency: string = 'USD',
+    predictedLTV?: number,
+    params?: FacebookEventParams
+  ): Promise<void> {
+    if (!this.isEnabled) return;
+    
+    try {
+      await AppEventsLogger.logEvent(FacebookEventName.START_TRIAL, {
+        fb_currency: currency,
+        _valueToSum: price,
+        ...(predictedLTV !== undefined && { predicted_ltv: predictedLTV }),
+        ...params,
+      });
+      console.log(`[Facebook] 🎯 Start Trial logged: ${price} ${currency}`);
+    } catch (error) {
+      console.error('[Facebook] Failed to log start trial:', error);
+    }
+  }
+
+  /**
+   * Log Subscribe event - CRITICAL for iOS 14+ and SKAdNetwork
+   * This is a standard Facebook event for subscription conversions
+   * 
+   * @param price - Subscription price
+   * @param currency - Currency code (e.g., 'USD')
+   * @param predictedLTV - Predicted lifetime value (optional but recommended)
+   * @param params - Additional parameters
+   */
+  async logSubscribe(
+    price: number,
+    currency: string = 'USD',
+    predictedLTV?: number,
+    params?: FacebookEventParams
+  ): Promise<void> {
+    if (!this.isEnabled) return;
+    
+    try {
+      await AppEventsLogger.logEvent(FacebookEventName.SUBSCRIBE, {
+        fb_currency: currency,
+        _valueToSum: price,
+        ...(predictedLTV !== undefined && { predicted_ltv: predictedLTV }),
+        ...params,
+      });
+      console.log(`[Facebook] 🎯 Subscribe logged: ${price} ${currency}`);
+    } catch (error) {
+      console.error('[Facebook] Failed to log subscribe:', error);
+    }
+  }
+
   // ==================== Custom Events ====================
 
   /**
@@ -556,3 +686,4 @@ class FacebookAnalyticsService {
 // Export singleton instance
 export const facebookAnalytics = new FacebookAnalyticsService();
 export default facebookAnalytics;
+// @feature:facebook-sdk:end

@@ -384,6 +384,27 @@ export const PaywallScreen: React.FC = () => {
     try {
       setBillingStatus('loading');
       console.log('[PaywallScreen] 🔍 Checking billing availability...');
+
+      // Wait for RevenueCat SDK to finish configuring (deferred init in startApp).
+      // On a fresh install everything is already configured by the time the
+      // user reaches this screen, but on a hot refresh the navigator can
+      // restore Paywall before deferred SDKs finish — without this gate,
+      // getOfferings() throws "There is no singleton instance".
+      if (!revenueCatService.getInitializationStatus()) {
+        console.log('[PaywallScreen] ⏳ RevenueCat not initialized yet, waiting...');
+        const ready = await revenueCatService.waitForInitialization(10000);
+        if (!ready) {
+          console.warn('[PaywallScreen] ⚠️ RevenueCat still not initialized, attempting fallback init');
+          try {
+            await revenueCatService.initialize(undefined, { enableAttribution: false });
+          } catch (fallbackError) {
+            console.error('[PaywallScreen] ❌ RevenueCat fallback init failed:', fallbackError);
+            setBillingStatus('unavailable');
+            return;
+          }
+        }
+      }
+
       const offerings = await revenueCatService.getOfferings();
       if (offerings?.current) {
         console.log('[PaywallScreen] ✅ Billing available, offerings loaded');
@@ -674,35 +695,35 @@ export const PaywallScreen: React.FC = () => {
   }
 
   // Billing unavailable - show fallback UI instead of broken RevenueCat paywall
-  if (billingStatus === 'unavailable') {
-    return (
-      <View style={[styles.container, styles.fallbackContainer,
-        needsAndroidTopPadding && { paddingTop: insets.top || StatusBar.currentHeight || 24 }
-      ]}>
-        {/* Cross button - same behavior as paywall dismiss */}
-        {/* <TouchableOpacity
-          style={[styles.crossButton, { top: (insets.top || StatusBar.currentHeight || 44) + 10 }]}
-          onPress={navigateBack}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <Text style={styles.crossButtonText}>{'✕'}</Text>
-        </TouchableOpacity> */}
+  // if (billingStatus === 'unavailable') {
+  //   return (
+  //     <View style={[styles.container, styles.fallbackContainer,
+  //       needsAndroidTopPadding && { paddingTop: insets.top || StatusBar.currentHeight || 24 }
+  //     ]}>
+  //       {/* Cross button - same behavior as paywall dismiss */}
+  //       {/* <TouchableOpacity
+  //         style={[styles.crossButton, { top: (insets.top || StatusBar.currentHeight || 44) + 10 }]}
+  //         onPress={navigateBack}
+  //         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+  //       >
+  //         <Text style={styles.crossButtonText}>{'✕'}</Text>
+  //       </TouchableOpacity> */}
 
-        <View style={styles.fallbackContent}>
-          <Text style={styles.fallbackIcon}>{'🛒'}</Text>
-          <Text style={styles.fallbackTitle}>Store Unavailable</Text>
-          <Text style={styles.fallbackMessage}>
-            {Platform.OS === 'android'
-              ? 'We couldn\'t connect to Google Play. Please make sure your Google Play account is signed in and try again.'
-              : 'We couldn\'t connect to the App Store. Please make sure your App Store account is signed in and try again.'}
-          </Text>
-          <TouchableOpacity style={styles.retryButton} onPress={checkBillingAvailability}>
-            <Text style={styles.retryButtonText}>Try Again</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
+  //       <View style={styles.fallbackContent}>
+  //         <Text style={styles.fallbackIcon}>{'🛒'}</Text>
+  //         <Text style={styles.fallbackTitle}>Store Unavailable</Text>
+  //         <Text style={styles.fallbackMessage}>
+  //           {Platform.OS === 'android'
+  //             ? 'We couldn\'t connect to Google Play. Please make sure your Google Play account is signed in and try again.'
+  //             : 'We couldn\'t connect to the App Store. Please make sure your App Store account is signed in and try again.'}
+  //         </Text>
+  //         <TouchableOpacity style={styles.retryButton} onPress={checkBillingAvailability}>
+  //           <Text style={styles.retryButtonText}>Try Again</Text>
+  //         </TouchableOpacity>
+  //       </View>
+  //     </View>
+  //   );
+  // }
 
   // Billing available - render the actual RevenueCat paywall
   return (

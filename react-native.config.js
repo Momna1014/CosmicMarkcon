@@ -3,8 +3,6 @@ module.exports = {
     ios: {},
     android: {},
   },
-  assets: [
-    './src/assets/fonts/',
-    './src/assets/fonts/inter/',
-  ],
+  // assets: ['./assets/fonts/'], // Root level assets directory
+ assets: ['./src/assets/fonts/'], // New source
 };

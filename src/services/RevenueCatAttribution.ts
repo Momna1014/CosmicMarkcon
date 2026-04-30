@@ -5,16 +5,38 @@
  */
 
 import Purchases from 'react-native-purchases';
-import appsFlyer from 'react-native-appsflyer';
+// @feature:appsflyer:start [disabled]
+// import appsFlyer from 'react-native-appsflyer'; // AppsFlyer disabled - not currently in use
+// @feature:appsflyer:end
+// @feature:adjust:start
+import { Adjust } from 'react-native-adjust';
+// @feature:adjust:end
 import { Platform } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
+
+// Track if attribution has already been set to avoid duplicate calls
+let attributionSetupComplete = false;
+let fbAnonIdSet = false;
+// @feature:adjust:start
+let adjustIdSet = false;
+// @feature:adjust:end
+// @feature:appsflyer:start [disabled]
+// let appsFlyerIdSet = false; // AppsFlyer disabled - not currently in use
+// @feature:appsflyer:end
 
 /**
  * Set all attribution network IDs in RevenueCat
  * This should be called after ATT permission is granted
+ * Safe to call multiple times - will skip if already set
  */
 export const setRevenueCatAttribution = async (): Promise<void> => {
   try {
+    // Skip if already completed
+    if (attributionSetupComplete) {
+      console.log('⏭️ [RevenueCat Attribution] Attribution already set, skipping...');
+      return;
+    }
+
     console.log('🔍 [RevenueCat Attribution] Starting attribution setup...');
 
     // Check if RevenueCat is configured
@@ -29,12 +51,20 @@ export const setRevenueCatAttribution = async (): Promise<void> => {
     // Set device identifiers
     await setDeviceIdentifiers();
 
-    // Set AppsFlyer ID
-    await setAppsFlyerAttribution();
+    // Set Adjust ID (only if not already set)
+    // @feature:adjust:start
+    await setAdjustAttribution();
+    // @feature:adjust:end
 
-    // Set Facebook Anonymous ID (if available)
+    // Set AppsFlyer ID (only if not already set)
+    // @feature:appsflyer:start [disabled]
+    // await setAppsFlyerAttribution(); // AppsFlyer disabled - not currently in use
+    // @feature:appsflyer:end
+
+    // Set Facebook Anonymous ID (only if not already set)
     await setFacebookAttribution();
 
+    attributionSetupComplete = true;
     console.log('✅ [RevenueCat Attribution] Attribution setup completed');
   } catch (error) {
     console.error(
@@ -62,77 +92,124 @@ const setDeviceIdentifiers = async (): Promise<void> => {
   }
 };
 
+// ===========================================================================
+// Adjust Attribution
+// ===========================================================================
+// @feature:adjust:start
 /**
- * Set AppsFlyer ID in RevenueCat
- * Uses the same pattern as Noorly project
+ * Set Adjust device ID in RevenueCat.
+ * The adid may not be available immediately after Adjust.initSdk() — it requires
+ * a round-trip to Adjust servers. This function tries once; the main bridge
+ * happens in setupAdjust.ts via setAttributionCallback which fires when
+ * attribution data (and adid) become available.
  */
-const setAppsFlyerAttribution = async (): Promise<void> => {
+const setAdjustAttribution = async (): Promise<void> => {
+  if (adjustIdSet) {
+    console.log('⏭️ [RevenueCat Attribution] Adjust ID already set, skipping...');
+    return;
+  }
+
   try {
-    // Get AppsFlyer UID using Promise wrapper (matches Noorly implementation)
-    const getAppsFlyerUIDPromise = (): Promise<string> => {
-      return new Promise((resolve, reject) => {
-        appsFlyer.getAppsFlyerUID((error, uid) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(uid || '');
-          }
-        });
-      });
-    };
+    const adid = await new Promise<string | null>((resolve) => {
+      Adjust.getAdid((id) => resolve(id));
+    });
 
-    const appsFlyerUID = await getAppsFlyerUIDPromise();
-
-    if (appsFlyerUID) {
-      // Set as attribute (matches Noorly: uses $appsflyerId with dollar sign)
-      await Purchases.setAttributes({
-        $appsflyerId: appsFlyerUID,
-      });
-      console.log(
-        `✅ [RevenueCat Attribution] AppsFlyer ID set: ${appsFlyerUID}`
-      );
+    if (adid) {
+      await Purchases.setAdjustID(adid);
+      adjustIdSet = true;
+      console.log(`✅ [RevenueCat Attribution] Adjust ID set: ${adid}`);
     } else {
       console.log(
-        '⚠️ [RevenueCat Attribution] AppsFlyer UID not available yet'
+        '⚠️ [RevenueCat Attribution] Adjust ID not available yet (will be set via attribution callback)'
       );
     }
-
-    // Listen for conversion data
-    appsFlyer.onInstallConversionData((data) => {
-      console.log(
-        '📊 [RevenueCat Attribution] AppsFlyer conversion data:',
-        data
-      );
-
-      // Set attribution data as attributes
-      if (data && data.data) {
-        const conversionData = data.data;
-        Purchases.setAttributes({
-          $mediaSource: conversionData.media_source || 'organic',
-          $campaign: conversionData.campaign || '',
-          $adGroup: conversionData.adgroup || '',
-          $ad: conversionData.ad_id || '',
-        }).catch((error) => {
-          console.error(
-            '❌ [RevenueCat Attribution] Error setting AppsFlyer attributes:',
-            error
-          );
-        });
-      }
-    });
   } catch (error) {
     console.error(
-      '❌ [RevenueCat Attribution] Error setting AppsFlyer ID:',
+      '❌ [RevenueCat Attribution] Error setting Adjust ID:',
       error
     );
   }
 };
+// @feature:adjust:end
+
+// ===========================================================================
+// @feature:appsflyer:start [disabled]
+// /**
+ // * Set AppsFlyer ID in RevenueCat
+ // * Uses the same pattern as Noorly project
+ // * Safe to call multiple times - will skip if already set
+ // */
+// const setAppsFlyerAttribution = async (): Promise<void> => {
+  // // Skip if already set
+  // if (appsFlyerIdSet) {
+    // console.log('⏭️ [RevenueCat Attribution] AppsFlyer ID already set, skipping...');
+    // return;
+  // }
+
+  // try {
+    // // Get AppsFlyer UID using Promise wrapper
+    // const getAppsFlyerUIDPromise = (): Promise<string> => {
+      // return new Promise((resolve, reject) => {
+        // appsFlyer.getAppsFlyerUID((error, uid) => {
+          // if (error) {
+            // reject(error);
+          // } else {
+            // resolve(uid || '');
+          // }
+        // });
+      // });
+    // };
+
+    // const appsFlyerUID = await getAppsFlyerUIDPromise();
+
+    // if (appsFlyerUID) {
+      // // Set as attribute ($appsflyerId with dollar sign)
+      // await Purchases.setAttributes({
+        // $appsflyerId: appsFlyerUID,
+      // });
+      // appsFlyerIdSet = true;
+      // console.log(`✅ [RevenueCat Attribution] AppsFlyer ID set: ${appsFlyerUID}`);
+    // } else {
+      // console.log('⚠️ [RevenueCat Attribution] AppsFlyer UID not available yet');
+    // }
+
+    // // Listen for conversion data (only set up listener once)
+    // appsFlyer.onInstallConversionData((data) => {
+      // console.log('📊 [RevenueCat Attribution] AppsFlyer conversion data:', data);
+      // if (data && data.data) {
+        // const conversionData = data.data;
+        // Purchases.setAttributes({
+          // $mediaSource: conversionData.media_source || 'organic',
+          // $campaign: conversionData.campaign || '',
+          // $adGroup: conversionData.adgroup || '',
+          // $ad: conversionData.ad_id || '',
+        // }).catch((error) => {
+          // console.error('❌ [RevenueCat Attribution] Error setting AppsFlyer attributes:', error);
+        // });
+      // }
+    // });
+  // } catch (error) {
+    // console.error('❌ [RevenueCat Attribution] Error setting AppsFlyer ID:', error);
+  // }
+// };
+// @feature:appsflyer:end
+// ===========================================================================
 
 /**
  * Set Facebook Anonymous ID in RevenueCat
  * Uses the same pattern as Noorly project
+ * Safe to call multiple times - will skip if already set
+ * 
+ * IMPORTANT: Facebook Anonymous ID cannot be modified once set in RevenueCat.
+ * This is a RevenueCat limitation - the $fbAnonId attribute is immutable.
  */
 const setFacebookAttribution = async (): Promise<void> => {
+  // Skip if already set - Facebook Anonymous ID cannot be modified once set
+  if (fbAnonIdSet) {
+    console.log('⏭️ [RevenueCat Attribution] Facebook Anonymous ID already set, skipping...');
+    return;
+  }
+
   try {
     // Get Facebook Anonymous ID (matches Noorly implementation)
     const { AppEventsLogger } = await import('react-native-fbsdk-next');
@@ -141,6 +218,7 @@ const setFacebookAttribution = async (): Promise<void> => {
     if (anonymousId) {
       // Set Facebook Anonymous ID in RevenueCat (matches Noorly)
       await Purchases.setFBAnonymousID(anonymousId);
+      fbAnonIdSet = true; // Mark as set to prevent future calls
       console.log(
         `✅ [RevenueCat Attribution] Facebook Anonymous ID set: ${anonymousId}`
       );
@@ -149,11 +227,18 @@ const setFacebookAttribution = async (): Promise<void> => {
         '⚠️ [RevenueCat Attribution] Facebook Anonymous ID not available'
       );
     }
-  } catch (error) {
-    console.error(
-      '❌ [RevenueCat Attribution] Error setting Facebook attribution:',
-      error
-    );
+  } catch (error: any) {
+    // If error is about ID already being set, mark as set to prevent retries
+    if (error?.message?.includes('cannot be modified') || 
+        error?.message?.includes('already set')) {
+      fbAnonIdSet = true;
+      console.log('⚠️ [RevenueCat Attribution] Facebook Anonymous ID already set on server');
+    } else {
+      console.error(
+        '❌ [RevenueCat Attribution] Error setting Facebook attribution:',
+        error
+      );
+    }
   }
 };
 

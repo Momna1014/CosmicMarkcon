@@ -105,7 +105,6 @@ const AnimatedOptionRow: React.FC<AnimatedOptionRowProps> = ({
           {isSelected && <View style={styles.radioCircleInner} />}
         </View>
 
-        {/* Label */}
         <Text
           style={[
             styles.optionLabel,
@@ -114,7 +113,6 @@ const AnimatedOptionRow: React.FC<AnimatedOptionRowProps> = ({
           {option.label}
         </Text>
 
-        {/* Icon on the right */}
         {option.SvgIcon && <option.SvgIcon width={ICON_SIZE} height={ICON_SIZE} />}
       </TouchableOpacity>
     </Animated.View>
@@ -181,7 +179,6 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
         />
 
         <View style={styles.content}>
-          {/* Header: Back + Progress Bar + Step Counter */}
           <Animated.View
             entering={FadeIn.delay(100).duration(400)}
             style={styles.header}>
@@ -189,7 +186,8 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
               style={styles.backButton}
               onPress={handleBack}
               activeOpacity={0.7}
-              hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+              hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+              >
               <BackArrowIcon width={moderateScale(24)} height={moderateScale(24)} />
             </TouchableOpacity>
 
@@ -204,37 +202,33 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
             <Text style={styles.stepCounter}>{CURRENT_STEP}/{TOTAL_STEPS}</Text>
           </Animated.View>
 
-          {/* Main Heading - Centered */}
           <Animated.Text
             entering={FadeInDown.delay(200).duration(600).springify()}
             style={styles.mainHeading}>
             What are you{'\n'}seeking right now?
           </Animated.Text>
 
-          {/* Sub Heading - Centered */}
           <Animated.Text
             entering={FadeInDown.delay(350).duration(600).springify()}
             style={styles.subHeading}>
             Choose what resonates. We'll shape{'\n'}your experience around it.
           </Animated.Text>
 
-          {/* Options List */}
           <ScrollView
             style={styles.scrollView}
             contentContainerStyle={styles.optionsList}
             showsVerticalScrollIndicator={false}>
-            {SEEKING_OPTIONS.map((option, index) => (
+            {SEEKING_OPTIONS?.map((option, index) => (
               <AnimatedOptionRow
-                key={option.id}
+                key={option?.id}
                 option={option}
-                isSelected={selectedOptions.includes(option.id)}
-                onPress={() => handleOptionToggle(option.id)}
+                isSelected={selectedOptions.includes(option?.id)}
+                onPress={() => handleOptionToggle(option?.id)}
                 index={index}
               />
             ))}
           </ScrollView>
 
-          {/* Continue Button */}
           <Animated.View
             entering={FadeIn.delay(500).duration(400)}
             style={styles.bottomSection}>

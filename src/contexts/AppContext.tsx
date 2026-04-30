@@ -3,38 +3,38 @@
  * 
  * Global state management for:
  * - Onboarding completion status
- * - Initial paywall completion status (tracks if user completed first paywall flow)
  * - Subscription/Premium status (synced with RevenueCat)
  * - Other app-wide state
+ * 
+ * Uses MMKV SyncStorage for instant loading - no async delays!
  */
 
 import React, {createContext, useContext, useState, useEffect, ReactNode} from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SyncStorage, TypedStorage } from '../redux/storage';
 import {revenueCatService, CustomerInfo} from '../services/RevenueCatService';
+// @feature:admob:start
+import { adMobService } from '../services/AdMob/AdMobService';
+// @feature:admob:end
+import firebaseService from '../services/firebase/FirebaseService';
+import { trackTrialEnded } from '../utils/paywallAnalytics';
 
 const ONBOARDING_KEY = '@app_onboarding_completed';
 const SUBSCRIPTION_KEY = '@app_subscription_status';
-const INITIAL_PAYWALL_KEY = '@app_initial_paywall_completed';
+const TRIAL_STATUS_KEY = '@app_trial_status';
+const TRIAL_DAYS_KEY = '@app_trial_days';
 
 interface AppContextType {
   // Onboarding
   onboardingCompleted: boolean;
-  setOnboardingCompleted: (completed: boolean) => Promise<void>;
-  
-  // Initial Paywall tracking
-  initialPaywallCompleted: boolean;
-  setInitialPaywallCompleted: (completed: boolean) => Promise<void>;
+  setOnboardingCompleted: (completed: boolean) => void;
   
   // Subscription
   isPremium: boolean;
-  setIsPremium: (premium: boolean) => Promise<void>;
-  refreshSubscriptionStatus: () => Promise<void>;
+  setIsPremium: (premium: boolean) => void;
+  refreshSubscriptionStatus: () => Promise<boolean>;
   
   // Loading state
   isLoading: boolean;
-  
-  // Helper to check if should show paywall on launch
-  shouldShowInitialPaywall: boolean;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -44,16 +44,81 @@ interface AppProviderProps {
 }
 
 export const AppProvider: React.FC<AppProviderProps> = ({children}) => {
-  const [onboardingCompleted, setOnboardingCompletedState] = useState(false);
-  const [initialPaywallCompleted, setInitialPaywallCompletedState] = useState(false);
-  const [isPremium, setIsPremiumState] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  // Initialize state SYNCHRONOUSLY from MMKV for instant UI
+  const [onboardingCompleted, setOnboardingCompletedState] = useState(() => {
+    return TypedStorage.getBoolean(ONBOARDING_KEY) ?? false;
+  });
+  const [isPremium, setIsPremiumState] = useState(() => {
+    const cachedValue = TypedStorage.getBoolean(SUBSCRIPTION_KEY) ?? false;
+    console.log('[AppContext] Initial isPremium from cache:', cachedValue);
+    return cachedValue;
+  });
+  const [isLoading, setIsLoading] = useState(false); // No loading needed - sync storage!
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Load persisted state and initialize RevenueCat on mount
   useEffect(() => {
-    initializeApp();
+    let isCancelled = false;
+    let elapsedMs = 0;
+    const pollIntervalMs = 250;
+    const pollTimeoutMs = 30000;
+    let pollTimer: ReturnType<typeof setInterval> | null = null;
+
+    const onRevenueCatReady = () => {
+      if (isCancelled) {
+        return;
+      }
+
+      setIsInitialized(true);
+      refreshSubscriptionStatus().catch(error => {
+        console.error('[AppContext] Failed to refresh subscription status:', error);
+      });
+    };
+
+    if (revenueCatService.getInitializationStatus()) {
+      onRevenueCatReady();
+    } else {
+      pollTimer = setInterval(() => {
+        elapsedMs += pollIntervalMs;
+
+        if (revenueCatService.getInitializationStatus()) {
+          if (pollTimer) {
+            clearInterval(pollTimer);
+            pollTimer = null;
+          }
+          onRevenueCatReady();
+          return;
+        }
+
+        if (elapsedMs >= pollTimeoutMs) {
+          if (pollTimer) {
+            clearInterval(pollTimer);
+            pollTimer = null;
+          }
+          console.warn('[AppContext] RevenueCat initialization not ready within polling window');
+        }
+      }, pollIntervalMs);
+    }
+
+    return () => {
+      isCancelled = true;
+      if (pollTimer) {
+        clearInterval(pollTimer);
+      }
+    };
   }, []);
+
+  // Sync isPremium to AdMob service and Firebase user property whenever it changes
+  useEffect(() => {
+    // @feature:admob:start
+    adMobService.setIsPremium(isPremium);
+    // @feature:admob:end
+    if (firebaseService.isAnalyticsEnabled()) {
+      firebaseService.setUserProperty(
+        'subscription_status',
+        isPremium ? 'premium' : 'free',
+      );
+    }
+  }, [isPremium]);
 
   // Listen for RevenueCat customer info updates
   useEffect(() => {
@@ -61,91 +126,53 @@ export const AppProvider: React.FC<AppProviderProps> = ({children}) => {
 
     const handleCustomerInfoUpdate = (customerInfo: CustomerInfo) => {
       const premiumStatus = revenueCatService.isPremium(customerInfo);
-      console.log('[AppContext] 💰 Customer info updated, isPremium:', premiumStatus);
-      setIsPremiumState(premiumStatus);
-      
-      // If user becomes premium, mark initial paywall as completed
-      if (premiumStatus) {
-        console.log('[AppContext] ✅ User is premium - marking initial paywall as completed');
-        setInitialPaywallCompletedState(true);
-        AsyncStorage.setItem(INITIAL_PAYWALL_KEY, JSON.stringify(true)).catch(err =>
-          console.error('[AppContext] Failed to save initial paywall status:', err)
-        );
+      console.log('[AppContext] 📢 Customer info update received, isPremium:', premiumStatus);
+
+      // Detect trial_ended: was on trial, now either converted or expired
+      const wasTrial = TypedStorage.getBoolean(TRIAL_STATUS_KEY) ?? false;
+      const entitlements = customerInfo.entitlements?.active || {};
+      const premiumEntitlement = entitlements.premium || entitlements.Premium || Object.values(entitlements)[0];
+      const isCurrentlyTrial = premiumEntitlement?.periodType === 'TRIAL';
+
+      if (wasTrial && !isCurrentlyTrial) {
+        const activeSubscription = customerInfo.activeSubscriptions?.[0] || 'unknown';
+        const reason = premiumStatus ? 'converted' : 'expired';
+        const trialDays = TypedStorage.getNumber(TRIAL_DAYS_KEY) ?? 0;
+        trackTrialEnded({ productId: activeSubscription, reason, trialDays });
+        console.log(`[AppContext] 📊 Trial ended: ${reason}`);
       }
-      
-      // Also persist to AsyncStorage for offline access
-      AsyncStorage.setItem(SUBSCRIPTION_KEY, JSON.stringify(premiumStatus)).catch(err =>
-        console.error('[AppContext] Failed to save premium status:', err)
-      );
+
+      // Persist current trial status
+      TypedStorage.setBoolean(TRIAL_STATUS_KEY, isCurrentlyTrial);
+
+      setIsPremiumState(premiumStatus);
+      // Persist to MMKV storage (sync - instant!)
+      TypedStorage.setBoolean(SUBSCRIPTION_KEY, premiumStatus);
+      console.log('[AppContext] ✅ Premium status persisted to storage:', premiumStatus);
     };
 
+    console.log('[AppContext] Adding RevenueCat customer info listener');
     revenueCatService.addCustomerInfoUpdateListener(handleCustomerInfoUpdate);
 
-    // Cleanup not needed as RevenueCat manages this
-    return () => {};
+    // Note: RevenueCat SDK doesn't provide a removeListener method
+    // The listener is managed internally by the SDK
+    return () => {
+      console.log('[AppContext] Customer info listener cleanup (SDK manages lifecycle)');
+    };
   }, [isInitialized]);
 
-  const initializeApp = async () => {
+  const refreshSubscriptionStatus = async (): Promise<boolean> => {
     try {
-      console.log('[AppContext] 🚀 Initializing app state...');
-      
-      // Load persisted onboarding status immediately
-      const onboardingValue = await AsyncStorage.getItem(ONBOARDING_KEY);
-      if (onboardingValue !== null) {
-        const parsed = JSON.parse(onboardingValue);
-        setOnboardingCompletedState(parsed);
-        console.log('[AppContext] 📋 Loaded onboardingCompleted:', parsed);
+      if (!revenueCatService.getInitializationStatus()) {
+        console.log('[AppContext] RevenueCat not initialized, using cached status');
+        return isPremium;
       }
 
-      // Load cached initial paywall status
-      const initialPaywallValue = await AsyncStorage.getItem(INITIAL_PAYWALL_KEY);
-      if (initialPaywallValue !== null) {
-        const parsed = JSON.parse(initialPaywallValue);
-        setInitialPaywallCompletedState(parsed);
-        console.log('[AppContext] 📋 Loaded initialPaywallCompleted:', parsed);
-      }
-
-      // Load cached subscription status for immediate display
-      const cachedSubscription = await AsyncStorage.getItem(SUBSCRIPTION_KEY);
-      if (cachedSubscription !== null) {
-        const parsed = JSON.parse(cachedSubscription);
-        setIsPremiumState(parsed);
-        console.log('[AppContext] 📋 Loaded isPremium (cached):', parsed);
-      }
-
-      // Mark loading as complete - this allows the app to show immediately
-      setIsLoading(false);
-      console.log('[AppContext] ✅ App state loaded, isLoading: false');
-
-      // Initialize RevenueCat in the background after splash is hidden
-      // This prevents blocking the initial render
-      setTimeout(async () => {
-        try {
-          console.log('[AppContext] 🔄 Initializing RevenueCat in background...');
-          await revenueCatService.initialize();
-          setIsInitialized(true);
-          console.log('[AppContext] ✅ RevenueCat initialized');
-
-          // Refresh subscription status from RevenueCat
-          await refreshSubscriptionStatus();
-        } catch (error) {
-          console.error('[AppContext] ❌ Failed to initialize RevenueCat:', error);
-          // Continue with cached data if RevenueCat fails
-        }
-      }, 100); // Small delay to let splash screen hide first
-
-    } catch (error) {
-      console.error('[AppContext] ❌ Failed to initialize app:', error);
-      setIsLoading(false);
-    }
-  };
-
-  const refreshSubscriptionStatus = async () => {
-    try {
+      console.log('[AppContext] Refreshing subscription status from RevenueCat...');
       const customerInfo = await revenueCatService.getCustomerInfo();
       const premiumStatus = revenueCatService.isPremium(customerInfo);
       
-      console.log('[AppContext] Subscription status:', {
+      console.log('[AppContext] Subscription status refreshed:', {
         isPremium: premiumStatus,
         activeSubscriptions: customerInfo.activeSubscriptions,
         entitlements: Object.keys(customerInfo.entitlements.active),
@@ -153,66 +180,44 @@ export const AppProvider: React.FC<AppProviderProps> = ({children}) => {
 
       setIsPremiumState(premiumStatus);
       
-      // Persist to AsyncStorage
-      await AsyncStorage.setItem(SUBSCRIPTION_KEY, JSON.stringify(premiumStatus));
+      // Persist to MMKV storage (sync - instant!)
+      TypedStorage.setBoolean(SUBSCRIPTION_KEY, premiumStatus);
+      
+      return premiumStatus;
     } catch (error) {
       console.error('[AppContext] Failed to refresh subscription status:', error);
+      // Return current cached value on error
+      return isPremium;
     }
   };
 
-  const setOnboardingCompleted = async (completed: boolean) => {
+  const setOnboardingCompleted = (completed: boolean) => {
     try {
-      await AsyncStorage.setItem(ONBOARDING_KEY, JSON.stringify(completed));
+      TypedStorage.setBoolean(ONBOARDING_KEY, completed);
       setOnboardingCompletedState(completed);
-      console.log('[AppContext] 📋 Onboarding completed status saved:', completed);
+      console.log('Onboarding completed status saved:', completed);
     } catch (error) {
-      console.error('[AppContext] ❌ Failed to save onboarding status:', error);
+      console.error('Failed to save onboarding status:', error);
     }
   };
 
-  const setInitialPaywallCompleted = async (completed: boolean) => {
+  const setIsPremium = (premium: boolean) => {
     try {
-      await AsyncStorage.setItem(INITIAL_PAYWALL_KEY, JSON.stringify(completed));
-      setInitialPaywallCompletedState(completed);
-      console.log('[AppContext] 📋 Initial paywall completed status saved:', completed);
-    } catch (error) {
-      console.error('[AppContext] ❌ Failed to save initial paywall status:', error);
-    }
-  };
-
-  const setIsPremium = async (premium: boolean) => {
-    try {
-      await AsyncStorage.setItem(SUBSCRIPTION_KEY, JSON.stringify(premium));
+      TypedStorage.setBoolean(SUBSCRIPTION_KEY, premium);
       setIsPremiumState(premium);
-      console.log('[AppContext] 💰 Premium status manually set:', premium);
+      console.log('[AppContext] Premium status manually set:', premium);
     } catch (error) {
-      console.error('[AppContext] ❌ Failed to save premium status:', error);
+      console.error('[AppContext] Failed to save premium status:', error);
     }
   };
-
-  // Helper to determine if we should show the initial paywall on app launch
-  // Show paywall if: onboarding is complete AND user is NOT premium
-  // Note: We show paywall again even for cancelled subscribers to encourage re-subscription
-  const shouldShowInitialPaywall = onboardingCompleted && !isPremium;
-
-  // Debug log for paywall decision
-  console.log('[AppContext] 🎯 Paywall decision:', {
-    onboardingCompleted,
-    initialPaywallCompleted,
-    isPremium,
-    shouldShowInitialPaywall,
-  });
 
   const value: AppContextType = {
     onboardingCompleted,
     setOnboardingCompleted,
-    initialPaywallCompleted,
-    setInitialPaywallCompleted,
     isPremium,
     setIsPremium,
     refreshSubscriptionStatus,
     isLoading,
-    shouldShowInitialPaywall,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
@@ -232,12 +237,13 @@ export const useApp = (): AppContextType => {
 /**
  * Reset all persisted state (useful for testing/debugging)
  */
-export const resetAppState = async () => {
+export const resetAppState = () => {
   try {
-    await AsyncStorage.multiRemove([ONBOARDING_KEY, SUBSCRIPTION_KEY, INITIAL_PAYWALL_KEY]);
-    console.log('[AppContext] 🗑️ App state reset successfully');
+    SyncStorage.removeItem(ONBOARDING_KEY);
+    SyncStorage.removeItem(SUBSCRIPTION_KEY);
+    console.log('App state reset successfully');
   } catch (error) {
-    console.error('[AppContext] ❌ Failed to reset app state:', error);
+    console.error('Failed to reset app state:', error);
   }
 };
 

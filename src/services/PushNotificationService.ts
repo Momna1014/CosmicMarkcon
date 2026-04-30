@@ -1,3 +1,4 @@
+// @feature:firebase-messaging:start
 /**
  * Push Notification Service - Firebase Cloud Messaging
  * 
@@ -40,11 +41,6 @@ class PushNotificationService {
         authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
         authStatus === messaging.AuthorizationStatus.PROVISIONAL
       ) {
-        // Register for remote messages on iOS (must be done before getting token)
-        if (Platform.OS === 'ios') {
-          await this.registerForRemoteNotifications();
-        }
-
         // Get FCM token
         await this.getFCMToken();
 
@@ -55,8 +51,6 @@ class PushNotificationService {
         this.setupTokenRefreshListener();
       } else {
         console.log('[PushNotificationService] Permissions not granted yet - skipping token fetch');
-        // Still set up message handlers for when permission is granted later
-        this.setupMessageHandlers();
       }
 
       this.initialized = true;
@@ -88,33 +82,21 @@ class PushNotificationService {
     try {
       // Check if token already exists
       if (this.fcmToken) {
-        console.log('[PushNotificationService] Using cached FCM token');
         return this.fcmToken;
       }
 
-      // On iOS, we must register for remote messages FIRST
+      // On iOS, FCM requires the APNs token to be set first.
+      // On a fresh install the APNs token usually arrives by the time we get
+      // here; on a refresh it may not be ready yet (especially in dev builds
+      // without the Push Notifications capability). Poll for up to ~5s and
+      // bail out gracefully instead of throwing if it never arrives.
       if (Platform.OS === 'ios') {
-        console.log('[PushNotificationService] iOS: Registering for remote messages...');
-        await messaging().registerDeviceForRemoteMessages();
-        console.log('[PushNotificationService] iOS: Registered for remote messages');
-        
-        // Wait a bit for APNs registration to complete
-        await new Promise<void>(resolve => setTimeout(() => resolve(), 500));
-        
-        // Now get APNs token
-        const apnsToken = await messaging().getAPNSToken();
+        const apnsToken = await this.waitForAPNSToken(5000, 250);
         if (!apnsToken) {
-          console.warn('[PushNotificationService] APNs token not available yet, waiting...');
-          // Wait a bit more and try again
-          await new Promise<void>(resolve => setTimeout(() => resolve(), 1000));
-          const retryApnsToken = await messaging().getAPNSToken();
-          if (!retryApnsToken) {
-            console.warn('[PushNotificationService] APNs token still not available');
-          } else {
-            console.log('[PushNotificationService] APNs token obtained on retry');
-          }
-        } else {
-          console.log('[PushNotificationService] APNs token obtained');
+          console.warn(
+            '[PushNotificationService] APNs token not available — skipping FCM token fetch. Local notifications still work.',
+          );
+          return null;
         }
       }
 
@@ -122,7 +104,6 @@ class PushNotificationService {
       const token = await messaging().getToken();
       this.fcmToken = token;
 
-      console.log('[PushNotificationService] FCM Token obtained:', token ? 'Yes' : 'No');
       console.log('[PushNotificationService] FCM Token:', token);
 
       // TODO: Send token to your server
@@ -131,9 +112,32 @@ class PushNotificationService {
       return token;
     } catch (error) {
       console.error('[PushNotificationService] Failed to get FCM token:', error);
-      // Don't throw - just return null to not block the flow
+      // Don't throw — push isn't critical, local notifications still work.
       return null;
     }
+  }
+
+  /**
+   * Poll for the iOS APNs token until it becomes available or we time out.
+   * Returns the token string or null if it never arrives.
+   */
+  private async waitForAPNSToken(
+    timeoutMs: number,
+    pollIntervalMs: number,
+  ): Promise<string | null> {
+    const startedAt = Date.now();
+    while (Date.now() - startedAt < timeoutMs) {
+      try {
+        const token = await messaging().getAPNSToken();
+        if (token) {
+          return token;
+        }
+      } catch (error) {
+        console.warn('[PushNotificationService] getAPNSToken error:', error);
+      }
+      await new Promise<void>(resolve => setTimeout(resolve, pollIntervalMs));
+    }
+    return null;
   }
 
   /**
@@ -185,8 +189,13 @@ class PushNotificationService {
       await this.displayNotification(remoteMessage);
     });
 
-    // NOTE: setBackgroundMessageHandler is registered in index.js (required by React Native Firebase)
-    // It must be at the root level, not inside a component or class
+    // Handle background messages
+    messaging().setBackgroundMessageHandler(async remoteMessage => {
+      console.log('[PushNotificationService] Background message received:', remoteMessage);
+      
+      // Display notification using Notifee
+      await this.displayNotification(remoteMessage);
+    });
 
     // Handle notification opened app (from quit state)
     messaging()
@@ -221,17 +230,6 @@ class PushNotificationService {
         return;
       }
 
-      // Get image URL if it exists and is valid
-      const imageUrl = notification.android?.imageUrl || notification.ios?.imageUrl || (data?.imageUrl as string);
-      const hasValidImage = imageUrl && typeof imageUrl === 'string' && imageUrl.startsWith('http');
-
-      console.log('[PushNotificationService] Displaying notification:', {
-        title: notification.title,
-        body: notification.body,
-        hasValidImage,
-        imageUrl: hasValidImage ? imageUrl : 'none',
-      });
-
       // Display using Notifee for better control
       await notifee.displayNotification({
         title: notification.title,
@@ -239,9 +237,8 @@ class PushNotificationService {
         data: data,
         android: {
           channelId: 'default',
-          smallIcon: 'ic_launcher',
-          // Only set largeIcon if we have a valid URL
-          ...(hasValidImage ? { largeIcon: imageUrl } : {}),
+          smallIcon: 'ic_notification',
+          largeIcon: notification.android?.imageUrl,
           pressAction: {
             id: 'default',
           },
@@ -255,8 +252,9 @@ class PushNotificationService {
         },
         ios: {
           sound: 'default',
-          // Only set attachments if we have a valid URL
-          ...(hasValidImage ? { attachments: [{ url: imageUrl }] } : {}),
+          attachments: notification.android?.imageUrl
+            ? [{url: notification.android.imageUrl}]
+            : undefined,
           foregroundPresentationOptions: {
             alert: true,
             badge: true,
@@ -381,3 +379,4 @@ export const pushNotificationService = new PushNotificationService();
 
 // Export types
 export type {FirebaseMessagingTypes};
+// @feature:firebase-messaging:end

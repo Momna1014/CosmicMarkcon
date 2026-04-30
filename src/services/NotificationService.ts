@@ -1,3 +1,4 @@
+// @feature:notifee:start
 /**
  * Notification Service - Local Notifications
  * 
@@ -487,3 +488,4 @@ export const notificationService = new NotificationService();
 
 // Export types
 export type {Notification, AuthorizationStatus};
+// @feature:notifee:end

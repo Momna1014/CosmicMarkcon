@@ -1,19 +1,15 @@
 /**
  * StackNavigator
- * 
+ *
  * Root stack navigator managing the main navigation flow:
  * - Onboarding (first launch only) - configurable
- * - Initial Paywall (after onboarding, before main app) - if not completed
  * - Main App (with tabs or drawer based on config)
- * - Modal screens (Paywall, Details)
+ * - Modal screens (Details, etc.)
  * 
- * NAVIGATION FLOW:
- * 1. If onboarding NOT completed → Onboarding screens
- * 2. If onboarding completed BUT initial paywall NOT completed AND not premium → Paywall
- * 3. Otherwise → MainApp
+ * Note: Paywall uses showPaywallModal() imperative API - no screen needed
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {useApp} from '../contexts/AppContext';
 import NavigationConfig from './NavigationConfig';
@@ -29,8 +25,6 @@ import ChatScreen from '../screens/Chat';
 import PalmCaptureScreen from '../screens/Chiromancy/PalmCaptureScreen';
 import ProfileScreen from '../screens/Profile';
 
-
-
 // Conditionally import DrawerNavigator
 let DrawerNavigator: any = null;
 if (NavigationConfig.enableDrawer) {
@@ -38,60 +32,68 @@ if (NavigationConfig.enableDrawer) {
     DrawerNavigator = require('./DrawerNavigator').default;
     console.log('✅ DrawerNavigator loaded successfully');
   } catch (error) {
-    console.warn('⚠️ DrawerNavigator not available. Install @react-navigation/drawer to enable drawer navigation.');
+    console.warn(
+      '⚠️ DrawerNavigator not available. Install @react-navigation/drawer to enable drawer navigation.',
+    );
     console.error('Drawer import error:', error);
   }
 }
 
-import {RootStackParamList} from './deepLinking';
+import { RootStackParamList } from './deepLinking';
+import { useNavigation } from '@react-navigation/native';
+
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 /**
  * Stack Navigator Component
- * 
- * Determines initial route based on onboarding and paywall status:
+ *
+ * Determines initial route based on onboarding status and config
  * - Shows Onboarding if enabled and not completed
- * - Shows Paywall if onboarding done but initial paywall not completed (and not premium)
  * - Shows MainApp with Drawer or Tabs based on config
  */
 export const StackNavigator: React.FC = () => {
-  const {onboardingCompleted, isLoading, shouldShowInitialPaywall, isPremium, initialPaywallCompleted} = useApp();
-  
+  const { onboardingCompleted,  isPremium } = useApp();
+  const navigation = useNavigation();
+
+  // Track screen transitions for interstitial ads
+  useEffect(() => {
+    if (isPremium) return;
+
+    const unsubscribe = navigation.addListener('state', () => {
+      // @feature:admob:start [disabled]
+      // adMobService.recordScreenTransition();
+      // @feature:admob:end
+    });
+
+    return unsubscribe;
+  }, [navigation, isPremium]);
+
   // Determine if we should show onboarding
-  const shouldShowOnboarding = NavigationConfig.enableOnboarding && !onboardingCompleted;
-  
+  const shouldShowOnboarding =
+    NavigationConfig.enableOnboarding && !onboardingCompleted;
+
+  // Determine initial route after onboarding
+  // Show MainApp (TabNavigator) as the main screen after onboarding
+  const initialRoute = shouldShowOnboarding
+    ? 'Onboarding'
+    : !isPremium
+      ? 'Paywall'
+      : 'MainApp';
+
   // Choose main navigator based on config
   // If drawer is enabled but not available, fallback to tabs
-  const MainNavigator = (NavigationConfig.enableDrawer && DrawerNavigator) 
-    ? DrawerNavigator 
-    : TabNavigator;
+  const MainNavigator =
+    NavigationConfig.enableDrawer && DrawerNavigator
+      ? DrawerNavigator
+      : TabNavigator;
 
-  // Determine initial route based on state
-  // Priority: Onboarding > Paywall > MainApp
-  const getInitialRoute = (): 'Onboarding' | 'Paywall' | 'MainApp' => {
-    if (shouldShowOnboarding) return 'Onboarding';
-    if (shouldShowInitialPaywall && NavigationConfig.enablePaywall) return 'Paywall';
-    return 'MainApp';
-  };
-
-  const initialRoute = getInitialRoute();
-
-  console.log('═══════════════════════════════════════════════════════════');
-  console.log('[StackNavigator] 🗺️ NAVIGATION DECISION');
-  console.log('[StackNavigator] 📋 onboardingCompleted:', onboardingCompleted);
-  console.log('[StackNavigator] 📋 initialPaywallCompleted:', initialPaywallCompleted);
-  console.log('[StackNavigator] 💰 isPremium:', isPremium);
-  console.log('[StackNavigator] 🎯 shouldShowOnboarding:', shouldShowOnboarding);
-  console.log('[StackNavigator] 🎯 shouldShowInitialPaywall:', shouldShowInitialPaywall);
-  console.log('[StackNavigator] 📍 initialRoute:', initialRoute);
-  console.log('═══════════════════════════════════════════════════════════');
-
-  if (isLoading) {
-    console.log('[StackNavigator] ⏳ Still loading app state...');
-    // You can return a loading screen here
-    return null;
-  }
+  // Remove the isLoading check that returns null - this causes tabs to not show on first launch
+  // The TabNavigator should always render, even during initialization
+  // if (isLoading) {
+  //   // You can return a loading screen here
+  //   return null;
+  // }
 
   return (
     <Stack.Navigator

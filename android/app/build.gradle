@@ -76,7 +76,6 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
-apply from: new File(["node", "--print", "require.resolve('@sentry/react-native/package.json')"].execute().text.trim(), "../sentry.gradle")
 android {
     ndkVersion rootProject.ext.ndkVersion
     
@@ -93,7 +92,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0.0"
+        versionName "1.0"
     }
     signingConfigs {
         debug {
@@ -102,21 +101,15 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-        release {
-            if (project.hasProperty('MY_RELEASE_STORE_FILE')) {
-                storeFile file(MY_RELEASE_STORE_FILE)
-                storePassword MY_RELEASE_STORE_PASSWORD
-                keyAlias MY_RELEASE_KEY_ALIAS
-                keyPassword MY_RELEASE_KEY_PASSWORD
-            }
-        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            signingConfig signingConfigs.release
+            // Caution! In production, you need to generate your own keystore file.
+            // see https://reactnative.dev/docs/signed-apk-android.
+            signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
@@ -126,8 +119,10 @@ android {
 repositories {
     google()
     mavenCentral()
-    maven { url 'https://artifacts.applovin.com/android' }
-    maven { url 'https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea' }
+// @feature:applovin-max:start [disabled]
+    // maven { url 'https://artifacts.applovin.com/android' }
+    // maven { url 'https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea' }
+// @feature:applovin-max:end
 }
 
 dependencies {
@@ -141,37 +136,45 @@ dependencies {
     }
     
     // ========================================
-    // AppLovin MAX SDK - Core SDK
+    // AndroidX SplashScreen for Android 12+ compatibility
     // ========================================
-    implementation 'com.applovin:applovin-sdk:+'
+    implementation 'androidx.core:core-splashscreen:1.0.1'
     
-    // ========================================
-    // AppLovin Mediation Adapters
-    // ========================================
-    implementation 'com.applovin.mediation:facebook-adapter:+'
-    implementation 'com.applovin.mediation:google-adapter:+'
-    implementation 'com.applovin.mediation:unityads-adapter:+'
-    implementation 'com.applovin.mediation:ironsource-adapter:+'
-    implementation 'com.applovin.mediation:vungle-adapter:+'
-    implementation 'com.applovin.mediation:mintegral-adapter:+'
-    implementation 'com.applovin.mediation:fyber-adapter:+'
-
-    // ========================================
-    // Compose dependencies (required by some adapters)
-    // ========================================
-    implementation platform('androidx.compose:compose-bom:2024.09.03')
-    implementation 'androidx.compose.runtime:runtime'
-    implementation 'androidx.compose.ui:ui'
-    implementation 'androidx.compose.foundation:foundation'
-    implementation 'androidx.compose.material:material'
-
-    // ========================================
-    // WorkManager (required by some adapters)
-    // ========================================
-    def work_version = "2.10.3"
-    implementation "androidx.work:work-runtime:$work_version"
-    implementation "androidx.work:work-runtime-ktx:$work_version"
+// @feature:applovin-max:start [disabled]
+    // // ========================================
+    // // AppLovin MAX SDK - Core SDK
+    // // ========================================
+    // implementation 'com.applovin:applovin-sdk:+'
     
+    // // ========================================
+    // // AppLovin Mediation Adapters
+    // // ========================================
+    // implementation 'com.applovin.mediation:facebook-adapter:+'
+    // implementation 'com.applovin.mediation:google-adapter:+'
+    // implementation 'com.applovin.mediation:unityads-adapter:+'
+    // implementation 'com.applovin.mediation:ironsource-adapter:+'
+    // implementation 'com.applovin.mediation:vungle-adapter:+'
+    // implementation 'com.applovin.mediation:mintegral-adapter:+'
+    // implementation 'com.applovin.mediation:fyber-adapter:+'
+
+    // // ========================================
+    // // Compose dependencies (required by some adapters)
+    // // ========================================
+    // implementation platform('androidx.compose:compose-bom:2024.09.03')
+    // implementation 'androidx.compose.runtime:runtime'
+    // implementation 'androidx.compose.ui:ui'
+    // implementation 'androidx.compose.foundation:foundation'
+    // implementation 'androidx.compose.material:material'
+
+    // // ========================================
+    // // WorkManager (required by some adapters)
+    // // ========================================
+    // def work_version = "2.10.3"
+    // implementation "androidx.work:work-runtime:$work_version"
+    // implementation "androidx.work:work-runtime-ktx:$work_version"
+// @feature:applovin-max:end
+    
+    // @feature:firebase-analytics:start
     // ========================================
     // Firebase BoM - manage Firebase library versions
     // ========================================
@@ -179,15 +182,32 @@ dependencies {
 
     // Firebase Analytics (no explicit version when using BoM)
     implementation("com.google.firebase:firebase-analytics")
+    // @feature:firebase-analytics:end
     
+    // @feature:firebase-crashlytics:start
     // Firebase Crashlytics for crash reporting
     implementation("com.google.firebase:firebase-crashlytics")
+    // @feature:firebase-crashlytics:end
     
+    // @feature:firebase-messaging:start
     // Firebase Messaging (already included via React Native Firebase)
     implementation("com.google.firebase:firebase-messaging")
+    // @feature:firebase-messaging:end
     
+    // @feature:firebase-remote-config:start
     // Firebase Remote Config for A/B testing and feature flags
     implementation("com.google.firebase:firebase-config")
+    // @feature:firebase-remote-config:end
+
+    // @feature:adjust:start
+    // ========================================
+    // Adjust SDK - Attribution & Analytics
+    // ========================================
+    // Google Advertising ID for device identification
+    implementation 'com.google.android.gms:play-services-ads-identifier:18.1.0'
+    // Google Play Install Referrer API for attribution (reftag, gclid)
+    implementation 'com.android.installreferrer:installreferrer:2.2'
+    // @feature:adjust:end
 }
 apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
 // Apply the Google services plugin to enable google-services.json processing

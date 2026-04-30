@@ -1,0 +1,1 @@
+export { hideSplash } from './splashControl';

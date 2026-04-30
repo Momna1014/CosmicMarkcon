@@ -1,15 +1,22 @@
 /**
- * Firebase Service
- * 
- * Centralized Firebase service for Analytics, Crashlytics, and Events
- * Provides a clean API for logging events, tracking screens, and managing crashes
- * 
+ * Firebase Service (functional module)
+ *
+ * IMPORTANT — IMPORT-TIME SAFETY:
+ *   The native Firebase JS bridges (`@react-native-firebase/analytics`,
+ *   `@react-native-firebase/crashlytics`) call the native default app on
+ *   first access. Auto-init is disabled in this app, so calling them before
+ *   `FirebaseConsentModule.initializeFirebase()` resolves crashes with:
+ *     "No Firebase App '[DEFAULT]' has been created"
+ *
+ *   To prevent that, this module:
+ *     1. Has NO top-level `import` of analytics/crashlytics.
+ *     2. Lazily `require()`s them inside each function, only after the
+ *        native bootstrap has succeeded (`nativeReady === true`).
+ *
  * @module FirebaseService
  */
 
-import analytics from '@react-native-firebase/analytics';
-import crashlytics from '@react-native-firebase/crashlytics';
-import {Platform} from 'react-native';
+import { NativeModules, Platform } from 'react-native';
 
 // ==================== TYPE DEFINITIONS ====================
 
@@ -25,342 +32,381 @@ export interface CrashAttributes {
   [key: string]: string;
 }
 
-// ==================== FIREBASE SERVICE CLASS ====================
+interface FirebaseConsentNativeModule {
+  initializeFirebase: () => Promise<boolean>;
+}
 
-class FirebaseService {
-  private static instance: FirebaseService;
-  private isInitialized: boolean = false;
+// ==================== MODULE STATE ====================
 
-  private constructor() {
-    this.initialize();
+let nativeReady = false;
+let analyticsEnabled = false;
+let crashlyticsEnabled = false;
+let bootstrapPromise: Promise<boolean> | null = null;
+
+// ==================== LAZY NATIVE BRIDGES ====================
+// Loaded ONLY after native bootstrap succeeds. Never at module-eval time.
+
+function getAnalytics(): any {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  return require('@react-native-firebase/analytics').default();
+}
+
+function getCrashlytics(): any {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  return require('@react-native-firebase/crashlytics').default();
+}
+
+function getFirebaseConsentModule(): FirebaseConsentNativeModule | null {
+  const mod = NativeModules.FirebaseConsentModule as
+    | FirebaseConsentNativeModule
+    | undefined;
+  if (!mod || typeof mod.initializeFirebase !== 'function') {
+    return null;
   }
+  return mod;
+}
 
-  /**
-   * Get singleton instance of FirebaseService
-   */
-  public static getInstance(): FirebaseService {
-    if (!FirebaseService.instance) {
-      FirebaseService.instance = new FirebaseService();
-    }
-    return FirebaseService.instance;
-  }
+// ==================== BOOTSTRAP ====================
 
-  /**
-   * Initialize Firebase services
-   */
-  private async initialize(): Promise<void> {
-    try {
-      // Enable Crashlytics data collection
-      await crashlytics().setCrashlyticsCollectionEnabled(true);
+async function ensureNativeBootstrap(): Promise<boolean> {
+  if (nativeReady) return true;
+  if (bootstrapPromise) return bootstrapPromise;
 
-      // Set initial user properties
-      await this.setUserProperty('platform', Platform.OS);
-      await this.setUserProperty('app_version', '1.0.0');
-
-      this.isInitialized = true;
-      console.log('✅ Firebase Service initialized successfully');
-    } catch (error) {
-      console.error('❌ Firebase Service initialization failed:', error);
-    }
-  }
-
-  // ==================== ANALYTICS METHODS ====================
-
-  /**
-   * Log a custom event to Firebase Analytics
-   * @param eventName - Name of the event (max 40 characters, alphanumeric and underscores only)
-   * @param params - Event parameters (max 25 parameters, each key max 40 chars, value max 100 chars)
-   */
-  async logEvent(
-    eventName: string,
-    params?: FirebaseEventParams,
-  ): Promise<void> {
-    try {
-      await analytics().logEvent(eventName, params);
-      console.log(`📊 Analytics Event: ${eventName}`, params);
-    } catch (error) {
-      console.error(`Failed to log event ${eventName}:`, error);
-    }
-  }
-
-  /**
-   * Log screen view event
-   * @param screenName - Name of the screen
-   * @param screenClass - Class/component name of the screen
-   */
-  async logScreenView(
-    screenName: string,
-    screenClass?: string,
-  ): Promise<void> {
-    try {
-      await analytics().logScreenView({
-        screen_name: screenName,
-        screen_class: screenClass || screenName,
-      });
-      console.log(`📱 Screen View: ${screenName}`);
-    } catch (error) {
-      console.error(`Failed to log screen view ${screenName}:`, error);
-    }
-  }
-
-  /**
-   * Set user ID for analytics
-   * @param userId - Unique user identifier
-   */
-  async setUserId(userId: string | null): Promise<void> {
-    try {
-      await analytics().setUserId(userId);
-      console.log(`👤 User ID set: ${userId}`);
-    } catch (error) {
-      console.error('Failed to set user ID:', error);
-    }
-  }
-
-  /**
-   * Set user property for analytics
-   * @param name - Property name (max 24 characters)
-   * @param value - Property value (max 36 characters)
-   */
-  async setUserProperty(name: string, value: string): Promise<void> {
-    try {
-      await analytics().setUserProperty(name, value);
-      console.log(`🏷️  User Property: ${name} = ${value}`);
-    } catch (error) {
-      console.error(`Failed to set user property ${name}:`, error);
-    }
-  }
-
-  /**
-   * Set multiple user properties at once
-   * @param properties - Object with property name-value pairs
-   */
-  async setUserProperties(properties: UserProperties): Promise<void> {
-    try {
-      const promises = Object.entries(properties).map(([name, value]) =>
-        this.setUserProperty(name, value),
-      );
-      await Promise.all(promises);
-    } catch (error) {
-      console.error('Failed to set user properties:', error);
-    }
-  }
-
-  /**
-   * Enable or disable analytics data collection
-   * @param enabled - Whether to enable analytics
-   */
-  async setAnalyticsCollectionEnabled(enabled: boolean): Promise<void> {
-    try {
-      await analytics().setAnalyticsCollectionEnabled(enabled);
-      console.log(`📊 Analytics collection ${enabled ? 'enabled' : 'disabled'}`);
-    } catch (error) {
-      console.error('Failed to set analytics collection:', error);
-    }
-  }
-
-  // ==================== CRASHLYTICS METHODS ====================
-
-  /**
-   * Record a non-fatal error/exception
-   * @param error - Error object or string
-   * @param jsErrorName - Optional custom error name
-   */
-  async recordError(error: Error | string, jsErrorName?: string): Promise<void> {
-    try {
-      if (typeof error === 'string') {
-        await crashlytics().recordError(new Error(error));
-      } else {
-        await crashlytics().recordError(error, jsErrorName);
-      }
-      console.log(`💥 Error recorded:`, error);
-    } catch (err) {
-      console.error('Failed to record error:', err);
-    }
-  }
-
-  /**
-   * Log a message to Crashlytics
-   * @param message - Message to log
-   */
-  async log(message: string): Promise<void> {
-    try {
-      await crashlytics().log(message);
-      console.log(`📝 Crashlytics log: ${message}`);
-    } catch (error) {
-      console.error('Failed to log to Crashlytics:', error);
-    }
-  }
-
-  /**
-   * Set custom key-value attribute for crash reports
-   * @param key - Attribute key
-   * @param value - Attribute value
-   */
-  async setCrashlyticsAttribute(
-    key: string,
-    value: string | number | boolean,
-  ): Promise<void> {
-    try {
-      await crashlytics().setAttribute(key, String(value));
-      console.log(`🔑 Crashlytics attribute: ${key} = ${value}`);
-    } catch (error) {
-      console.error(`Failed to set crashlytics attribute ${key}:`, error);
-    }
-  }
-
-  /**
-   * Set multiple custom attributes at once
-   * @param attributes - Object with key-value pairs
-   */
-  async setCrashlyticsAttributes(
-    attributes: CrashAttributes,
-  ): Promise<void> {
-    try {
-      await crashlytics().setAttributes(attributes);
-      console.log(`🔑 Crashlytics attributes set:`, attributes);
-    } catch (error) {
-      console.error('Failed to set crashlytics attributes:', error);
-    }
-  }
-
-  /**
-   * Set user identifier for crash reports
-   * @param userId - User ID
-   */
-  async setCrashlyticsUserId(userId: string): Promise<void> {
-    try {
-      await crashlytics().setUserId(userId);
-      console.log(`👤 Crashlytics User ID: ${userId}`);
-    } catch (error) {
-      console.error('Failed to set crashlytics user ID:', error);
-    }
-  }
-
-  /**
-   * Force a crash (for testing purposes only)
-   * WARNING: This will crash the app immediately
-   */
-  crash(): void {
-    console.warn('⚠️  Forcing app crash for testing...');
-    crashlytics().crash();
-  }
-
-  /**
-   * Enable or disable crash collection
-   * @param enabled - Whether to enable crash collection
-   */
-  async setCrashlyticsCollectionEnabled(enabled: boolean): Promise<void> {
-    try {
-      await crashlytics().setCrashlyticsCollectionEnabled(enabled);
-      console.log(
-        `💥 Crashlytics collection ${enabled ? 'enabled' : 'disabled'}`,
-      );
-    } catch (error) {
-      console.error('Failed to set crashlytics collection:', error);
-    }
-  }
-
-  /**
-   * Check if crashlytics collection is enabled
-   */
-  async isCrashlyticsCollectionEnabled(): Promise<boolean> {
-    try {
-      const enabled = crashlytics().isCrashlyticsCollectionEnabled;
-      return enabled;
-    } catch (error) {
-      console.error('Failed to check crashlytics status:', error);
+  bootstrapPromise = (async () => {
+    const consentModule = getFirebaseConsentModule();
+    if (!consentModule) {
+      console.error('❌ FirebaseConsentModule unavailable');
       return false;
     }
-  }
+    try {
+      await consentModule.initializeFirebase();
+      nativeReady = true;
+      console.log('✅ Firebase native bootstrap completed');
+      return true;
+    } catch (error) {
+      console.error('❌ Firebase native bootstrap failed:', error);
+      return false;
+    }
+  })();
 
-  // ==================== PREDEFINED EVENTS ====================
-
-  /**
-   * Log app open event
-   */
-  async logAppOpen(): Promise<void> {
-    await this.logEvent('app_open', {
-      timestamp: Date.now(),
-      platform: Platform.OS,
-    });
-  }
-
-  /**
-   * Log login event
-   * @param method - Login method (e.g., 'google', 'apple', 'email')
-   */
-  async logLogin(method: string): Promise<void> {
-    await this.logEvent('login', {method});
-  }
-
-  /**
-   * Log signup event
-   * @param method - Signup method (e.g., 'google', 'apple', 'email')
-   */
-  async logSignUp(method: string): Promise<void> {
-    await this.logEvent('sign_up', {method});
-  }
-
-  /**
-   * Log button click event
-   * @param buttonName - Name/ID of the button
-   * @param screenName - Screen where button was clicked
-   */
-  async logButtonClick(buttonName: string, screenName: string): Promise<void> {
-    await this.logEvent('button_click', {
-      button_name: buttonName,
-      screen_name: screenName,
-    });
-  }
-
-  /**
-   * Log purchase event
-   * @param itemId - Item identifier
-   * @param itemName - Item name
-   * @param price - Item price
-   * @param currency - Currency code (e.g., 'USD')
-   */
-  async logPurchase(
-    itemId: string,
-    itemName: string,
-    price: number,
-    currency: string = 'USD',
-  ): Promise<void> {
-    await this.logEvent('purchase', {
-      item_id: itemId,
-      item_name: itemName,
-      value: price,
-      currency,
-    });
-  }
-
-  /**
-   * Log search event
-   * @param searchTerm - Search query
-   */
-  async logSearch(searchTerm: string): Promise<void> {
-    await this.logEvent('search', {search_term: searchTerm});
-  }
-
-  /**
-   * Log share event
-   * @param contentType - Type of content shared
-   * @param itemId - ID of shared content
-   * @param method - Share method (e.g., 'facebook', 'twitter')
-   */
-  async logShare(
-    contentType: string,
-    itemId: string,
-    method: string,
-  ): Promise<void> {
-    await this.logEvent('share', {
-      content_type: contentType,
-      item_id: itemId,
-      method,
-    });
+  try {
+    return await bootstrapPromise;
+  } finally {
+    bootstrapPromise = null;
   }
 }
 
-// ==================== EXPORT SINGLETON INSTANCE ====================
+// ==================== STATE ACCESSORS ====================
 
-export default FirebaseService.getInstance();
+export function isAnalyticsEnabled(): boolean {
+  return analyticsEnabled;
+}
+
+export function isCrashlyticsEnabled(): boolean {
+  return crashlyticsEnabled;
+}
+
+export function isNativeReady(): boolean {
+  return nativeReady;
+}
+
+// ==================== ANALYTICS ====================
+
+export async function logEvent(
+  eventName: string,
+  params?: FirebaseEventParams,
+): Promise<void> {
+  if (!analyticsEnabled || !nativeReady) {
+    console.log(`📊 Analytics disabled, skipping event: ${eventName}`);
+    return;
+  }
+  try {
+    await getAnalytics().logEvent(eventName, params);
+    console.log(`📊 Analytics Event: ${eventName}`, params);
+  } catch (error) {
+    console.error(`Failed to log event ${eventName}:`, error);
+  }
+}
+
+export async function logScreenView(
+  screenName: string,
+  screenClass?: string,
+): Promise<void> {
+  if (!analyticsEnabled || !nativeReady) {
+    console.log(`📱 Analytics disabled, skipping screen: ${screenName}`);
+    return;
+  }
+  try {
+    await getAnalytics().logScreenView({
+      screen_name: screenName,
+      screen_class: screenClass || screenName,
+    });
+    console.log(`📱 Screen View: ${screenName}`);
+  } catch (error) {
+    console.error(`Failed to log screen view ${screenName}:`, error);
+  }
+}
+
+export async function setUserId(userId: string | null): Promise<void> {
+  if (!analyticsEnabled || !nativeReady) {
+    console.log('👤 Analytics disabled, skipping user ID');
+    return;
+  }
+  try {
+    await getAnalytics().setUserId(userId);
+    console.log(`👤 User ID set: ${userId}`);
+  } catch (error) {
+    console.error('Failed to set user ID:', error);
+  }
+}
+
+export async function setUserProperty(name: string, value: string): Promise<void> {
+  if (!analyticsEnabled || !nativeReady) {
+    console.log(`🏷️  Analytics disabled, skipping property: ${name}`);
+    return;
+  }
+  try {
+    await getAnalytics().setUserProperty(name, value);
+    console.log(`🏷️  User Property: ${name} = ${value}`);
+  } catch (error) {
+    console.error(`Failed to set user property ${name}:`, error);
+  }
+}
+
+export async function setUserProperties(properties: UserProperties): Promise<void> {
+  if (!analyticsEnabled || !nativeReady) {
+    console.log('🏷️  Analytics disabled, skipping user properties');
+    return;
+  }
+  try {
+    await Promise.all(
+      Object.entries(properties).map(([name, value]) => setUserProperty(name, value)),
+    );
+  } catch (error) {
+    console.error('Failed to set user properties:', error);
+  }
+}
+
+async function setDefaultAnalyticsProperties(): Promise<void> {
+  await setUserProperty('platform', Platform.OS);
+  await setUserProperty('app_version', '1.0.0');
+}
+
+export async function setAnalyticsCollectionEnabled(enabled: boolean): Promise<void> {
+  if (enabled) {
+    const ok = await ensureNativeBootstrap();
+    if (!ok) {
+      analyticsEnabled = false;
+      console.warn('⚠️  Analytics enable skipped: Firebase bootstrap unavailable');
+      return;
+    }
+  } else if (!nativeReady) {
+    analyticsEnabled = false;
+    console.log('📊 Analytics collection disabled (Firebase not initialized yet)');
+    return;
+  }
+
+  try {
+    await getAnalytics().setAnalyticsCollectionEnabled(enabled);
+    analyticsEnabled = enabled;
+    if (enabled) await setDefaultAnalyticsProperties();
+    console.log(`📊 Analytics collection ${enabled ? 'enabled' : 'disabled'}`);
+  } catch (error) {
+    console.error('Failed to set analytics collection:', error);
+  }
+}
+
+// ==================== CRASHLYTICS ====================
+
+export async function recordError(
+  error: Error | string,
+  jsErrorName?: string,
+): Promise<void> {
+  if (!crashlyticsEnabled || !nativeReady) {
+    console.log('💥 Crashlytics disabled, skipping error record');
+    return;
+  }
+  try {
+    if (typeof error === 'string') {
+      await getCrashlytics().recordError(new Error(error));
+    } else {
+      await getCrashlytics().recordError(error, jsErrorName);
+    }
+    console.log('💥 Error recorded:', error);
+  } catch (err) {
+    console.error('Failed to record error:', err);
+  }
+}
+
+export async function log(message: string): Promise<void> {
+  if (!crashlyticsEnabled || !nativeReady) {
+    console.log('💥 Crashlytics disabled, skipping log message');
+    return;
+  }
+  try {
+    await getCrashlytics().log(message);
+    console.log(`📝 Crashlytics log: ${message}`);
+  } catch (error) {
+    console.error('Failed to log to Crashlytics:', error);
+  }
+}
+
+export async function setCrashlyticsAttribute(
+  key: string,
+  value: string | number | boolean,
+): Promise<void> {
+  if (!crashlyticsEnabled || !nativeReady) {
+    console.log(`💥 Crashlytics disabled, skipping attribute: ${key}`);
+    return;
+  }
+  try {
+    await getCrashlytics().setAttribute(key, String(value));
+    console.log(`🔑 Crashlytics attribute: ${key} = ${value}`);
+  } catch (error) {
+    console.error(`Failed to set crashlytics attribute ${key}:`, error);
+  }
+}
+
+export async function setCrashlyticsAttributes(attributes: CrashAttributes): Promise<void> {
+  if (!crashlyticsEnabled || !nativeReady) {
+    console.log('💥 Crashlytics disabled, skipping attributes');
+    return;
+  }
+  try {
+    await getCrashlytics().setAttributes(attributes);
+    console.log('🔑 Crashlytics attributes set:', attributes);
+  } catch (error) {
+    console.error('Failed to set crashlytics attributes:', error);
+  }
+}
+
+export async function setCrashlyticsUserId(userId: string): Promise<void> {
+  if (!crashlyticsEnabled || !nativeReady) {
+    console.log('💥 Crashlytics disabled, skipping user ID');
+    return;
+  }
+  try {
+    await getCrashlytics().setUserId(userId);
+    console.log(`👤 Crashlytics User ID: ${userId}`);
+  } catch (error) {
+    console.error('Failed to set crashlytics user ID:', error);
+  }
+}
+
+export function crash(): void {
+  if (!crashlyticsEnabled || !nativeReady) {
+    console.log('💥 Crashlytics disabled, crash() skipped');
+    return;
+  }
+  console.warn('⚠️  Forcing app crash for testing...');
+  getCrashlytics().crash();
+}
+
+export async function setCrashlyticsCollectionEnabled(enabled: boolean): Promise<void> {
+  if (enabled) {
+    const ok = await ensureNativeBootstrap();
+    if (!ok) {
+      crashlyticsEnabled = false;
+      console.warn('⚠️  Crashlytics enable skipped: Firebase bootstrap unavailable');
+      return;
+    }
+  } else if (!nativeReady) {
+    crashlyticsEnabled = false;
+    console.log('💥 Crashlytics collection disabled (Firebase not initialized yet)');
+    return;
+  }
+
+  try {
+    await getCrashlytics().setCrashlyticsCollectionEnabled(enabled);
+    crashlyticsEnabled = enabled;
+    console.log(`💥 Crashlytics collection ${enabled ? 'enabled' : 'disabled'}`);
+  } catch (error) {
+    console.error('Failed to set crashlytics collection:', error);
+  }
+}
+
+export async function isCrashlyticsCollectionEnabled(): Promise<boolean> {
+  return crashlyticsEnabled;
+}
+
+// ==================== PREDEFINED EVENTS ====================
+
+export async function logAppOpen(): Promise<void> {
+  await logEvent('app_open', { timestamp: Date.now(), platform: Platform.OS });
+}
+
+export async function logLogin(method: string): Promise<void> {
+  await logEvent('login', { method });
+}
+
+export async function logSignUp(method: string): Promise<void> {
+  await logEvent('sign_up', { method });
+}
+
+export async function logButtonClick(buttonName: string, screenName: string): Promise<void> {
+  await logEvent('button_click', { button_name: buttonName, screen_name: screenName });
+}
+
+export async function logPurchase(
+  itemId: string,
+  itemName: string,
+  price: number,
+  currency: string = 'USD',
+): Promise<void> {
+  await logEvent('purchase', {
+    item_id: itemId,
+    item_name: itemName,
+    value: price,
+    currency,
+  });
+}
+
+export async function logSearch(searchTerm: string): Promise<void> {
+  await logEvent('search', { search_term: searchTerm });
+}
+
+export async function logShare(
+  contentType: string,
+  itemId: string,
+  method: string,
+): Promise<void> {
+  await logEvent('share', {
+    content_type: contentType,
+    item_id: itemId,
+    method,
+  });
+}
+
+// ==================== BACK-COMPAT DEFAULT EXPORT ====================
+/**
+ * Back-compat shim for existing call sites that imported the singleton.
+ * @deprecated Import the named functions directly from this module.
+ */
+const firebaseService = {
+  isAnalyticsEnabled,
+  isCrashlyticsEnabled,
+  isNativeReady,
+  logEvent,
+  logScreenView,
+  setUserId,
+  setUserProperty,
+  setUserProperties,
+  setAnalyticsCollectionEnabled,
+  recordError,
+  log,
+  setCrashlyticsAttribute,
+  setCrashlyticsAttributes,
+  setCrashlyticsUserId,
+  crash,
+  setCrashlyticsCollectionEnabled,
+  isCrashlyticsCollectionEnabled,
+  logAppOpen,
+  logLogin,
+  logSignUp,
+  logButtonClick,
+  logPurchase,
+  logSearch,
+  logShare,
+};
+
+export default firebaseService;

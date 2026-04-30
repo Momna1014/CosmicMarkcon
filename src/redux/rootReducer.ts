@@ -18,7 +18,7 @@ import cosmicDataReducer from './slices/cosmicDataSlice';
  */
 const rootReducer = combineReducers({
   auth: authReducer,
-  onboarding: onboardingReducer,
+    onboarding: onboardingReducer,
   partners: partnersReducer,
   cosmicGuides: cosmicGuidesReducer,
   keys: keysReducer,

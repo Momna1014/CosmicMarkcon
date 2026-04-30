@@ -9,9 +9,10 @@ dependencyResolutionManagement {
         mavenCentral()
         maven { url 'https://artifacts.applovin.com/android' }
         maven { url 'https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea' }
+        
     }
 }
 
-rootProject.name = 'CosmicMarkcon'
+rootProject.name = 'Cosmiq'
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')

@@ -13,8 +13,25 @@ export const navigationRef = createNavigationContainerRef();
  * Navigate to a screen
  */
 export function navigate(name: string, params?: any) {
+  console.log(`[NavigationService] navigate called: ${name}`, { 
+    isReady: navigationRef.isReady(),
+    params 
+  });
+  
   if (navigationRef.isReady()) {
+    console.log(`[NavigationService] ✅ Navigating to ${name}`);
     (navigationRef as any).navigate(name, params);
+  } else {
+    console.warn(`[NavigationService] ⚠️ Navigation ref not ready, will retry...`);
+    // Retry after a short delay
+    setTimeout(() => {
+      if (navigationRef.isReady()) {
+        console.log(`[NavigationService] ✅ Retry successful, navigating to ${name}`);
+        (navigationRef as any).navigate(name, params);
+      } else {
+        console.error(`[NavigationService] ❌ Navigation ref still not ready after retry`);
+      }
+    }, 500);
   }
 }
 
