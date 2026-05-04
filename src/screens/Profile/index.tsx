@@ -10,6 +10,7 @@ import {
   Switch,
   AppState,
   Linking,
+  ActivityIndicator,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSelector, useDispatch} from 'react-redux';
@@ -57,6 +58,10 @@ import {
 } from '../../components/pickers';
 import {getZodiacSign} from '../../components/mock/zodiacMockData';
 import {styles} from './styles';
+import {useTranslation} from 'react-i18next';
+import {applyUpdatedConsent, getConsentResult} from '../../InitializationFlow';
+import {openConsentPreferences} from '../../InitializationFlow/consent';
+import {showInfoToast, showSuccessToast} from '../../utils/toast';
 
 type Props = {
   navigation: any;
@@ -156,6 +161,33 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
   // Picker visibility
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [showCityPicker, setShowCityPicker] = useState(false);
+
+  // Consent / Privacy preferences
+  const {t} = useTranslation();
+  const [isUpdatingPreferences, setIsUpdatingPreferences] = useState(false);
+
+  const handleManagePreferences = useCallback(async () => {
+    if (isUpdatingPreferences) return;
+    setIsUpdatingPreferences(true);
+    try {
+      const previous = getConsentResult();
+      const result = await openConsentPreferences(previous);
+      if (result.outcome === 'not-eu') {
+        showInfoToast(t('settings.managePreferences.notAvailable'));
+        return;
+      }
+      if (result.changed) {
+        await applyUpdatedConsent(result.consent);
+        showSuccessToast(t('settings.managePreferences.updated'));
+      } else {
+        showInfoToast(t('settings.managePreferences.noChanges'));
+      }
+    } catch (error) {
+      console.error('[Settings] Error opening privacy preferences:', error);
+    } finally {
+      setIsUpdatingPreferences(false);
+    }
+  }, [isUpdatingPreferences, t]);
 
   // Calculate zodiac sign dynamically based on current birth date
   const calculatedZodiacSign = useMemo(() => {
@@ -599,6 +631,30 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
                   height={16}
                   style={styles.legalRowArrow}
                 />
+              </TouchableOpacity>
+            </View>
+
+            {/* SECTION: Privacy Preferences (EU only) */}
+            <Text style={styles.sectionHeading}>Privacy</Text>
+            <View style={styles.legalCard}>
+              <View style={styles.glassOverlay} />
+              <TouchableOpacity
+                style={styles.legalRow}
+                onPress={handleManagePreferences}
+                disabled={isUpdatingPreferences}
+                activeOpacity={0.7}>
+                <View style={styles.legalRowIconContainer}>
+                  <PrivacyIcon width={22} height={22} />
+                </View>
+                <View style={styles.legalRowTextContainer}>
+                  <Text style={styles.legalRowTitle}>Manage Preferences</Text>
+                  <Text style={styles.legalRowSubtitle}>Update your consent settings</Text>
+                </View>
+                {isUpdatingPreferences ? (
+                  <ActivityIndicator size="small" color="rgba(255,255,255,0.5)" />
+                ) : (
+                  <GoRightIcon width={16} height={16} style={styles.legalRowArrow} />
+                )}
               </TouchableOpacity>
             </View>
 

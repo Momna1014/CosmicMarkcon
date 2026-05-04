@@ -40,9 +40,12 @@ export interface OnboardingState {
   
   // Timestamp when onboarding was completed
   completedAt: string | null;
-  
+
   // Is onboarding data saved?
   isDataSaved: boolean;
+
+  // Whether the user has accepted the consent agreement screen
+  consentAgreed: boolean;
 }
 
 /**
@@ -57,6 +60,7 @@ const initialState: OnboardingState = {
   country: '',
   completedAt: null,
   isDataSaved: false,
+  consentAgreed: false,
 };
 
 /**
@@ -172,6 +176,10 @@ const onboardingSlice = createSlice({
      * Clear all onboarding data
      * Useful for testing or resetting user
      */
+    setConsentAgreed: (state) => {
+      state.consentAgreed = true;
+    },
+
     clearOnboardingData: (state) => {
       console.log('🗑️ [Redux] Clearing onboarding data...');
       Object.assign(state, initialState);
@@ -187,6 +195,7 @@ export const {
   setBirthday,
   setBirthLocation,
   saveOnboardingData,
+  setConsentAgreed,
   clearOnboardingData,
 } = onboardingSlice.actions;
 
@@ -231,6 +240,8 @@ export const selectGender = (state: RootState) => state.onboarding.gender;
  * Check if onboarding data is saved
  */
 export const selectIsOnboardingDataSaved = (state: RootState) => state.onboarding.isDataSaved;
+
+export const selectConsentAgreed = (state: RootState) => state.onboarding.consentAgreed;
 
 /**
  * Select when onboarding was completed

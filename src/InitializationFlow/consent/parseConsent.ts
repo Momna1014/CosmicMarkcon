@@ -12,7 +12,7 @@ import {
   type Region,
   type VendorGrants,
 } from '../types';
-import { VENDOR_TOKEN_MAP } from './consentPolicy';
+import { VENDOR_TOKEN_MAP, getTemplateGrant } from './consentPolicy';
 
 export type ParseConsentResponseOptions = {
   region: Region;
@@ -235,6 +235,16 @@ function deriveCategoryGrants(decisions: ConsentDecisionMap): ConsentGrants {
       continue;
     }
 
+    // Pass 1: exact templateId match — highest confidence.
+    const tg = getTemplateGrant(decision.templateId);
+    if (tg) {
+      for (const grant of tg.grants) {
+        grants[grant] = true;
+      }
+    }
+
+    // Pass 2: name / category token matching — belt-and-suspenders for
+    // services not yet in KNOWN_TEMPLATE_IDS or with unexpected slugs.
     const text = searchableDecisionText(decision);
 
     if (hasAnyToken(text, ['analytics', 'measurement', 'firebase analytics', 'firebase_analytics'])) {
@@ -263,7 +273,22 @@ function deriveVendorGrants(
 ): VendorGrants {
   const vendorGrants: VendorGrants = { ...DEFAULT_VENDOR_GRANTS };
 
+  // Pass 1: exact templateId match — highest confidence; set before tokens.
+  for (const decision of Object.values(decisions)) {
+    if (!decision.granted) {
+      continue;
+    }
+    const tg = getTemplateGrant(decision.templateId);
+    if (tg?.vendorKey) {
+      vendorGrants[tg.vendorKey] = true;
+    }
+  }
+
+  // Pass 2: name / category token matching — skips vendors already granted.
   for (const [vendor, tokens] of Object.entries(VENDOR_TOKEN_MAP)) {
+    if (vendorGrants[vendor as keyof VendorGrants]) {
+      continue; // already set by templateId pass above
+    }
     vendorGrants[vendor as keyof VendorGrants] = Object.values(decisions).some(decision => {
       if (!decision.granted) {
         return false;

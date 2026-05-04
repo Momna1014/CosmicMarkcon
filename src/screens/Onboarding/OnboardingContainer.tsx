@@ -7,9 +7,14 @@
 import React, {useState} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {useNavigation, CommonActions} from '@react-navigation/native';
+import {useDispatch, useSelector} from 'react-redux';
 import {Colors} from '../../theme';
 import {useApp} from '../../contexts/AppContext';
 import {getZodiacSign} from '../../components/mock/zodiacMockData';
+import {
+  selectConsentAgreed,
+  setConsentAgreed,
+} from '../../redux/slices/onboardingSlice';
 
 import OnboardingScreen1, {AlignmentOption} from './OnboardingScreen1';
 import OnboardingScreen2 from './OnboardingScreen2';
@@ -18,6 +23,7 @@ import OnboardingScreen4 from './OnboardingScreen4';
 import OnboardingScreen5 from './OnboardingScreen5';
 import OnboardingScreen6 from './OnboardingScreen6';
 import OnboardingScreen7 from './OnboardingScreen7';
+import ConsentAgreementScreen from './ConsentAgreementScreen';
 import OnboardingScreen8 from './OnboardingScreen8';
 import OnboardingScreen9 from './OnboardingScreen9';
 import OnboardingScreen10 from './OnboardingScreen10';
@@ -41,6 +47,8 @@ export interface OnboardingData {
 export const OnboardingContainer: React.FC = () => {
   const navigation = useNavigation();
   const {setOnboardingCompleted, isPremium} = useApp();
+  const dispatch = useDispatch();
+  const consentAgreed = useSelector(selectConsentAgreed);
   const [currentScreen, setCurrentScreen] = useState(1);
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
     seeking: [],
@@ -60,8 +68,10 @@ export const OnboardingContainer: React.FC = () => {
 
   const handleGoBack = () => {
     if (currentScreen > 1) {
-      console.log(`\n\ud83d\udd35 [Screen ${currentScreen}] Going back to Screen ${currentScreen - 1}`);
-      setCurrentScreen(currentScreen - 1);
+      // Skip the agreement screen on back navigation once consent has been given
+      const prevScreen = currentScreen - 1 === 4 && consentAgreed ? 3 : currentScreen - 1;
+      console.log(`\n\ud83d\udd35 [Screen ${currentScreen}] Going back to Screen ${prevScreen}`);
+      setCurrentScreen(prevScreen);
     }
   };
 
@@ -90,7 +100,8 @@ export const OnboardingContainer: React.FC = () => {
     } else {
       console.log('\n\ud83d\udd35 [Screen 3] No clarity selected - moving forward');
     }
-    setCurrentScreen(4);
+    // Skip agreement if user already agreed in a previous session
+    setCurrentScreen(consentAgreed ? 5 : 4);
   };
 
   const handleScreen4Next = (gender: string | null) => {
@@ -100,7 +111,7 @@ export const OnboardingContainer: React.FC = () => {
       console.log('📦 [OnboardingData] Current state:', JSON.stringify(updated, null, 2));
       return updated;
     });
-    setCurrentScreen(5);
+    setCurrentScreen(6);
   };
 
   const handleScreen5Next = (name: string) => {
@@ -114,13 +125,13 @@ export const OnboardingContainer: React.FC = () => {
     } else {
       console.log('\n\ud83d\udd35 [Screen 5] No name entered - moving forward');
     }
-    setCurrentScreen(6);
+    setCurrentScreen(7);
   };
 
   const handleScreen6Next = () => {
     console.log('\n🔵 [Screen 6] Unlock Analysis Info Viewed');
     console.log('📦 [OnboardingData] Passing forward:', JSON.stringify(onboardingData, null, 2));
-    setCurrentScreen(7);
+    setCurrentScreen(8);
   };
 
   const handleScreen7Next = (birthday: Date) => {
@@ -132,28 +143,34 @@ export const OnboardingContainer: React.FC = () => {
       console.log('📦 [OnboardingData] Passing forward:', JSON.stringify(updated, null, 2));
       return updated;
     });
-    setCurrentScreen(8);
+    setCurrentScreen(9);
+  };
+
+  const handleAgreementNext = () => {
+    console.log('\n🔵 [Agreement] Consent accepted - continuing to Screen 4');
+    dispatch(setConsentAgreed());
+    setCurrentScreen(5);
   };
 
   const handleScreen8Next = () => {
     console.log('\n🔵 [Screen 8] Chart Preview Viewed');
     console.log('📦 [OnboardingData] Passing forward:', JSON.stringify(onboardingData, null, 2));
-    setCurrentScreen(9);
+    setCurrentScreen(10);
   };
 
   const handleScreen9Next = () => {
     console.log('\n🔵 [Screen 9] Insights Preview Complete');
-    setCurrentScreen(10);
+    setCurrentScreen(11);
   };
 
   const handleScreen10Next = () => {
     console.log('\n🔵 [Screen 10] Video Complete');
-    setCurrentScreen(11);
+    setCurrentScreen(12);
   };
 
   const handleScreen11Next = () => {
     console.log('\n🔵 [Screen 11] Video Complete');
-    setCurrentScreen(12);
+    setCurrentScreen(13);
   };
 
   const handleScreen12Next = async () => {
@@ -209,13 +226,20 @@ export const OnboardingContainer: React.FC = () => {
         );
       case 4:
         return (
+          <ConsentAgreementScreen
+            onNext={handleAgreementNext}
+            onGoBack={handleGoBack}
+          />
+        );
+      case 5:
+        return (
           <OnboardingScreen4
             onNext={handleScreen4Next}
             onGoBack={handleGoBack}
             gender={onboardingData.gender}
           />
         );
-      case 5:
+      case 6:
         return (
           <OnboardingScreen5
             onNext={handleScreen5Next}
@@ -223,7 +247,7 @@ export const OnboardingContainer: React.FC = () => {
             gender={onboardingData.gender}
           />
         );
-      case 6:
+      case 7:
         return (
           <OnboardingScreen6
             onNext={handleScreen6Next}
@@ -231,21 +255,21 @@ export const OnboardingContainer: React.FC = () => {
             gender={onboardingData.gender}
           />
         );
-      case 7:
+      case 8:
         return (
           <OnboardingScreen7
             onNext={handleScreen7Next}
             onGoBack={handleGoBack}
           />
         );
-      case 8:
+      case 9:
         return (
           <OnboardingScreen8
             onNext={handleScreen8Next}
             onGoBack={handleGoBack}
           />
         );
-      case 9:
+      case 10:
         return (
           <OnboardingScreen9
             onNext={handleScreen9Next}
@@ -253,21 +277,21 @@ export const OnboardingContainer: React.FC = () => {
             onboardingData={onboardingData}
           />
         );
-      case 10:
+      case 11:
         return (
           <OnboardingScreen10
             onContinue={handleScreen10Next}
             onGoBack={handleGoBack}
           />
         );
-      case 11:
+      case 12:
         return (
           <OnboardingScreen11
             onContinue={handleScreen11Next}
             onGoBack={handleGoBack}
           />
         );
-      case 12:
+      case 13:
         return (
           <OnboardingScreen12
             onContinue={handleScreen12Next}
