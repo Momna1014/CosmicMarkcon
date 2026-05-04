@@ -22,7 +22,7 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {useRoute, RouteProp} from '@react-navigation/native';
+import {useRoute, RouteProp, useNavigation} from '@react-navigation/native';
 import {
   verticalScale,
   horizontalScale,
@@ -96,7 +96,12 @@ interface AttachedImage {
 const ChatScreen: React.FC<Props> = () => {
   // Get route params
   const route = useRoute<RouteProp<ChatRouteParams, 'Chat'>>();
+  const navigation = useNavigation<any>();
   const {source, imageUri, handType, yourSign, theirSign, loveMatchSummary} = route.params || {};
+
+  const handleOpenReport = useCallback(() => {
+    navigation.navigate('ReportProblem', {source: 'chat'});
+  }, [navigation]);
   
   // State
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -562,6 +567,7 @@ const ChatScreen: React.FC<Props> = () => {
                 ? 'AI COMPATIBILITY'
                 : 'AI ASTROLOGER'
             }
+            onReportPress={handleOpenReport}
           />
 
           {/* Keyboard Avoiding View */}

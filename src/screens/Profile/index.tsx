@@ -37,6 +37,7 @@ import AvatarDefaultIcon from '../../assets/icons/horoscope_icons/avatar_default
 import GoRightIcon from '../../assets/icons/home_icons/right_arrow.svg';
 import TermsIcon from '../../assets/icons/profile_icons/terms_conditions.svg';
 import PrivacyIcon from '../../assets/icons/profile_icons/privacy_policy.svg';
+import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const PRIVACY_URL = 'https://whoop.myappsstudio.com/privacy-policy.html';
 const TERMS_URL = 'https://whoop.myappsstudio.com/terms-and-conditions.html';
@@ -625,6 +626,37 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
                 <View style={styles.legalRowTextContainer}>
                   <Text style={styles.legalRowTitle}>Privacy Policy</Text>
                   <Text style={styles.legalRowSubtitle}>How we handle your data</Text>
+                </View>
+                <GoRightIcon
+                  width={16}
+                  height={16}
+                  style={styles.legalRowArrow}
+                />
+              </TouchableOpacity>
+            </View>
+
+            {/* SECTION: Help & Support */}
+            <Text style={styles.sectionHeading}>Help & Support</Text>
+            <View style={styles.legalCard}>
+              <View style={styles.glassOverlay} />
+              <TouchableOpacity
+                style={styles.legalRow}
+                onPress={() =>
+                  navigation.navigate('ReportProblem', {source: 'settings'})
+                }
+                activeOpacity={0.7}>
+                <View style={styles.legalRowIconContainer}>
+                  <MaterialCommunityIcon
+                    name="comment-alert-outline"
+                    size={22}
+                    color="#FFFFFF"
+                  />
+                </View>
+                <View style={styles.legalRowTextContainer}>
+                  <Text style={styles.legalRowTitle}>Report a Problem</Text>
+                  <Text style={styles.legalRowSubtitle}>
+                    Tell us about a bug or share feedback
+                  </Text>
                 </View>
                 <GoRightIcon
                   width={16}
