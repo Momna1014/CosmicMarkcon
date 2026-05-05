@@ -36,10 +36,6 @@ import {
   // @feature:admob:end
   FACEBOOK_APP_ID,
   FACEBOOK_CLIENT_TOKEN,
-  // @feature:appsflyer:start [disabled]
-  // APPSFLYER_DEV_KEY,
-  // APPSFLYER_APP_ID,
-  // @feature:appsflyer:end
   // @feature:adjust:start
   ADJUST_APP_TOKEN_ANDROID,
   ADJUST_APP_TOKEN_IOS,
@@ -89,10 +85,6 @@ export type Env = {
   // @feature:admob:end
   FACEBOOK_APP_ID: string
   FACEBOOK_CLIENT_TOKEN: string
-  // @feature:appsflyer:start [disabled]
-  // APPSFLYER_DEV_KEY: string
-  // APPSFLYER_APP_ID: string
-  // @feature:appsflyer:end
   // @feature:adjust:start
   ADJUST_APP_TOKEN_ANDROID: string
   ADJUST_APP_TOKEN_IOS: string
@@ -142,10 +134,6 @@ const env: Env = {
   // @feature:admob:end
   FACEBOOK_APP_ID: FACEBOOK_APP_ID ?? '',
   FACEBOOK_CLIENT_TOKEN: FACEBOOK_CLIENT_TOKEN ?? '',
-  // @feature:appsflyer:start [disabled]
-  // APPSFLYER_DEV_KEY: APPSFLYER_DEV_KEY ?? '',
-  // APPSFLYER_APP_ID: APPSFLYER_APP_ID ?? '',
-  // @feature:appsflyer:end
   // @feature:adjust:start
   ADJUST_APP_TOKEN_ANDROID: ADJUST_APP_TOKEN_ANDROID ?? '',
   ADJUST_APP_TOKEN_IOS: ADJUST_APP_TOKEN_IOS ?? '',

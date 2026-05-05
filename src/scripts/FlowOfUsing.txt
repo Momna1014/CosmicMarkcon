@@ -67,11 +67,6 @@ Toggle the active Ads SDK (admob ↔ applovin):
     bash src/scripts/toggle-ads-sdk.sh applovin
     bash src/scripts/toggle-ads-sdk.sh status
 
-Toggle the active Attribution SDK (adjust ↔ appsflyer):
-    bash src/scripts/toggle-attribution-sdk.sh adjust
-    bash src/scripts/toggle-attribution-sdk.sh appsflyer
-    bash src/scripts/toggle-attribution-sdk.sh status
-
 Add --no-cleanup to skip npm install / pod install / gradle clean:
     bash src/scripts/toggle-ads-sdk.sh applovin --no-cleanup
 

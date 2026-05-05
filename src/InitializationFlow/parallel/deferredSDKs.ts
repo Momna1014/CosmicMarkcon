@@ -37,9 +37,6 @@ import { setupAdMob } from '../sdks/setupAdMob';
 // @feature:adjust:start
 import { setupAdjust } from '../sdks/setupAdjust';
 // @feature:adjust:end
-// @feature:appsflyer:start [disabled]
-// import { setupAppsFlyer } from '../sdks/setupAppsFlyer';
-// @feature:appsflyer:end
 import { setupFacebook } from '../sdks/setupFacebook';
 import { enableSentryFullTracking } from '../sdks/setupSentry';
 import { setupRemoteConfig } from '../sdks/setupRemoteConfig';
@@ -164,15 +161,6 @@ function buildGroupB(consent: ConsentResult, adsMode: AdsModeResult): DeferredTa
     tasks.push({ name: 'AdjustDisable', run: () => setupAdjust(consent, false) });
   }
   // @feature:adjust:end
-
-  // @feature:appsflyer:start [disabled]
-  // // AppsFlyer — analytics-grade attribution (alternative to Adjust). Only runs when advertising allowed.
-  // if (isPersonalized && (isVendorAllowed(consent, 'appsflyer') || analyticsAllowed)) {
-    // tasks.push({ name: 'AppsFlyer', run: () => setupAppsFlyer(trackingAllowed, true) });
-  // } else {
-    // tasks.push({ name: 'AppsFlyerDisable', run: () => setupAppsFlyer(false, false) });
-  // }
-  // @feature:appsflyer:end
 
   // @feature:admob:start
   // AdMob — initialize in personalized OR NPA mode. Never disabled by consent

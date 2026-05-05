@@ -87,7 +87,7 @@ class RevenueCatService {
             console.warn('[RevenueCat] Initial customer info fetch failed:', error);
           });
 
-        // Set attribution data (IDFA, AppsFlyer, Facebook)
+        // Set attribution data (IDFA, Adjust, Facebook)
         // This should be called after ATT permission is granted
         if (enableAttribution) {
           await this.setupAttribution();
@@ -143,8 +143,8 @@ class RevenueCatService {
   async setupAttribution(): Promise<void> {
     try {
       console.log('[RevenueCat] Setting up attribution...');
-      
-      // Set all attribution identifiers (IDFA, AppsFlyer, Facebook)
+
+      // Set all attribution identifiers (IDFA, Adjust, Facebook)
       await setRevenueCatAttribution();
       
       // Set device information

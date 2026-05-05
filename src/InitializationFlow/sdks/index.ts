@@ -9,10 +9,6 @@ export { setupAdMob } from './setupAdMob';
 // @feature:adjust:start
 export { setupAdjust, trackAdjustEvent, trackAdjustAdRevenue, setAdjustPushToken, sendAdjustGdprForgetMe } from './setupAdjust';
 // @feature:adjust:end
-// @feature:appsflyer:start [disabled]
-// // AppsFlyer — kept for reference, replaced by Adjust in active use
-// export { setupAppsFlyer } from './setupAppsFlyer';
-// @feature:appsflyer:end
 export { setupFacebook } from './setupFacebook';
 export { setupRevenueCat } from './setupRevenueCat';
 export { setupRemoteConfig } from './setupRemoteConfig';

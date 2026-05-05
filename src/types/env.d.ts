@@ -50,10 +50,6 @@ declare module '@env' {
   // Facebook SDK
   export const FACEBOOK_APP_ID: string
   export const FACEBOOK_CLIENT_TOKEN: string
-  
-  // Attribution (AppsFlyer) — kept for reference, replaced by Adjust in active use
-  export const APPSFLYER_DEV_KEY: string
-  export const APPSFLYER_APP_ID: string
 
   // Attribution (Adjust)
   export const ADJUST_APP_TOKEN_ANDROID: string

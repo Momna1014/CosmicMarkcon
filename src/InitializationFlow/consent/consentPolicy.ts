@@ -48,7 +48,6 @@ export const VENDOR_TOKEN_MAP: Record<ConsentVendorKey, string[]> = {
   adjust: ['adjust', 'attribution'],
   admob: ['admob', 'google mobile ads', 'advertising', 'marketing', 'ads'],
   applovin: ['applovin', 'max', 'advertising', 'marketing', 'ads'],
-  appsflyer: ['appsflyer', 'attribution'],
   facebook: ['facebook', 'meta', 'advertising', 'marketing', 'ads'],
   revenuecat: ['revenuecat', 'purchase', 'subscription', 'personalization', 'personalisation'],
   remoteConfig: ['remote config', 'remote_config', 'firebase remote config'],
@@ -107,7 +106,6 @@ export const KNOWN_TEMPLATE_IDS: Record<string, TemplateGrant> = {
   // ---- Ad Networks with vendorKey -----------------------------------------
   'r7rvuoyDz':       { vendorKey: 'admob',     grants: ['advertising'] },   // AdMob
   'fHczTMzX8':       { vendorKey: 'applovin',  grants: ['advertising'] },   // AppLovin
-  'Gx9iMF__f':       { vendorKey: 'appsflyer', grants: ['analytics', 'advertising'] }, // AppsFlyer
   '1XvFW-Y2k':       { vendorKey: 'facebook',  grants: ['advertising'] },   // Facebook
   'ax0Nljnj2szF_r':  { vendorKey: 'facebook',  grants: ['advertising'] },   // Facebook Audience Network
   'ocv9HNX_g':       { vendorKey: 'facebook',  grants: ['advertising'] },   // Facebook SDK

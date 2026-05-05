@@ -628,26 +628,7 @@ export const PaywallScreen: React.FC = () => {
     
     // Track Facebook subscription started event - this is important for revenue tracking
     trackSubscriptionStarted('premium', 'Premium Subscription', 0, 'monthly');
-    
-    // Track AppsFlyer purchase event - CRITICAL for attribution tracking
-    // Note: In debug/development mode, this is a sandbox purchase
-    // const productId = customerInfo?.activeSubscriptions?.[0] || 'premium';
-    // const isSandbox = __DEV__ || customerInfo?.entitlements?.all?.[Object.keys(customerInfo?.entitlements?.all || {})[0]]?.isSandbox === true;
-    
-    // appsFlyerService.logPurchase(
-    //   0, // Revenue amount - RevenueCat S2S integration should handle actual revenue
-    //   'USD',
-    //   productId,
-    //   {
-    //     af_content_type: 'subscription',
-    //     af_content_id: productId,
-    //     af_order_id: customerInfo?.originalAppUserId || '',
-    //     af_sandbox: isSandbox ? 'true' : 'false',
-    //     source: source,
-    //   }
-    // );
-    // console.log('[PaywallScreen] 📊 AppsFlyer purchase logged (sandbox:', isSandbox, ')');
-    
+
     await refreshSubscriptionStatus();
     await setInitialPaywallCompleted(true);
     navigateBack();

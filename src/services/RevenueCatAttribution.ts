@@ -5,9 +5,6 @@
  */
 
 import Purchases from 'react-native-purchases';
-// @feature:appsflyer:start [disabled]
-// import appsFlyer from 'react-native-appsflyer'; // AppsFlyer disabled - not currently in use
-// @feature:appsflyer:end
 // @feature:adjust:start
 import { Adjust } from 'react-native-adjust';
 // @feature:adjust:end
@@ -20,9 +17,6 @@ let fbAnonIdSet = false;
 // @feature:adjust:start
 let adjustIdSet = false;
 // @feature:adjust:end
-// @feature:appsflyer:start [disabled]
-// let appsFlyerIdSet = false; // AppsFlyer disabled - not currently in use
-// @feature:appsflyer:end
 
 /**
  * Set all attribution network IDs in RevenueCat
@@ -55,11 +49,6 @@ export const setRevenueCatAttribution = async (): Promise<void> => {
     // @feature:adjust:start
     await setAdjustAttribution();
     // @feature:adjust:end
-
-    // Set AppsFlyer ID (only if not already set)
-    // @feature:appsflyer:start [disabled]
-    // await setAppsFlyerAttribution(); // AppsFlyer disabled - not currently in use
-    // @feature:appsflyer:end
 
     // Set Facebook Anonymous ID (only if not already set)
     await setFacebookAttribution();
@@ -131,69 +120,6 @@ const setAdjustAttribution = async (): Promise<void> => {
   }
 };
 // @feature:adjust:end
-
-// ===========================================================================
-// @feature:appsflyer:start [disabled]
-// /**
- // * Set AppsFlyer ID in RevenueCat
- // * Uses the same pattern as Noorly project
- // * Safe to call multiple times - will skip if already set
- // */
-// const setAppsFlyerAttribution = async (): Promise<void> => {
-  // // Skip if already set
-  // if (appsFlyerIdSet) {
-    // console.log('⏭️ [RevenueCat Attribution] AppsFlyer ID already set, skipping...');
-    // return;
-  // }
-
-  // try {
-    // // Get AppsFlyer UID using Promise wrapper
-    // const getAppsFlyerUIDPromise = (): Promise<string> => {
-      // return new Promise((resolve, reject) => {
-        // appsFlyer.getAppsFlyerUID((error, uid) => {
-          // if (error) {
-            // reject(error);
-          // } else {
-            // resolve(uid || '');
-          // }
-        // });
-      // });
-    // };
-
-    // const appsFlyerUID = await getAppsFlyerUIDPromise();
-
-    // if (appsFlyerUID) {
-      // // Set as attribute ($appsflyerId with dollar sign)
-      // await Purchases.setAttributes({
-        // $appsflyerId: appsFlyerUID,
-      // });
-      // appsFlyerIdSet = true;
-      // console.log(`✅ [RevenueCat Attribution] AppsFlyer ID set: ${appsFlyerUID}`);
-    // } else {
-      // console.log('⚠️ [RevenueCat Attribution] AppsFlyer UID not available yet');
-    // }
-
-    // // Listen for conversion data (only set up listener once)
-    // appsFlyer.onInstallConversionData((data) => {
-      // console.log('📊 [RevenueCat Attribution] AppsFlyer conversion data:', data);
-      // if (data && data.data) {
-        // const conversionData = data.data;
-        // Purchases.setAttributes({
-          // $mediaSource: conversionData.media_source || 'organic',
-          // $campaign: conversionData.campaign || '',
-          // $adGroup: conversionData.adgroup || '',
-          // $ad: conversionData.ad_id || '',
-        // }).catch((error) => {
-          // console.error('❌ [RevenueCat Attribution] Error setting AppsFlyer attributes:', error);
-        // });
-      // }
-    // });
-  // } catch (error) {
-    // console.error('❌ [RevenueCat Attribution] Error setting AppsFlyer ID:', error);
-  // }
-// };
-// @feature:appsflyer:end
-// ===========================================================================
 
 /**
  * Set Facebook Anonymous ID in RevenueCat
