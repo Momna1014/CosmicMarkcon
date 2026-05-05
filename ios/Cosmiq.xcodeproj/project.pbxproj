@@ -557,7 +557,7 @@
 				CODE_SIGN_ENTITLEMENTS = Cosmiq/Cosmiq.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = T2RW4YJTUF;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Cosmiq/Info.plist;
@@ -590,7 +590,7 @@
 				CODE_SIGN_ENTITLEMENTS = Cosmiq/Cosmiq.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = T2RW4YJTUF;
 				INFOPLIST_FILE = Cosmiq/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
