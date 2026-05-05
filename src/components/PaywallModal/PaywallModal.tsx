@@ -18,8 +18,8 @@ import RevenueCatUI, { PAYWALL_RESULT } from 'react-native-purchases-ui';
 import Purchases from 'react-native-purchases';
 import { navigate } from '../../navigation/NavigationService';
 import { revenueCatService } from '../../services/RevenueCatService';
-// @feature:admob:start
-import { adMobService } from '../../services/AdMob/AdMobService';
+// @feature:admob:start [disabled]
+// import { adMobService } from '../../services/AdMob/AdMobService';
 // @feature:admob:end
 import { TypedStorage } from '../../redux/storage';
 import {
@@ -334,8 +334,8 @@ export async function showPaywallModal(options: PaywallModalOptions = {}): Promi
         // Show interstitial ad after dismissing free paywall
         // Skip fire-and-forget for onboarding — PaywallScreen handles it with blocking ad
         if (source !== PAYWALL_SOURCES.APP_OPEN) {
-          // @feature:admob:start
-          adMobService.showInterstitialNow();
+          // @feature:admob:start [disabled]
+          // adMobService.showInterstitialNow();
           // @feature:admob:end
         }
         break;
@@ -358,16 +358,16 @@ export async function showPaywallModal(options: PaywallModalOptions = {}): Promi
           [{ text: 'OK' }]
         );
         onDismissed?.();
-        // @feature:admob:start
-        adMobService.showInterstitialNow();
+        // @feature:admob:start [disabled]
+        // adMobService.showInterstitialNow();
         // @feature:admob:end
         break;
 
       default:
         console.log('[Paywall] ❓ Unknown paywall result:', result);
         onDismissed?.();
-        // @feature:admob:start
-        adMobService.showInterstitialNow();
+        // @feature:admob:start [disabled]
+        // adMobService.showInterstitialNow();
         // @feature:admob:end
         break;
     }

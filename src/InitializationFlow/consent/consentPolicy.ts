@@ -46,7 +46,9 @@ export const VENDOR_TOKEN_MAP: Record<ConsentVendorKey, string[]> = {
   firebaseCrashlytics: ['firebase crashlytics', 'firebase_crashlytics', 'crashlytics', 'crash'],
   sentry: ['sentry', 'crash', 'diagnostic'],
   adjust: ['adjust', 'attribution'],
-  admob: ['admob', 'google mobile ads', 'advertising', 'marketing', 'ads'],
+  // @feature:admob:start [disabled]
+  // admob: ['admob', 'google mobile ads', 'advertising', 'marketing', 'ads'],
+  // @feature:admob:end
   applovin: ['applovin', 'max', 'advertising', 'marketing', 'ads'],
   facebook: ['facebook', 'meta', 'advertising', 'marketing', 'ads'],
   revenuecat: ['revenuecat', 'purchase', 'subscription', 'personalization', 'personalisation'],
@@ -104,7 +106,9 @@ export const KNOWN_TEMPLATE_IDS: Record<string, TemplateGrant> = {
   '5bv4OvSwoXKh-G':  { grants: ['advertising'] },              // Verve HyBid / PubNative
 
   // ---- Ad Networks with vendorKey -----------------------------------------
-  'r7rvuoyDz':       { vendorKey: 'admob',     grants: ['advertising'] },   // AdMob
+  // @feature:admob:start [disabled]
+  // 'r7rvuoyDz':       { vendorKey: 'admob',     grants: ['advertising'] },   // AdMob
+  // @feature:admob:end
   'fHczTMzX8':       { vendorKey: 'applovin',  grants: ['advertising'] },   // AppLovin
   '1XvFW-Y2k':       { vendorKey: 'facebook',  grants: ['advertising'] },   // Facebook
   'ax0Nljnj2szF_r':  { vendorKey: 'facebook',  grants: ['advertising'] },   // Facebook Audience Network
@@ -215,7 +219,9 @@ export function isCrashReportingAllowed(consent: ConsentResult): boolean {
 
 export function isAdvertisingAllowed(consent: ConsentResult): boolean {
   return (
-    isVendorAllowed(consent, 'admob') ||
+    // @feature:admob:start [disabled]
+    // isVendorAllowed(consent, 'admob') ||
+    // @feature:admob:end
     isVendorAllowed(consent, 'applovin') ||
     isVendorAllowed(consent, 'facebook') ||
     consent.grants.advertising

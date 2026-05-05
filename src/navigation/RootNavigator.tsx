@@ -19,8 +19,8 @@ import { navigationRef } from './NavigationService';
 import { AppProvider, useApp } from '../contexts/AppContext';
 
 // Import AdMob service for app open ad
-// @feature:admob:start
-import { adMobService } from '../services/AdMob/AdMobService';
+// @feature:admob:start [disabled]
+// import { adMobService } from '../services/AdMob/AdMobService';
 // @feature:admob:end
 
 /**
@@ -38,14 +38,14 @@ function RootNavigatorContent() {
     if (hasTriggeredAppOpenAd.current) return;
     hasTriggeredAppOpenAd.current = true;
     if (!onboardingCompleted) {
-      // @feature:admob:start
-      adMobService.skipAppOpenAd();
+      // @feature:admob:start [disabled]
+      // adMobService.skipAppOpenAd();
       // @feature:admob:end
       return;
     }
     if (isPremium) return;
-    // @feature:admob:start
-    adMobService.showAppOpenAd();
+    // @feature:admob:start [disabled]
+    // adMobService.showAppOpenAd();
     // @feature:admob:end
   }, [isPremium, onboardingCompleted]);
 

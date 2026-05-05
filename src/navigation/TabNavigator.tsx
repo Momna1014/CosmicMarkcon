@@ -10,8 +10,10 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import {createBottomTabNavigator, BottomTabBarProps} from '@react-navigation/bottom-tabs';
 import NavigationConfig from './NavigationConfig';
+// @feature:admob:start [disabled]
 // import BannerAdComponent from '../components/ads/BannerAdComponent';
 // import { BannerAdSize } from '../services/AppLovinService';
+// @feature:admob:end
 import BottomTabBar from '../components/BottomTabComponent/BottomTabBar';
 
 // Import screens
@@ -38,10 +40,12 @@ export const HIDDEN_TABS_SCREENS = NavigationConfig.hiddenTabScreens;
 const CustomTabBar: React.FC<BottomTabBarProps> = (props) => {
   return (
     <View style={customTabBarStyles.container}>
-      {/* <BannerAdComponent 
+      {/* @feature:admob:start [disabled] */}
+      {/* <BannerAdComponent
         size={BannerAdSize.BANNER}
         visible={true}
       /> */}
+      {/* @feature:admob:end */}
       <BottomTabBar {...props} />
     </View>
   );

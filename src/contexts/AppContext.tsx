@@ -12,8 +12,8 @@
 import React, {createContext, useContext, useState, useEffect, ReactNode} from 'react';
 import { SyncStorage, TypedStorage } from '../redux/storage';
 import {revenueCatService, CustomerInfo} from '../services/RevenueCatService';
-// @feature:admob:start
-import { adMobService } from '../services/AdMob/AdMobService';
+// @feature:admob:start [disabled]
+// import { adMobService } from '../services/AdMob/AdMobService';
 // @feature:admob:end
 import firebaseService from '../services/firebase/FirebaseService';
 import { trackTrialEnded } from '../utils/paywallAnalytics';
@@ -109,8 +109,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({children}) => {
 
   // Sync isPremium to AdMob service and Firebase user property whenever it changes
   useEffect(() => {
-    // @feature:admob:start
-    adMobService.setIsPremium(isPremium);
+    // @feature:admob:start [disabled]
+    // adMobService.setIsPremium(isPremium);
     // @feature:admob:end
     if (firebaseService.isAnalyticsEnabled()) {
       firebaseService.setUserProperty(

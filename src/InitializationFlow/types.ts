@@ -33,7 +33,9 @@ export type ConsentVendorKey =
   | 'firebaseCrashlytics'
   | 'sentry'
   | 'adjust'
-  | 'admob'
+  // @feature:admob:start [disabled]
+  // | 'admob'
+  // @feature:admob:end
   | 'applovin'
   | 'facebook'
   | 'revenuecat'
@@ -47,7 +49,9 @@ export type VendorGrants = {
   firebaseCrashlytics: boolean;
   sentry: boolean;
   adjust?: boolean;
-  admob?: boolean;
+  // @feature:admob:start [disabled]
+  // admob?: boolean;
+  // @feature:admob:end
   applovin?: boolean;
   facebook: boolean;
   revenuecat: boolean;
@@ -82,8 +86,8 @@ export const DEFAULT_VENDOR_GRANTS: VendorGrants = {
   // @feature:adjust:start
   adjust: false,
   // @feature:adjust:end
-  // @feature:admob:start
-  admob: false,
+  // @feature:admob:start [disabled]
+  // admob: false,
   // @feature:admob:end
   // @feature:applovin-max:start [disabled]
   // applovin: false,

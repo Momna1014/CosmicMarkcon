@@ -1,7 +1,7 @@
 export { setupFirebaseCrashlytics, setupFirebaseAnalytics } from './setupFirebase';
 export { setupSentryAnonymous, enableSentryFullTracking } from './setupSentry';
-// @feature:admob:start
-export { setupAdMob } from './setupAdMob';
+// @feature:admob:start [disabled]
+// export { setupAdMob } from './setupAdMob';
 // @feature:admob:end
 // @feature:applovin-max:start [disabled]
 // export { setupAppLovin } from './setupAppLovin';

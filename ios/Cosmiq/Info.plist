@@ -55,10 +55,12 @@
 	<false/>
 	<key>FirebaseRemoteConfigAutoFetchEnabled</key>
 	<false/>
-	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-3940256099942544~1458002511</string>
-	<key>GADDelayAppMeasurementInit</key>
-	<true/>
+	<!-- @feature:admob:start [disabled] -->
+	<!-- <key>GADApplicationIdentifier</key> -->
+	<!-- <string>ca-app-pub-3940256099942544~1458002511</string> -->
+	<!-- <key>GADDelayAppMeasurementInit</key> -->
+	<!-- <true/> -->
+	<!-- @feature:admob:end -->
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>fbapi</string>

@@ -28,8 +28,8 @@
  */
 
 import type { ATTStatus, ConsentResult, AdsModeResult } from '../types';
-// @feature:admob:start
-import { setupAdMob } from '../sdks/setupAdMob';
+// @feature:admob:start [disabled]
+// import { setupAdMob } from '../sdks/setupAdMob';
 // @feature:admob:end
 // @feature:applovin-max:start [disabled]
 // import { setupAppLovin } from '../sdks/setupAppLovin';
@@ -162,14 +162,14 @@ function buildGroupB(consent: ConsentResult, adsMode: AdsModeResult): DeferredTa
   }
   // @feature:adjust:end
 
-  // @feature:admob:start
-  // AdMob — initialize in personalized OR NPA mode. Never disabled by consent
-  // (RC kill-switch uses disableAdMob() separately).
-  if (isPersonalized && isVendorAllowed(consent, 'admob')) {
-    tasks.push({ name: 'AdMob', run: () => setupAdMob('personalized') });
-  } else {
-    tasks.push({ name: 'AdMobNPA', run: () => setupAdMob('non-personalized') });
-  }
+  // @feature:admob:start [disabled]
+  // // AdMob — initialize in personalized OR NPA mode. Never disabled by consent
+  // // (RC kill-switch uses disableAdMob() separately).
+  // if (isPersonalized && isVendorAllowed(consent, 'admob')) {
+  //   tasks.push({ name: 'AdMob', run: () => setupAdMob('personalized') });
+  // } else {
+  //   tasks.push({ name: 'AdMobNPA', run: () => setupAdMob('non-personalized') });
+  // }
   // @feature:admob:end
 
   // @feature:applovin-max:start [disabled]
