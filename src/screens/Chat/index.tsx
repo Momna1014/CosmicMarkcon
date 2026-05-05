@@ -339,7 +339,7 @@ const ChatScreen: React.FC<Props> = () => {
         flatListRef.current?.scrollToEnd({animated: true});
       }, 100);
       try {
-        const reply = await chatConversationService.sendMessage(
+        const {content: reply} = await chatConversationService.sendMessage(
           conversationRef.current,
           imgUri,
         );
