@@ -1,4 +1,14 @@
 import firebaseService from '../../services/firebase/FirebaseService';
+import { initializeFirebaseNative } from '../../services/firebase/FirebaseService';
+
+/**
+ * Bootstrap the native Firebase default app. Must run regardless of consent
+ * because Firebase Auth (anonymous sign-in) is essential — without this the
+ * `auth()` call in FirebaseAuthService throws "No Firebase App '[DEFAULT]'".
+ */
+export async function setupFirebaseNative(): Promise<void> {
+  await initializeFirebaseNative();
+}
 
 export async function disableFirebaseCollection(): Promise<void> {
   await firebaseService.setAnalyticsCollectionEnabled(false);
