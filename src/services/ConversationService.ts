@@ -1,5 +1,24 @@
 import axios from 'axios';
 import {store} from '../redux/store';
+import {sanitizeAIResponse, validateAIResponse} from '../utils/aiGuardrails';
+
+const GUARDRAIL_RULES = `
+
+GUARDRAIL RULES (MANDATORY):
+- Provide spiritual and entertainment-based guidance only.
+- Do not provide medical diagnosis, prescriptions, cures, or treatment instructions.
+- Do not provide legal advice.
+- Do not provide financial instructions, investment guarantees, or money-transfer advice.
+- Do not encourage self-harm, violence, abuse, or dangerous behavior.
+- Do not make guaranteed or absolute predictions. Frame readings as reflective, possibility-based, and for entertainment.
+- If the user asks for serious professional advice, politely redirect them to a qualified professional.`;
+
+function safeText(input: unknown): string {
+  if (typeof input !== 'string') return (input as string) ?? '';
+  const cleaned = sanitizeAIResponse(input);
+  const check = validateAIResponse(cleaned);
+  return check.allowed ? cleaned : check.safeMessage;
+}
 
 /**
  * Response types for ChatGPT-powered cosmic data
@@ -165,7 +184,7 @@ class ConversationService {
     console.log('📅 Date:', today);
     console.log('👤 User:', user.name || 'Anonymous', '| Sign:', user.zodiacSign);
 
-    const systemPrompt = `You are an expert astrologer AI. You provide accurate, personalized daily horoscope readings and real-time planetary transit information. Always respond in valid JSON format.`;
+    const systemPrompt = `You are an expert astrologer AI. You provide accurate, personalized daily horoscope readings and real-time planetary transit information. Always respond in valid JSON format.${GUARDRAIL_RULES}`;
 
     // Build optional profile details
     const locationInfo = user.city && user.country ? `\n- Birth Location: ${user.city}, ${user.country}` : '';
@@ -193,6 +212,17 @@ Return ONLY valid JSON with keys "dailyEnergy" and "transits".`;
       const raw = await this.chatCompletion(systemPrompt, userPrompt);
       const parsed: CosmicHomeData = JSON.parse(raw);
 
+      if (parsed.dailyEnergy) {
+        parsed.dailyEnergy.message = safeText(parsed.dailyEnergy.message);
+      }
+      if (Array.isArray(parsed.transits)) {
+        parsed.transits = parsed.transits.map(t => ({
+          ...t,
+          subtext: safeText(t.subtext),
+          description: safeText(t.description),
+        }));
+      }
+
       console.log('✅ [ConversationService] Cosmic home data received:');
       console.log('📊 Daily Energy:', JSON.stringify(parsed.dailyEnergy, null, 2));
       console.log('🪐 Transits:', JSON.stringify(parsed.transits, null, 2));
@@ -202,6 +232,22 @@ Return ONLY valid JSON with keys "dailyEnergy" and "transits".`;
       console.error('❌ [ConversationService] Failed to fetch cosmic data:', error.message || error);
       throw error;
     }
+  }
+
+  private sanitizeHoroscopeData(data: HoroscopeData): HoroscopeData {
+    if (Array.isArray(data?.sections)) {
+      data.sections = data.sections.map(s => ({
+        ...s,
+        description: safeText(s.description),
+      }));
+    }
+    if (Array.isArray(data?.luckyElements)) {
+      data.luckyElements = data.luckyElements.map(le => ({
+        ...le,
+        items: Array.isArray(le.items) ? le.items.map(i => safeText(i)) : le.items,
+      }));
+    }
+    return data;
   }
 
   /**
@@ -244,7 +290,7 @@ Return ONLY valid JSON with keys "dailyEnergy" and "transits".`;
     console.log('📅 Today:', todayKey, '| Tomorrow:', tomorrowKey);
     console.log('👤 User:', user.name || 'Anonymous', '| Sign:', user.zodiacSign);
 
-    const systemPrompt = `You are an expert astrologer AI. Provide accurate, sign-specific horoscope readings. Respond in valid JSON only.`;
+    const systemPrompt = `You are an expert astrologer AI. Provide accurate, sign-specific horoscope readings. Respond in valid JSON only.${GUARDRAIL_RULES}`;
 
     // Build optional profile details
     const locationInfo = user.city && user.country ? ` from ${user.city}, ${user.country}` : '';
@@ -281,7 +327,16 @@ STRICT UNIQUENESS RULES — THESE ARE MANDATORY:
     try {
       const raw = await this.chatCompletion(systemPrompt, userPrompt, 60000);
       const parsed = JSON.parse(raw) as {days: Record<string, HoroscopeData>; weekly: HoroscopeData};
-       console.log("parsed", parsed)      
+
+      if (parsed.days && typeof parsed.days === 'object') {
+        for (const key of Object.keys(parsed.days)) {
+          parsed.days[key] = this.sanitizeHoroscopeData(parsed.days[key]);
+        }
+      }
+      if (parsed.weekly) {
+        parsed.weekly = this.sanitizeHoroscopeData(parsed.weekly);
+      }
+
       console.log('✅ [ConversationService] Horoscope bundle received');
       console.log('📊 Days:', Object.keys(parsed.days));
 
@@ -304,7 +359,7 @@ STRICT UNIQUENESS RULES — THESE ARE MANDATORY:
     console.log('💕 [ConversationService] Fetching love match data...');
     console.log('♈ Your sign:', yourSign, '| Their sign:', theirSign);
 
-    const systemPrompt = `You are an expert astrologer AI specializing in zodiac compatibility and love readings. Respond in valid JSON only.`;
+    const systemPrompt = `You are an expert astrologer AI specializing in zodiac compatibility and love readings. Respond in valid JSON only.${GUARDRAIL_RULES}`;
 
     const userPrompt = `Analyze the zodiac compatibility between ${yourSign} and ${theirSign}.
 
@@ -332,6 +387,11 @@ RULES:
     try {
       const raw = await this.chatCompletion(systemPrompt, userPrompt);
       const parsed: LoveMatchResult = JSON.parse(raw);
+
+      parsed.alignmentText = safeText(parsed.alignmentText);
+      if (parsed.cosmicInsight) {
+        parsed.cosmicInsight.description = safeText(parsed.cosmicInsight.description);
+      }
 
       console.log('✅ [ConversationService] Love match data received');
       console.log('📊 Overall:', parsed.overallScore, '| Love:', parsed.lovePercentage,
