@@ -346,7 +346,7 @@ export const OnboardingScreen6: React.FC<OnboardingScreen6Props> = ({
 const styles = StyleSheet.create({
   backgroundFallback: {
     flex: 1,
-    backgroundColor: Colors.cosmicBackground,
+    backgroundColor: Colors.new_background,
   },
   container: {
     flex: 1,

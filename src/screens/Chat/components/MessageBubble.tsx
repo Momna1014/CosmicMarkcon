@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import FastImage, {OnLoadEvent} from 'react-native-fast-image';
 import Clipboard from '@react-native-clipboard/clipboard';
+import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   FontFamilies,
   fontScale,
@@ -39,6 +40,7 @@ interface ImageDimensions {
 interface MessageBubbleProps {
   message: ChatMessage;
   onImagePress?: (imageUrl: string) => void;
+  onReportPress?: (message: ChatMessage) => void;
 }
 
 // Separate component for adaptive image to prevent parent re-renders
@@ -214,8 +216,15 @@ const CopyFeedback = memo(({visible, animValue}: {visible: boolean; animValue: A
 CopyFeedback.displayName = 'CopyFeedback';
 
 const MessageBubble: React.FC<MessageBubbleProps> = memo(
-  ({message, onImagePress}) => {
+  ({message, onImagePress, onReportPress}) => {
     const isAI = message.sender === 'ai';
+    const canReport = isAI && !!message.content && !!onReportPress;
+
+    const handleReportPress = useCallback(() => {
+      if (onReportPress) {
+        onReportPress(message);
+      }
+    }, [onReportPress, message]);
     const [showCopyFeedback, setShowCopyFeedback] = useState(false);
     const copyAnimValue = useRef(new Animated.Value(0)).current;
     const animationRef = useRef<Animated.CompositeAnimation | null>(null);
@@ -271,6 +280,31 @@ const MessageBubble: React.FC<MessageBubbleProps> = memo(
       );
     }, [message.imageUrl, handleImagePress]);
 
+    const renderReportFlag = useCallback(() => {
+      if (!canReport) return null;
+      return (
+        <View style={styles.reportFlagRow}>
+          <View style={styles.reportFlagDivider} />
+          <TouchableOpacity
+            style={styles.reportFlagPill}
+            onPress={handleReportPress}
+            activeOpacity={0.75}
+            hitSlop={{top: 6, bottom: 6, left: 6, right: 6}}
+            accessibilityRole="button"
+            accessibilityLabel="Report this response">
+            <View style={styles.reportFlagIconWrap}>
+              <MaterialCommunityIcon
+                name="flag-variant"
+                size={moderateScale(16)}
+                color="#FFFFFF"
+              />
+            </View>
+            <Text style={styles.reportFlagLabel}>Report</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }, [canReport, handleReportPress]);
+
     const renderContent = useCallback(() => {
       if (message.type === 'image') {
         return renderImage();
@@ -296,6 +330,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = memo(
               selectable={Platform.OS === 'android'}>
               {message.content}
             </Text>
+            {renderReportFlag()}
             <CopyFeedback visible={showCopyFeedback} animValue={copyAnimValue} />
           </TouchableOpacity>
         );
@@ -315,10 +350,19 @@ const MessageBubble: React.FC<MessageBubbleProps> = memo(
               {message.content}
             </Text>
           )}
+          {renderReportFlag()}
           <CopyFeedback visible={showCopyFeedback} animValue={copyAnimValue} />
         </TouchableOpacity>
       );
-    }, [message, isAI, renderImage, handleLongPress, showCopyFeedback, copyAnimValue]);
+    }, [
+      message,
+      isAI,
+      renderImage,
+      handleLongPress,
+      showCopyFeedback,
+      copyAnimValue,
+      renderReportFlag,
+    ]);
 
     return (
       <View style={[styles.container, isAI ? styles.aiContainer : styles.userContainer]}>
@@ -362,6 +406,57 @@ const styles = StyleSheet.create({
   },
   bubbleWrapper: {
     maxWidth: MAX_BUBBLE_WIDTH,
+  },
+  reportFlagRow: {
+    marginTop: verticalScale(10),
+    alignItems: 'flex-end',
+  },
+  reportFlagDivider: {
+    alignSelf: 'stretch',
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    marginBottom: verticalScale(8),
+  },
+  reportFlagPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    // paddingLeft: horizontalScale(4),
+    // paddingRight: horizontalScale(10),
+    paddingVertical: verticalScale(5),
+    paddingHorizontal:horizontalScale(7),
+    borderRadius: radiusScale(20),
+    backgroundColor: 'rgba(255, 255, 255, 0.13)',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(255, 255, 255, 0.22)',
+    gap: horizontalScale(3),
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.18,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
+  },
+  reportFlagIconWrap: {
+    // width: moderateScale(20),
+    // height: moderateScale(20),
+    // borderRadius: moderateScale(10),
+    // backgroundColor: 'rgba(255, 255, 255, 0.18)',
+    // borderWidth: StyleSheet.hairlineWidth,
+    // borderColor: 'rgba(255, 255, 255, 0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  reportFlagLabel: {
+    fontFamily: FontFamilies.sunlightDreams,
+    fontSize: fontScale(12),
+    color: 'rgba(255, 255, 255, 0.9)',
+    // letterSpacing: 0.6,
+
   },
   bubble: {
     borderRadius: radiusScale(24),

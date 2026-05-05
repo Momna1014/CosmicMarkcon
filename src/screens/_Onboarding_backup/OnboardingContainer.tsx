@@ -232,7 +232,7 @@ export const OnboardingContainer: React.FC = () => {
       default:
         return <OnboardingScreen1 onContinue={handleScreen1Continue} />;
     }
-  };
+  };                                                       
 
   return <View style={styles.container}>{renderScreen()}</View>;
 };
@@ -240,7 +240,7 @@ export const OnboardingContainer: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.cosmicBackground,
+    backgroundColor: Colors.new_background,
   },
 });
 

@@ -1,6 +1,11 @@
 import axios from 'axios';
 import RNFS from 'react-native-fs';
 import {store} from '../redux/store';
+import {
+  validateUserMessage,
+  validateAIResponse,
+  sanitizeAIResponse,
+} from '../utils/aiGuardrails';
 
 /**
  * Chat message format for Oracle conversation history
@@ -341,7 +346,16 @@ GUARDRAILS:
 - If the user asks about topics completely unrelated to astrology, spirituality, relationships, self-improvement, or wellness, gently redirect them back. Example: "The stars guide me in matters of the cosmos and the heart. Perhaps you could ask me about your zodiac path instead?"
 - Never provide medical, legal, or financial advice. If asked, recommend consulting a professional.
 - Never generate harmful, offensive, or inappropriate content.
-- Do NOT respond in JSON format. Respond in natural conversational text with emoji where appropriate.${sourceContext}`;
+- Do NOT respond in JSON format. Respond in natural conversational text with emoji where appropriate.
+
+GUARDRAIL RULES (MANDATORY):
+- Provide spiritual and entertainment-based guidance only.
+- Do not provide medical diagnosis, prescriptions, cures, or treatment instructions.
+- Do not provide legal advice.
+- Do not provide financial instructions, investment guarantees, or money-transfer advice.
+- Do not encourage self-harm, violence, abuse, or dangerous behavior.
+- Do not make guaranteed or absolute predictions. Frame readings as reflective, possibility-based, and for entertainment.
+- If the user asks for serious professional advice, politely redirect them to a qualified professional.${sourceContext}`;
   }
 
   /**
@@ -556,8 +570,16 @@ CRITICAL RULES:
     messages: OracleChatMessage[],
     imageUri?: string,
     timeoutMs: number = 60000,
-  ): Promise<string> {
+  ): Promise<{content: string; blocked: boolean}> {
     const config = this.getConfig();
+
+    const lastUserText = this.extractLatestUserText(messages);
+    if (lastUserText) {
+      const inputCheck = validateUserMessage(lastUserText);
+      if (!inputCheck.allowed) {
+        return {content: inputCheck.safeMessage, blocked: true};
+      }
+    }
 
     // If there's an image, convert the last user message to Vision format
     let apiMessages = [...messages];
@@ -604,9 +626,15 @@ CRITICAL RULES:
         },
       );
 
-      const reply = response.data.choices[0].message.content;
-      console.log('✅ [ChatService] Reply received, length:', reply.length);
-      return reply;
+      const reply: string = response.data.choices[0].message.content;
+      console.log('✅ [ChatService] Reply received, length:', reply?.length ?? 0);
+
+      const cleaned = sanitizeAIResponse(reply);
+      const outputCheck = validateAIResponse(cleaned);
+      if (!outputCheck.allowed) {
+        return {content: outputCheck.safeMessage, blocked: true};
+      }
+      return {content: cleaned, blocked: false};
     } catch (error: any) {
       console.error(
         '❌ [ChatService] Failed:',
@@ -614,6 +642,22 @@ CRITICAL RULES:
       );
       throw error;
     }
+  }
+
+  private extractLatestUserText(messages: OracleChatMessage[]): string {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const msg = messages[i];
+      if (msg.role !== 'user') continue;
+      if (typeof msg.content === 'string') return msg.content;
+      if (Array.isArray(msg.content)) {
+        return msg.content
+          .filter((c): c is {type: 'text'; text: string} => c.type === 'text')
+          .map(c => c.text)
+          .join(' ');
+      }
+      return '';
+    }
+    return '';
   }
 
   /**

@@ -353,6 +353,74 @@ export const launchImageLibrary = async (
 };
 
 /**
+ * Launch image library to select multiple photos
+ */
+export const launchImageLibraryMulti = async (
+  selectionLimit: number = 5,
+  options: ImagePickerOptions = {},
+): Promise<ImagePickerResult[]> => {
+  const permissionStatus = await requestGalleryPermission();
+
+  if (permissionStatus !== 'granted') {
+    showPermissionDeniedAlert('Photo Library', permissionStatus === 'never_ask_again');
+    return [];
+  }
+
+  try {
+    const ImagePicker = require('react-native-image-picker');
+    const mergedOptions = {...DEFAULT_OPTIONS, ...options};
+
+    return new Promise((resolve) => {
+      ImagePicker.launchImageLibrary(
+        {
+          mediaType: mergedOptions.mediaType,
+          maxWidth: mergedOptions.maxWidth,
+          maxHeight: mergedOptions.maxHeight,
+          quality: mergedOptions.quality,
+          includeBase64: mergedOptions.includeBase64,
+          selectionLimit,
+        },
+        (response: any) => {
+          if (response.didCancel) {
+            resolve([]);
+          } else if (response.errorCode) {
+            if (response.errorCode === 'permission') {
+              showPermissionDeniedAlert('Photo Library', true);
+              resolve([]);
+              return;
+            }
+            console.error('Gallery error:', response.errorMessage);
+            Alert.alert('Error', 'Failed to select images. Please try again.');
+            resolve([]);
+          } else if (response.assets && response.assets.length > 0) {
+            const results: ImagePickerResult[] = response.assets
+              .filter((asset: any) => !!asset.uri)
+              .map((asset: any) => ({
+                uri: asset.uri,
+                type: asset.type || 'image/jpeg',
+                fileName: asset.fileName || `photo_${Date.now()}.jpg`,
+                fileSize: asset.fileSize,
+                width: asset.width,
+                height: asset.height,
+              }));
+            resolve(results);
+          } else {
+            resolve([]);
+          }
+        },
+      );
+    });
+  } catch (error) {
+    console.error('Gallery launch error:', error);
+    Alert.alert(
+      'Gallery Not Available',
+      'Please install react-native-image-picker to use gallery functionality.',
+    );
+    return [];
+  }
+};
+
+/**
  * Show action sheet to choose between camera and gallery
  */
 export const showImagePickerOptions = (
@@ -383,5 +451,6 @@ export const showImagePickerOptions = (
 export default {
   launchCamera,
   launchImageLibrary,
+  launchImageLibraryMulti,
   showImagePickerOptions,
 };

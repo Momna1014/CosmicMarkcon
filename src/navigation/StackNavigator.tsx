@@ -24,6 +24,7 @@ import AddPartnerScreen from '../screens/Love/AddPartnerScreen';
 import ChatScreen from '../screens/Chat';
 import PalmCaptureScreen from '../screens/Chiromancy/PalmCaptureScreen';
 import ProfileScreen from '../screens/Profile';
+import ReportProblemScreen from '../screens/ReportProblem';
 
 // Conditionally import DrawerNavigator
 let DrawerNavigator: any = null;
@@ -199,6 +200,16 @@ export const StackNavigator: React.FC = () => {
       <Stack.Screen
         name="Profile"
         component={ProfileScreen}
+        options={{
+          headerShown: false,
+          animation: 'slide_from_right',
+        }}
+      />
+
+      {/* Report Problem Screen - Stack screen without bottom tabs */}
+      <Stack.Screen
+        name="ReportProblem"
+        component={ReportProblemScreen}
         options={{
           headerShown: false,
           animation: 'slide_from_right',

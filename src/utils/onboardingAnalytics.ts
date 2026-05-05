@@ -59,6 +59,14 @@ export const trackOnboarding3ClarityView = async () => {
 };
 
 // ─────────────────────────────────────────────
+// AGREEMENT – Consent screen after onboarding 3
+// ─────────────────────────────────────────────
+
+export const trackAgreementAfterOnboarding3 = async () => {
+  await logEvent('agreement_after_onboarding_3', { step: 3.5 });
+};
+
+// ─────────────────────────────────────────────
 // SCREEN 4 – Gender selection
 // ─────────────────────────────────────────────
 

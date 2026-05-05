@@ -37,10 +37,19 @@ export type ConfigDefaults = {
 
 class RemoteConfigServiceClass {
   private isInitialized: boolean = false;
-  private configInstance: FirebaseRemoteConfigTypes.Module;
+  private _configInstance: FirebaseRemoteConfigTypes.Module | null = null;
 
-  constructor() {
-    this.configInstance = remoteConfig();
+  /**
+   * Lazy getter — defers `remoteConfig()` call until first use so that the
+   * Firebase native app is guaranteed to be ready by that point.
+   * Calling it in the constructor crashed with "No Firebase App '[DEFAULT]'"
+   * because the singleton is created at module-load time, before native init.
+   */
+  private get configInstance(): FirebaseRemoteConfigTypes.Module {
+    if (!this._configInstance) {
+      this._configInstance = remoteConfig();
+    }
+    return this._configInstance;
   }
 
   /**

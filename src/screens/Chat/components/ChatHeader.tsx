@@ -33,14 +33,13 @@ const ChatHeader: React.FC<ChatHeaderProps> = memo(({title, subtitle}) => {
           activeOpacity={0.7}>
           <CrossIcon width={moderateScale(40)} height={moderateScale(40)} />
         </TouchableOpacity>
-        
+
         {/* <GradientText style={styles.title}>{title}</GradientText> */}
         <Text style={styles.title}>{title}</Text>
 
-        
         <View style={styles.spacer} />
       </View>
-      
+
       {/* Subtitle below */}
       <Text style={styles.subtitle}>{subtitle}</Text>
     </View>

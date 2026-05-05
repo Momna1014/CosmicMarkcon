@@ -37,6 +37,15 @@ export type RootStackParamList = {
   // Profile Screen (Stack screen without tabs)
   Profile: undefined;
 
+  // Report Problem Screen (Stack screen without tabs)
+  ReportProblem:
+    | {
+        source?: 'settings' | 'chat';
+        reasons?: string[];
+        reportedMessage?: string;
+      }
+    | undefined;
+
   // Chat Screen (Stack screen without tabs)
   Chat: {
     source?: 'palm' | 'love';
