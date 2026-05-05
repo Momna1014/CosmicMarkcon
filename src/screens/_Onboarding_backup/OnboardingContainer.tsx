@@ -232,7 +232,7 @@ export const OnboardingContainer: React.FC = () => {
       default:
         return <OnboardingScreen1 onContinue={handleScreen1Continue} />;
     }
-  };
+  };                                                       
 
   return <View style={styles.container}>{renderScreen()}</View>;
 };

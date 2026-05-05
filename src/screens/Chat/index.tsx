@@ -108,10 +108,6 @@ const ChatScreen: React.FC<Props> = () => {
   const navigation = useNavigation<any>();
   const {source, imageUri, handType, yourSign, theirSign, loveMatchSummary} = route.params || {};
 
-  const handleOpenReport = useCallback(() => {
-    navigation.navigate('ReportProblem', {source: 'chat'});
-  }, [navigation]);
-
   // Report-this-response modal state
   const [reportTargetMessage, setReportTargetMessage] = useState<ChatMessage | null>(null);
 
@@ -601,7 +597,6 @@ const ChatScreen: React.FC<Props> = () => {
                 ? 'AI COMPATIBILITY'
                 : 'AI ASTROLOGER'
             }
-            onReportPress={handleOpenReport}
           />
 
           {/* Keyboard Avoiding View */}
