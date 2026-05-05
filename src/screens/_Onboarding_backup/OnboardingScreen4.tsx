@@ -405,7 +405,7 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
 const styles = StyleSheet.create({
   backgroundFallback: {
     flex: 1,
-    backgroundColor: Colors.cosmicBackground,
+    backgroundColor: Colors.new_background,
   },
   container: {
     flex: 1,

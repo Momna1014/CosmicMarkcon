@@ -55,34 +55,56 @@ export const ReportDiagnosticsService = {
     return `[${diagnostics.appName}] Problem Report · v${diagnostics.appVersion} · ${platform}`;
   },
 
-  buildEmailBody(description: string, d: ReportDiagnostics): string {
+  buildEmailBody(
+    description: string,
+    d: ReportDiagnostics,
+    extras?: {reasons?: string[]; reportedMessage?: string},
+  ): string {
     const platform = d.platform === 'ios' ? 'iOS' : 'Android';
     const reportedAt = formatDate(d.reportedAt);
     const uptime = formatUptime(d.appUptimeSeconds);
     const divider = '─────────────────────────────────────';
-    return [
+
+    const lines: string[] = [
       'PROBLEM REPORT',
       divider,
       `App      : ${d.appName}`,
       `Source   : ${sourceLabel(d.source)}`,
       `Reported : ${reportedAt}`,
       '',
-      '━━━ ISSUE DESCRIPTION ━━━',
-      description.trim(),
-      '',
-      '━━━ APP INFO ━━━',
-      `Version   : ${d.appVersion} (build ${d.buildNumber})`,
-      `Bundle ID : ${d.bundleId}`,
-      `Platform  : ${platform} ${d.osVersion}`,
-      '',
-      '━━━ DEVICE INFO ━━━',
-      `Model     : ${d.deviceModel}`,
-      `Locale    : ${d.locale}`,
-      `Uptime    : ${uptime}`,
-      '',
-      divider,
-      'This report contains no personal account data.',
-    ].join('\n');
+    ];
+
+    if (extras?.reasons && extras.reasons.length > 0) {
+      lines.push('━━━ REPORT REASONS ━━━');
+      extras.reasons.forEach(reason => {
+        lines.push(`• ${reason}`);
+      });
+      lines.push('');
+    }
+
+    if (extras?.reportedMessage && extras.reportedMessage.trim().length > 0) {
+      lines.push('━━━ REPORTED RESPONSE ━━━');
+      lines.push(extras.reportedMessage.trim());
+      lines.push('');
+    }
+
+    lines.push('━━━ ISSUE DESCRIPTION ━━━');
+    lines.push(description.trim());
+    lines.push('');
+    lines.push('━━━ APP INFO ━━━');
+    lines.push(`Version   : ${d.appVersion} (build ${d.buildNumber})`);
+    lines.push(`Bundle ID : ${d.bundleId}`);
+    lines.push(`Platform  : ${platform} ${d.osVersion}`);
+    lines.push('');
+    lines.push('━━━ DEVICE INFO ━━━');
+    lines.push(`Model     : ${d.deviceModel}`);
+    lines.push(`Locale    : ${d.locale}`);
+    lines.push(`Uptime    : ${uptime}`);
+    lines.push('');
+    lines.push(divider);
+    lines.push('This report contains no personal account data.');
+
+    return lines.join('\n');
   },
 };
 

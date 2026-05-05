@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import FastImage, {OnLoadEvent} from 'react-native-fast-image';
 import Clipboard from '@react-native-clipboard/clipboard';
+import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   FontFamilies,
   fontScale,
@@ -39,6 +40,7 @@ interface ImageDimensions {
 interface MessageBubbleProps {
   message: ChatMessage;
   onImagePress?: (imageUrl: string) => void;
+  onReportPress?: (message: ChatMessage) => void;
 }
 
 // Separate component for adaptive image to prevent parent re-renders
@@ -214,8 +216,15 @@ const CopyFeedback = memo(({visible, animValue}: {visible: boolean; animValue: A
 CopyFeedback.displayName = 'CopyFeedback';
 
 const MessageBubble: React.FC<MessageBubbleProps> = memo(
-  ({message, onImagePress}) => {
+  ({message, onImagePress, onReportPress}) => {
     const isAI = message.sender === 'ai';
+    const canReport = isAI && !!message.content && !!onReportPress;
+
+    const handleReportPress = useCallback(() => {
+      if (onReportPress) {
+        onReportPress(message);
+      }
+    }, [onReportPress, message]);
     const [showCopyFeedback, setShowCopyFeedback] = useState(false);
     const copyAnimValue = useRef(new Animated.Value(0)).current;
     const animationRef = useRef<Animated.CompositeAnimation | null>(null);
@@ -327,7 +336,25 @@ const MessageBubble: React.FC<MessageBubbleProps> = memo(
             <UserStarIcon width={moderateScale(40)} height={moderateScale(40)} />
           </View>
         )}
-        <View style={styles.bubbleWrapper}>{renderContent()}</View>
+        <View style={styles.bubbleWrapper}>
+          {renderContent()}
+          {canReport ? (
+            <TouchableOpacity
+              style={styles.reportFlagButton}
+              onPress={handleReportPress}
+              activeOpacity={0.7}
+              hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}
+              accessibilityRole="button"
+              accessibilityLabel="Report this response">
+              <MaterialCommunityIcon
+                name="flag-outline"
+                size={moderateScale(16)}
+                color="#FFFFFF"
+              />
+              <Text style={styles.reportFlagLabel}>Report</Text>
+            </TouchableOpacity>
+          ) : null}
+        </View>
       </View>
     );
   },
@@ -362,6 +389,26 @@ const styles = StyleSheet.create({
   },
   bubbleWrapper: {
     maxWidth: MAX_BUBBLE_WIDTH,
+  },
+  reportFlagButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    marginTop: verticalScale(6),
+    marginLeft: horizontalScale(4),
+    paddingVertical: verticalScale(4),
+    paddingHorizontal: horizontalScale(8),
+    borderRadius: radiusScale(12),
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.12)',
+    gap: horizontalScale(4),
+  },
+  reportFlagLabel: {
+    fontFamily: FontFamilies.interMedium,
+    fontSize: fontScale(11),
+    color: '#FFFFFF',
+    letterSpacing: 0.4,
   },
   bubble: {
     borderRadius: radiusScale(24),

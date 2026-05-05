@@ -688,7 +688,7 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
 const styles = StyleSheet.create({
   backgroundFallback: {
     flex: 1,
-    backgroundColor: Colors.cosmicBackground,
+    backgroundColor: Colors.new_background,
   },
   container: {
     flex: 1,

@@ -18,7 +18,8 @@ import Share, {Social} from 'react-native-share';
 import RNFS from 'react-native-fs';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {ChatHeader} from '../Chat/components';
+import {ChatHeader, REPORT_REASONS} from '../Chat/components';
+import type {ReportReasonId} from '../Chat/components';
 import {styles} from './styles';
 import {showErrorToast, showInfoToast} from '../../utils/toast';
 import {launchImageLibraryMulti, ImagePickerResult} from '../../utils/imagePicker';
@@ -31,10 +32,15 @@ const SUPPORT_EMAIL = 'momnasarfraz636@gmail.com';
 const MIN_DESCRIPTION_LENGTH = 20;
 const MAX_DESCRIPTION_LENGTH = 1500;
 const MAX_ATTACHMENTS = 5;
-const MAILTO_BODY_MAX = 1600;
 
 type ReportRouteParams = {
-  ReportProblem: {source?: ReportSource} | undefined;
+  ReportProblem:
+    | {
+        source?: ReportSource;
+        reasons?: string[];
+        reportedMessage?: string;
+      }
+    | undefined;
 };
 
 type Props = {
@@ -44,6 +50,19 @@ type Props = {
 const ReportProblemScreen: React.FC<Props> = () => {
   const route = useRoute<RouteProp<ReportRouteParams, 'ReportProblem'>>();
   const source: ReportSource = route.params?.source || 'settings';
+
+  // Reasons + reported message are seeded from route params but tracked in
+  // local state so "Send another" can clear them — otherwise the next
+  // report would inherit stale context from the prior flagged response.
+  const [reportedMessage, setReportedMessage] = useState<string>(
+    route.params?.reportedMessage || '',
+  );
+  const [reasonLabels, setReasonLabels] = useState<string[]>(() => {
+    const ids = (route.params?.reasons || []) as ReportReasonId[];
+    return ids
+      .map(id => REPORT_REASONS.find(r => r.id === id)?.label)
+      .filter((label): label is string => !!label);
+  });
 
   const [description, setDescription] = useState('');
   const [attachments, setAttachments] = useState<ImagePickerResult[]>([]);
@@ -92,20 +111,19 @@ const ReportProblemScreen: React.FC<Props> = () => {
       body: ReportDiagnosticsService.buildEmailBody(
         trimmedDescription,
         diagnostics,
+        {reasons: reasonLabels, reportedMessage},
       ),
     };
-  }, [trimmedDescription, source]);
+  }, [trimmedDescription, source, reasonLabels, reportedMessage]);
 
   const fallbackToMailto = useCallback(
     async (subject: string, body: string) => {
-      const clippedBody =
-        body.length > MAILTO_BODY_MAX
-          ? `${body.slice(0, MAILTO_BODY_MAX)}\n...(truncated)`
-          : body;
-
+      // No truncation — send the full body. Modern mail clients handle long
+      // mailto URLs fine. Mailto cannot carry attachments, so this path is
+      // only used as a last resort when share APIs fail.
       const fullMailto = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(
         subject,
-      )}&body=${encodeURIComponent(clippedBody)}`;
+      )}&body=${encodeURIComponent(body)}`;
       const subjectOnlyMailto = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(
         subject,
       )}`;
@@ -138,25 +156,61 @@ const ReportProblemScreen: React.FC<Props> = () => {
 
   const openEmailComposer = useCallback(
     async (subject: string, message: string, urls: string[]) => {
-      if (urls.length > 0) {
+      const hasAttachments = urls.length > 0;
+
+      // 1) shareSingle({social: Social.Email}) — opens Gmail/Mail directly.
+      // Best UX, but on Android it uses ACTION_SENDTO + mailto: under the
+      // hood, which makes Gmail silently drop attachments. We try it first
+      // because subject + body delivery is most reliable here.
+      try {
+        await Share.shareSingle({
+          social: Social.Email,
+          title: subject,
+          subject,
+          message,
+          email: SUPPORT_EMAIL,
+          ...(hasAttachments ? {urls} : {}),
+        });
+        if (!hasAttachments) return;
+        // If attachments were requested, fall through to Share.open below
+        // anyway because shareSingle on Android may have ignored them.
+        // (shareSingle on iOS uses MFMailComposeViewController and DOES
+        // attach correctly, so there it's fine — but we can't tell from
+        // here whether attachments actually landed. Bias toward the
+        // attachment-safe path on Android only.)
+        if (Platform.OS === 'ios') return;
+      } catch (shareSingleError) {
+        console.warn(
+          '[ReportProblem] shareSingle EMAIL failed, trying Share.open',
+          shareSingleError,
+        );
+      }
+
+      // 2) Share.open with type 'message/rfc822' — fires ACTION_SEND with
+      // EXTRA_STREAM, which Gmail (and other email apps) honor for real
+      // attachments. Shows an email-only chooser.
+      if (hasAttachments) {
         try {
-          await Share.shareSingle({
-            social: Social.Email,
+          await Share.open({
             title: subject,
             subject,
             message,
             email: SUPPORT_EMAIL,
             urls,
+            type: 'message/rfc822',
+            failOnCancel: false,
           });
           return;
-        } catch (shareError) {
+        } catch (openError) {
           console.warn(
-            '[ReportProblem] shareSingle EMAIL failed, falling back to mailto (attachments will be lost)',
-            shareError,
+            '[ReportProblem] Share.open failed, falling back to mailto (attachments will be lost)',
+            openError,
           );
         }
       }
 
+      // 3) Last resort — mailto. No attachments possible, but full body
+      // is delivered.
       await fallbackToMailto(subject, message);
     },
     [fallbackToMailto],
@@ -215,6 +269,8 @@ const ReportProblemScreen: React.FC<Props> = () => {
   const handleResetForAnother = useCallback(() => {
     setDescription('');
     setAttachments([]);
+    setReasonLabels([]);
+    setReportedMessage('');
     setTouched({description: false});
     setSubmitted(false);
   }, []);
@@ -282,6 +338,45 @@ const ReportProblemScreen: React.FC<Props> = () => {
                 we can help.
               </Text>
             </View>
+
+            {/* Reporting context (only when navigated from a flagged response) */}
+            {(reasonLabels.length > 0 || reportedMessage) ? (
+              <>
+                <Text style={styles.sectionHeading}>Reporting</Text>
+                <View style={styles.glassCard}>
+                  {reasonLabels.length > 0 ? (
+                    <View style={styles.reasonsBlock}>
+                      <Text style={styles.reasonsBlockLabel}>
+                        Reasons selected
+                      </Text>
+                      <View style={styles.reasonChipsRow}>
+                        {reasonLabels.map(label => (
+                          <View key={label} style={styles.reasonChip}>
+                            <MaterialCommunityIcon
+                              name="flag-variant"
+                              size={12}
+                              color="#FFFFFF"
+                            />
+                            <Text style={styles.reasonChipText}>{label}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  ) : null}
+
+                  {reportedMessage ? (
+                    <View style={styles.reportedQuoteWrap}>
+                      <Text style={styles.reportedQuoteLabel}>
+                        Reported response
+                      </Text>
+                      <Text style={styles.reportedQuoteText} numberOfLines={5}>
+                        "{reportedMessage.trim()}"
+                      </Text>
+                    </View>
+                  ) : null}
+                </View>
+              </>
+            ) : null}
 
             {/* Description */}
             <Text style={styles.sectionHeading}>Description</Text>

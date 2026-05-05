@@ -62,6 +62,61 @@ export const styles = StyleSheet.create({
     lineHeight: fontScale(19),
   },
 
+  // Reporting context (when navigated from a flagged AI response)
+  reasonsBlock: {
+    marginBottom: verticalScale(14),
+  },
+  reasonsBlockLabel: {
+    fontFamily: FontFamilies.interMedium,
+    fontSize: fontScale(11),
+    color: 'rgba(194, 209, 243, 0.55)',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    marginBottom: verticalScale(8),
+  },
+  reasonChipsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: horizontalScale(8),
+  },
+  reasonChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: horizontalScale(6),
+    paddingHorizontal: horizontalScale(10),
+    paddingVertical: verticalScale(6),
+    borderRadius: radiusScale(20),
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.25)',
+  },
+  reasonChipText: {
+    fontFamily: FontFamilies.interMedium,
+    fontSize: fontScale(12),
+    color: '#FFFFFF',
+  },
+  reportedQuoteWrap: {
+    paddingTop: verticalScale(12),
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(194, 209, 243, 0.12)',
+  },
+  reportedQuoteLabel: {
+    fontFamily: FontFamilies.interMedium,
+    fontSize: fontScale(11),
+    color: 'rgba(194, 209, 243, 0.55)',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    marginTop: verticalScale(10),
+    marginBottom: verticalScale(8),
+  },
+  reportedQuoteText: {
+    fontFamily: FontFamilies.interRegular,
+    fontSize: fontScale(13),
+    color: 'rgba(255, 255, 255, 0.78)',
+    lineHeight: fontScale(20),
+    fontStyle: 'italic',
+  },
+
   // Attachments
   attachmentHeader: {
     marginBottom: verticalScale(10),

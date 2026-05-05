@@ -31,7 +31,16 @@ import {
 } from '../../theme';
 
 // Components
-import {ChatHeader, MessageBubble, ChatInput, ImagePreviewModal, TypingIndicator, PalmLineTabs} from './components';
+import {
+  ChatHeader,
+  MessageBubble,
+  ChatInput,
+  ImagePreviewModal,
+  TypingIndicator,
+  PalmLineTabs,
+  ReportResponseModal,
+} from './components';
+import type {ReportReasonId} from './components';
 
 // Icons
 const ArrowDownIcon = require('../../assets/icons/chat_icons/arrow.png');
@@ -102,6 +111,30 @@ const ChatScreen: React.FC<Props> = () => {
   const handleOpenReport = useCallback(() => {
     navigation.navigate('ReportProblem', {source: 'chat'});
   }, [navigation]);
+
+  // Report-this-response modal state
+  const [reportTargetMessage, setReportTargetMessage] = useState<ChatMessage | null>(null);
+
+  const handleMessageReportPress = useCallback((msg: ChatMessage) => {
+    setReportTargetMessage(msg);
+  }, []);
+
+  const handleCloseReportModal = useCallback(() => {
+    setReportTargetMessage(null);
+  }, []);
+
+  const handleSubmitReportReasons = useCallback(
+    (reasons: ReportReasonId[]) => {
+      const messageContent = reportTargetMessage?.content || '';
+      setReportTargetMessage(null);
+      navigation.navigate('ReportProblem', {
+        source: 'chat',
+        reasons,
+        reportedMessage: messageContent,
+      });
+    },
+    [navigation, reportTargetMessage],
+  );
   
   // State
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -509,9 +542,10 @@ const ChatScreen: React.FC<Props> = () => {
       <MessageBubble
         message={item}
         onImagePress={handleImagePress}
+        onReportPress={handleMessageReportPress}
       />
     ),
-    [handleImagePress],
+    [handleImagePress, handleMessageReportPress],
   );
 
   // Key extractor
@@ -656,6 +690,13 @@ const ChatScreen: React.FC<Props> = () => {
         message="The oracle is receiving too many transmissions right now. Please try again in a moment."
         buttonText="Got It"
         onDismiss={() => setShowQuotaAlert(false)}
+      />
+
+      {/* Report-this-response Modal */}
+      <ReportResponseModal
+        visible={!!reportTargetMessage}
+        onClose={handleCloseReportModal}
+        onSubmit={handleSubmitReportReasons}
       />
     </View>
   );
