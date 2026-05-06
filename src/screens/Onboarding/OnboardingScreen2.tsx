@@ -33,11 +33,7 @@ import {
   moderateScale,
 } from '../../theme';
 import {hapticLight} from '../../utils/haptics';
-import {
-  trackOnboarding2View,
-} from '../../utils/onboardingAnalytics';
-import {useScreenView} from '../../hooks/useFacebookAnalytics';
-import firebaseService from '../../services/firebase/FirebaseService';
+import {trackOnboarding2View} from '../../utils/onboardingAnalytics';
 import {OnboardingButton} from '../../components/OnboardingButton';
 
 // Icons
@@ -125,19 +121,12 @@ export const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({
 }) => {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
 
-  useScreenView('OnboardingScreen2', {
-    screen_category: 'onboarding',
-    step: 2,
-    total_steps: 11,
-  });
-
   const CURRENT_STEP = 2;
   const TOTAL_STEPS = 12;
   const progressWidth = useSharedValue(0);
 
   useEffect(() => {
     trackOnboarding2View();
-    firebaseService.logScreenView('onboarding_2_seeking_options', 'OnboardingScreen2');
 
     const targetProgress = (CURRENT_STEP / TOTAL_STEPS) * 100;
     progressWidth.value = withDelay(

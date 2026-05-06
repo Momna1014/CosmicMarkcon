@@ -33,8 +33,6 @@ import {
   moderateScale,
 } from '../../theme';
 import {hapticLight} from '../../utils/haptics';
-import {useScreenView} from '../../hooks/useFacebookAnalytics';
-import firebaseService from '../../services/firebase/FirebaseService';
 import {trackOnboarding4GenderView} from '../../utils/onboardingAnalytics';
 import {OnboardingButton} from '../../components/OnboardingButton';
 
@@ -115,19 +113,12 @@ export const OnboardingScreen4: React.FC<OnboardingScreen4Props> = ({
 }) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(gender || null);
 
-  useScreenView('OnboardingScreen4', {
-    screen_category: 'onboarding',
-    step: 4,
-    total_steps: 9,
-  });
-
   const CURRENT_STEP = 4;
   const TOTAL_STEPS = 12;
   const progressWidth = useSharedValue((CURRENT_STEP - 1) / TOTAL_STEPS * 100);
 
   useEffect(() => {
     trackOnboarding4GenderView();
-    firebaseService.logScreenView('onboarding_4_gender_selection', 'OnboardingScreen4');
 
     const targetProgress = (CURRENT_STEP / TOTAL_STEPS) * 100;
     progressWidth.value = withDelay(

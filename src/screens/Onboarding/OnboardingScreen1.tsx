@@ -31,12 +31,7 @@ import {
   moderateScale,
 } from '../../theme';
 import {hapticLight} from '../../utils/haptics';
-import {
-  trackOnboarding1View,
-  trackOnboardingStarted,
-} from '../../utils/onboardingAnalytics';
-import {useScreenView} from '../../hooks/useFacebookAnalytics';
-import firebaseService from '../../services/firebase/FirebaseService';
+import {trackOnboarding1View} from '../../utils/onboardingAnalytics';
 import {OnboardingButton} from '../../components/OnboardingButton';
 
 const WelcomeVideo = require('../../assets/Videos/welcome.mp4');
@@ -54,18 +49,10 @@ interface OnboardingScreen1Props {
 export const OnboardingScreen1: React.FC<OnboardingScreen1Props> = ({
   onContinue,
 }) => {
-  useScreenView('OnboardingScreen1', {
-    screen_category: 'onboarding',
-    step: 1,
-    total_steps: 12,
-  });
-
   const progressWidth = useSharedValue((CURRENT_STEP - 1) / TOTAL_STEPS * 100);
 
   useEffect(() => {
-    trackOnboardingStarted();
     trackOnboarding1View();
-    firebaseService.logScreenView('onboarding_1_welcome', 'OnboardingScreen1');
 
     progressWidth.value = withDelay(
       300,

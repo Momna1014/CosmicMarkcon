@@ -32,8 +32,6 @@ import {
   moderateScale,
 } from '../../theme';
 import {hapticLight} from '../../utils/haptics';
-import {useScreenView} from '../../hooks/useFacebookAnalytics';
-import firebaseService from '../../services/firebase/FirebaseService';
 import {trackOnboarding11AiVideoView} from '../../utils/onboardingAnalytics';
 import {OnboardingButton} from '../../components/OnboardingButton';
 
@@ -55,17 +53,10 @@ export const OnboardingScreen11: React.FC<OnboardingScreen11Props> = ({
   onContinue,
   onGoBack,
 }) => {
-  useScreenView('OnboardingScreen11', {
-    screen_category: 'onboarding',
-    step: 11,
-    total_steps: 12,
-  });
-
   const progressWidth = useSharedValue((CURRENT_STEP - 1) / TOTAL_STEPS * 100);
 
   useEffect(() => {
     trackOnboarding11AiVideoView();
-    firebaseService.logScreenView('onboarding_11_palm_reading', 'OnboardingScreen11');
 
     progressWidth.value = withDelay(
       300,

@@ -39,8 +39,6 @@ import {
   moderateScale,
 } from '../../theme';
 import {hapticLight} from '../../utils/haptics';
-import {useScreenView} from '../../hooks/useFacebookAnalytics';
-import firebaseService from '../../services/firebase/FirebaseService';
 import {trackOnboarding9InsightsPreviewView} from '../../utils/onboardingAnalytics';
 import {saveOnboardingData} from '../../redux/slices/onboardingSlice';
 import {getZodiacSign} from '../../components/mock/zodiacMockData';
@@ -126,12 +124,6 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
   onboardingData,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
-  
-  useScreenView('OnboardingScreen9', {
-    screen_category: 'onboarding',
-    step: 9,
-    total_steps: 9,
-  });
 
   const CURRENT_STEP = 9;
   const TOTAL_STEPS = 12;
@@ -142,7 +134,6 @@ export const OnboardingScreen9: React.FC<OnboardingScreen9Props> = ({
 
   useEffect(() => {
     trackOnboarding9InsightsPreviewView();
-    firebaseService.logScreenView('onboarding_9_insights_preview', 'OnboardingScreen9');
 
     const targetProgress = (CURRENT_STEP / TOTAL_STEPS) * 100;
     progressWidth.value = withDelay(
