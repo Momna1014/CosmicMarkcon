@@ -2,7 +2,7 @@ import React, {useCallback, useMemo, useEffect, useState, useRef} from 'react';
 import {View, StatusBar, ScrollView, RefreshControl, InteractionManager} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSelector} from 'react-redux';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
@@ -11,14 +11,8 @@ import {styles} from './styles';
 import {RootStackParamList, MainTabParamList} from '../../navigation/deepLinking';
 
 // Analytics
-import {useScreenView} from '../../hooks/useFacebookAnalytics';
-import firebaseService from '../../services/firebase/FirebaseService';
-import {
-  trackHomeView,
-  trackHomeFeatureCardTap,
-  trackHomeCosmicGuideTap,
-  trackHomeDailyHoroscopeTap,
-} from '../../utils/mainScreenAnalytics';
+import {trackHomeTabView, trackBtChildView} from '../../utils/mainScreenAnalytics';
+import {markNextFocusFromHome} from '../../utils/tabNavigationSource';
 
 // Cosmic data hook
 import {useCosmicData} from '../../hooks/useCosmicData';
@@ -153,31 +147,29 @@ const HomeScreen: React.FC = () => {
     return onboardingData?.zodiacSign?.toUpperCase() || 'ARIES';
   }, [onboardingData?.zodiacSign]);
 
-  // Analytics - Screen View
-  useScreenView('Home', {
-    screen_category: 'main',
-    zodiac_sign: zodiacSign,
-  });
-
-  // Analytics - Track screen view on mount
-  useEffect(() => {
-    trackHomeView();
-    firebaseService.logScreenView('Home', 'HomeScreen');
-  }, []);
+  // Analytics - Bottom tab view
+  useFocusEffect(
+    useCallback(() => {
+      trackHomeTabView();
+    }, [])
+  );
 
   // Memoized callback handlers - prevents child component re-renders
   const handleReadHoroscope = useCallback(() => {
-    trackHomeDailyHoroscopeTap(zodiacSign);
+    trackBtChildView('home', 'horoscope');
+    markNextFocusFromHome();
     navigation.navigate('Horoscope');
-  }, [navigation, zodiacSign]);
+  }, [navigation]);
 
   const handleSynastryPress = useCallback(() => {
-    trackHomeFeatureCardTap('synastry');
+    trackBtChildView('home', 'love');
+    markNextFocusFromHome();
     navigation.navigate('Love');
   }, [navigation]);
 
   const handleChiromancyPress = useCallback(() => {
-    trackHomeFeatureCardTap('chiromancy');
+    trackBtChildView('home', 'chiromancy');
+    markNextFocusFromHome();
     navigation.navigate('Chiromancy');
   }, [navigation]);
 
@@ -186,7 +178,6 @@ const HomeScreen: React.FC = () => {
   }, [navigation]);
 
   const handleCosmicGuidePress = useCallback((guideId: string) => {
-    trackHomeCosmicGuideTap(guideId, guideId);
     navigation.navigate('CosmicGuideDetail', {guideId});
   }, [navigation]);
 

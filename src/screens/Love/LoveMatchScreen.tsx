@@ -27,13 +27,7 @@ import LoveLoader from '../../components/LoveLoader';
 import CosmicAlert from '../../components/CosmicAlert';
 
 // Analytics
-import {useScreenView} from '../../hooks/useFacebookAnalytics';
-import firebaseService from '../../services/firebase/FirebaseService';
-import {
-  trackLoveMatchView,
-  trackLoveMatchAskOracleTap,
-  trackLoveMatchDismiss,
-} from '../../utils/mainScreenAnalytics';
+import {trackBtChildView} from '../../utils/mainScreenAnalytics';
 
 // Import icons
 import CosmicInsightIcon from '../../assets/icons/horoscope_icons/cosmic_insight.svg';
@@ -481,28 +475,16 @@ const LoveMatchScreen: React.FC<Props> = ({route}) => {
     return () => { cancelled = true; };
   }, [yourSign, theirSign, buildMatchData]);
 
-  // Analytics - Screen View
-  useScreenView('LoveMatch', {
-    screen_category: 'love',
-    your_sign: yourSign,
-    their_sign: theirSign,
-  });
-
-  // Analytics - Track screen view on mount
+  // Analytics - Bottom tab child view
   useEffect(() => {
-    if (matchData) {
-      trackLoveMatchView(yourSign, theirSign, matchData.overallScore);
-    }
-    firebaseService.logScreenView('LoveMatch', 'LoveMatchScreen');
-  }, [yourSign, theirSign, matchData]);
+    trackBtChildView('love', 'lovematch');
+  }, []);
 
   const handleClose = useCallback(() => {
-    trackLoveMatchDismiss(yourSign, theirSign);
     navigation.goBack();
-  }, [navigation, yourSign, theirSign]);
+  }, [navigation]);
 
   const handleAskOracle = useCallback(() => {
-    trackLoveMatchAskOracleTap(yourSign, theirSign);
     const summary = matchData
       ? `My sign: ${yourSign}\nPartner's sign: ${theirSign}\nOverall compatibility: ${matchData.overallScore}%\nAlignment: ${matchData.alignmentText}\n${matchData.metrics.map(m => `${m.label}: ${m.percentage}%`).join('\n')}\nCelestial Insight: ${matchData.cosmicInsight.description}`
       : `My sign: ${yourSign}, Partner's sign: ${theirSign}`;

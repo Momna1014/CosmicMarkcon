@@ -25,13 +25,7 @@ import {launchCamera, ImagePickerResult} from '../../utils/imagePicker';
 import CustomAlert from '../../components/common/CustomAlert';
 
 // Analytics
-import {useScreenView} from '../../hooks/useFacebookAnalytics';
-import firebaseService from '../../services/firebase/FirebaseService';
-import {
-  trackPalmCaptureView,
-  trackPalmCaptureImage,
-  trackPalmAnalysisStart,
-} from '../../utils/mainScreenAnalytics';
+import {trackBtChildView} from '../../utils/mainScreenAnalytics';
 
 // Import icons
 import CrossIcon from '../../assets/icons/home_icons/cross.svg';
@@ -269,18 +263,10 @@ const PalmCaptureScreen: React.FC = memo(() => {
   const previewAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
-  // Analytics - Screen View
-  useScreenView('PalmCapture', {
-    screen_category: 'chiromancy',
-    hand_type: handType === 'leftHand' ? 'left' : 'right',
-  });
-
-  // Analytics - Track screen view on mount
+  // Analytics - Bottom tab child view
   useEffect(() => {
-    const hand = handType === 'leftHand' ? 'left' : 'right';
-    trackPalmCaptureView(hand as 'left' | 'right');
-    firebaseService.logScreenView('PalmCapture', 'PalmCaptureScreen');
-  }, [handType]);
+    trackBtChildView('chiromancy', 'palmcapture');
+  }, []);
 
   useEffect(() => {
     // Animate in on mount
@@ -336,8 +322,6 @@ const PalmCaptureScreen: React.FC = memo(() => {
     });
     
     if (result) {
-      const hand = handType === 'leftHand' ? 'left' : 'right';
-      trackPalmCaptureImage(hand as 'left' | 'right');
       setCapturedImage(result);
       setShowPreview(true);
       
@@ -364,8 +348,6 @@ const PalmCaptureScreen: React.FC = memo(() => {
 
   const handleConfirm = useCallback(() => {
     if (capturedImage) {
-      const hand = handType === 'leftHand' ? 'left' : 'right';
-      trackPalmAnalysisStart(hand as 'left' | 'right');
       // Replace current screen with Chat so going back skips PalmCaptureScreen
       navigation.replace('Chat', {
         source: 'palm',

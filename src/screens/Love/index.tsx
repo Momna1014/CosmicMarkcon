@@ -26,15 +26,9 @@ import {
 import SignSelectModal, {ZodiacSignItem, getZodiacIcon} from '../../components/home_components/SignSelectModal';
 
 // Analytics
-import {useScreenView} from '../../hooks/useFacebookAnalytics';
-import firebaseService from '../../services/firebase/FirebaseService';
-import {
-  trackLoveView,
-  trackLoveTabChange,
-  trackLoveSignSelect,
-  trackLoveMatchNowTap,
-  trackLoveAddPartnerTap,
-} from '../../utils/mainScreenAnalytics';
+import {trackLoveTabView} from '../../utils/mainScreenAnalytics';
+import {useFocusEffect} from '@react-navigation/native';
+import {consumeNextFocusSource} from '../../utils/tabNavigationSource';
 import {hapticLight} from '../../utils/haptics';
 
 // Import SVG icons
@@ -298,21 +292,16 @@ const LoveScreen: React.FC<Props> = ({navigation}) => {
     return onboardingData?.zodiacSign || 'Aries';
   }, [onboardingData?.zodiacSign]);
 
-  // Analytics - Screen View
-  useScreenView('Love', {
-    screen_category: 'main',
-    zodiac_sign: userZodiacSign,
-  });
-
-  // Analytics - Track screen view on mount
-  useEffect(() => {
-    trackLoveView();
-    firebaseService.logScreenView('Love', 'LoveScreen');
-  }, []);
+  // Analytics - Bottom tab view
+  useFocusEffect(
+    useCallback(() => {
+      if (consumeNextFocusSource() === 'home') { return; }
+      trackLoveTabView();
+    }, [])
+  );
 
   const handleTabPress = useCallback((tab: TabType) => {
     hapticLight();
-    trackLoveTabChange(tab === 'quickMatch' ? 'quick_match' : 'deep_bond');
     setActiveTab(tab);
   }, []);
 
@@ -327,8 +316,6 @@ const LoveScreen: React.FC<Props> = ({navigation}) => {
   const handleSelectSign = useCallback((sign: ZodiacSignItem) => {
     setSelectedSign(sign);
     setModalVisible(false);
-    trackLoveSignSelect('their', sign.name);
-    trackLoveMatchNowTap(onboardingData?.zodiacSign || 'Aries', sign.name);
     // Navigate to LoveMatch screen with both signs
     navigation.navigate('LoveMatch', {
       yourSign: onboardingData?.zodiacSign || 'Aries',
@@ -337,7 +324,6 @@ const LoveScreen: React.FC<Props> = ({navigation}) => {
   }, [navigation, onboardingData?.zodiacSign]);
 
   const handleAddPartner = useCallback(() => {
-    trackLoveAddPartnerTap();
     navigation.navigate('AddPartner');
   }, [navigation]);
 
@@ -363,7 +349,6 @@ const LoveScreen: React.FC<Props> = ({navigation}) => {
 
   const handlePartnerPress = useCallback((partner: Partner) => {
     hapticLight();
-    trackLoveMatchNowTap(onboardingData?.zodiacSign || 'Aries', partner.zodiacSign);
     navigation.navigate('LoveMatch', {
       yourSign: onboardingData?.zodiacSign || 'Aries',
       theirSign: partner.zodiacSign,

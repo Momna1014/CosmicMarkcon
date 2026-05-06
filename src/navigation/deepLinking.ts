@@ -7,13 +7,15 @@
 
 import {LinkingOptions} from '@react-navigation/native';
 
+export type BottomTabSource = 'home' | 'horoscope' | 'love' | 'chiromancy' | 'chat';
+
 export type RootStackParamList = {
   // Auth/Onboarding
   Onboarding: undefined;
-  
+
   // Paywall
-  Paywall: {source?: string; offeringIdentifier?: string} | undefined;
-  
+  Paywall: {source?: string; offeringIdentifier?: string; bottomTabSource?: BottomTabSource} | undefined;
+
   // Main App
   MainApp: undefined;
 
@@ -43,6 +45,7 @@ export type RootStackParamList = {
         source?: 'settings' | 'chat';
         reasons?: string[];
         reportedMessage?: string;
+        bottomTabSource?: BottomTabSource;
       }
     | undefined;
 

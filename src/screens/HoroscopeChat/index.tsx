@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -8,18 +8,11 @@ import {
   Image,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {useSelector} from 'react-redux';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {selectOnboardingState} from '../../redux/slices/onboardingSlice';
 import {RootStackParamList} from '../../navigation/deepLinking';
 import {styles} from './styles';
-import {useScreenView} from '../../hooks/useFacebookAnalytics';
-import firebaseService from '../../services/firebase/FirebaseService';
-import {
-  trackHoroscopeChatView,
-  trackHoroscopeChatStartTap,
-} from '../../utils/mainScreenAnalytics';
+import {trackChatTabView} from '../../utils/mainScreenAnalytics';
 
 // Icons
 import CosmicOracleChatIcon from '../../assets/icons/chat_icons/cosmic_oracle_chat.svg';
@@ -30,16 +23,13 @@ const StarIcon = require('../../assets/icons/chat_icons/star.png');
 
 const HoroscopeChatScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const onboardingData = useSelector(selectOnboardingState);
-  const zodiacSign = onboardingData?.zodiacSign || '';
 
-  // Analytics
-  useScreenView('HoroscopeChat', {zodiac_sign: zodiacSign});
-
-  useEffect(() => {
-    trackHoroscopeChatView(zodiacSign);
-    firebaseService.logScreenView('HoroscopeChat', 'HoroscopeChatScreen');
-  }, [zodiacSign]);
+  // Analytics - Bottom tab view
+  useFocusEffect(
+    useCallback(() => {
+      trackChatTabView();
+    }, [])
+  );
 
   // Animations
   const badgeFade = useRef(new Animated.Value(0)).current;
@@ -69,7 +59,6 @@ const HoroscopeChatScreen: React.FC = () => {
   }, [badgeFade, iconFade, iconScale, textFade, textSlide, buttonFade, buttonSlide]);
 
   const handleStartChat = () => {
-    trackHoroscopeChatStartTap(zodiacSign);
     navigation.getParent<NativeStackNavigationProp<RootStackParamList>>()?.navigate('Chat');
   };
 

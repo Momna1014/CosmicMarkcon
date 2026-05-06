@@ -50,14 +50,7 @@ import {hapticLight} from '../../utils/haptics';
 import {ICountry, ICity, City} from 'country-state-city';
 
 // Analytics
-import {useScreenView} from '../../hooks/useFacebookAnalytics';
-import firebaseService from '../../services/firebase/FirebaseService';
-import {
-  trackAddPartnerView,
-  trackAddPartnerStep,
-  trackAddPartnerComplete,
-  trackAddPartnerDismiss,
-} from '../../utils/mainScreenAnalytics';
+import {trackBtChildView} from '../../utils/mainScreenAnalytics';
 
 // Icons
 import CloseIcon from '../../assets/icons/home_icons/cross.svg';
@@ -125,15 +118,9 @@ const AddPartnerScreen: React.FC<AddPartnerScreenProps> = ({navigation}) => {
   const progressWidth = useSharedValue(33);
   const buttonScale = useSharedValue(1);
 
-  // Analytics - Screen View
-  useScreenView('AddPartner', {
-    screen_category: 'love',
-  });
-
-  // Analytics - Track screen view on mount
+  // Analytics - Bottom tab child view
   useEffect(() => {
-    trackAddPartnerView();
-    firebaseService.logScreenView('AddPartner', 'AddPartnerScreen');
+    trackBtChildView('love', 'addpartner');
   }, []);
 
   // Update progress bar based on step
@@ -148,10 +135,6 @@ const AddPartnerScreen: React.FC<AddPartnerScreenProps> = ({navigation}) => {
       duration: 500,
       easing: Easing.out(Easing.cubic),
     });
-    // Track step changes
-    if (currentStep !== 'analyze') {
-      trackAddPartnerStep(currentStep);
-    }
   }, [currentStep, progressWidth]);
 
 
@@ -168,7 +151,6 @@ const AddPartnerScreen: React.FC<AddPartnerScreenProps> = ({navigation}) => {
   // Handle close
   const handleClose = () => {
     hapticLight();
-    trackAddPartnerDismiss(currentStep);
     navigation.goBack();
   };
 
@@ -189,7 +171,6 @@ const AddPartnerScreen: React.FC<AddPartnerScreenProps> = ({navigation}) => {
         // Save partner to Redux, then show analyze step
         if (birthday) {
           const zodiacSign = getZodiacSign(birthday);
-          trackAddPartnerComplete(zodiacSign.name, selectedCity !== null);
           dispatch(addPartner({
             name: partnerName.trim(),
             birthday: birthday.toISOString(),

@@ -68,12 +68,7 @@ import {
 } from '../../utils/imagePicker';
 
 // Analytics
-import {useScreenView} from '../../hooks/useFacebookAnalytics';
-import firebaseService from '../../services/firebase/FirebaseService';
-import {
-  trackChatView,
-  trackChatMessageSend,
-} from '../../utils/mainScreenAnalytics';
+import {trackBtChildView, BottomTabSource} from '../../utils/mainScreenAnalytics';
 import CosmicAlert from '../../components/CosmicAlert';
 
 // Palm diagram assets
@@ -127,9 +122,10 @@ const ChatScreen: React.FC<Props> = () => {
         source: 'chat',
         reasons,
         reportedMessage: messageContent,
+        bottomTabSource,
       });
     },
-    [navigation, reportTargetMessage],
+    [navigation, reportTargetMessage, bottomTabSource],
   );
   
   // State
@@ -182,17 +178,13 @@ const ChatScreen: React.FC<Props> = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Analytics - Screen View
-  useScreenView('Chat', {
-    screen_category: 'main',
-    source: source || 'direct',
-  });
-
-  // Analytics - Track screen view on mount
+  // Analytics - Bottom tab child view (source-routed)
+  // Maps Chat's existing `source` param to its originating bottom tab.
+  const bottomTabSource: BottomTabSource =
+    source === 'palm' ? 'chiromancy' : source === 'love' ? 'love' : 'chat';
   useEffect(() => {
-    trackChatView();
-    firebaseService.logScreenView('Chat', 'ChatScreen');
-  }, []);
+    trackBtChildView(bottomTabSource, 'chat');
+  }, [bottomTabSource]);
 
   // Handle initial message from Palm Capture or Love Match
   useEffect(() => {
@@ -377,7 +369,6 @@ const ChatScreen: React.FC<Props> = () => {
   // Send text message (with optional image)
   const handleSendMessage = useCallback(
     async (text: string, attachedImageUri?: string) => {
-      trackChatMessageSend(text.length);
       const userMessage = createUserMessage(text, attachedImageUri);
       addMessage(userMessage);
 
