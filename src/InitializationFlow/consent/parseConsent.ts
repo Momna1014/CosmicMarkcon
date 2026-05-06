@@ -251,7 +251,10 @@ function deriveCategoryGrants(decisions: ConsentDecisionMap): ConsentGrants {
       grants.analytics = true;
     }
 
-    if (hasAnyToken(text, ['advertising', 'marketing', 'admob', 'applovin', 'facebook', 'meta', 'adjust', 'ads'])) {
+    // @feature:admob:start [disabled]
+    // 'admob' token removed from advertising token list while AdMob is disabled
+    // @feature:admob:end
+    if (hasAnyToken(text, ['advertising', 'marketing', 'applovin', 'facebook', 'meta', 'adjust', 'ads'])) {
       grants.advertising = true;
     }
 
@@ -311,9 +314,11 @@ function deriveVendorGrants(
   if (!vendorGrants.adjust && (grants.analytics || grants.advertising)) {
     vendorGrants.adjust = true;
   }
-  if (!vendorGrants.admob && grants.advertising) {
-    vendorGrants.admob = true;
-  }
+  // @feature:admob:start [disabled]
+  // if (!vendorGrants.admob && grants.advertising) {
+  //   vendorGrants.admob = true;
+  // }
+  // @feature:admob:end
   if (!vendorGrants.applovin && grants.advertising) {
     vendorGrants.applovin = true;
   }

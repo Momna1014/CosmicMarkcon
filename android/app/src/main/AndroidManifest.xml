@@ -104,9 +104,11 @@
       android:name="firebase_inapp_messaging_auto_data_collection_enabled"
       android:value="false" />
 
-    <meta-data
+    <!-- @feature:admob:start [disabled] -->
+    <!-- <meta-data
       android:name="com.google.android.gms.ads.DELAY_APP_MEASUREMENT_INIT"
-      android:value="true" />
+      android:value="true" /> -->
+    <!-- @feature:admob:end -->
 
     <activity
       android:name="com.facebook.FacebookActivity"
@@ -153,9 +155,11 @@
       android:name="app.notifee.core.BlockStateBroadcastReceiver"
       tools:node="remove" />
 
-    <meta-data
+    <!-- @feature:admob:start [disabled] -->
+    <!-- <meta-data
       android:name="com.google.android.gms.ads.APPLICATION_ID"
-      android:value="ca-app-pub-3781511156022357~2699873695" />
+      android:value="ca-app-pub-3781511156022357~2699873695" /> -->
+    <!-- @feature:admob:end -->
 
     <receiver
       android:name=".widget.TodoWidgetProvider"
@@ -175,6 +179,7 @@
       android:launchMode="singleTask"
       android:windowSoftInputMode="adjustResize"
       android:exported="true"
+      android:screenOrientation="portrait"
       android:theme="@style/BootTheme">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />

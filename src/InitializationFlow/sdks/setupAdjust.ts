@@ -20,7 +20,7 @@ import {
  * Initialize the Adjust SDK with consent-aware configuration.
  *
  * Called from deferredSDKs after splash hides (non-critical path).
- * Replaces AppsFlyer as the Mobile Measurement Partner (MMP).
+ * Adjust is the Mobile Measurement Partner (MMP) for the project.
  *
  * Note: Adjust v5 reads ATT status from the OS automatically —
  * no need to pass attStatus explicitly.

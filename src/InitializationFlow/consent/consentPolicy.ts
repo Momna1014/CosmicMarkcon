@@ -46,9 +46,10 @@ export const VENDOR_TOKEN_MAP: Record<ConsentVendorKey, string[]> = {
   firebaseCrashlytics: ['firebase crashlytics', 'firebase_crashlytics', 'crashlytics', 'crash'],
   sentry: ['sentry', 'crash', 'diagnostic'],
   adjust: ['adjust', 'attribution'],
-  admob: ['admob', 'google mobile ads', 'advertising', 'marketing', 'ads'],
+  // @feature:admob:start [disabled]
+  // admob: ['admob', 'google mobile ads', 'advertising', 'marketing', 'ads'],
+  // @feature:admob:end
   applovin: ['applovin', 'max', 'advertising', 'marketing', 'ads'],
-  appsflyer: ['appsflyer', 'attribution'],
   facebook: ['facebook', 'meta', 'advertising', 'marketing', 'ads'],
   revenuecat: ['revenuecat', 'purchase', 'subscription', 'personalization', 'personalisation'],
   remoteConfig: ['remote config', 'remote_config', 'firebase remote config'],
@@ -105,9 +106,10 @@ export const KNOWN_TEMPLATE_IDS: Record<string, TemplateGrant> = {
   '5bv4OvSwoXKh-G':  { grants: ['advertising'] },              // Verve HyBid / PubNative
 
   // ---- Ad Networks with vendorKey -----------------------------------------
-  'r7rvuoyDz':       { vendorKey: 'admob',     grants: ['advertising'] },   // AdMob
+  // @feature:admob:start [disabled]
+  // 'r7rvuoyDz':       { vendorKey: 'admob',     grants: ['advertising'] },   // AdMob
+  // @feature:admob:end
   'fHczTMzX8':       { vendorKey: 'applovin',  grants: ['advertising'] },   // AppLovin
-  'Gx9iMF__f':       { vendorKey: 'appsflyer', grants: ['analytics', 'advertising'] }, // AppsFlyer
   '1XvFW-Y2k':       { vendorKey: 'facebook',  grants: ['advertising'] },   // Facebook
   'ax0Nljnj2szF_r':  { vendorKey: 'facebook',  grants: ['advertising'] },   // Facebook Audience Network
   'ocv9HNX_g':       { vendorKey: 'facebook',  grants: ['advertising'] },   // Facebook SDK
@@ -217,7 +219,9 @@ export function isCrashReportingAllowed(consent: ConsentResult): boolean {
 
 export function isAdvertisingAllowed(consent: ConsentResult): boolean {
   return (
-    isVendorAllowed(consent, 'admob') ||
+    // @feature:admob:start [disabled]
+    // isVendorAllowed(consent, 'admob') ||
+    // @feature:admob:end
     isVendorAllowed(consent, 'applovin') ||
     isVendorAllowed(consent, 'facebook') ||
     consent.grants.advertising

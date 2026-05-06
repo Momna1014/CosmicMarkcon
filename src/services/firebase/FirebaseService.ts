@@ -96,6 +96,22 @@ async function ensureNativeBootstrap(): Promise<boolean> {
   }
 }
 
+/**
+ * Public entry point for the native Firebase bootstrap.
+ *
+ * Firebase Auth (anonymous sign-in) is in the Functional/Essential category and
+ * MUST work regardless of the user's analytics / crashlytics / advertising
+ * consent. Call this from the essentials phase of the boot flow so the
+ * `[DEFAULT]` Firebase App always exists by the time `auth()` is touched —
+ * even when the user denies all consent or disables granular categories.
+ *
+ * Resolves to `true` when the native default app is ready, `false` otherwise.
+ * Idempotent and safe to call multiple times.
+ */
+export async function initializeFirebaseNative(): Promise<boolean> {
+  return ensureNativeBootstrap();
+}
+
 // ==================== STATE ACCESSORS ====================
 
 export function isAnalyticsEnabled(): boolean {

@@ -28,7 +28,7 @@ import {
   type ReportSource,
 } from '../../services/support/ReportDiagnosticsService';
 
-const SUPPORT_EMAIL = 'momnasarfraz636@gmail.com';
+const SUPPORT_EMAIL = 'hello@markconapps.com';
 const MIN_DESCRIPTION_LENGTH = 20;
 const MAX_DESCRIPTION_LENGTH = 1500;
 const MAX_ATTACHMENTS = 5;

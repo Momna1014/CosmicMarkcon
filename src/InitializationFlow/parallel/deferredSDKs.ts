@@ -28,8 +28,8 @@
  */
 
 import type { ATTStatus, ConsentResult, AdsModeResult } from '../types';
-// @feature:admob:start
-import { setupAdMob } from '../sdks/setupAdMob';
+// @feature:admob:start [disabled]
+// import { setupAdMob } from '../sdks/setupAdMob';
 // @feature:admob:end
 // @feature:applovin-max:start [disabled]
 // import { setupAppLovin } from '../sdks/setupAppLovin';
@@ -37,9 +37,6 @@ import { setupAdMob } from '../sdks/setupAdMob';
 // @feature:adjust:start
 import { setupAdjust } from '../sdks/setupAdjust';
 // @feature:adjust:end
-// @feature:appsflyer:start [disabled]
-// import { setupAppsFlyer } from '../sdks/setupAppsFlyer';
-// @feature:appsflyer:end
 import { setupFacebook } from '../sdks/setupFacebook';
 import { enableSentryFullTracking } from '../sdks/setupSentry';
 import { setupRemoteConfig } from '../sdks/setupRemoteConfig';
@@ -165,23 +162,14 @@ function buildGroupB(consent: ConsentResult, adsMode: AdsModeResult): DeferredTa
   }
   // @feature:adjust:end
 
-  // @feature:appsflyer:start [disabled]
-  // // AppsFlyer — analytics-grade attribution (alternative to Adjust). Only runs when advertising allowed.
-  // if (isPersonalized && (isVendorAllowed(consent, 'appsflyer') || analyticsAllowed)) {
-    // tasks.push({ name: 'AppsFlyer', run: () => setupAppsFlyer(trackingAllowed, true) });
+  // @feature:admob:start [disabled]
+  // // AdMob — initialize in personalized OR NPA mode. Never disabled by consent
+  // // (RC kill-switch uses disableAdMob() separately).
+  // if (isPersonalized && isVendorAllowed(consent, 'admob')) {
+  //   tasks.push({ name: 'AdMob', run: () => setupAdMob('personalized') });
   // } else {
-    // tasks.push({ name: 'AppsFlyerDisable', run: () => setupAppsFlyer(false, false) });
+  //   tasks.push({ name: 'AdMobNPA', run: () => setupAdMob('non-personalized') });
   // }
-  // @feature:appsflyer:end
-
-  // @feature:admob:start
-  // AdMob — initialize in personalized OR NPA mode. Never disabled by consent
-  // (RC kill-switch uses disableAdMob() separately).
-  if (isPersonalized && isVendorAllowed(consent, 'admob')) {
-    tasks.push({ name: 'AdMob', run: () => setupAdMob('personalized') });
-  } else {
-    tasks.push({ name: 'AdMobNPA', run: () => setupAdMob('non-personalized') });
-  }
   // @feature:admob:end
 
   // @feature:applovin-max:start [disabled]

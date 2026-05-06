@@ -482,11 +482,8 @@ function buildRegionNotRequiredConsent(
       // @feature:adjust:start
       adjust: true,
       // @feature:adjust:end
-      // @feature:appsflyer:start [disabled]
-      // appsflyer: true,
-      // @feature:appsflyer:end
-      // @feature:admob:start
-      admob: true,
+      // @feature:admob:start [disabled]
+      // admob: true,
       // @feature:admob:end
       // @feature:applovin-max:start [disabled]
       // applovin: true,

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Shared helpers for vendor-toggle scripts (admob/applovin, adjust/appsflyer).
+# Shared helpers for vendor-toggle scripts (admob/applovin).
 # Strategy: every togglable region is bracketed by paired markers like:
 #     // @feature:<name>:start   ...   // @feature:<name>:end
 # Comment style is auto-detected from the START marker line. Supported styles:

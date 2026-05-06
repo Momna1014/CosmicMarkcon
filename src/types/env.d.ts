@@ -34,26 +34,24 @@ declare module '@env' {
   export const APPLOVIN_APP_OPEN_AD_UNIT_ANDROID: string
 
   // Advertising (Google AdMob)
-  export const ADMOB_APP_ID_IOS: string
-  export const ADMOB_APP_ID_ANDROID: string
-  export const ADMOB_BANNER_AD_UNIT_IOS: string
-  export const ADMOB_BANNER_AD_UNIT_ANDROID: string
-  export const ADMOB_INTERSTITIAL_AD_UNIT_IOS: string
-  export const ADMOB_INTERSTITIAL_AD_UNIT_ANDROID: string
-  export const ADMOB_REWARDED_AD_UNIT_IOS: string
-  export const ADMOB_REWARDED_AD_UNIT_ANDROID: string
-  export const ADMOB_APP_OPEN_AD_UNIT_IOS: string
-  export const ADMOB_APP_OPEN_AD_UNIT_ANDROID: string
-  export const ADMOB_NATIVE_AD_UNIT_IOS: string
-  export const ADMOB_NATIVE_AD_UNIT_ANDROID: string
+  // @feature:admob:start [disabled]
+  // export const ADMOB_APP_ID_IOS: string
+  // export const ADMOB_APP_ID_ANDROID: string
+  // export const ADMOB_BANNER_AD_UNIT_IOS: string
+  // export const ADMOB_BANNER_AD_UNIT_ANDROID: string
+  // export const ADMOB_INTERSTITIAL_AD_UNIT_IOS: string
+  // export const ADMOB_INTERSTITIAL_AD_UNIT_ANDROID: string
+  // export const ADMOB_REWARDED_AD_UNIT_IOS: string
+  // export const ADMOB_REWARDED_AD_UNIT_ANDROID: string
+  // export const ADMOB_APP_OPEN_AD_UNIT_IOS: string
+  // export const ADMOB_APP_OPEN_AD_UNIT_ANDROID: string
+  // export const ADMOB_NATIVE_AD_UNIT_IOS: string
+  // export const ADMOB_NATIVE_AD_UNIT_ANDROID: string
+  // @feature:admob:end
   
   // Facebook SDK
   export const FACEBOOK_APP_ID: string
   export const FACEBOOK_CLIENT_TOKEN: string
-  
-  // Attribution (AppsFlyer) — kept for reference, replaced by Adjust in active use
-  export const APPSFLYER_DEV_KEY: string
-  export const APPSFLYER_APP_ID: string
 
   // Attribution (Adjust)
   export const ADJUST_APP_TOKEN_ANDROID: string

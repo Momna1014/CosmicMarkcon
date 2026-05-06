@@ -33,24 +33,26 @@ export type ConsentVendorKey =
   | 'firebaseCrashlytics'
   | 'sentry'
   | 'adjust'
-  | 'admob'
+  // @feature:admob:start [disabled]
+  // | 'admob'
+  // @feature:admob:end
   | 'applovin'
-  | 'appsflyer'
   | 'facebook'
   | 'revenuecat'
   | 'remoteConfig';
 
-// Togglable vendors (admob/applovin, adjust/appsflyer) are optional so the
-// codebase still type-checks when one of each pair is commented out by the
-// toggle scripts in src/scripts/.
+// Togglable vendors (admob/applovin) are optional so the codebase still
+// type-checks when one of each pair is commented out by the toggle scripts
+// in src/scripts/.
 export type VendorGrants = {
   firebaseAnalytics: boolean;
   firebaseCrashlytics: boolean;
   sentry: boolean;
   adjust?: boolean;
-  admob?: boolean;
+  // @feature:admob:start [disabled]
+  // admob?: boolean;
+  // @feature:admob:end
   applovin?: boolean;
-  appsflyer?: boolean;
   facebook: boolean;
   revenuecat: boolean;
   remoteConfig: boolean;
@@ -84,15 +86,12 @@ export const DEFAULT_VENDOR_GRANTS: VendorGrants = {
   // @feature:adjust:start
   adjust: false,
   // @feature:adjust:end
-  // @feature:admob:start
-  admob: false,
+  // @feature:admob:start [disabled]
+  // admob: false,
   // @feature:admob:end
   // @feature:applovin-max:start [disabled]
   // applovin: false,
   // @feature:applovin-max:end
-  // @feature:appsflyer:start [disabled]
-  // appsflyer: false,
-  // @feature:appsflyer:end
   facebook: false,
   revenuecat: false,
   remoteConfig: false,

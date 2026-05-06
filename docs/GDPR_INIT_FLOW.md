@@ -28,7 +28,7 @@ Grants:
 - crashReporting
 
 Mapping:
-- analytics: Firebase Analytics, AppsFlyer
+- analytics: Firebase Analytics, Adjust
 - advertising: AdMob, AppLovin, Facebook SDK
 - personalization: RevenueCat attribution and identifiers
 - crashReporting: Firebase Crashlytics, Sentry
@@ -40,7 +40,7 @@ Pre-consent:
 - Firebase Crashlytics: disabled
 - Sentry: not initialized (explicitly closed)
 - Facebook SDK: not initialized, autolog disabled
-- AppsFlyer: not initialized, stopped/anonymized
+- Adjust: not initialized
 - AdMob: not initialized
 - AppLovin: not initialized
 - RevenueCat attribution: disabled
@@ -51,7 +51,7 @@ Consent accepted:
 - Firebase Crashlytics: enabled
 - Sentry: initialized (no PII), enabled
 - Facebook SDK: initialized, autolog enabled
-- AppsFlyer: initialized, opt-out based on ATT
+- Adjust: initialized, third-party sharing based on ATT and granular consent
 - AdMob: initialized, personalized or non-personalized based on ATT
 - AppLovin: initialized with privacy flags based on consent and ads mode
 - RevenueCat attribution: enabled if ATT authorized
@@ -62,7 +62,7 @@ Consent denied:
 - Firebase Crashlytics: disabled
 - Sentry: closed/disabled
 - Facebook SDK: disabled
-- AppsFlyer: stopped/anonymized
+- Adjust: third-party sharing disabled
 - AdMob: initialized in non-personalized mode only
 - AppLovin: initialized in non-personalized mode only
 - RevenueCat attribution: disabled
@@ -74,7 +74,7 @@ Consent denied:
 - setupFirebaseCrashlytics is called only after crashReporting consent.
 - setupFirebaseAnalytics is called only after analytics consent.
 - FacebookAnalyticsService requires explicit consent before initialize/log.
-- AppsFlyerService requires explicit consent before initialize/log.
+- Adjust SDK third-party sharing is gated on advertising/analytics consent.
 - paywallAnalytics logs are gated by firebaseService.isAnalyticsEnabled() and facebookAnalytics.canLog().
 - AppContext only sets Firebase user properties when analytics is enabled.
 
@@ -86,13 +86,12 @@ Relevant files:
 - src/InitializationFlow/parallel/initDeniedMode.ts
 - src/InitializationFlow/sdks/setupFirebase.ts
 - src/InitializationFlow/sdks/setupSentry.ts
-- src/InitializationFlow/sdks/setupAppsFlyer.ts
+- src/InitializationFlow/sdks/setupAdjust.ts
 - src/InitializationFlow/sdks/setupFacebook.ts
 - src/InitializationFlow/sdks/setupAdMob.ts
 - src/InitializationFlow/sdks/setupAppLovin.ts
 - src/services/firebase/FirebaseService.ts
 - src/services/FacebookAnalyticsService.ts
-- src/services/AppsFlyerService.ts
 - src/utils/paywallAnalytics.ts
 
 ## Native Hardening (Pre-Consent Auto-Collection)
@@ -123,7 +122,6 @@ Files:
 ### Android
 - AndroidManifest disables Firebase Analytics/Crashlytics auto-collection, FCM auto-init, Performance collection, Remote Config auto-fetch, InApp Messaging auto-collection, and deferred deep links.
 - AndroidManifest disables Facebook auto-init, autolog, and advertiser ID collection.
-- AppsFlyer install referrer receiver is disabled by default.
 - AppLovin SDK key removed from AndroidManifest to prevent auto-initialization.
 
 Files:
@@ -134,28 +132,25 @@ Files:
 1. AppLovin SDK key removed
 The AppLovin SDK key has been removed from both Info.plist and AndroidManifest.xml. The SDK now initializes only after consent via runtime `AppLovinMAX.initialize()`. If AppLovin is re-enabled in the future, ensure the key is only supplied at runtime.
 
-2. AppsFlyer install referrer
-The AppsFlyer install referrer receiver is disabled to avoid pre-consent collection. This prevents install referrer attribution until a runtime enable mechanism is added.
-
-3. Firebase build scripts
+2. Firebase build scripts
 Crashlytics build scripts still run in Xcode/Gradle; they do not collect user data by themselves. Runtime collection is disabled by native config flags and JS-layer gating.
 
-4. Pre-consent network calls
+3. Pre-consent network calls
 `AppUpdateService.checkForUpdate()` and `OpenAIConfigService.initialize()` make network calls before consent. These send only static auth codes, app version, and platform — no personal data or device identifiers. This is defensible under legitimate interest (force-update safety) and does not constitute personal data processing under GDPR.
 
-5. Apple Privacy Manifest
+4. Apple Privacy Manifest
 `PrivacyInfo.xcprivacy` must be kept in sync when SDKs are added/removed. Apple requires this manifest for App Store submission since Spring 2024.
 
 ## Verification Checklist
 
 1. Fresh install, EU IP:
    - Usercentrics banner appears before navigation.
-   - No Firebase/Facebook/AppsFlyer/AdMob network calls before consent (verify via proxy).
+   - No Firebase/Facebook/Adjust/AdMob network calls before consent (verify via proxy).
 
 2. Deny consent:
    - Firebase Analytics/Crashlytics remain disabled.
    - Sentry is closed/disabled.
-   - Facebook/AppsFlyer remain disabled.
+   - Facebook/Adjust third-party sharing remain disabled.
    - Ads are non-personalized only.
 
 3. Accept consent:

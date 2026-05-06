@@ -55,10 +55,12 @@
 	<false/>
 	<key>FirebaseRemoteConfigAutoFetchEnabled</key>
 	<false/>
-	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-3940256099942544~1458002511</string>
-	<key>GADDelayAppMeasurementInit</key>
-	<true/>
+	<!-- @feature:admob:start [disabled] -->
+	<!-- <key>GADApplicationIdentifier</key> -->
+	<!-- <string>ca-app-pub-3940256099942544~1458002511</string> -->
+	<!-- <key>GADDelayAppMeasurementInit</key> -->
+	<!-- <true/> -->
+	<!-- @feature:admob:end -->
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>fbapi</string>
@@ -76,6 +78,10 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Cosmiq needs access to your location to provide location-based features.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Cosmiq needs access to your location to provide location-based features.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Cosmiq needs access to your location to provide location-based features.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Cosmiq needs access to your camera to let you take photos for your profile and content.</string>
@@ -752,8 +758,10 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
