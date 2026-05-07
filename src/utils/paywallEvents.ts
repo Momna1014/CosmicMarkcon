@@ -7,9 +7,15 @@
  *   - 'splash'               otherwise (kill+reopen / cold-launch into paywall)
  *
  * Events:
- *   - paywall_viewed                         (skipped when src === 'onboarding')
+ *   - paywall_viewed                         (generic, skipped when src === 'onboarding')
+ *   - paywall_dismissed                      (generic, skipped when src === 'onboarding')
+ *   - paywall_btn_tab                        (generic, skipped when src === 'onboarding')
+ *   - paywall_purchase_completed             (generic, skipped when src === 'onboarding')
+ *   - paywall_purchase_cancelled             (generic, skipped when src === 'onboarding')
+ *   - paywall_purchase_restore               (generic, skipped when src === 'onboarding')
  *   - pw_viewed_{src}
  *   - pw_dismissed_{src}
+ *   - pw_btn_tab_{src}                       (fires when user taps continue / free trial)
  *   - pw_purchase_completed_{src}
  *   - pw_purchase_cancelled_{src}
  *   - pw_purchase_restored_{src}
@@ -54,18 +60,42 @@ export const trackPaywallViewedVia = async (ctx: PaywallContext) => {
   await logPaywallEvent(`pw_viewed_${resolvePaywallSrc(ctx)}`);
 };
 
+export const trackTrialBtnVia = async (ctx: PaywallContext) => {
+  const src = resolvePaywallSrc(ctx);
+  await Promise.all([
+    logPaywallEvent(`pw_btn_tab_${src}`),
+    src !== 'onboarding' ? logPaywallEvent('paywall_btn_tab') : Promise.resolve(),
+  ]);
+};
+
 export const trackPaywallDismissedVia = async (ctx: PaywallContext) => {
-  await logPaywallEvent(`pw_dismissed_${resolvePaywallSrc(ctx)}`);
+  const src = resolvePaywallSrc(ctx);
+  await Promise.all([
+    logPaywallEvent(`pw_dismissed_${src}`),
+    src !== 'onboarding' ? logPaywallEvent('paywall_dismissed') : Promise.resolve(),
+  ]);
 };
 
 export const trackPurchaseCompletedVia = async (ctx: PaywallContext) => {
-  await logPaywallEvent(`pw_purchase_completed_${resolvePaywallSrc(ctx)}`);
+  const src = resolvePaywallSrc(ctx);
+  await Promise.all([
+    logPaywallEvent(`pw_purchase_completed_${src}`),
+    src !== 'onboarding' ? logPaywallEvent('paywall_purchase_completed') : Promise.resolve(),
+  ]);
 };
 
 export const trackPurchaseCancelledVia = async (ctx: PaywallContext) => {
-  await logPaywallEvent(`pw_purchase_cancelled_${resolvePaywallSrc(ctx)}`);
+  const src = resolvePaywallSrc(ctx);
+  await Promise.all([
+    logPaywallEvent(`pw_purchase_cancelled_${src}`),
+    src !== 'onboarding' ? logPaywallEvent('paywall_purchase_cancelled') : Promise.resolve(),
+  ]);
 };
 
 export const trackPurchaseRestoredVia = async (ctx: PaywallContext) => {
-  await logPaywallEvent(`pw_purchase_restored_${resolvePaywallSrc(ctx)}`);
+  const src = resolvePaywallSrc(ctx);
+  await Promise.all([
+    logPaywallEvent(`pw_purchase_restored_${src}`),
+    src !== 'onboarding' ? logPaywallEvent('paywall_purchase_restore') : Promise.resolve(),
+  ]);
 };

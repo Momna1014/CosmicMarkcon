@@ -127,3 +127,11 @@ export const trackOnboarding11AiVideoView = async () => {
 export const trackOnboarding12FinalVideoView = async () => {
   await logEvent('onboarding_step12_final_video', { step: 12 });
 };
+
+// ─────────────────────────────────────────────
+// COMPLETION – Fired when the user finishes screen 12 / final video
+// ─────────────────────────────────────────────
+
+export const trackOnboardingCompleted = async () => {
+  await logEvent('onboarding_completed');
+};

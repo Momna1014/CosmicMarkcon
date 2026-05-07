@@ -329,6 +329,7 @@ import {
   trackPaywallViewed,
   trackPaywallViewedVia,
   trackPaywallDismissedVia,
+  trackTrialBtnVia,
   trackPurchaseCompletedVia,
   trackPurchaseCancelledVia,
   trackPurchaseRestoredVia,
@@ -505,6 +506,14 @@ export const PaywallScreen: React.FC = () => {
   }, [navigateBack, paywallCtx]);
 
   /**
+   * Handle purchase started (user tapped the trial / continue / subscribe button)
+   */
+  const handlePurchaseStarted = useCallback(() => {
+    console.log('[PaywallScreen] ▶️ Purchase started (trial/continue button tapped)');
+    trackTrialBtnVia(paywallCtx);
+  }, [paywallCtx]);
+
+  /**
    * Handle restore started
    */
   const handleRestoreStarted = useCallback(() => {
@@ -650,6 +659,7 @@ export const PaywallScreen: React.FC = () => {
       <RevenueCatUI.Paywall
         style={styles.paywall}
         onDismiss={handleDismiss}
+        onPurchaseStarted={handlePurchaseStarted}
         onRestoreStarted={handleRestoreStarted}
         onRestoreCompleted={handleRestoreCompleted}
         onRestoreError={handleRestoreError}

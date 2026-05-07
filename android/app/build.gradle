@@ -76,6 +76,14 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
+// Load release signing credentials from android/keystore.properties (gitignored).
+// Falls back to environment variables for CI builds.
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     
@@ -101,15 +109,27 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            // Reads credentials from android/keystore.properties (gitignored) or CI env vars.
+            def storeFilePath = keystoreProperties['RELEASE_STORE_FILE'] ?: System.getenv('RELEASE_STORE_FILE')
+            def storePass = keystoreProperties['RELEASE_STORE_PASSWORD'] ?: System.getenv('RELEASE_STORE_PASSWORD')
+            def alias = keystoreProperties['RELEASE_KEY_ALIAS'] ?: System.getenv('RELEASE_KEY_ALIAS')
+            def keyPass = keystoreProperties['RELEASE_KEY_PASSWORD'] ?: System.getenv('RELEASE_KEY_PASSWORD')
+
+            if (storeFilePath && storePass && alias && keyPass) {
+                storeFile file(storeFilePath)
+                storePassword storePass
+                keyAlias alias
+                keyPassword keyPass
+            }
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release.storeFile != null ? signingConfigs.release : signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
