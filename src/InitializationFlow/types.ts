@@ -36,14 +36,12 @@ export type ConsentVendorKey =
   // @feature:admob:start [disabled]
   // | 'admob'
   // @feature:admob:end
-  | 'applovin'
   | 'facebook'
   | 'revenuecat'
   | 'remoteConfig';
 
-// Togglable vendors (admob/applovin) are optional so the codebase still
-// type-checks when one of each pair is commented out by the toggle scripts
-// in src/scripts/.
+// admob is optional so the codebase still type-checks while AdMob stays
+// disabled (its VendorGrants field is commented out).
 export type VendorGrants = {
   firebaseAnalytics: boolean;
   firebaseCrashlytics: boolean;
@@ -52,7 +50,6 @@ export type VendorGrants = {
   // @feature:admob:start [disabled]
   // admob?: boolean;
   // @feature:admob:end
-  applovin?: boolean;
   facebook: boolean;
   revenuecat: boolean;
   remoteConfig: boolean;
@@ -89,9 +86,6 @@ export const DEFAULT_VENDOR_GRANTS: VendorGrants = {
   // @feature:admob:start [disabled]
   // admob: false,
   // @feature:admob:end
-  // @feature:applovin-max:start [disabled]
-  // applovin: false,
-  // @feature:applovin-max:end
   facebook: false,
   revenuecat: false,
   remoteConfig: false,

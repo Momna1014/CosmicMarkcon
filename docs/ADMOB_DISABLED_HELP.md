@@ -20,23 +20,23 @@
 
 ## TL;DR — How to RE-ENABLE AdMob
 
-The fastest path:
+> **Note:** the `toggle-ads-sdk.sh` vendor-toggle script has been **removed**
+> from the project (along with AppLovin MAX). Re-enabling AdMob is now a
+> **manual** process — follow **Section K — Manual re-enable checklist** below
+> to uncomment the `@feature:admob` blocks, then refresh native builds:
 
 ```bash
-# 1. Toggle script reverses every [disabled] marker + restores package.json:
-bash src/scripts/toggle-ads-sdk.sh admob
-
-# 2. Refresh node_modules + iOS pods (THIS STEP IS NOT OPTIONAL — see "iOS pod state" section below):
+# 1. Refresh node_modules + iOS pods (THIS STEP IS NOT OPTIONAL — see "iOS pod state" section below):
 yarn install        # postinstall runs `pod install` automatically
 
-# 3. Clean Android caches (so stale codegen doesn't break the build):
+# 2. Clean Android caches (so stale codegen doesn't break the build):
 yarn android:clean
 
-# 4. Reset Metro cache and run:
+# 3. Reset Metro cache and run:
 yarn start --reset-cache
 ```
 
-That's it. Skip to **"What to do if Xcode crashes with GADApplicationIdentifier"**
+Skip to **"What to do if Xcode crashes with GADApplicationIdentifier"**
 below if you hit a runtime error after re-enabling.
 
 If you'd rather re-enable **manually** (without the toggle script), follow
@@ -299,10 +299,10 @@ Same convention as section E (start marker `[disabled]`, every line `// `-prefix
 
 ## H. Toggle script state
 
-### `src/scripts/.toggle-state.json`
-- Updated from `{ "ads": "admob" }` to `{ "ads": "disabled" }`.
-- The `bash src/scripts/toggle-ads-sdk.sh status` command now reflects
-  that no ads SDK is active.
+> The ad-vendor toggle system (`src/scripts/toggle-ads-sdk.sh`,
+> `_toggle-lib.sh`, `.toggle-state.json`) has since been **removed** from the
+> project. AdMob remains disabled purely via the commented `@feature:admob`
+> blocks; re-enable it manually per **Section K**.
 
 ---
 
@@ -316,7 +316,6 @@ Same convention as section E (start marker `[disabled]`, every line `// `-prefix
 | `android/app/build.gradle` line 207 (`play-services-ads-identifier`) | Used by **Adjust** for GAID lookup, not AdMob. Removing it would break Adjust attribution. |
 | `android/app/proguard-rules.pro` `AdvertisingIdClient` rules | Same — for Adjust, not AdMob. |
 | `src/InitializationFlow/sdks/setupAdjust.ts` | Has documentation comments referencing AdMob as a possible `trackAdjustAdRevenue` source (`'admob_sdk'`). Adjust functions without AdMob; these are doc strings. |
-| `src/services/AppLovinService.ts` | Already `[disabled]` independently; only a stub. The single string mentioning AdMob is inside an already-commented block. |
 | `docs/GDPR_INIT_FLOW.md` | Historical SDK matrix doc. Treated as reference material; not retroactively updated. |
 
 ---
@@ -351,9 +350,10 @@ grep -c "^react-native-google-mobile-ads@" yarn.lock
 
 ---
 
-## K. Manual re-enable checklist (for when the toggle script isn't an option)
+## K. Manual re-enable checklist
 
-If you want to re-enable AdMob without using `toggle-ads-sdk.sh`:
+The vendor-toggle script has been removed, so this manual process is the only
+way to re-enable AdMob:
 
 ### Step 1 — Source code (per-file uncomment)
 
@@ -369,7 +369,6 @@ For every file listed in sections **A–H** above:
    from `disabledDependencies` back into `dependencies`.
 5. **`app.json`** — rename `_disabled_react-native-google-mobile-ads` →
    `react-native-google-mobile-ads`.
-6. **`src/scripts/.toggle-state.json`** — set to `{ "ads": "admob" }`.
 
 ### Step 2 — Refresh native builds
 

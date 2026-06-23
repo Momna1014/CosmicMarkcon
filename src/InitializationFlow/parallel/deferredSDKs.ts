@@ -8,7 +8,7 @@
  *   │   RemoteConfig, SentryFullTracking, RevenueCat (basic configure)│
  *   ├─────────────────────────────────────────────────────────────────┤
  *   │ Group B — ATT-dependent                                         │
- *   │   Adjust, AdMob, AppLovin, Facebook                             │
+ *   │   Adjust, AdMob, Facebook                                      │
  *   └─────────────────────────────────────────────────────────────────┘
  *
  * Both groups are kicked off concurrently. Inside each group every task
@@ -31,9 +31,6 @@ import type { ATTStatus, ConsentResult, AdsModeResult } from '../types';
 // @feature:admob:start [disabled]
 // import { setupAdMob } from '../sdks/setupAdMob';
 // @feature:admob:end
-// @feature:applovin-max:start [disabled]
-// import { setupAppLovin } from '../sdks/setupAppLovin';
-// @feature:applovin-max:end
 // @feature:adjust:start
 import { setupAdjust } from '../sdks/setupAdjust';
 // @feature:adjust:end
@@ -136,19 +133,19 @@ function buildGroupB(consent: ConsentResult, adsMode: AdsModeResult): DeferredTa
   // Three states, decided strictly by GDPR consent + ATT (resolveAdsMode):
   //
   //   1. PERSONALIZED — advertisingAllowed && adsMode.mode === 'personalized'
-  //      AdMob personalized + AppLovin personalized + Adjust ON + Facebook ON
+  //      AdMob personalized + Adjust ON + Facebook ON
   //
   //   2. NPA (Non-Personalized Ads)
   //      Triggered by ANY of:
   //        • consent.status === 'denied'         (Usercentrics Deny All)
   //        • marketing toggled off in granular   (advertisingAllowed === false)
   //        • iOS ATT not granted                 (adsMode.mode === 'non-personalized')
-  //      AdMob NPA + AppLovin NPA + Adjust DISABLED + Facebook DISABLED
+  //      AdMob NPA + Adjust DISABLED + Facebook DISABLED
   //
   //   • Adjust (attribution) and Facebook (targeting) have NO compliant NPA
   //     mode under GDPR — they always require explicit advertising consent,
   //     so we disable both whenever we fall into the NPA state.
-  //   • AdMob & AppLovin both honour the NPA flag at SDK level — they will
+  //   • AdMob honours the NPA flag at SDK level — it will
   //     only request contextual ads (no IDFA, no profile lookup).
   // ────────────────────────────────────────────────────────────────────
   const isPersonalized = advertisingAllowed && adsMode.mode === 'personalized';
@@ -171,15 +168,6 @@ function buildGroupB(consent: ConsentResult, adsMode: AdsModeResult): DeferredTa
   //   tasks.push({ name: 'AdMobNPA', run: () => setupAdMob('non-personalized') });
   // }
   // @feature:admob:end
-
-  // @feature:applovin-max:start [disabled]
-  // // AppLovin — same NPA-always strategy as AdMob.
-  // if (isPersonalized && isVendorAllowed(consent, 'applovin')) {
-    // tasks.push({ name: 'AppLovin', run: () => setupAppLovin(consent, 'personalized') });
-  // } else {
-    // tasks.push({ name: 'AppLovinNPA', run: () => setupAppLovin(consent, 'non-personalized') });
-  // }
-  // @feature:applovin-max:end
 
   // Facebook — no compliant NPA mode. Disable whenever not fully personalized.
   if (isPersonalized && isVendorAllowed(consent, 'facebook')) {

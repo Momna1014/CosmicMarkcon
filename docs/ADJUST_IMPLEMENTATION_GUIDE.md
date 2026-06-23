@@ -347,7 +347,7 @@ function buildGroupB(consent: ConsentResult, adsMode: AdsModeResult): DeferredTa
     tasks.push({ name: 'AdjustDisable', run: () => setupAdjust(consent, false) });
   }
 
-  // ... other Group B SDKs (AdMob/AppLovin/Facebook)
+  // ... other Group B SDKs (AdMob/Facebook)
   return tasks;
 }
 ```
@@ -446,11 +446,6 @@ import { trackAdjustAdRevenue } from '@/InitializationFlow/sdks';
 admobAd.addAdEventListener(AdEventType.PAID, ({ value, currency, ...rest }) => {
   trackAdjustAdRevenue('admob_sdk', value, currency, rest.network, rest.adUnitId, rest.placement);
 });
-
-// AppLovin MAX impression revenue:
-adView.on('onAdRevenuePaid', (ad) => {
-  trackAdjustAdRevenue('applovin_max_sdk', ad.revenue, 'USD', ad.networkName, ad.adUnitId);
-});
 ```
 
 ## 8. Push notifications
@@ -512,7 +507,7 @@ After integrating, verify in this order:
 | **Android native** | [android/app/build.gradle](../android/app/build.gradle) | `play-services-ads-identifier`, `installreferrer` |
 | Android native | [android/app/src/main/AndroidManifest.xml](../android/app/src/main/AndroidManifest.xml) | `INTERNET`, `ACCESS_NETWORK_STATE`, `AD_ID`, `BIND_GET_INSTALL_REFERRER_SERVICE` permissions |
 
-> **No mediation adapters exist for Adjust.** Adjust is an MMP (Mobile Measurement Partner), not an ad network. "Adapters" only apply to ad-network SDKs (AppLovin MAX → AdMob/Unity/Vungle/etc.). Adjust **receives** mediation ad-revenue data via the `trackAdjustAdRevenue` helper in §7.
+> **No mediation adapters exist for Adjust.** Adjust is an MMP (Mobile Measurement Partner), not an ad network. "Adapters" only apply to ad-network/mediation SDKs (e.g. AdMob mediation → Unity/Vungle/etc.). Adjust **receives** mediation ad-revenue data via the `trackAdjustAdRevenue` helper in §7.
 
 ---
 

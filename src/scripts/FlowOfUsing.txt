@@ -55,29 +55,3 @@ Run Script: rename-app-display.sh (Follow Permissions.txt for running this)
 
 ----------------------------------------------------------------------------------------
 
-
-
-
-────────────────────────────────────────────────────────────────────
-SDK TOGGLE SCRIPTS
-────────────────────────────────────────────────────────────────────
-
-Toggle the active Ads SDK (admob ↔ applovin):
-    bash src/scripts/toggle-ads-sdk.sh admob
-    bash src/scripts/toggle-ads-sdk.sh applovin
-    bash src/scripts/toggle-ads-sdk.sh status
-
-Add --no-cleanup to skip npm install / pod install / gradle clean:
-    bash src/scripts/toggle-ads-sdk.sh applovin --no-cleanup
-
-How it works:
-- Every integration point is bracketed by paired markers
-  (// @feature:<vendor>:start ... // @feature:<vendor>:end) across
-  TS/JS, native (Podfile, *.gradle, AndroidManifest.xml, Info.plist,
-  PrivacyInfo.xcprivacy), and .env. JSON files (package.json,
-  app.json) use a key-rename approach ("react-native-X" <->
-  "_disabled_react-native-X") because JSON has no comment syntax.
-- Toggling does NOT remove code; it line-comments the inactive
-  vendor's blocks (and renames its JSON deps). Switching back
-  restores the original lines.
-- Active vendor per pair is recorded in src/scripts/.toggle-state.json.

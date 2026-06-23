@@ -269,8 +269,8 @@ export function trackAdjustEvent(
 }
 
 /**
- * Track ad revenue from a mediation source (AdMob, AppLovin MAX, etc.)
- * @param source - Ad revenue source identifier (e.g. 'admob_sdk', 'applovin_max_sdk')
+ * Track ad revenue from a mediation source (AdMob, etc.)
+ * @param source - Ad revenue source identifier (e.g. 'admob_sdk')
  * @param revenue - Revenue amount
  * @param currency - ISO 4217 currency code
  * @param network - Ad network name

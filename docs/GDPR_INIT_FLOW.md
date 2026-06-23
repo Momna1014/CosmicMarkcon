@@ -29,7 +29,7 @@ Grants:
 
 Mapping:
 - analytics: Firebase Analytics, Adjust
-- advertising: AdMob, AppLovin, Facebook SDK
+- advertising: AdMob, Facebook SDK
 - personalization: RevenueCat attribution and identifiers
 - crashReporting: Firebase Crashlytics, Sentry
 
@@ -42,7 +42,6 @@ Pre-consent:
 - Facebook SDK: not initialized, autolog disabled
 - Adjust: not initialized
 - AdMob: not initialized
-- AppLovin: not initialized
 - RevenueCat attribution: disabled
 - Remote Config: not initialized
 
@@ -53,7 +52,6 @@ Consent accepted:
 - Facebook SDK: initialized, autolog enabled
 - Adjust: initialized, third-party sharing based on ATT and granular consent
 - AdMob: initialized, personalized or non-personalized based on ATT
-- AppLovin: initialized with privacy flags based on consent and ads mode
 - RevenueCat attribution: enabled if ATT authorized
 - Remote Config: initialized
 
@@ -64,7 +62,6 @@ Consent denied:
 - Facebook SDK: disabled
 - Adjust: third-party sharing disabled
 - AdMob: initialized in non-personalized mode only
-- AppLovin: initialized in non-personalized mode only
 - RevenueCat attribution: disabled
 - Remote Config: not initialized
 
@@ -89,7 +86,6 @@ Relevant files:
 - src/InitializationFlow/sdks/setupAdjust.ts
 - src/InitializationFlow/sdks/setupFacebook.ts
 - src/InitializationFlow/sdks/setupAdMob.ts
-- src/InitializationFlow/sdks/setupAppLovin.ts
 - src/services/firebase/FirebaseService.ts
 - src/services/FacebookAnalyticsService.ts
 - src/utils/paywallAnalytics.ts
@@ -111,7 +107,6 @@ Relevant files:
 - Firebase collection disabled on startup in AppDelegate.swift.
 - Info.plist disables Firebase Analytics/Crashlytics auto-collection, FCM auto-init, Performance collection, and Remote Config auto-fetch.
 - Info.plist disables Facebook auto-init, autolog, and advertiser ID collection.
-- AppLovin SDK key removed from Info.plist to prevent auto-initialization.
 - **PrivacyInfo.xcprivacy** declares all collected data types (Device ID, Crash Data, Performance Data, Product Interaction, Advertising Data, Purchase History, Diagnostics), tracking domains, and sets `NSPrivacyTracking: true` (ATT-gated).
 
 Files:
@@ -122,23 +117,19 @@ Files:
 ### Android
 - AndroidManifest disables Firebase Analytics/Crashlytics auto-collection, FCM auto-init, Performance collection, Remote Config auto-fetch, InApp Messaging auto-collection, and deferred deep links.
 - AndroidManifest disables Facebook auto-init, autolog, and advertiser ID collection.
-- AppLovin SDK key removed from AndroidManifest to prevent auto-initialization.
 
 Files:
 - android/app/src/main/AndroidManifest.xml
 
 ## Remaining Risks and Notes
 
-1. AppLovin SDK key removed
-The AppLovin SDK key has been removed from both Info.plist and AndroidManifest.xml. The SDK now initializes only after consent via runtime `AppLovinMAX.initialize()`. If AppLovin is re-enabled in the future, ensure the key is only supplied at runtime.
-
-2. Firebase build scripts
+1. Firebase build scripts
 Crashlytics build scripts still run in Xcode/Gradle; they do not collect user data by themselves. Runtime collection is disabled by native config flags and JS-layer gating.
 
-3. Pre-consent network calls
+2. Pre-consent network calls
 `AppUpdateService.checkForUpdate()` and `OpenAIConfigService.initialize()` make network calls before consent. These send only static auth codes, app version, and platform — no personal data or device identifiers. This is defensible under legitimate interest (force-update safety) and does not constitute personal data processing under GDPR.
 
-4. Apple Privacy Manifest
+3. Apple Privacy Manifest
 `PrivacyInfo.xcprivacy` must be kept in sync when SDKs are added/removed. Apple requires this manifest for App Store submission since Spring 2024.
 
 ## Verification Checklist

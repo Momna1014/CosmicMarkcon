@@ -16,7 +16,6 @@ chmod +x src/scripts/cleanup-backups.sh
 
 To Run the SCRIPTS, run the below command accordingly:
 
-./src/scripts/setup-applovin.sh
 ./src/scripts/rename-app-display.sh "My Awesome App"
 
 node src/scripts/app-icon-generator.js

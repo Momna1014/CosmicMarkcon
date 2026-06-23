@@ -10,9 +10,6 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-// @feature:applovin-max:start [disabled]
-        // maven { url 'https://artifacts.applovin.com/android' }  // Add this line
-// @feature:applovin-max:end
 
     }
     dependencies {

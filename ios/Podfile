@@ -48,19 +48,6 @@ target 'Cosmiq' do
   pod 'RecaptchaInterop', :modular_headers => true
   # @feature:firebase-remote-config:end
 
-  # @feature:applovin-max:start [disabled]
-  # # ========================================
-  # # AppLovin Mediation Adapters
-  # # ========================================
-  # # Temporarily disabled Facebook adapter due to iOS build issues (FBAudienceNetwork bundle)
-  # # pod 'AppLovinMediationFacebookAdapter'
-  # pod 'AppLovinMediationGoogleAdapter'
-  # pod 'AppLovinMediationUnityAdsAdapter'
-  # pod 'AppLovinMediationIronSourceAdapter'
-  # pod 'AppLovinMediationVungleAdapter'
-  # pod 'AppLovinMediationMintegralAdapter'
-  # pod 'AppLovinMediationFyberAdapter'
-  # @feature:applovin-max:end
 
   use_react_native!(
     :path => config[:reactNativePath],
@@ -85,11 +72,6 @@ target 'Cosmiq' do
         config.build_settings['DEBUG_INFORMATION_FORMAT'] = 'dwarf-with-dsym'
         config.build_settings['GENERATE_DSYM'] = 'YES'
         
-        # Fixes for AppLovin and related frameworks
-        if target.name.include?('AppLovin')
-          config.build_settings['STRIP_INSTALLED_PRODUCT'] = 'NO'
-          config.build_settings['COPY_PHASE_STRIP'] = 'NO'
-        end
         
         # Fix for Facebook Audience Network Swift runtime issue
         if target.name.include?('FBAudienceNetwork') || target.name.include?('FBSDKCoreKit')

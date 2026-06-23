@@ -485,9 +485,6 @@ function buildRegionNotRequiredConsent(
       // @feature:admob:start [disabled]
       // admob: true,
       // @feature:admob:end
-      // @feature:applovin-max:start [disabled]
-      // applovin: true,
-      // @feature:applovin-max:end
       facebook: true,
       revenuecat: true,
       remoteConfig: true,

@@ -90,7 +90,6 @@
     "sharp": "^0.34.5"
   },
   "disabledDependencies": {
-    "react-native-applovin-max": "^9.4.1",
     "react-native-google-mobile-ads": "^16.3.0"
   },
   "devDependencies": {

@@ -22,17 +22,6 @@ declare module '@env' {
   export const REVENUECAT_IOS_KEY: string
   export const REVENUECAT_ANDROID_KEY: string
   
-  // Advertising (AppLovin MAX)
-  export const APPLOVIN_SDK_KEY: string
-  export const APPLOVIN_BANNER_AD_UNIT_IOS: string
-  export const APPLOVIN_BANNER_AD_UNIT_ANDROID: string
-  export const APPLOVIN_INTERSTITIAL_AD_UNIT_IOS: string
-  export const APPLOVIN_INTERSTITIAL_AD_UNIT_ANDROID: string
-  export const APPLOVIN_REWARDED_AD_UNIT_IOS: string
-  export const APPLOVIN_REWARDED_AD_UNIT_ANDROID: string
-  export const APPLOVIN_APP_OPEN_AD_UNIT_IOS: string
-  export const APPLOVIN_APP_OPEN_AD_UNIT_ANDROID: string
-
   // Advertising (Google AdMob)
   // @feature:admob:start [disabled]
   // export const ADMOB_APP_ID_IOS: string

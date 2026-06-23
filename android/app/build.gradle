@@ -139,10 +139,6 @@ android {
 repositories {
     google()
     mavenCentral()
-// @feature:applovin-max:start [disabled]
-    // maven { url 'https://artifacts.applovin.com/android' }
-    // maven { url 'https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea' }
-// @feature:applovin-max:end
 }
 
 dependencies {
@@ -160,39 +156,6 @@ dependencies {
     // ========================================
     implementation 'androidx.core:core-splashscreen:1.0.1'
     
-// @feature:applovin-max:start [disabled]
-    // // ========================================
-    // // AppLovin MAX SDK - Core SDK
-    // // ========================================
-    // implementation 'com.applovin:applovin-sdk:+'
-    
-    // // ========================================
-    // // AppLovin Mediation Adapters
-    // // ========================================
-    // implementation 'com.applovin.mediation:facebook-adapter:+'
-    // implementation 'com.applovin.mediation:google-adapter:+'
-    // implementation 'com.applovin.mediation:unityads-adapter:+'
-    // implementation 'com.applovin.mediation:ironsource-adapter:+'
-    // implementation 'com.applovin.mediation:vungle-adapter:+'
-    // implementation 'com.applovin.mediation:mintegral-adapter:+'
-    // implementation 'com.applovin.mediation:fyber-adapter:+'
-
-    // // ========================================
-    // // Compose dependencies (required by some adapters)
-    // // ========================================
-    // implementation platform('androidx.compose:compose-bom:2024.09.03')
-    // implementation 'androidx.compose.runtime:runtime'
-    // implementation 'androidx.compose.ui:ui'
-    // implementation 'androidx.compose.foundation:foundation'
-    // implementation 'androidx.compose.material:material'
-
-    // // ========================================
-    // // WorkManager (required by some adapters)
-    // // ========================================
-    // def work_version = "2.10.3"
-    // implementation "androidx.work:work-runtime:$work_version"
-    // implementation "androidx.work:work-runtime-ktx:$work_version"
-// @feature:applovin-max:end
     
     // @feature:firebase-analytics:start
     // ========================================

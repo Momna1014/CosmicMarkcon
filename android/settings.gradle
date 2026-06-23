@@ -7,8 +7,6 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://artifacts.applovin.com/android' }
-        maven { url 'https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea' }
         
     }
 }

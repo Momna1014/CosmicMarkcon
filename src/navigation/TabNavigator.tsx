@@ -12,7 +12,6 @@ import {createBottomTabNavigator, BottomTabBarProps} from '@react-navigation/bot
 import NavigationConfig from './NavigationConfig';
 // @feature:admob:start [disabled]
 // import BannerAdComponent from '../components/ads/BannerAdComponent';
-// import { BannerAdSize } from '../services/AppLovinService';
 // @feature:admob:end
 import BottomTabBar from '../components/BottomTabComponent/BottomTabBar';
 
