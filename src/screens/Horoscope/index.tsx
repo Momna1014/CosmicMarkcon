@@ -24,12 +24,9 @@ import CosmicAlert from '../../components/CosmicAlert';
 import {useHoroscopeData} from '../../hooks/useHoroscopeData';
 
 // Analytics
-import {useScreenView} from '../../hooks/useFacebookAnalytics';
-import firebaseService from '../../services/firebase/FirebaseService';
-import {
-  trackHoroscopeView,
-  trackHoroscopeTabChange,
-} from '../../utils/mainScreenAnalytics';
+import {trackHoroscopeTabView} from '../../utils/mainScreenAnalytics';
+import {useFocusEffect} from '@react-navigation/native';
+import {consumeNextFocusSource} from '../../utils/tabNavigationSource';
 import {hapticLight} from '../../utils/haptics';
 
 type TabType = 'today' | 'tomorrow' | 'weekly';
@@ -233,23 +230,18 @@ const HoroscopeScreen: React.FC<Props> = () => {
     return formatDate(new Date());
   }, [activeTab]);
 
-  // Analytics - Screen View
-  useScreenView('Horoscope', {
-    screen_category: 'main',
-    zodiac_sign: zodiacSign,
-  });
-
-  // Analytics - Track screen view on mount
-  useEffect(() => {
-    trackHoroscopeView(zodiacSign);
-    firebaseService.logScreenView('Horoscope', 'HoroscopeScreen');
-  }, [zodiacSign]);
+  // Analytics - Bottom tab view
+  useFocusEffect(
+    useCallback(() => {
+      if (consumeNextFocusSource() === 'home') { return; }
+      trackHoroscopeTabView();
+    }, [])
+  );
 
   const handleTabPress = useCallback((tab: TabType) => {
     hapticLight();
-    trackHoroscopeTabChange(tab, zodiacSign);
     setActiveTab(tab);
-  }, [zodiacSign]);
+  }, []);
 
   const renderTabContent = useCallback(() => {
     switch (activeTab) {

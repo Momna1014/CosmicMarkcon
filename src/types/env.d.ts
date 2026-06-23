@@ -59,7 +59,8 @@ declare module '@env' {
 
   // Consent Management (Usercentrics)
   export const USER_CENTRIC: string
-  export const USER_CENTRIC_RULESET_ID: string
+  export const USER_CENTRIC_RULESET_ID_ANDROID: string
+  export const USER_CENTRIC_RULESET_ID_IOS: string
   export const USER_CENTRIC_SETTINGS_ID: string
   export const USER_CENTRIC_IDENTITY_MODE: string
 

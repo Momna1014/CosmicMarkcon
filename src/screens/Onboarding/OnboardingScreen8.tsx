@@ -33,8 +33,6 @@ import {
   moderateScale,
 } from '../../theme';
 import {hapticLight} from '../../utils/haptics';
-import {useScreenView} from '../../hooks/useFacebookAnalytics';
-import firebaseService from '../../services/firebase/FirebaseService';
 import {trackOnboarding8BirthplaceView} from '../../utils/onboardingAnalytics';
 import {OnboardingButton} from '../../components/OnboardingButton';
 import {
@@ -67,19 +65,12 @@ export const OnboardingScreen8: React.FC<OnboardingScreen8Props> = ({
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [showCityPicker, setShowCityPicker] = useState(false);
 
-  useScreenView('OnboardingScreen8', {
-    screen_category: 'onboarding',
-    step: 8,
-    total_steps: 9,
-  });
-
   const CURRENT_STEP = 8;
   const TOTAL_STEPS = 12;
   const progressWidth = useSharedValue((CURRENT_STEP - 1) / TOTAL_STEPS * 100);
 
   useEffect(() => {
     trackOnboarding8BirthplaceView();
-    firebaseService.logScreenView('onboarding_8_birthplace_selection', 'OnboardingScreen8');
 
     const targetProgress = (CURRENT_STEP / TOTAL_STEPS) * 100;
     progressWidth.value = withDelay(

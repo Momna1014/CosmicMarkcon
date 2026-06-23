@@ -15,6 +15,7 @@ import {
   selectConsentAgreed,
   setConsentAgreed,
 } from '../../redux/slices/onboardingSlice';
+import {trackOnboardingCompleted} from '../../utils/onboardingAnalytics';
 
 import OnboardingScreen1, {AlignmentOption} from './OnboardingScreen1';
 import OnboardingScreen2 from './OnboardingScreen2';
@@ -179,7 +180,9 @@ export const OnboardingContainer: React.FC = () => {
     console.log('========================================');
     console.log('📦 FINAL ONBOARDING DATA:', JSON.stringify(onboardingData, null, 2));
     console.log('========================================\n');
-    
+
+    trackOnboardingCompleted();
+
     // Determine where to navigate based on premium status
     const targetScreen = isPremium ? 'MainApp' : 'Paywall';
     console.log('[OnboardingContainer] 🎬 isPremium:', isPremium, '-> navigating to:', targetScreen);

@@ -22,12 +22,7 @@ import {selectCompletedLessonsForGuide} from '../../redux/slices/cosmicGuidesSli
 import {RootState} from '../../redux/rootReducer';
 
 // Analytics
-import {useScreenView} from '../../hooks/useFacebookAnalytics';
-import firebaseService from '../../services/firebase/FirebaseService';
-import {
-  trackCosmicGuideDetailView,
-  trackCosmicGuideLessonTap,
-} from '../../utils/mainScreenAnalytics';
+import {trackBtChildView} from '../../utils/mainScreenAnalytics';
 
 // Icons
 import CrossIcon from '../../assets/icons/home_icons/cross.svg';
@@ -103,19 +98,10 @@ const CosmicGuideDetail: React.FC<CosmicGuideDetailProps> = ({navigation, route}
     selectCompletedLessonsForGuide(state, guideId),
   );
 
-  // Analytics - Screen View
-  useScreenView('CosmicGuideDetail', {
-    screen_category: 'cosmic_guide',
-    guide_id: guideId,
-  });
-
-  // Analytics - Track screen view on mount
+  // Analytics - Bottom tab child view
   useEffect(() => {
-    if (guide) {
-      trackCosmicGuideDetailView(guideId, guide.title, guide.lessonsCount);
-      firebaseService.logScreenView('CosmicGuideDetail', 'CosmicGuideDetailScreen');
-    }
-  }, [guideId, guide]);
+    trackBtChildView('home', 'cosmicguidedetail');
+  }, []);
 
   // Close handler
   const handleClose = useCallback(() => {
@@ -125,7 +111,6 @@ const CosmicGuideDetail: React.FC<CosmicGuideDetailProps> = ({navigation, route}
   // Navigate to lesson detail
   const handleLessonPress = useCallback(
     (lesson: Lesson) => {
-      trackCosmicGuideLessonTap(guideId, lesson.id, lesson.number);
       navigation.navigate('LessonDetail', {
         guideId,
         lessonId: lesson.id,

@@ -2,8 +2,8 @@
   "name": "Cosmiq",
   "displayName": "Cosmiq",
     "_disabled_react-native-google-mobile-ads": {
-    "android_app_id": "ca-app-pub-3781511156022357~2699873695",
-    "ios_app_id": "ca-app-pub-3781511156022357~2699873695",
+    "android_app_id": "",
+    "ios_app_id": "",
     "delay_app_measurement_init": true
   }
 }

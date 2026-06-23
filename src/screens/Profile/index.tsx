@@ -18,14 +18,7 @@ import {ICountry, ICity, City, Country} from 'country-state-city';
 import {useApp} from '../../contexts/AppContext';
 
 // Analytics
-import {useScreenView} from '../../hooks/useFacebookAnalytics';
-import firebaseService from '../../services/firebase/FirebaseService';
-import {
-  trackProfileView,
-  trackProfileEditTap,
-  trackProfileSave,
-  trackProfileSubscriptionTap,
-} from '../../utils/mainScreenAnalytics';
+import {trackBtChildView} from '../../utils/mainScreenAnalytics';
 
 // Notifications
 import {useNotifications} from '../../contexts/NotificationContext';
@@ -96,17 +89,10 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
   const cardSlideAnim = useRef(new Animated.Value(40)).current;
   const cardScaleAnim = useRef(new Animated.Value(0.95)).current;
 
-  // Analytics - Screen View
-  useScreenView('Profile', {
-    screen_category: 'main',
-    zodiac_sign: onboardingData?.zodiacSign || '',
-  });
-
-  // Analytics - Track screen view on mount
+  // Analytics - Bottom tab child view
   useEffect(() => {
-    trackProfileView(onboardingData?.zodiacSign || '');
-    firebaseService.logScreenView('Profile', 'ProfileScreen');
-  }, [onboardingData?.zodiacSign]);
+    trackBtChildView('home', 'profile');
+  }, []);
 
   useEffect(() => {
     // Staggered entrance animations
@@ -242,8 +228,6 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
     const signChanged = calculatedZodiacSign !== onboardingData.zodiacSign;
     if (signChanged) changedFields.push('zodiacSign');
 
-    trackProfileSave(changedFields);
-
     dispatch(
       saveOnboardingData({
         name: name.trim(), // pass empty string to allow clearing saved name
@@ -285,14 +269,12 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
   };
 
   const handleEditProfile = () => {
-    trackProfileEditTap();
     setShowProfileCard(false);
   };
 
   const handlePremiumPress = useCallback(() => {
     if (!isPremium) {
-      trackProfileSubscriptionTap();
-      navigation.navigate('Paywall', {source: 'profile_screen'});
+      navigation.navigate('Paywall', {source: 'profile_screen', bottomTabSource: 'home'});
     }
   }, [isPremium, navigation]);
 
@@ -642,7 +624,7 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
               <TouchableOpacity
                 style={styles.legalRow}
                 onPress={() =>
-                  navigation.navigate('ReportProblem', {source: 'settings'})
+                  navigation.navigate('ReportProblem', {source: 'settings', bottomTabSource: 'home'})
                 }
                 activeOpacity={0.7}>
                 <View style={styles.legalRowIconContainer}>

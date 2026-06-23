@@ -43,8 +43,6 @@ import {
   moderateScale,
 } from '../../theme';
 import {hapticLight} from '../../utils/haptics';
-import {useScreenView} from '../../hooks/useFacebookAnalytics';
-import firebaseService from '../../services/firebase/FirebaseService';
 import {trackOnboarding7BirthdayView} from '../../utils/onboardingAnalytics';
 import {OnboardingButton} from '../../components/OnboardingButton';
 import {getZodiacSign} from '../../components/mock/zodiacMockData';
@@ -375,12 +373,6 @@ export const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({
   const [hasTrackedBirthday, setHasTrackedBirthday] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(Platform.OS === 'ios');
 
-  useScreenView('OnboardingScreen7', {
-    screen_category: 'onboarding',
-    step: 7,
-    total_steps: 9,
-  });
-
   const CURRENT_STEP = 7;
   const TOTAL_STEPS = 12;
   const progressWidth = useSharedValue((CURRENT_STEP - 1) / TOTAL_STEPS * 100);
@@ -395,7 +387,6 @@ export const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({
 
   useEffect(() => {
     trackOnboarding7BirthdayView();
-    firebaseService.logScreenView('onboarding_7_birthday_zodiac', 'OnboardingScreen7');
 
     const targetProgress = (CURRENT_STEP / TOTAL_STEPS) * 100;
     progressWidth.value = withDelay(

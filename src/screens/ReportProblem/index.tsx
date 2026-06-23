@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {
   View,
   Text,
@@ -27,6 +27,7 @@ import {
   ReportDiagnosticsService,
   type ReportSource,
 } from '../../services/support/ReportDiagnosticsService';
+import {trackBtChildView, BottomTabSource} from '../../utils/mainScreenAnalytics';
 
 const SUPPORT_EMAIL = 'hello@markconapps.com';
 const MIN_DESCRIPTION_LENGTH = 20;
@@ -39,6 +40,7 @@ type ReportRouteParams = {
         source?: ReportSource;
         reasons?: string[];
         reportedMessage?: string;
+        bottomTabSource?: BottomTabSource;
       }
     | undefined;
 };
@@ -50,6 +52,12 @@ type Props = {
 const ReportProblemScreen: React.FC<Props> = () => {
   const route = useRoute<RouteProp<ReportRouteParams, 'ReportProblem'>>();
   const source: ReportSource = route.params?.source || 'settings';
+  const bottomTabSource: BottomTabSource = route.params?.bottomTabSource || 'home';
+
+  // Analytics - Bottom tab child view (source-routed)
+  useEffect(() => {
+    trackBtChildView(bottomTabSource, 'reportproblem');
+  }, [bottomTabSource]);
 
   // Reasons + reported message are seeded from route params but tracked in
   // local state so "Send another" can clear them — otherwise the next

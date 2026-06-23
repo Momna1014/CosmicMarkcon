@@ -20,13 +20,9 @@ import {
 } from '../../theme';
 
 // Analytics
-import {useScreenView} from '../../hooks/useFacebookAnalytics';
-import firebaseService from '../../services/firebase/FirebaseService';
-import {
-  trackChiromancyView,
-  trackChiromancyHandSelect,
-  trackChiromancyScanTap,
-} from '../../utils/mainScreenAnalytics';
+import {trackChiromancyTabView} from '../../utils/mainScreenAnalytics';
+import {useFocusEffect} from '@react-navigation/native';
+import {consumeNextFocusSource} from '../../utils/tabNavigationSource';
 import {hapticLight} from '../../utils/haptics';
 
 
@@ -165,16 +161,13 @@ const ScanPalmCard = memo(({handType, onPress}: {handType: TabType; onPress: () 
 const ChiromancyScreen: React.FC<Props> = ({navigation}) => {
   const [activeTab, setActiveTab] = useState<TabType>('leftHand');
   
-  // Analytics - Screen View
-  useScreenView('Chiromancy', {
-    screen_category: 'main',
-  });
-
-  // Analytics - Track screen view on mount
-  useEffect(() => {
-    trackChiromancyView();
-    firebaseService.logScreenView('Chiromancy', 'ChiromancyScreen');
-  }, []);
+  // Analytics - Bottom tab view
+  useFocusEffect(
+    useCallback(() => {
+      if (consumeNextFocusSource() === 'home') { return; }
+      trackChiromancyTabView();
+    }, [])
+  );
   
   // Entrance animations
   const titleFadeAnim = useRef(new Animated.Value(0)).current;
@@ -258,12 +251,10 @@ const ChiromancyScreen: React.FC<Props> = ({navigation}) => {
 
   const handleTabPress = useCallback((tab: TabType) => {
     hapticLight();
-    trackChiromancyHandSelect(tab === 'leftHand' ? 'left' : 'right');
     setActiveTab(tab);
   }, []);
 
   const handleScanPress = useCallback(() => {
-    trackChiromancyScanTap(activeTab === 'leftHand' ? 'left' : 'right');
     navigation.navigate('PalmCapture', {handType: activeTab});
   }, [navigation, activeTab]);
 

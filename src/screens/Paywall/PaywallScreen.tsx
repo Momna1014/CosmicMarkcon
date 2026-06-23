@@ -314,7 +314,7 @@
  * navigation.navigate('Paywall', { source: 'onboarding_start_reading' })
  */
 
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {StyleSheet, View, Platform, StatusBar, Alert, Text, ActivityIndicator, TouchableOpacity} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -323,13 +323,22 @@ import RevenueCatUI from 'react-native-purchases-ui';
 import {revenueCatService} from '../../services/RevenueCatService';
 
 // Analytics imports
-import { useScreenView } from '../../hooks/useFacebookAnalytics';
-import { trackSubscriptionView, trackSubscriptionStarted } from '../../utils/facebookEvents';
-import firebaseService from '../../services/firebase/FirebaseService';
+import { trackSubscriptionStarted } from '../../utils/facebookEvents';
+import { trackBtChildView, BottomTabSource } from '../../utils/mainScreenAnalytics';
+import {
+  trackPaywallViewed,
+  trackPaywallViewedVia,
+  trackPaywallDismissedVia,
+  trackTrialBtnVia,
+  trackPurchaseCompletedVia,
+  trackPurchaseCancelledVia,
+  trackPurchaseRestoredVia,
+} from '../../utils/paywallEvents';
 
 interface PaywallRouteParams {
   source?: string;
   offeringIdentifier?: string;
+  bottomTabSource?: BottomTabSource;
 }
 
 export const PaywallScreen: React.FC = () => {
@@ -340,6 +349,15 @@ export const PaywallScreen: React.FC = () => {
   
   const params = (route.params as PaywallRouteParams) || {};
   const source = params.source || 'unknown';
+  const bottomTabSource = params.bottomTabSource;
+
+  // Analytics - Bottom tab child view (only when navigated from a bottom tab path).
+  // App-launch / post-onboarding Paywall has no bottomTabSource and fires no event.
+  useEffect(() => {
+    if (bottomTabSource) {
+      trackBtChildView(bottomTabSource, 'paywall');
+    }
+  }, [bottomTabSource]);
   
   // Track if we've already navigated to prevent double navigation
   const hasNavigatedRef = React.useRef(false);
@@ -356,24 +374,20 @@ export const PaywallScreen: React.FC = () => {
   // On Android, when coming from in-app screens, we need to account for status bar
   const needsAndroidTopPadding = Platform.OS === 'android' && isFromInApp;
 
-  // ===== Analytics: Track screen view =====
-  useScreenView('PaywallScreen', {
-    screen_category: 'monetization',
-    source: source,
-  });
+  // Source-suffixed paywall analytics context. Resolves to 'onboarding' or
+  // 'bt_home_ch_paywall' (or null when neither). All paywall events read from this.
+  const paywallCtx = useMemo(
+    () => ({source, bottomTabSource}),
+    [source, bottomTabSource],
+  );
 
-  /**
-   * Log Firebase event helper.
-   * When the user arrives directly from onboarding (source === 'onboarding_complete')
-   * all events are suffixed with '_via_onboarding' — this only ever happens once,
-   * on the very first paywall visit after the onboarding flow completes.
-   */
-  const logFirebaseEvent = useCallback((eventName: string, eventParams?: Record<string, any>) => {
-    const resolvedName =
-      source === 'onboarding_complete' ? `${eventName}_via_onb` : eventName;
-    console.log(`📊 [PaywallScreen] Firebase Event: ${resolvedName}`, eventParams);
-    firebaseService.logEvent(resolvedName, eventParams);
-  }, [source]);
+  // Mount-time paywall view events.
+  // - paywall_viewed: every entry EXCEPT first-time onboarding
+  // - paywall_viewed_via_{src}: every entry where {src} is recognized
+  useEffect(() => {
+    trackPaywallViewed(paywallCtx);
+    trackPaywallViewedVia(paywallCtx);
+  }, [paywallCtx]);
 
   /**
    * Check if billing/offerings are available before rendering the paywall.
@@ -419,20 +433,10 @@ export const PaywallScreen: React.FC = () => {
     }
   }, []);
 
-  // Log screen view to Firebase on mount
+  // Pre-check billing availability before showing paywall
   useEffect(() => {
-    console.log('📱 [PaywallScreen] Screen mounted - logging Firebase screen view');
-    firebaseService.logScreenView('PaywallScreen', 'PaywallScreen');
-    logFirebaseEvent('paywall_viewed', {
-      source: source,
-      timestamp: Date.now(),
-    });
-    // Track Facebook subscription view event
-    trackSubscriptionView('premium', 'Premium Subscription', 0, 'monthly');
-
-    // Pre-check billing availability before showing paywall
     checkBillingAvailability();
-  }, [logFirebaseEvent, source, checkBillingAvailability]);
+  }, [checkBillingAvailability]);
 
   console.log('[PaywallScreen] 🎬 Rendering embedded paywall from:', source);
 
@@ -497,57 +501,46 @@ export const PaywallScreen: React.FC = () => {
    */
   const handleDismiss = useCallback(async () => {
     console.log('[PaywallScreen] 👋 User dismissed paywall via cross button');
-    logFirebaseEvent('paywall_dismissed', {
-      source: source,
-      timestamp: Date.now(),
-    });
+    trackPaywallDismissedVia(paywallCtx);
     navigateBack();
-  }, [navigateBack, logFirebaseEvent, source]);
+  }, [navigateBack, paywallCtx]);
+
+  /**
+   * Handle purchase started (user tapped the trial / continue / subscribe button)
+   */
+  const handlePurchaseStarted = useCallback(() => {
+    console.log('[PaywallScreen] ▶️ Purchase started (trial/continue button tapped)');
+    trackTrialBtnVia(paywallCtx);
+  }, [paywallCtx]);
 
   /**
    * Handle restore started
    */
   const handleRestoreStarted = useCallback(() => {
     console.log('[PaywallScreen] 🔄 Restore started...');
-    logFirebaseEvent('paywall_restore_started', {
-      source: source,
-      timestamp: Date.now(),
-    });
-  }, [logFirebaseEvent, source]);
+  }, []);
 
   /**
    * Handle restore completed
    */
   const handleRestoreCompleted = useCallback(async (_callbackCustomerInfo: any) => {
     console.log('[PaywallScreen] ✅ Restore callback fired, callback data:', _callbackCustomerInfo?.activeSubscriptions);
-    
+
     // IMPORTANT: The customerInfo from RevenueCatUI's onRestoreCompleted callback
     // can be unreliable (activeSubscriptions may be undefined even when user has
     // an active subscription). Always fetch fresh data directly from RevenueCat servers.
     try {
       const freshCustomerInfo = await revenueCatService.getCustomerInfo();
       const isPremiumNow = revenueCatService.isPremium(freshCustomerInfo);
-      
+
       console.log('[PaywallScreen] 🔍 Fresh customer info after restore:', {
         isPremium: isPremiumNow,
         activeSubscriptions: freshCustomerInfo.activeSubscriptions,
         activeEntitlements: Object.keys(freshCustomerInfo.entitlements.active),
       });
-      
-      logFirebaseEvent('paywall_restore_completed', {
-        source: source,
-        subscriptions: freshCustomerInfo.activeSubscriptions?.join(',') || 'none',
-        is_premium: isPremiumNow,
-        timestamp: Date.now(),
-      });
-      
+
       if (!isPremiumNow) {
-        // No active subscriptions found after server check
         console.log('[PaywallScreen] ⚠️ Restore completed but no active subscriptions found (server-verified)');
-        logFirebaseEvent('paywall_restore_no_purchases', {
-          source: source,
-          timestamp: Date.now(),
-        });
         Alert.alert(
           'No Subscriptions Found',
           'We couldn\'t find any active subscriptions to restore. If you believe this is an error, please try again or contact support.',
@@ -555,84 +548,43 @@ export const PaywallScreen: React.FC = () => {
         );
         return;
       }
-      
-      // User has active subscription - proceed
-      logFirebaseEvent('restore_success', {
-        source: source,
-        product_id: freshCustomerInfo.activeSubscriptions?.[0] || 'premium',
-        screen: 'PaywallScreen',
-        timestamp: Date.now(),
-      });
-      
-      // Track Facebook subscription started (restored)
+
+      trackPurchaseRestoredVia(paywallCtx);
       trackSubscriptionStarted('premium', 'Premium Subscription', 0, 'monthly');
       await refreshSubscriptionStatus();
       await setInitialPaywallCompleted(true);
       navigateBack();
     } catch (error) {
       console.error('[PaywallScreen] ❌ Failed to verify restore status:', error);
-      logFirebaseEvent('paywall_restore_verify_error', {
-        source: source,
-        error: String(error),
-        timestamp: Date.now(),
-      });
       // On error fetching fresh info, fall back to refreshing subscription status
       // which will trigger the customer info listener in AppContext
       await refreshSubscriptionStatus();
     }
-  }, [refreshSubscriptionStatus, setInitialPaywallCompleted, navigateBack, logFirebaseEvent, source]);
+  }, [refreshSubscriptionStatus, setInitialPaywallCompleted, navigateBack, paywallCtx]);
 
   /**
    * Handle restore error
    */
   const handleRestoreError = useCallback((error: any) => {
     console.log('[PaywallScreen] ❌ Restore error:', error?.message);
-    logFirebaseEvent('paywall_restore_error', {
-      source: source,
-      error: error?.message || 'unknown_error',
-      timestamp: Date.now(),
-    });
     // Mark billing error so dismiss handler blocks navigation
     hasNavigatedRef.current = false;
-  }, [logFirebaseEvent, source]);
+  }, []);
 
   /**
    * Handle purchase completed
    */
   const handlePurchaseCompleted = useCallback(async (customerInfo: any) => {
     console.log('[PaywallScreen] 🎉 Purchase completed!', customerInfo?.activeSubscriptions);
-    
-    // Log multiple event names for comprehensive tracking
-    logFirebaseEvent('paywall_purchase_completed', {
-      source: source,
-      subscriptions: customerInfo?.activeSubscriptions?.join(',') || 'none',
-      timestamp: Date.now(),
-    });
-    
-    // Explicit purchase_success event
-    logFirebaseEvent('purchase_success', {
-      source: source,
-      product_type: 'subscription',
-      product_id: customerInfo?.activeSubscriptions?.[0] || 'premium',
-      screen: 'PaywallScreen',
-      timestamp: Date.now(),
-    });
-    
-    // Standard Firebase purchase event
-    logFirebaseEvent('purchase', {
-      source: source,
-      item_id: customerInfo?.activeSubscriptions?.[0] || 'premium',
-      item_name: 'Premium Subscription',
-      success: true,
-    });
-    
-    // Track Facebook subscription started event - this is important for revenue tracking
+
+    trackPurchaseCompletedVia(paywallCtx);
+    // Meta standard Subscribe event — required for SKAdNetwork / ad revenue tracking
     trackSubscriptionStarted('premium', 'Premium Subscription', 0, 'monthly');
 
     await refreshSubscriptionStatus();
     await setInitialPaywallCompleted(true);
     navigateBack();
-  }, [refreshSubscriptionStatus, setInitialPaywallCompleted, navigateBack, logFirebaseEvent, source]);
+  }, [refreshSubscriptionStatus, setInitialPaywallCompleted, navigateBack, paywallCtx]);
 
   /**
    * Handle purchase error
@@ -640,27 +592,19 @@ export const PaywallScreen: React.FC = () => {
   const handlePurchaseError = useCallback((error: any) => {
     const errorMessage = error?.message || 'unknown_error';
     console.log('[PaywallScreen] ❌ Purchase error:', errorMessage);
-    logFirebaseEvent('paywall_purchase_error', {
-      source: source,
-      error: errorMessage,
-      timestamp: Date.now(),
-    });
     // Mark that a billing error occurred
     hasNavigatedRef.current = false;
     // Don't navigate away - let user try again or dismiss
-  }, [logFirebaseEvent, source]);
+  }, []);
 
   /**
    * Handle purchase cancelled
    */
   const handlePurchaseCancelled = useCallback(() => {
     console.log('[PaywallScreen] ⏸️ Purchase cancelled by user');
-    logFirebaseEvent('paywall_purchase_cancelled', {
-      source: source,
-      timestamp: Date.now(),
-    });
+    trackPurchaseCancelledVia(paywallCtx);
     // Don't navigate away - user can try again or dismiss
-  }, [logFirebaseEvent, source]);
+  }, [paywallCtx]);
 
   // Render based on billing availability
   // Loading state - checking if billing is available
@@ -715,6 +659,7 @@ export const PaywallScreen: React.FC = () => {
       <RevenueCatUI.Paywall
         style={styles.paywall}
         onDismiss={handleDismiss}
+        onPurchaseStarted={handlePurchaseStarted}
         onRestoreStarted={handleRestoreStarted}
         onRestoreCompleted={handleRestoreCompleted}
         onRestoreError={handleRestoreError}

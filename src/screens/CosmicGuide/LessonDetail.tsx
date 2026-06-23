@@ -18,13 +18,7 @@ import {RootState} from '../../redux/rootReducer';
 import CosmicAlert from '../../components/CosmicAlert';
 
 // Analytics
-import {useScreenView} from '../../hooks/useFacebookAnalytics';
-import firebaseService from '../../services/firebase/FirebaseService';
-import {
-  trackLessonDetailView,
-  trackLessonComplete,
-  trackLessonDetailDismiss,
-} from '../../utils/mainScreenAnalytics';
+import {trackBtChildView} from '../../utils/mainScreenAnalytics';
 
 // Icons
 import CrossIcon from '../../assets/icons/home_icons/cross.svg';
@@ -60,31 +54,19 @@ const LessonDetail: React.FC<LessonDetailProps> = ({navigation, route}) => {
   // Track alert visibility
   const [showAlert, setShowAlert] = React.useState(false);
 
-  // Analytics - Screen View
-  useScreenView('LessonDetail', {
-    screen_category: 'cosmic_guide',
-    guide_id: guideId,
-    lesson_id: lessonId,
-  });
-
-  // Analytics - Track screen view on mount
+  // Analytics - Bottom tab child view
   useEffect(() => {
-    if (lesson) {
-      trackLessonDetailView(guideId, lessonId, lesson.title);
-      firebaseService.logScreenView('LessonDetail', 'LessonDetailScreen');
-    }
-  }, [guideId, lessonId, lesson]);
+    trackBtChildView('home', 'lessondetail');
+  }, []);
 
   // Close handler
   const handleClose = useCallback(() => {
-    trackLessonDetailDismiss(guideId, lessonId, isCompleted);
     navigation.goBack();
-  }, [navigation, guideId, lessonId, isCompleted]);
+  }, [navigation]);
 
   // Complete handler
   const handleComplete = useCallback(() => {
     if (!isCompleted && lesson) {
-      trackLessonComplete(guideId, lessonId, lesson.number);
       // Dispatch Redux action to mark lesson as completed
       dispatch(markLessonCompleted({guideId, lessonId}));
       // Show completion alert

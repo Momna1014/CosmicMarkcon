@@ -1,4 +1,5 @@
 import type { UsercentricsOptions } from '@usercentrics/react-native-sdk';
+import { Platform } from 'react-native';
 import env from '../../config/env';
 import type { ConsentIdentity } from '../types';
 
@@ -45,7 +46,11 @@ function buildSettingsIdentity(settingsId: string): ConsentIdentity | null {
 }
 
 function computeIdentity(): ConsentIdentity | null {
-  const ruleSetId = normalize(env.USER_CENTRIC_RULESET_ID);
+  const ruleSetId = normalize(
+    Platform.OS === 'ios'
+      ? env.USER_CENTRIC_RULESET_ID_IOS
+      : env.USER_CENTRIC_RULESET_ID_ANDROID,
+  );
   const settingsId = normalize(env.USER_CENTRIC_SETTINGS_ID);
   const identityMode = normalizeIdentityMode(env.USER_CENTRIC_IDENTITY_MODE);
 

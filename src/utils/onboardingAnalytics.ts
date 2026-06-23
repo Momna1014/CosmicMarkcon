@@ -1,25 +1,23 @@
 /**
  * Onboarding Analytics Events
  *
- * Simple view event tracking for all onboarding screens (1–12).
+ * View event tracking for all onboarding screens.
  * Integrates both Facebook Analytics and Firebase Analytics.
  *
- * Event naming convention: onboarding_{screen_number}_{what_is_on_screen}
+ * Event naming convention: onboarding_step{N}_{screen_name}
  */
 
 import { Platform } from 'react-native';
 import { facebookAnalytics } from '../services/FacebookAnalyticsService';
 import firebase from '../services/firebase/FirebaseService';
 
-/**
- * Helper to log to both Facebook and Firebase
- */
 const logEvent = async (eventName: string, params: Record<string, any> = {}) => {
   const enrichedParams = {
     ...params,
     platform: Platform.OS,
     timestamp: Date.now(),
   };
+  console.log(`🎯 [Onboarding Event] ${eventName} → sending to Facebook + Firebase`, enrichedParams);
   await Promise.all([
     facebookAnalytics.logCustomEvent(eventName, enrichedParams),
     firebase.logEvent(eventName, enrichedParams),
@@ -27,19 +25,11 @@ const logEvent = async (eventName: string, params: Record<string, any> = {}) => 
 };
 
 // ─────────────────────────────────────────────
-// FLOW
-// ─────────────────────────────────────────────
-
-export const trackOnboardingStarted = async () => {
-  await logEvent('onboarding_started', { step: 0 });
-};
-
-// ─────────────────────────────────────────────
 // SCREEN 1 – Welcome intro video
 // ─────────────────────────────────────────────
 
 export const trackOnboarding1View = async () => {
-  await logEvent('onboarding_1_welcome_video', { step: 1 });
+  await logEvent('onboarding_step1_welcome_video', { step: 1 });
 };
 
 // ─────────────────────────────────────────────
@@ -47,7 +37,7 @@ export const trackOnboarding1View = async () => {
 // ─────────────────────────────────────────────
 
 export const trackOnboarding2View = async () => {
-  await logEvent('onboarding_2_seeking_options', { step: 2 });
+  await logEvent('onboarding_step2_seeking_options', { step: 2 });
 };
 
 // ─────────────────────────────────────────────
@@ -55,7 +45,7 @@ export const trackOnboarding2View = async () => {
 // ─────────────────────────────────────────────
 
 export const trackOnboarding3ClarityView = async () => {
-  await logEvent('onboarding_3_clarity_grid', { step: 3 });
+  await logEvent('onboarding_step3_clarity_grid', { step: 3 });
 };
 
 // ─────────────────────────────────────────────
@@ -63,7 +53,7 @@ export const trackOnboarding3ClarityView = async () => {
 // ─────────────────────────────────────────────
 
 export const trackAgreementAfterOnboarding3 = async () => {
-  await logEvent('agreement_after_onboarding_3', { step: 3.5 });
+  await logEvent('onboarding_step3_5_consent_agreement', { step: 3.5 });
 };
 
 // ─────────────────────────────────────────────
@@ -71,7 +61,7 @@ export const trackAgreementAfterOnboarding3 = async () => {
 // ─────────────────────────────────────────────
 
 export const trackOnboarding4GenderView = async () => {
-  await logEvent('onboarding_4_gender_selection', { step: 4 });
+  await logEvent('onboarding_step4_gender_selection', { step: 4 });
 };
 
 // ─────────────────────────────────────────────
@@ -79,7 +69,7 @@ export const trackOnboarding4GenderView = async () => {
 // ─────────────────────────────────────────────
 
 export const trackOnboarding5NameInputView = async () => {
-  await logEvent('onboarding_5_name_input', { step: 5 });
+  await logEvent('onboarding_step5_name_input', { step: 5 });
 };
 
 // ─────────────────────────────────────────────
@@ -87,7 +77,7 @@ export const trackOnboarding5NameInputView = async () => {
 // ─────────────────────────────────────────────
 
 export const trackOnboarding6CosmicProfileView = async () => {
-  await logEvent('onboarding_6_cosmic_profile', { step: 6 });
+  await logEvent('onboarding_step6_cosmic_profile', { step: 6 });
 };
 
 // ─────────────────────────────────────────────
@@ -95,7 +85,7 @@ export const trackOnboarding6CosmicProfileView = async () => {
 // ─────────────────────────────────────────────
 
 export const trackOnboarding7BirthdayView = async () => {
-  await logEvent('onboarding_7_birthday_zodiac', { step: 7 });
+  await logEvent('onboarding_step7_birthday_zodiac', { step: 7 });
 };
 
 // ─────────────────────────────────────────────
@@ -103,7 +93,7 @@ export const trackOnboarding7BirthdayView = async () => {
 // ─────────────────────────────────────────────
 
 export const trackOnboarding8BirthplaceView = async () => {
-  await logEvent('onboarding_8_birthplace_selection', { step: 8 });
+  await logEvent('onboarding_step8_birthplace_selection', { step: 8 });
 };
 
 // ─────────────────────────────────────────────
@@ -111,7 +101,7 @@ export const trackOnboarding8BirthplaceView = async () => {
 // ─────────────────────────────────────────────
 
 export const trackOnboarding9InsightsPreviewView = async () => {
-  await logEvent('onboarding_9_insights_preview', { step: 9 });
+  await logEvent('onboarding_step9_insights_preview', { step: 9 });
 };
 
 // ─────────────────────────────────────────────
@@ -119,7 +109,7 @@ export const trackOnboarding9InsightsPreviewView = async () => {
 // ─────────────────────────────────────────────
 
 export const trackOnboarding10LoveMatchVideoView = async () => {
-  await logEvent('onboarding_10_love_match_video', { step: 10 });
+  await logEvent('onboarding_step10_love_match_video', { step: 10 });
 };
 
 // ─────────────────────────────────────────────
@@ -127,7 +117,7 @@ export const trackOnboarding10LoveMatchVideoView = async () => {
 // ─────────────────────────────────────────────
 
 export const trackOnboarding11AiVideoView = async () => {
-  await logEvent('onboarding_11_ai_chat_video', { step: 11 });
+  await logEvent('onboarding_step11_ai_chat_video', { step: 11 });
 };
 
 // ─────────────────────────────────────────────
@@ -135,6 +125,13 @@ export const trackOnboarding11AiVideoView = async () => {
 // ─────────────────────────────────────────────
 
 export const trackOnboarding12FinalVideoView = async () => {
-  await logEvent('onboarding_12_final_video', { step: 12 });
+  await logEvent('onboarding_step12_final_video', { step: 12 });
 };
 
+// ─────────────────────────────────────────────
+// COMPLETION – Fired when the user finishes screen 12 / final video
+// ─────────────────────────────────────────────
+
+export const trackOnboardingCompleted = async () => {
+  await logEvent('onboarding_completed');
+};
