@@ -43,8 +43,8 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const PRIVACY_POLICY_URL = 'https://whoop.myappsstudio.com/privacy-policy.html';
-const TERMS_URL = 'https://whoop.myappsstudio.com/terms-and-conditions.html';
+const PRIVACY_POLICY_URL = 'https://milaltechnologies.com/privacy-policy.html';
+const TERMS_URL = 'https://milaltechnologies.com/terms-and-conditions.html';
 
 const H_PAD = horizontalScale(20);
 

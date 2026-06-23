@@ -254,7 +254,10 @@ function deriveCategoryGrants(decisions: ConsentDecisionMap): ConsentGrants {
     // @feature:admob:start [disabled]
     // 'admob' token removed from advertising token list while AdMob is disabled
     // @feature:admob:end
-    if (hasAnyToken(text, ['advertising', 'marketing', 'facebook', 'meta', 'adjust', 'ads'])) {
+    // @feature:adjust:start [disabled]
+    // 'adjust' token removed from advertising token list while Adjust is disabled
+    // @feature:adjust:end
+    if (hasAnyToken(text, ['advertising', 'marketing', 'facebook', 'meta', 'ads'])) {
       grants.advertising = true;
     }
 
@@ -311,9 +314,11 @@ function deriveVendorGrants(
   if (!vendorGrants.sentry && grants.crashReporting) {
     vendorGrants.sentry = true;
   }
-  if (!vendorGrants.adjust && (grants.analytics || grants.advertising)) {
-    vendorGrants.adjust = true;
-  }
+  // @feature:adjust:start [disabled]
+  // if (!vendorGrants.adjust && (grants.analytics || grants.advertising)) {
+  //   vendorGrants.adjust = true;
+  // }
+  // @feature:adjust:end
   // @feature:admob:start [disabled]
   // if (!vendorGrants.admob && grants.advertising) {
   //   vendorGrants.admob = true;

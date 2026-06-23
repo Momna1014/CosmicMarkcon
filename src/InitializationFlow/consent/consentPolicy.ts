@@ -45,7 +45,9 @@ export const VENDOR_TOKEN_MAP: Record<ConsentVendorKey, string[]> = {
   firebaseAnalytics: ['firebase analytics', 'firebase_analytics', 'analytics'],
   firebaseCrashlytics: ['firebase crashlytics', 'firebase_crashlytics', 'crashlytics', 'crash'],
   sentry: ['sentry', 'crash', 'diagnostic'],
-  adjust: ['adjust', 'attribution'],
+  // @feature:adjust:start [disabled]
+  // adjust: ['adjust', 'attribution'],
+  // @feature:adjust:end
   // @feature:admob:start [disabled]
   // admob: ['admob', 'google mobile ads', 'advertising', 'marketing', 'ads'],
   // @feature:admob:end
@@ -201,7 +203,9 @@ export function isVendorAllowed(consent: ConsentResult, vendor: ConsentVendorKey
 export function isAnalyticsAllowed(consent: ConsentResult): boolean {
   return (
     isVendorAllowed(consent, 'firebaseAnalytics') ||
-    isVendorAllowed(consent, 'adjust') ||
+    // @feature:adjust:start [disabled]
+    // isVendorAllowed(consent, 'adjust') ||
+    // @feature:adjust:end
     isVendorAllowed(consent, 'remoteConfig') ||
     consent.grants.analytics
   );

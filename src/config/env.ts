@@ -25,9 +25,9 @@ import {
   // @feature:admob:end
   FACEBOOK_APP_ID,
   FACEBOOK_CLIENT_TOKEN,
-  // @feature:adjust:start
-  ADJUST_APP_TOKEN_ANDROID,
-  ADJUST_APP_TOKEN_IOS,
+  // @feature:adjust:start [disabled]
+  // ADJUST_APP_TOKEN_ANDROID,
+  // ADJUST_APP_TOKEN_IOS,
   // @feature:adjust:end
   USER_CENTRIC,
   USER_CENTRIC_RULESET_ID_ANDROID,
@@ -64,9 +64,9 @@ export type Env = {
   // @feature:admob:end
   FACEBOOK_APP_ID: string
   FACEBOOK_CLIENT_TOKEN: string
-  // @feature:adjust:start
-  ADJUST_APP_TOKEN_ANDROID: string
-  ADJUST_APP_TOKEN_IOS: string
+  // @feature:adjust:start [disabled]
+  // ADJUST_APP_TOKEN_ANDROID: string
+  // ADJUST_APP_TOKEN_IOS: string
   // @feature:adjust:end
   USER_CENTRIC: string
   USER_CENTRIC_RULESET_ID_ANDROID: string
@@ -103,9 +103,9 @@ const env: Env = {
   // @feature:admob:end
   FACEBOOK_APP_ID: FACEBOOK_APP_ID ?? '',
   FACEBOOK_CLIENT_TOKEN: FACEBOOK_CLIENT_TOKEN ?? '',
-  // @feature:adjust:start
-  ADJUST_APP_TOKEN_ANDROID: ADJUST_APP_TOKEN_ANDROID ?? '',
-  ADJUST_APP_TOKEN_IOS: ADJUST_APP_TOKEN_IOS ?? '',
+  // @feature:adjust:start [disabled]
+  // ADJUST_APP_TOKEN_ANDROID: ADJUST_APP_TOKEN_ANDROID ?? '',
+  // ADJUST_APP_TOKEN_IOS: ADJUST_APP_TOKEN_IOS ?? '',
   // @feature:adjust:end
   USER_CENTRIC: USER_CENTRIC ?? '',
   USER_CENTRIC_RULESET_ID_ANDROID: USER_CENTRIC_RULESET_ID_ANDROID ?? '',

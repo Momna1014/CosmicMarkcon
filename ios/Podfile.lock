@@ -1,9 +1,4 @@
 PODS:
-  - Adjust (5.6.2):
-    - Adjust/Adjust (= 5.6.2)
-  - Adjust/Adjust (5.6.2):
-    - AdjustSignature (= 3.67.0)
-  - AdjustSignature (3.67.0)
   - boost (1.84.0)
   - BVLinearGradient (2.8.3):
     - React-Core
@@ -2075,9 +2070,6 @@ PODS:
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
     - SocketRocket
-  - react-native-adjust (5.6.0):
-    - Adjust (= 5.6.2)
-    - React-Core
   - react-native-blur (4.4.1):
     - boost
     - DoubleConversion
@@ -3921,7 +3913,6 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
-  - react-native-adjust (from `../node_modules/react-native-adjust`)
   - "react-native-blur (from `../node_modules/@react-native-community/blur`)"
   - react-native-fbsdk-next (from `../node_modules/react-native-fbsdk-next`)
   - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
@@ -3999,8 +3990,6 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - Adjust
-    - AdjustSignature
     - FBAEMKit
     - FBSDKCoreKit
     - FBSDKCoreKit_Basics
@@ -4135,8 +4124,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   React-microtasksnativemodule:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
-  react-native-adjust:
-    :path: "../node_modules/react-native-adjust"
   react-native-blur:
     :path: "../node_modules/@react-native-community/blur"
   react-native-fbsdk-next:
@@ -4283,8 +4270,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  Adjust: 62ea53a252534df416676e7ac2f1558d60e6e39e
-  AdjustSignature: 9498705a4ac67b719e31828be4d74fbb8656950c
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
   BVLinearGradient: cb006ba232a1f3e4f341bb62c42d1098c284da70
   DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb
@@ -4363,7 +4348,6 @@ SPEC CHECKSUMS:
   React-logger: 500f2fa5697d224e63c33d913c8a4765319e19bf
   React-Mapbuffer: 4c50cf6af44286015a20a5995d5321f625c93459
   React-microtasksnativemodule: a84b9331106616ab1fa36de9ae555718d4bbdcf5
-  react-native-adjust: 1ed9577cd1998e4278ad26e1175bdd391207938c
   react-native-blur: b83ffbc5380d8bd2f06804b4b0e848be3507e65c
   react-native-fbsdk-next: 325e4973a478f098bb9406fb2a13fa2e1f5dffeb
   react-native-geolocation: 49d39b53dfeb6c22ff1ad69e71ac9c7981affdaa

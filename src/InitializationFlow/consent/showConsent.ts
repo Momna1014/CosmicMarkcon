@@ -479,8 +479,8 @@ function buildRegionNotRequiredConsent(
       firebaseAnalytics: true,
       firebaseCrashlytics: true,
       sentry: true,
-      // @feature:adjust:start
-      adjust: true,
+      // @feature:adjust:start [disabled]
+      // adjust: true,
       // @feature:adjust:end
       // @feature:admob:start [disabled]
       // admob: true,

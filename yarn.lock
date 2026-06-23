@@ -7724,11 +7724,6 @@ react-is@^19.1.0, react-is@^19.1.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-19.2.5.tgz#7e7b54143e9313fed787b23fd4295d5a23872ad9"
   integrity sha512-Dn0t8IQhCmeIT3wu+Apm1/YVsJXsGWi6k4sPdnBIdqMVtHtv0IGi6dcpNpNkNac0zB2uUAqNX3MHzN8c+z2rwQ==
 
-react-native-adjust@^5.5.0:
-  version "5.6.0"
-  resolved "https://registry.yarnpkg.com/react-native-adjust/-/react-native-adjust-5.6.0.tgz#97f7662a2b6df2f66b64864029734b8df10f200f"
-  integrity sha512-UCEzT1nBeTxQPaIR2VPjMjZVQQ8Fhj9EhpkSJQI4w7XifvsHrtXD2nEKPjWV3alhDT1oVO3H2267eTNIwE51UA==
-
 react-native-bootsplash@^6.3.11:
   version "6.3.12"
   resolved "https://registry.yarnpkg.com/react-native-bootsplash/-/react-native-bootsplash-6.3.12.tgz#b6760f0e1e4feb2de683e7e1c9ed790f8e51268b"

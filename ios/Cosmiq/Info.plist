@@ -93,8 +93,10 @@
 	<string>Cosmiq would like to send you notifications about important updates and messages.</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>Cosmiq would like to track your activity across apps and websites owned by other companies for personalized advertising and analytics purposes.</string>
-	<key>NSAdvertisingAttributionReportEndpoint</key>
-	<string>https://adjust-skadnetwork.com</string>
+	<!-- @feature:adjust:start [disabled] -->
+	<!-- <key>NSAdvertisingAttributionReportEndpoint</key> -->
+	<!-- <string>https://adjust-skadnetwork.com</string> -->
+	<!-- @feature:adjust:end -->
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>SKAdNetworkItems</key>

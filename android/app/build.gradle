@@ -182,14 +182,14 @@ dependencies {
     implementation("com.google.firebase:firebase-config")
     // @feature:firebase-remote-config:end
 
-    // @feature:adjust:start
-    // ========================================
-    // Adjust SDK - Attribution & Analytics
-    // ========================================
-    // Google Advertising ID for device identification
-    implementation 'com.google.android.gms:play-services-ads-identifier:18.1.0'
-    // Google Play Install Referrer API for attribution (reftag, gclid)
-    implementation 'com.android.installreferrer:installreferrer:2.2'
+    // @feature:adjust:start [disabled]
+    // // ========================================
+    // // Adjust SDK - Attribution & Analytics
+    // // ========================================
+    // // Google Advertising ID for device identification
+    // implementation 'com.google.android.gms:play-services-ads-identifier:18.1.0'
+    // // Google Play Install Referrer API for attribution (reftag, gclid)
+    // implementation 'com.android.installreferrer:installreferrer:2.2'
     // @feature:adjust:end
 }
 apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")

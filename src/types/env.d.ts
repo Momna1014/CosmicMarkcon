@@ -42,9 +42,11 @@ declare module '@env' {
   export const FACEBOOK_APP_ID: string
   export const FACEBOOK_CLIENT_TOKEN: string
 
-  // Attribution (Adjust)
-  export const ADJUST_APP_TOKEN_ANDROID: string
-  export const ADJUST_APP_TOKEN_IOS: string
+  // @feature:adjust:start [disabled]
+  // // Attribution (Adjust)
+  // export const ADJUST_APP_TOKEN_ANDROID: string
+  // export const ADJUST_APP_TOKEN_IOS: string
+  // @feature:adjust:end
 
   // Consent Management (Usercentrics)
   export const USER_CENTRIC: string

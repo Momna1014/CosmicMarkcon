@@ -31,8 +31,8 @@ import type { ATTStatus, ConsentResult, AdsModeResult } from '../types';
 // @feature:admob:start [disabled]
 // import { setupAdMob } from '../sdks/setupAdMob';
 // @feature:admob:end
-// @feature:adjust:start
-import { setupAdjust } from '../sdks/setupAdjust';
+// @feature:adjust:start [disabled]
+// import { setupAdjust } from '../sdks/setupAdjust';
 // @feature:adjust:end
 import { setupFacebook } from '../sdks/setupFacebook';
 import { enableSentryFullTracking } from '../sdks/setupSentry';
@@ -125,7 +125,9 @@ function buildGroupB(consent: ConsentResult, adsMode: AdsModeResult): DeferredTa
 
   const trackingAllowed = adsMode.trackingAllowed;
   const advertisingAllowed = isAdvertisingAllowed(consent);
-  const analyticsAllowed = isAnalyticsAllowed(consent);
+  // @feature:adjust:start [disabled]
+  // const analyticsAllowed = isAnalyticsAllowed(consent);
+  // @feature:adjust:end
 
   // ────────────────────────────────────────────────────────────────────
   // GDPR ads policy (NPA-always strategy)
@@ -150,13 +152,13 @@ function buildGroupB(consent: ConsentResult, adsMode: AdsModeResult): DeferredTa
   // ────────────────────────────────────────────────────────────────────
   const isPersonalized = advertisingAllowed && adsMode.mode === 'personalized';
 
-  // @feature:adjust:start
-  // Adjust — analytics-grade attribution. Only runs when advertising allowed.
-  if (isPersonalized && (isVendorAllowed(consent, 'adjust') || analyticsAllowed)) {
-    tasks.push({ name: 'Adjust', run: () => setupAdjust(consent, trackingAllowed) });
-  } else {
-    tasks.push({ name: 'AdjustDisable', run: () => setupAdjust(consent, false) });
-  }
+  // @feature:adjust:start [disabled]
+  // // Adjust — analytics-grade attribution. Only runs when advertising allowed.
+  // if (isPersonalized && (isVendorAllowed(consent, 'adjust') || analyticsAllowed)) {
+  //   tasks.push({ name: 'Adjust', run: () => setupAdjust(consent, trackingAllowed) });
+  // } else {
+  //   tasks.push({ name: 'AdjustDisable', run: () => setupAdjust(consent, false) });
+  // }
   // @feature:adjust:end
 
   // @feature:admob:start [disabled]

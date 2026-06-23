@@ -9,8 +9,10 @@
 
 # Add any project specific keep options here:
 
-# Adjust SDK — Required when ProGuard/R8 is enabled
--keep class com.adjust.sdk.** { *; }
+# @feature:adjust:start [disabled]
+# # Adjust SDK — Required when ProGuard/R8 is enabled
+# -keep class com.adjust.sdk.** { *; }
+# @feature:adjust:end
 -keep class com.google.android.gms.common.ConnectionResult {
     int SUCCESS;
 }

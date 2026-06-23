@@ -5,8 +5,8 @@
  */
 
 import Purchases from 'react-native-purchases';
-// @feature:adjust:start
-import { Adjust } from 'react-native-adjust';
+// @feature:adjust:start [disabled]
+// import { Adjust } from 'react-native-adjust';
 // @feature:adjust:end
 import { Platform } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
@@ -14,8 +14,8 @@ import DeviceInfo from 'react-native-device-info';
 // Track if attribution has already been set to avoid duplicate calls
 let attributionSetupComplete = false;
 let fbAnonIdSet = false;
-// @feature:adjust:start
-let adjustIdSet = false;
+// @feature:adjust:start [disabled]
+// let adjustIdSet = false;
 // @feature:adjust:end
 
 /**
@@ -46,8 +46,8 @@ export const setRevenueCatAttribution = async (): Promise<void> => {
     await setDeviceIdentifiers();
 
     // Set Adjust ID (only if not already set)
-    // @feature:adjust:start
-    await setAdjustAttribution();
+    // @feature:adjust:start [disabled]
+    // await setAdjustAttribution();
     // @feature:adjust:end
 
     // Set Facebook Anonymous ID (only if not already set)
@@ -84,41 +84,41 @@ const setDeviceIdentifiers = async (): Promise<void> => {
 // ===========================================================================
 // Adjust Attribution
 // ===========================================================================
-// @feature:adjust:start
-/**
- * Set Adjust device ID in RevenueCat.
- * The adid may not be available immediately after Adjust.initSdk() — it requires
- * a round-trip to Adjust servers. This function tries once; the main bridge
- * happens in setupAdjust.ts via setAttributionCallback which fires when
- * attribution data (and adid) become available.
- */
-const setAdjustAttribution = async (): Promise<void> => {
-  if (adjustIdSet) {
-    console.log('⏭️ [RevenueCat Attribution] Adjust ID already set, skipping...');
-    return;
-  }
-
-  try {
-    const adid = await new Promise<string | null>((resolve) => {
-      Adjust.getAdid((id) => resolve(id));
-    });
-
-    if (adid) {
-      await Purchases.setAdjustID(adid);
-      adjustIdSet = true;
-      console.log(`✅ [RevenueCat Attribution] Adjust ID set: ${adid}`);
-    } else {
-      console.log(
-        '⚠️ [RevenueCat Attribution] Adjust ID not available yet (will be set via attribution callback)'
-      );
-    }
-  } catch (error) {
-    console.error(
-      '❌ [RevenueCat Attribution] Error setting Adjust ID:',
-      error
-    );
-  }
-};
+// @feature:adjust:start [disabled]
+// /**
+//  * Set Adjust device ID in RevenueCat.
+//  * The adid may not be available immediately after Adjust.initSdk() — it requires
+//  * a round-trip to Adjust servers. This function tries once; the main bridge
+//  * happens in setupAdjust.ts via setAttributionCallback which fires when
+//  * attribution data (and adid) become available.
+//  */
+// const setAdjustAttribution = async (): Promise<void> => {
+//   if (adjustIdSet) {
+//     console.log('⏭️ [RevenueCat Attribution] Adjust ID already set, skipping...');
+//     return;
+//   }
+//
+//   try {
+//     const adid = await new Promise<string | null>((resolve) => {
+//       Adjust.getAdid((id) => resolve(id));
+//     });
+//
+//     if (adid) {
+//       await Purchases.setAdjustID(adid);
+//       adjustIdSet = true;
+//       console.log(`✅ [RevenueCat Attribution] Adjust ID set: ${adid}`);
+//     } else {
+//       console.log(
+//         '⚠️ [RevenueCat Attribution] Adjust ID not available yet (will be set via attribution callback)'
+//       );
+//     }
+//   } catch (error) {
+//     console.error(
+//       '❌ [RevenueCat Attribution] Error setting Adjust ID:',
+//       error
+//     );
+//   }
+// };
 // @feature:adjust:end
 
 /**

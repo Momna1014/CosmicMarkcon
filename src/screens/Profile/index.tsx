@@ -32,8 +32,8 @@ import TermsIcon from '../../assets/icons/profile_icons/terms_conditions.svg';
 import PrivacyIcon from '../../assets/icons/profile_icons/privacy_policy.svg';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const PRIVACY_URL = 'https://whoop.myappsstudio.com/privacy-policy.html';
-const TERMS_URL = 'https://whoop.myappsstudio.com/terms-and-conditions.html';
+const PRIVACY_URL = 'https://milaltechnologies.com/privacy-policy.html';
+const TERMS_URL = 'https://milaltechnologies.com/terms-and-conditions.html';
 
 // Chat Header (same as Chat screen)
 import {ChatHeader} from '../Chat/components';
